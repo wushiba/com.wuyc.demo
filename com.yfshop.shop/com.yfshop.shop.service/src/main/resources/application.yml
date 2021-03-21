@@ -1,0 +1,18 @@
+---
+spring:
+  application:
+    name: yfshop-shop-service
+  main:
+    web-application-type: none
+  profiles:
+    active: @profiles.active@
+
+mybatis:
+  configuration:
+    default-fetch-size: 100
+    default-statement-timeout: 30
+    map-underscore-to-camel-case: true
+  mapper-locations: classpath*:/mapper/**/**/*.xml
+  type-aliases-package: com.jf.front.service
+  type-handlers-package: com.jf.front.service.typehandler
+

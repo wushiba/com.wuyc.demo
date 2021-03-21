@@ -1,0 +1,9 @@
+---
+spring:
+  application:
+    name: yfshop-admin-service
+  main:
+    web-application-type: none
+  profiles:
+    active: @profiles.active@
+

@@ -1,0 +1,256 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.jf.front.service.dao.card.JfUserCardDao" >
+
+    <resultMap id="JfUserCardMap" type="com.yfshop.admin.service.bean.card.JfUserCard" >
+        <id column="id" property="id" jdbcType="INTEGER" />
+        
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+        
+        <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+        
+        <result column="card" property="card" jdbcType="VARCHAR" />
+        
+        <result column="card_key" property="cardKey" jdbcType="VARCHAR" />
+        
+        <result column="merchant_id" property="merchantId" jdbcType="INTEGER" />
+        
+        <result column="channel" property="channel" jdbcType="VARCHAR" />
+        
+        <result column="mobile" property="mobile" jdbcType="VARCHAR" />
+        
+        <result column="source" property="source" jdbcType="VARCHAR" />
+        
+        <result column="item_title" property="itemTitle" jdbcType="VARCHAR" />
+        
+        <result column="item_no" property="itemNo" jdbcType="VARCHAR" />
+        
+        <result column="out_item_no" property="outItemNo" jdbcType="VARCHAR" />
+
+        <result column="face_value" property="faceValue" jdbcType="INTEGER" />
+
+        <result column="expire_time" property="expireTime" jdbcType="TIMESTAMP" />
+        
+        <result column="is_use" property="isUse" jdbcType="CHAR" />
+        
+        <result column="use_time" property="useTime" jdbcType="TIMESTAMP" />
+        
+        <result column="out_order_id" property="outOrderId" jdbcType="VARCHAR" />
+        
+        <result column="score" property="score" jdbcType="INTEGER" />
+        
+        <result column="remark" property="remark" jdbcType="VARCHAR" />
+    </resultMap>
+    
+    <sql id="Base_Column_List" >
+        id,
+        create_time,
+        update_time,
+        card,
+        card_key,
+        merchant_id,
+        channel,
+        mobile,
+        source,
+        item_title,
+        item_no,
+        out_item_no,
+        face_value,
+        expire_time,
+        is_use,
+        use_time,
+        out_order_id,
+        score,
+        remark
+    </sql>
+    
+    <sql id="where">
+        <if test="id!=null">
+        and id = #{id,jdbcType=INTEGER}
+        </if>
+        <if test="createTime!=null and createTime!=''">
+        and create_time = #{createTime,jdbcType=TIMESTAMP}
+        </if>
+        <if test="updateTime!=null and updateTime!=''">
+        and update_time = #{updateTime,jdbcType=TIMESTAMP}
+        </if>
+        <if test="card!=null and card!=''">
+        and card = #{card,jdbcType=VARCHAR}
+        </if>
+        <if test="cardKey!=null and cardKey!=''">
+        and card_key = #{cardKey,jdbcType=VARCHAR}
+        </if>
+        <if test="merchantId!=null">
+        and merchant_id = #{merchantId,jdbcType=INTEGER}
+        </if>
+        <if test="channel!=null and channel!=''">
+        and channel = #{channel,jdbcType=VARCHAR}
+        </if>
+        <if test="mobile!=null and mobile!=''">
+        and mobile = #{mobile,jdbcType=VARCHAR}
+        </if>
+        <if test="source!=null and source!=''">
+        and source = #{source,jdbcType=VARCHAR}
+        </if>
+        <if test="itemTitle!=null and itemTitle!=''">
+        and item_title = #{itemTitle,jdbcType=VARCHAR}
+        </if>
+        <if test="itemNo!=null and itemNo!=''">
+        and item_no = #{itemNo,jdbcType=VARCHAR}
+        </if>
+        <if test="outItemNo!=null and outItemNo!=''">
+        and out_item_no = #{outItemNo,jdbcType=VARCHAR}
+        </if>
+        <if test="faceValue!=null">
+            and face_value = #{faceValue,jdbcType=INTEGER}
+        </if>
+        <if test="expireTime!=null and expireTime!=''">
+        and expire_time = #{expireTime,jdbcType=TIMESTAMP}
+        </if>
+        <if test="isUse!=null and isUse!=''">
+        and is_use = #{isUse,jdbcType=CHAR}
+        </if>
+        <if test="useTime!=null and useTime!=''">
+        and use_time = #{useTime,jdbcType=TIMESTAMP}
+        </if>
+        <if test="outOrderId!=null and outOrderId!=''">
+        and out_order_id = #{outOrderId,jdbcType=VARCHAR}
+        </if>
+        <if test="score!=null">
+        and score = #{score,jdbcType=INTEGER}
+        </if>
+        <if test="remark!=null and remark!=''">
+        and remark = #{remark,jdbcType=VARCHAR}
+        </if>
+    </sql>
+    
+    <select id="getJfUserCardById" resultMap="JfUserCardMap" parameterType="java.lang.Integer" >
+        select 
+        <include refid="Base_Column_List" />
+        from jf_user_card
+        where id = #{id,jdbcType=INTEGER}
+    </select>
+
+
+    <select id="getJfUserCardByCardKey" resultMap="JfUserCardMap" parameterType="java.lang.String" >
+        select
+        <include refid="Base_Column_List" />
+        from jf_user_card
+        where card_key = #{cardKey}
+    </select>
+        
+	<select id="getJfUserCardCount" parameterType="com.yfshop.admin.service.bean.card.JfUserCard" resultType="int">
+        select count(1) from jf_user_card where 1=1 
+        <include refid="where" />
+    </select>
+	
+	<select id="findJfUserCardListByPage" parameterType="com.yfshop.admin.service.bean.card.JfUserCard" resultMap="JfUserCardMap">
+        select * from jf_user_card where 1=1 
+		<include refid="where" />
+		order by id desc
+        limit #{pageStart}, #{pageSize}
+    </select>
+	
+	<select id="getAll" parameterType="com.yfshop.admin.service.bean.card.JfUserCard" resultMap="JfUserCardMap">
+        select * from jf_user_card where 1=1 
+        <include refid="where" />
+		order by id desc
+    </select>
+
+    <insert id="insertJfUserCard" parameterType="com.yfshop.admin.service.bean.card.JfUserCard" useGeneratedKeys="true" keyProperty="id" >
+        insert into jf_user_card (<include refid="Base_Column_List" />)
+        values (
+        #{id,jdbcType=INTEGER},
+        #{createTime,jdbcType=TIMESTAMP},
+        #{updateTime,jdbcType=TIMESTAMP},
+        #{card,jdbcType=VARCHAR},
+        #{cardKey,jdbcType=VARCHAR},
+        #{merchantId,jdbcType=INTEGER},
+        #{channel,jdbcType=VARCHAR},
+        #{mobile,jdbcType=VARCHAR},
+        #{source,jdbcType=VARCHAR},
+        #{itemTitle,jdbcType=VARCHAR},
+        #{itemNo,jdbcType=VARCHAR},
+        #{outItemNo,jdbcType=VARCHAR},
+        #{faceValue,jdbcType=INTEGER},
+        #{expireTime,jdbcType=TIMESTAMP},
+        #{isUse,jdbcType=CHAR},
+        #{useTime,jdbcType=TIMESTAMP},
+        #{outOrderId,jdbcType=VARCHAR},
+        #{score,jdbcType=INTEGER},
+        #{remark,jdbcType=VARCHAR}
+        )
+    </insert>
+    
+    
+    <update id="updateJfUserCard" parameterType="com.yfshop.admin.service.bean.card.JfUserCard" >
+        update jf_user_card
+        <set>
+            <if test="id != null" >
+                id = #{id,jdbcType=INTEGER},
+            </if>
+            <if test="createTime != null" >
+                create_time = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null" >
+                update_time = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="card != null" >
+                card = #{card,jdbcType=VARCHAR},
+            </if>
+            <if test="cardKey != null" >
+                card_key = #{cardKey,jdbcType=VARCHAR},
+            </if>
+            <if test="merchantId != null" >
+                merchant_id = #{merchantId,jdbcType=INTEGER},
+            </if>
+            <if test="channel != null" >
+                channel = #{channel,jdbcType=VARCHAR},
+            </if>
+            <if test="mobile != null" >
+                mobile = #{mobile,jdbcType=VARCHAR},
+            </if>
+            <if test="faceValue != null" >
+                face_value = #{faceValue,jdbcType=INTEGER},
+            </if>
+            <if test="source != null" >
+                source = #{source,jdbcType=VARCHAR},
+            </if>
+            <if test="itemTitle != null" >
+                item_title = #{itemTitle,jdbcType=VARCHAR},
+            </if>
+            <if test="itemNo != null" >
+                item_no = #{itemNo,jdbcType=VARCHAR},
+            </if>
+            <if test="outItemNo != null" >
+                out_item_no = #{outItemNo,jdbcType=VARCHAR},
+            </if>
+            <if test="expireTime != null" >
+                expire_time = #{expireTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="isUse != null" >
+                is_use = #{isUse,jdbcType=CHAR},
+            </if>
+            <if test="useTime != null" >
+                use_time = #{useTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="outOrderId != null" >
+                out_order_id = #{outOrderId,jdbcType=VARCHAR},
+            </if>
+            <if test="score != null" >
+                score = #{score,jdbcType=INTEGER},
+            </if>
+            <if test="remark != null" >
+                remark = #{remark,jdbcType=VARCHAR}
+            </if>
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+
+    <update id="updateUserCardUseStatus" parameterType="com.yfshop.admin.service.bean.card.JfUserCard" >
+        update jf_user_card set
+        update_time = now(), is_use = 'Y', card = #{card}, out_order_id = #{outOrderId}
+        where card_key = #{cardKey} and is_use = 'N'
+    </update>
+
+</mapper>

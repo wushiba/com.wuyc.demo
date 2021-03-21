@@ -1,0 +1,249 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.jf.front.service.dao.item.JfShopItemDao" >
+
+    <resultMap id="JfShopItemMap" type="com.yfshop.admin.service.bean.item.JfShopItem" >
+        <id column="id" property="id" jdbcType="INTEGER" />
+        
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+        
+        <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+        
+        <result column="merchant_id" property="merchantId" jdbcType="INTEGER" />
+        
+        <result column="category_id" property="categoryId" jdbcType="INTEGER" />
+        
+        <result column="channel" property="channel" jdbcType="VARCHAR" />
+        
+        <result column="platform" property="platform" jdbcType="VARCHAR" />
+        
+        <result column="item_title" property="itemTitle" jdbcType="VARCHAR" />
+        
+        <result column="item_no" property="itemNo" jdbcType="VARCHAR" />
+        
+        <result column="out_item_no" property="outItemNo" jdbcType="VARCHAR" />
+        
+        <result column="purchase_value" property="purchaseValue" jdbcType="INTEGER" />
+        
+        <result column="settlement_value" property="settlementValue" jdbcType="INTEGER" />
+
+        <result column="face_value" property="faceValue" jdbcType="INTEGER" />
+        
+        <result column="score" property="score" jdbcType="INTEGER" />
+        
+        <result column="image_url" property="imageUrl" jdbcType="VARCHAR" />
+        
+        <result column="remark" property="remark" jdbcType="VARCHAR" />
+        
+        <result column="is_enable" property="isEnable" jdbcType="CHAR" />
+    </resultMap>
+    
+    <sql id="Base_Column_List" >
+        id,
+        create_time,
+        update_time,
+        merchant_id,
+        category_id,
+        channel,
+        platform,
+        item_title,
+        item_no,
+        out_item_no,
+        purchase_value,
+        settlement_value,
+        face_value,
+        score,
+        image_url,
+        remark,
+        is_enable
+    </sql>
+    
+    <sql id="where">
+        <if test="id!=null">
+        and id = #{id,jdbcType=INTEGER}
+        </if>
+        <if test="createTime!=null and createTime!=''">
+        and create_time = #{createTime,jdbcType=TIMESTAMP}
+        </if>
+        <if test="updateTime!=null and updateTime!=''">
+        and update_time = #{updateTime,jdbcType=TIMESTAMP}
+        </if>
+        <if test="merchantId!=null">
+        and merchant_id = #{merchantId,jdbcType=INTEGER}
+        </if>
+        <if test="categoryId!=null">
+        and category_id = #{categoryId,jdbcType=INTEGER}
+        </if>
+        <if test="channel!=null and channel!=''">
+        and channel = #{channel,jdbcType=VARCHAR}
+        </if>
+        <if test="platform!=null and platform!=''">
+        and platform = #{platform,jdbcType=VARCHAR}
+        </if>
+        <if test="itemTitle!=null and itemTitle!=''">
+        and item_title = #{itemTitle,jdbcType=VARCHAR}
+        </if>
+        <if test="itemNo!=null and itemNo!=''">
+        and item_no = #{itemNo,jdbcType=VARCHAR}
+        </if>
+        <if test="outItemNo!=null and outItemNo!=''">
+        and out_item_no = #{outItemNo,jdbcType=VARCHAR}
+        </if>
+        <if test="purchaseValue!=null">
+        and purchase_value = #{purchaseValue,jdbcType=INTEGER}
+        </if>
+        <if test="settlementValue!=null">
+        and settlement_value = #{settlementValue,jdbcType=INTEGER}
+        </if>
+        <if test="faceValue!=null">
+            and face_value = #{faceValue,jdbcType=INTEGER}
+        </if>
+        <if test="score!=null">
+        and score = #{score,jdbcType=INTEGER}
+        </if>
+        <if test="imageUrl!=null and imageUrl!=''">
+        and image_url = #{imageUrl,jdbcType=VARCHAR}
+        </if>
+        <if test="remark!=null and remark!=''">
+        and remark = #{remark,jdbcType=VARCHAR}
+        </if>
+        <if test="isEnable!=null and isEnable!=''">
+        and is_enable = #{isEnable,jdbcType=CHAR}
+        </if>
+    </sql>
+    
+    <select id="getJfShopItemById" resultMap="JfShopItemMap" parameterType="java.lang.Integer" >
+        select 
+        <include refid="Base_Column_List" />
+        from jf_shop_item
+        where id = #{id,jdbcType=INTEGER}
+    </select>
+
+    <select id="getJfShopItemByItemNo" resultMap="JfShopItemMap" parameterType="java.lang.String" >
+        select
+        <include refid="Base_Column_List" />
+        from jf_shop_item
+        where item_no = #{itemNo}
+    </select>
+
+    <select id="getJfShopItemByOutItemNo" resultMap="JfShopItemMap" parameterType="java.lang.String" >
+        select
+        <include refid="Base_Column_List" />
+        from jf_shop_item
+        where out_item_no = #{outItemNo}
+    </select>
+
+    <select id="getJfShopItemByCategoryId" resultMap="JfShopItemMap" parameterType="java.lang.Integer" >
+        select
+        <include refid="Base_Column_List" />
+        from jf_shop_item
+        where category_id = #{categoryId,jdbcType=INTEGER}
+    </select>
+
+    <select id="getJfShopItemByMerchantId" resultMap="JfShopItemMap" parameterType="java.lang.Integer" >
+        select
+        <include refid="Base_Column_List" />
+        from jf_shop_item
+        where merchant_id = #{merchantId,jdbcType=INTEGER}
+    </select>
+        
+	<select id="getJfShopItemCount" parameterType="com.yfshop.admin.service.bean.item.JfShopItem" resultType="int">
+        select count(1) from jf_shop_item where 1=1 
+        <include refid="where" />
+    </select>
+	
+	<select id="findJfShopItemListByPage" parameterType="com.yfshop.admin.service.bean.item.JfShopItem" resultMap="JfShopItemMap">
+        select * from jf_shop_item where 1=1 
+		<include refid="where" />
+		order by id desc
+        limit #{pageStart}, #{pageSize}
+    </select>
+	
+	<select id="getAll" parameterType="com.yfshop.admin.service.bean.item.JfShopItem" resultMap="JfShopItemMap">
+        select * from jf_shop_item where 1=1 
+        <include refid="where" />
+		order by id desc
+    </select>
+
+    <insert id="insertJfShopItem" parameterType="com.yfshop.admin.service.bean.item.JfShopItem" useGeneratedKeys="true" keyProperty="id" >
+        insert into jf_shop_item (<include refid="Base_Column_List" />)
+        values (
+        #{id,jdbcType=INTEGER},
+        #{createTime,jdbcType=TIMESTAMP},
+        #{updateTime,jdbcType=TIMESTAMP},
+        #{merchantId,jdbcType=INTEGER},
+        #{categoryId,jdbcType=INTEGER},
+        #{channel,jdbcType=VARCHAR},
+        #{platform,jdbcType=VARCHAR},
+        #{itemTitle,jdbcType=VARCHAR},
+        #{itemNo,jdbcType=VARCHAR},
+        #{outItemNo,jdbcType=VARCHAR},
+        #{purchaseValue,jdbcType=INTEGER},
+        #{settlementValue,jdbcType=INTEGER},
+        #{faceValue,jdbcType=INTEGER},
+        #{score,jdbcType=INTEGER},
+        #{imageUrl,jdbcType=VARCHAR},
+        #{remark,jdbcType=VARCHAR},
+        #{isEnable,jdbcType=CHAR}
+        )
+    </insert>
+    
+    <update id="updateJfShopItem" parameterType="com.yfshop.admin.service.bean.item.JfShopItem" >
+        update jf_shop_item
+        <set>
+            <if test="id != null" >
+                id = #{id,jdbcType=INTEGER},
+            </if>
+            <if test="createTime != null" >
+                create_time = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null" >
+                update_time = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="merchantId != null" >
+                merchant_id = #{merchantId,jdbcType=INTEGER},
+            </if>
+            <if test="categoryId != null" >
+                category_id = #{categoryId,jdbcType=INTEGER},
+            </if>
+            <if test="channel != null" >
+                channel = #{channel,jdbcType=VARCHAR},
+            </if>
+            <if test="platform != null" >
+                platform = #{platform,jdbcType=VARCHAR},
+            </if>
+            <if test="itemTitle != null" >
+                item_title = #{itemTitle,jdbcType=VARCHAR},
+            </if>
+            <if test="itemNo != null" >
+                item_no = #{itemNo,jdbcType=VARCHAR},
+            </if>
+            <if test="outItemNo != null" >
+                out_item_no = #{outItemNo,jdbcType=VARCHAR},
+            </if>
+            <if test="purchaseValue != null" >
+                purchase_value = #{purchaseValue,jdbcType=INTEGER},
+            </if>
+            <if test="settlementValue != null" >
+                settlement_value = #{settlementValue,jdbcType=INTEGER},
+            </if>
+            <if test="faceValue != null" >
+                face_value = #{faceValue,jdbcType=INTEGER},
+            </if>
+            <if test="score != null" >
+                score = #{score,jdbcType=INTEGER},
+            </if>
+            <if test="imageUrl != null" >
+                image_url = #{imageUrl,jdbcType=VARCHAR},
+            </if>
+            <if test="remark != null" >
+                remark = #{remark,jdbcType=VARCHAR},
+            </if>
+            <if test="isEnable != null" >
+                is_enable = #{isEnable,jdbcType=CHAR}
+            </if>
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+
+</mapper>

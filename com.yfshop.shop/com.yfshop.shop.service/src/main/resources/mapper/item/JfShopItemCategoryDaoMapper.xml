@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.jf.front.service.dao.item.JfShopItemCategoryDao" >
+
+    <resultMap id="JfShopItemCategoryMap" type="com.yfshop.admin.service.bean.item.JfShopItemCategory" >
+        <id column="id" property="id" jdbcType="INTEGER" />
+        
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+        
+        <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+        
+        <result column="merchant_id" property="merchantId" jdbcType="INTEGER" />
+        
+        <result column="category_name" property="categoryName" jdbcType="VARCHAR" />
+        
+        <result column="login_url" property="loginUrl" jdbcType="VARCHAR" />
+
+        <result column="business_alias" property="businessAlias" jdbcType="VARCHAR" />
+        
+        <result column="remark" property="remark" jdbcType="VARCHAR" />
+        
+        <result column="is_enable" property="isEnable" jdbcType="CHAR" />
+    </resultMap>
+    
+    <sql id="Base_Column_List" >
+        id,
+        create_time,
+        update_time,
+        merchant_id,
+        category_name,
+        login_url,
+        business_alias,
+        remark,
+        is_enable
+    </sql>
+    
+    <sql id="where">
+        <if test="id!=null">
+        and id = #{id,jdbcType=INTEGER}
+        </if>
+        <if test="createTime!=null and createTime!=''">
+        and create_time = #{createTime,jdbcType=TIMESTAMP}
+        </if>
+        <if test="updateTime!=null and updateTime!=''">
+        and update_time = #{updateTime,jdbcType=TIMESTAMP}
+        </if>
+        <if test="merchantId!=null">
+        and merchant_id = #{merchantId,jdbcType=INTEGER}
+        </if>
+        <if test="categoryName!=null and categoryName!=''">
+        and category_name = #{categoryName,jdbcType=VARCHAR}
+        </if>
+        <if test="loginUrl!=null and loginUrl!=''">
+        and login_url = #{loginUrl,jdbcType=VARCHAR}
+        </if>
+        <if test="businessAlias!=null and businessAlias!=''">
+            and business_alias = #{businessAlias,jdbcType=VARCHAR}
+        </if>
+        <if test="remark!=null and remark!=''">
+        and remark = #{remark,jdbcType=VARCHAR}
+        </if>
+        <if test="isEnable!=null and isEnable!=''">
+        and is_enable = #{isEnable,jdbcType=CHAR}
+        </if>
+    </sql>
+    
+    <select id="getJfShopItemCategoryById" resultMap="JfShopItemCategoryMap" parameterType="java.lang.Integer" >
+        select 
+        <include refid="Base_Column_List" />
+        from jf_shop_item_category
+        where id = #{id,jdbcType=INTEGER}
+    </select>
+
+    <select id="getJfShopItemCategoryByMerchantId" resultMap="JfShopItemCategoryMap" parameterType="java.lang.Integer" >
+        select
+        <include refid="Base_Column_List" />
+        from jf_shop_item_category
+        where merchant_id = #{merchantId,jdbcType=INTEGER}
+        order by id desc limit 1
+    </select>
+
+	<select id="getJfShopItemCategoryCount" parameterType="com.yfshop.admin.service.bean.item.JfShopItemCategory" resultType="int">
+        select count(1) from jf_shop_item_category where 1=1 
+        <include refid="where" />
+    </select>
+	
+	<select id="findJfShopItemCategoryListByPage" parameterType="com.yfshop.admin.service.bean.item.JfShopItemCategory" resultMap="JfShopItemCategoryMap">
+        select * from jf_shop_item_category where 1=1 
+		<include refid="where" />
+		order by id desc
+        limit #{pageStart}, #{pageSize}
+    </select>
+	
+	<select id="getAll" parameterType="com.yfshop.admin.service.bean.item.JfShopItemCategory" resultMap="JfShopItemCategoryMap">
+        select * from jf_shop_item_category where 1=1 
+        <include refid="where" />
+		order by id desc
+    </select>
+
+    <insert id="insertJfShopItemCategory" parameterType="com.yfshop.admin.service.bean.item.JfShopItemCategory" useGeneratedKeys="true" keyProperty="id" >
+        insert into jf_shop_item_category (<include refid="Base_Column_List" />)
+        values (
+        #{id,jdbcType=INTEGER},
+        #{createTime,jdbcType=TIMESTAMP},
+        #{updateTime,jdbcType=TIMESTAMP},
+        #{merchantId,jdbcType=INTEGER},
+        #{categoryName,jdbcType=VARCHAR},
+        #{loginUrl,jdbcType=VARCHAR},
+        #{businessAlias,jdbcType=VARCHAR},
+        #{remark,jdbcType=VARCHAR},
+        #{isEnable,jdbcType=CHAR}
+        )
+    </insert>
+    
+    
+    <update id="updateJfShopItemCategory" parameterType="com.yfshop.admin.service.bean.item.JfShopItemCategory" >
+        update jf_shop_item_category
+        <set>
+            <if test="id != null" >
+                id = #{id,jdbcType=INTEGER},
+            </if>
+            <if test="createTime != null" >
+                create_time = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null" >
+                update_time = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="merchantId != null" >
+                merchant_id = #{merchantId,jdbcType=INTEGER},
+            </if>
+            <if test="categoryName != null" >
+                category_name = #{categoryName,jdbcType=VARCHAR},
+            </if>
+            <if test="loginUrl != null" >
+                login_url = #{loginUrl,jdbcType=VARCHAR},
+            </if>
+            <if test="businessAlias != null" >
+                business_alias = #{businessAlias,jdbcType=VARCHAR},
+            </if>
+            <if test="remark != null" >
+                remark = #{remark,jdbcType=VARCHAR},
+            </if>
+            <if test="isEnable != null" >
+                is_enable = #{isEnable,jdbcType=CHAR}
+            </if>
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+
+</mapper>

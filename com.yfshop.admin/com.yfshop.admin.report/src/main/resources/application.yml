@@ -1,0 +1,10 @@
+---
+spring:
+  application:
+    name: yfshop-admin-report
+  main:
+    web-application-type: none
+  profiles:
+    active: @profiles.active@
+
+

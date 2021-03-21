@@ -1,0 +1,19 @@
+---
+server:
+  port: 9094
+dubbo:
+  registry:
+    address: zookeeper://10.10.3.31:2181
+    dynamic: true
+  metadataReport:
+    address: zookeeper://10.10.3.31:2181
+  configcenter:
+    address: zookeeper://10.10.3.31:2181
+  application:
+    name: yfshop-admin-web
+  consumer:
+    timeout: 30000
+    retries: 0
+    check: false
+  scan:
+    base-packages: com.yfshop.admin.controller

@@ -1,0 +1,46 @@
+# 使用说明 V3.8.0
+# 1. 使用docker-compose  宿主机不需要配置host来发现
+# 2. 无需修改源码，根目录  docker-compose up 即可
+# 3. 静静等待服务启动
+
+version: '2'
+services:
+
+  jf-base-service:
+    build:
+      context: ./com.jf.base.service
+    restart: always
+    container_name: jf-base-service
+    image: jf-base-service
+
+  jf-front-service:
+    build:
+      context: ./com.jf.front.service
+    restart: always
+    image: jf-front-service
+    container_name: jf-front-service
+
+  jf-service:
+    build:
+      context: ./com.jf.service
+    restart: always
+    image: jf-service
+    container_name: jf-service
+
+  jf-front-web:
+    build:
+      context: ./com.jf.front.web
+    restart: always
+    image: jf-front-web
+    container_name: jf-front-web
+    ports:
+      - 9092:9092
+
+  jf-web:
+    build:
+      context: ./com.jf.web
+    restart: always
+    image: jf-web
+    container_name: jf-web
+    ports:
+      - 9091:9091

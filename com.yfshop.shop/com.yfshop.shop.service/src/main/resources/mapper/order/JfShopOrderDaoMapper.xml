@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.jf.front.service.dao.order.JfShopOrderDao" >
+
+    <resultMap id="JfShopOrderMap" type="com.yfshop.admin.service.bean.order.JfShopOrder" >
+        <id column="id" property="id" jdbcType="INTEGER" />
+        
+        
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+        
+        <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+
+        <result column="merchant_id" property="merchantId" jdbcType="INTEGER" />
+        
+        <result column="platform" property="platform" jdbcType="VARCHAR" />
+        
+        <result column="out_order_id" property="outOrderId" jdbcType="VARCHAR" />
+        
+        <result column="order_time" property="orderTime" jdbcType="TIMESTAMP" />
+        
+        <result column="out_token_id" property="outTokenId" jdbcType="VARCHAR" />
+        
+        <result column="mobile" property="mobile" jdbcType="VARCHAR" />
+        
+        <result column="mobile_province" property="mobileProvince" jdbcType="VARCHAR" />
+        
+        <result column="mobile_city" property="mobileCity" jdbcType="VARCHAR" />
+        
+        <result column="use_status" property="useStatus" jdbcType="VARCHAR" />
+        
+        <result column="is_notify" property="isNotify" jdbcType="CHAR" />
+        
+        <result column="sign" property="sign" jdbcType="VARCHAR" />
+        
+        <result column="request_ip" property="requestIp" jdbcType="VARCHAR" />
+        
+        <result column="field_msg" property="fieldMsg" jdbcType="VARCHAR" />
+    </resultMap>
+    
+    <sql id="Base_Column_List" >
+        id,
+        create_time,
+        update_time,
+        merchant_id,
+        platform,
+        out_order_id,
+        order_time,
+        out_token_id,
+        mobile,
+        mobile_province,
+        mobile_city,
+        use_status,
+        is_notify,
+        sign,
+        request_ip,
+        field_msg
+    </sql>
+    
+    <sql id="where">
+        <if test="id!=null">
+        and id = #{id,jdbcType=INTEGER}
+        </if>
+        <if test="createTime!=null and createTime!=''">
+        and create_time = #{createTime,jdbcType=TIMESTAMP}
+        </if>
+        <if test="updateTime!=null and updateTime!=''">
+        and update_time = #{updateTime,jdbcType=TIMESTAMP}
+        </if>
+        <if test="merchantId!=null">
+            and merchant_id = #{merchantId,jdbcType=INTEGER}
+        </if>
+        <if test="platform!=null and platform!=''">
+        and platform = #{platform,jdbcType=VARCHAR}
+        </if>
+        <if test="outOrderId!=null and outOrderId!=''">
+        and out_order_id = #{outOrderId,jdbcType=VARCHAR}
+        </if>
+        <if test="orderTime!=null and orderTime!=''">
+        and order_time = #{orderTime,jdbcType=TIMESTAMP}
+        </if>
+        <if test="outTokenId!=null and outTokenId!=''">
+        and out_token_id = #{outTokenId,jdbcType=VARCHAR}
+        </if>
+        <if test="mobile!=null and mobile!=''">
+        and mobile = #{mobile,jdbcType=VARCHAR}
+        </if>
+        <if test="mobileProvince!=null and mobileProvince!=''">
+        and mobile_province = #{mobileProvince,jdbcType=VARCHAR}
+        </if>
+        <if test="mobileCity!=null and mobileCity!=''">
+        and mobile_city = #{mobileCity,jdbcType=VARCHAR}
+        </if>
+        <if test="useStatus!=null and useStatus!=''">
+        and use_status = #{useStatus,jdbcType=VARCHAR}
+        </if>
+        <if test="isNotify!=null and isNotify!=''">
+        and is_notify = #{isNotify,jdbcType=CHAR}
+        </if>
+        <if test="sign!=null and sign!=''">
+        and sign = #{sign,jdbcType=VARCHAR}
+        </if>
+        <if test="requestIp!=null and requestIp!=''">
+        and request_ip = #{requestIp,jdbcType=VARCHAR}
+        </if>
+        <if test="fieldMsg!=null and fieldMsg!=''">
+        and field_msg = #{fieldMsg,jdbcType=VARCHAR}
+        </if>
+    </sql>
+    
+    <select id="getJfShopOrderById" resultMap="JfShopOrderMap" parameterType="java.lang.Integer" >
+        select 
+        <include refid="Base_Column_List" />
+        from jf_shop_order
+        where id = #{id,jdbcType=INTEGER}
+    </select>
+
+    <select id="getShopOrderByOutOrderId" resultMap="JfShopOrderMap" parameterType="java.lang.String" >
+        select
+        <include refid="Base_Column_List" />
+        from jf_shop_order
+        where out_order_id = #{outOrderId}
+    </select>
+
+	<select id="getJfShopOrderCount" parameterType="com.yfshop.admin.service.bean.order.JfShopOrder" resultType="int">
+        select count(1) from jf_shop_order where 1=1 
+        <include refid="where" />
+    </select>
+	
+	<select id="findJfShopOrderListByPage" parameterType="com.yfshop.admin.service.bean.order.JfShopOrder" resultMap="JfShopOrderMap">
+        select * from jf_shop_order where 1=1 
+		<include refid="where" />
+		order by id desc
+        limit #{pageStart}, #{pageSize}
+    </select>
+	
+	<select id="getAll" parameterType="com.yfshop.admin.service.bean.order.JfShopOrder" resultMap="JfShopOrderMap">
+        select * from jf_shop_order where 1=1 
+        <include refid="where" />
+		order by id desc
+    </select>
+    
+  
+    <insert id="insertJfShopOrder" parameterType="com.yfshop.admin.service.bean.order.JfShopOrder" useGeneratedKeys="true" keyProperty="id" >
+        insert into jf_shop_order (<include refid="Base_Column_List" />)
+        values (
+        #{id,jdbcType=INTEGER},
+        #{createTime,jdbcType=TIMESTAMP},
+        #{updateTime,jdbcType=TIMESTAMP},
+        #{merchantId,jdbcType=INTEGER},
+        #{platform,jdbcType=VARCHAR},
+        #{outOrderId,jdbcType=VARCHAR},
+        #{orderTime,jdbcType=TIMESTAMP},
+        #{outTokenId,jdbcType=VARCHAR},
+        #{mobile,jdbcType=VARCHAR},
+        #{mobileProvince,jdbcType=VARCHAR},
+        #{mobileCity,jdbcType=VARCHAR},
+        #{useStatus,jdbcType=VARCHAR},
+        #{isNotify,jdbcType=CHAR},
+        #{sign,jdbcType=VARCHAR},
+        #{requestIp,jdbcType=VARCHAR},
+        #{fieldMsg,jdbcType=VARCHAR}
+        )
+    </insert>
+    
+    
+    <update id="updateJfShopOrder" parameterType="com.yfshop.admin.service.bean.order.JfShopOrder" >
+        update jf_shop_order
+        <set>
+            <if test="id != null" >
+                id = #{id,jdbcType=INTEGER},
+            </if>
+            <if test="createTime != null" >
+                create_time = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null" >
+                update_time = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="merchantId != null" >
+                merchant_id = #{merchantId,jdbcType=INTEGER},
+            </if>
+            <if test="platform != null" >
+                platform = #{platform,jdbcType=VARCHAR},
+            </if>
+            <if test="outOrderId != null" >
+                out_order_id = #{outOrderId,jdbcType=VARCHAR},
+            </if>
+            <if test="orderTime != null" >
+                order_time = #{orderTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="outTokenId != null" >
+                out_token_id = #{outTokenId,jdbcType=VARCHAR},
+            </if>
+            <if test="mobile != null" >
+                mobile = #{mobile,jdbcType=VARCHAR},
+            </if>
+            <if test="mobileProvince != null" >
+                mobile_province = #{mobileProvince,jdbcType=VARCHAR},
+            </if>
+            <if test="mobileCity != null" >
+                mobile_city = #{mobileCity,jdbcType=VARCHAR},
+            </if>
+            <if test="useStatus != null" >
+                use_status = #{useStatus,jdbcType=VARCHAR},
+            </if>
+            <if test="isNotify != null" >
+                is_notify = #{isNotify,jdbcType=CHAR},
+            </if>
+            <if test="sign != null" >
+                sign = #{sign,jdbcType=VARCHAR},
+            </if>
+            <if test="requestIp != null" >
+                request_ip = #{requestIp,jdbcType=VARCHAR},
+            </if>
+            <if test="fieldMsg != null" >
+                field_msg = #{fieldMsg,jdbcType=VARCHAR}
+            </if>
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+
+    <update id="updateNotifyStatus">
+        update jf_shop_order set is_notify = 'Y'
+        where id = #{id} and is_notify = 'N'
+    </update>
+
+</mapper>
