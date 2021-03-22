@@ -50,6 +50,16 @@
             <artifactId>easypoi-annotation</artifactId>
         </dependency>
         <!--easypoi end-->
+
+        <dependency>
+            <groupId>com.yfshop.parent</groupId>
+            <artifactId>com.yfshop.common</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.baomidou</groupId>
+            <artifactId>mybatis-plus-extension</artifactId>
+            <version>${mybatis-plus.version}</version>
+        </dependency>
     </dependencies>
 
 
