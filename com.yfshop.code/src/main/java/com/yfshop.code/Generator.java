@@ -22,20 +22,19 @@ import java.util.Map;
  */
 public class Generator {
     //生成文件所在项目路径
-    private static String baseProjectPath = System.getProperty("user.dir").concat("/").concat("com.yfshop.codegen");
+    private static String baseProjectPath = System.getProperty("user.dir").concat("/").concat("com.yfshop.code");
 
     //基本包名
     private static String basePackage="com.yfshop.code";
     //作者
     private static String authorName="yoush";
     //要生成的表名
-    private static String[] tables= {"cms_help","cms_help_category","cms_member_report","cms_prefrence_area","cms_prefrence_area_product_relation","cms_subject","cms_subject_category","cms_subject_comment","cms_subject_product_relation","cms_topic","cms_topic_category","cms_topic_comment","oms_cart_item","oms_company_address","oms_order","oms_order_item","oms_order_operate_history","oms_order_return_apply","oms_order_return_reason","oms_order_setting","pms_album","pms_album_pic","pms_brand","pms_comment","pms_comment_replay","pms_feight_template","pms_member_price","pms_product","pms_product_attribute","pms_product_attribute_category","pms_product_attribute_value","pms_product_category","pms_product_category_attribute_relation","pms_product_full_reduction","pms_product_ladder","pms_product_operate_log","pms_product_vertify_record","pms_sku_stock","sms_coupon","sms_coupon_history","sms_coupon_product_category_relation","sms_coupon_product_relation","sms_flash_promotion","sms_flash_promotion_log","sms_flash_promotion_product_relation","sms_flash_promotion_session","sms_home_advertise","sms_home_brand","sms_home_new_product","sms_home_recommend_product","sms_home_recommend_subject","ums_admin","ums_admin_login_log","ums_admin_permission_relation","ums_admin_role_relation","ums_growth_change_history","ums_integration_change_history","ums_integration_consume_setting","ums_member","ums_member_level","ums_member_login_log","ums_member_member_tag_relation","ums_member_product_category_relation","ums_member_receive_address","ums_member_rule_setting","ums_member_statistics_info","ums_member_tag","ums_member_task","ums_menu","ums_permission","ums_resource","ums_resource_category","ums_role","ums_role_menu_relation","ums_role_permission_relation","ums_role_resource_relation"};
-    //table前缀
-    private static String prefix="";
+    private static String[] tables= {"yf_act_code_batch","yf_act_code_batch_detail","yf_act_code_batch_record","yf_banner","yf_coupon","yf_item","yf_item_category","yf_item_content","yf_item_image","yf_item_sku","yf_item_spec_name","yf_item_spec_value","yf_menu","yf_merchant","yf_merchant_detail","yf_order","yf_order_address","yf_order_detail","yf_permission","yf_region","yf_rl_role_permission","yf_role","yf_source_factory","yf_user","yf_user_address","yf_user_cart","yf_user_coupon","yf_website_code","yf_website_code_detail","yf_website_type"};
+    private static String prefix="yf_";
 
     //数据库配置四要素
     private static String driverName = "com.mysql.cj.jdbc.Driver";
-    private static String url = "jdbc:mysql://127.0.0.1:3306/glasses_mall?useUnicode=true&characterEncoding=UTF-8&zeroDateTimeBehavior=convertToNull&serverTimezone=UTC";
+    private static String url = "jdbc:mysql://127.0.0.1:3306/yfshop?useUnicode=true&characterEncoding=UTF-8&zeroDateTimeBehavior=convertToNull&serverTimezone=UTC";
     private static String username = "root";
     private static String password = "root";
 

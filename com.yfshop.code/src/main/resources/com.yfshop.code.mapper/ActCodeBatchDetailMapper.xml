@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yfshop.code.mapper.ActCodeBatchDetailMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.yfshop.code.model.ActCodeBatchDetail">
+        <id column="id" property="id" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+        <result column="act_code" property="actCode" />
+        <result column="cipher_code" property="cipherCode" />
+        <result column="trace_no" property="traceNo" />
+        <result column="act_id" property="actId" />
+        <result column="batch_id" property="batchId" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, create_time, update_time, act_code, cipher_code, trace_no, act_id, batch_id
+    </sql>
+
+</mapper>

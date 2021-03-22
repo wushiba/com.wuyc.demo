@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yfshop.code.mapper.ItemMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.yfshop.code.model.Item">
+        <id column="id" property="id" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+        <result column="category_id" property="categoryId" />
+        <result column="receive_way" property="receiveWay" />
+        <result column="item_title" property="itemTitle" />
+        <result column="item_sub_title" property="itemSubTitle" />
+        <result column="item_price" property="itemPrice" />
+        <result column="item_market_price" property="itemMarketPrice" />
+        <result column="freight" property="freight" />
+        <result column="item_stock" property="itemStock" />
+        <result column="item_cover" property="itemCover" />
+        <result column="is_enable" property="isEnable" />
+        <result column="is_delete" property="isDelete" />
+        <result column="spec_num" property="specNum" />
+        <result column="sort" property="sort" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, create_time, update_time, category_id, receive_way, item_title, item_sub_title, item_price, item_market_price, freight, item_stock, item_cover, is_enable, is_delete, spec_num, sort
+    </sql>
+
+</mapper>

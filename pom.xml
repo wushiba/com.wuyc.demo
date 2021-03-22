@@ -50,6 +50,7 @@
         <easypoi.version>3.2.0</easypoi.version>
         <logstash-logback.version>5.3</logstash-logback.version>
         <weixin-java-mp.version>4.0.0</weixin-java-mp.version>
+        <weixin-java-pay.version>4.0.0</weixin-java-pay.version>
         <docker.registry>172.17.0.111</docker.registry>
         <docker.host>http://172.17.0.111:2375</docker.host>
         <docker.namespace>library</docker.namespace>
@@ -399,6 +400,13 @@
                 <artifactId>weixin-java-mp</artifactId>
                 <version>${weixin-java-mp.version}</version>
             </dependency>
+
+            <dependency>
+                <groupId>com.github.binarywang</groupId>
+                <artifactId>weixin-java-pay</artifactId>
+                <version>${weixin-java-pay.version}</version>
+            </dependency>
+
         </dependencies>
 
     </dependencyManagement>

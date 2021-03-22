@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yfshop.code.mapper.UserCouponMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.yfshop.code.model.UserCoupon">
+        <id column="id" property="id" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+        <result column="user_id" property="userId" />
+        <result column="merchant_id" property="merchantId" />
+        <result column="pid_path" property="pidPath" />
+        <result column="coupon_id" property="couponId" />
+        <result column="coupon_title" property="couponTitle" />
+        <result column="coupon_resource" property="couponResource" />
+        <result column="coupon_price" property="couponPrice" />
+        <result column="use_condition_price" property="useConditionPrice" />
+        <result column="use_range_type" property="useRangeType" />
+        <result column="can_use_item_ids" property="canUseItemIds" />
+        <result column="valid_start_time" property="validStartTime" />
+        <result column="valid_end_time" property="validEndTime" />
+        <result column="nickname" property="nickname" />
+        <result column="mobile" property="mobile" />
+        <result column="use_status" property="useStatus" />
+        <result column="coupon_desc" property="couponDesc" />
+        <result column="use_time" property="useTime" />
+        <result column="order_id" property="orderId" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, create_time, update_time, user_id, merchant_id, pid_path, coupon_id, coupon_title, coupon_resource, coupon_price, use_condition_price, use_range_type, can_use_item_ids, valid_start_time, valid_end_time, nickname, mobile, use_status, coupon_desc, use_time, order_id
+    </sql>
+
+</mapper>
