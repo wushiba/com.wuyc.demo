@@ -15,9 +15,9 @@ import javax.servlet.MultipartConfigElement;
 
 @ServletComponentScan
 @SpringBootApplication
-public class AdminWebApplication {
+public class AdminWxApplication {
     public static void main(String[] args) {
-        ConfigurableApplicationContext applicationContext = SpringApplication.run(AdminWebApplication.class, args);
+        ConfigurableApplicationContext applicationContext = SpringApplication.run(AdminWxApplication.class, args);
         String property = applicationContext.getEnvironment().getProperty("spring.profiles.active");
         System.out.println("==============启动了===com.jf.front.web====================环境===" + property);
     }
