@@ -11,7 +11,7 @@ public class ShopServiceApplication {
 	public static void main(String[] args) {
 		ConfigurableApplicationContext applicationContext = SpringApplication.run(ShopServiceApplication.class, args);
 		String property = applicationContext.getEnvironment().getProperty("spring.profiles.active");
-		System.out.println("==============启动了=====com.jf.front.service==================环境===" + property);
+		System.out.println("==============启动了=====com.yfshop.shop.service==================环境===" + property);
 	}
 }
 
