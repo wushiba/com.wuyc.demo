@@ -1,4 +1,4 @@
-package com.yfshop.admin.config;
+package com.yfshop.shop.config;
 
 import cn.dev33.satoken.interceptor.SaAnnotationInterceptor;
 import cn.hutool.core.date.DateUtil;

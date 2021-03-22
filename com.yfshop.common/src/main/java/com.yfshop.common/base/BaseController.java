@@ -1,5 +1,6 @@
 package com.yfshop.common.base;
 
+import cn.dev33.satoken.session.SaSession;
 import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.extra.servlet.ServletUtil;
 import com.yfshop.common.api.ResultCode;
@@ -113,4 +114,12 @@ public interface BaseController {
         return getCurrentRequest().getSession();
     }
 
+    /**
+     * 获取当前登录账号的会话
+     *
+     * @return the sa session
+     */
+    default SaSession getCurrentSaSession() {
+        return StpUtil.getSessionByLoginId(getCurrentAdminUserId(), false);
+    }
 }

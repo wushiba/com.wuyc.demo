@@ -1,5 +1,9 @@
 package com.yfshop.common.exception;
 
+import cn.dev33.satoken.exception.NotLoginException;
+import cn.dev33.satoken.exception.NotPermissionException;
+import cn.dev33.satoken.exception.NotRoleException;
+import cn.dev33.satoken.exception.SaTokenException;
 import com.alibaba.fastjson.JSON;
 import com.yfshop.common.api.CommonResult;
 import com.yfshop.common.api.ErrorCode;
@@ -247,6 +251,48 @@ public class CustomGlobalExceptionResolver implements HandlerExceptionResolver, 
         if ("org.apache.dubbo.rpc.RpcException".equals(t.getClass().getName())) {
             codeAndMessage.setCode(ERROR_CODE);
             codeAndMessage.setMessage("服务调用失败");
+            return codeAndMessage;
+        }
+        // 登陆权限验证异常
+        if (t instanceof SaTokenException) {
+            String message;
+            if (t instanceof NotLoginException) {
+                // 如果是未登录异常
+                NotLoginException notLoginException = (NotLoginException) t;
+                switch (notLoginException.getType()) {
+                    case NotLoginException.NOT_TOKEN:
+                        message = "未提供token";
+                        break;
+                    case NotLoginException.INVALID_TOKEN:
+                        message = "token无效";
+                        break;
+                    case NotLoginException.TOKEN_TIMEOUT:
+                        message = "token已过期";
+                        break;
+                    case NotLoginException.BE_REPLACED:
+                        message = "token已被顶下线";
+                        break;
+                    case NotLoginException.KICK_OUT:
+                        message = "token已被踢下线";
+                        break;
+                    default:
+                        message = "当前会话未登录";
+                        break;
+                }
+            } else if (t instanceof NotRoleException) {
+                // 如果是角色异常
+                NotRoleException notRoleException = (NotRoleException) t;
+                message = "无此角色：" + notRoleException.getRole();
+            } else if (t instanceof NotPermissionException) {
+                // 如果是权限异常
+                NotPermissionException notPermissionException = (NotPermissionException) t;
+                message = "无此权限：" + notPermissionException.getCode();
+            } else {
+                SaTokenException saTokenException = (SaTokenException) t;
+                message = saTokenException.getMessage();
+            }
+            codeAndMessage.setCode(ERROR_CODE);
+            codeAndMessage.setMessage(message);
             return codeAndMessage;
         }
         if (t instanceof RuntimeException) {
