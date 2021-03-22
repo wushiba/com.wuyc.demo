@@ -30,7 +30,7 @@ public class AdminServiceApplication {
     public static void main(String[] args) {
         ConfigurableApplicationContext applicationContext = SpringApplication.run(AdminServiceApplication.class, args);
         String property = applicationContext.getEnvironment().getProperty("spring.profiles.active");
-        System.out.println("==============启动了=====server==================环境==" + property);
+        System.out.println("==============启动了=====com.yfshop.admin==================环境==" + property);
     }
 
     @Role(BeanDefinition.ROLE_INFRASTRUCTURE)

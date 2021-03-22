@@ -19,7 +19,7 @@ public class AdminWxApplication {
     public static void main(String[] args) {
         ConfigurableApplicationContext applicationContext = SpringApplication.run(AdminWxApplication.class, args);
         String property = applicationContext.getEnvironment().getProperty("spring.profiles.active");
-        System.out.println("==============启动了===com.jf.front.web====================环境===" + property);
+        System.out.println("==============启动了===com.yfshop.admin.wx====================环境===" + property);
     }
 
 }

@@ -11,7 +11,7 @@ public class AdminReportApplication {
     public static void main(String[] args) {
         ConfigurableApplicationContext applicationContext = SpringApplication.run(AdminReportApplication.class, args);
         String property = applicationContext.getEnvironment().getProperty("spring.profiles.active");
-        System.out.println("==============启动了=====server==================环境==" + property);
+        System.out.println("==============启动了=====com.yfshop.admin.merchant==================环境==" + property);
     }
 }
 
