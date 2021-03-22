@@ -1,7 +1,7 @@
 package com.yfshop.common.validate;
 
 import com.yfshop.common.validate.annotation.CheckEnum;
-import com.yfshop.common.validate.annotation.MustInCandidateValue;
+import com.yfshop.common.validate.annotation.CandidateValue;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
@@ -47,7 +47,7 @@ class Demo {
         private Integer merchantPackageId;
 
         @NotEmpty(message = "是否上架不能为空不能为空")
-        @MustInCandidateValue(candidateValue = {"Y", "N"}, message = "是否上架的取值只能是Y|N")
+        @CandidateValue(candidateValue = {"Y", "N"}, message = "是否上架的取值只能是Y|N")
         private String isEnable;
 
         public String getPackageType() {

@@ -1,6 +1,6 @@
 package com.yfshop.common.validate.annotation;
 
-import com.yfshop.common.validate.validator.MustInCandidateValueValidator;
+import com.yfshop.common.validate.validator.CandidateValueValidator;
 
 import javax.validation.Constraint;
 import javax.validation.Payload;
@@ -27,8 +27,8 @@ import static java.lang.annotation.ElementType.PARAMETER;
 @Target({FIELD, PARAMETER, ANNOTATION_TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 @ReportAsSingleViolation
-@Constraint(validatedBy = {MustInCandidateValueValidator.class})
-public @interface MustInCandidateValue {
+@Constraint(validatedBy = {CandidateValueValidator.class})
+public @interface CandidateValue {
 
     String message() default "invalid value.";
 
@@ -47,6 +47,6 @@ public @interface MustInCandidateValue {
     @Retention(RetentionPolicy.RUNTIME)
     @Documented
     @interface List {
-        MustInCandidateValue[] value();
+        CandidateValue[] value();
     }
 }
