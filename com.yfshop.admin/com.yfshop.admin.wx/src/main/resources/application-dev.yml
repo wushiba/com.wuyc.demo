@@ -32,3 +32,20 @@ spring:
         port: 6379
         timeout: 1000
 
+logging:
+  level:
+    org.springframework.web: INFO
+    com.yfshop.admin: DEBUG
+    me.chanjar.weixin: DEBUG
+wx:
+  mp:
+    useRedis: true
+    redisConfig:
+      host: 127.0.0.1
+      port: 6379
+    configs:
+      - appId: 1111 # 第一个公众号的appid
+        secret: 1111 # 公众号的appsecret
+        token: 111 # 接口配置里的Token值
+        aesKey: 111 # 接口配置里的EncodingAESKey值
+

@@ -10,10 +10,21 @@ dubbo:
   configcenter:
     address: zookeeper://10.10.3.35:2181
   application:
-    name: yfshop-admin-web
+    name: yfshop-admin-wx
   consumer:
     timeout: 30000
     retries: 0
     check: false
   scan:
-    base-packages: com.yfshop.admin.controlle
+    base-packages: com.yfshop.admin.controller
+wx:
+  mp:
+    useRedis: true
+    redisConfig:
+      host: 127.0.0.1
+      port: 6379
+    configs:
+      - appId: 1111 # 第一个公众号的appid
+        secret: 1111 # 公众号的appsecret
+        token: 111 # 接口配置里的Token值
+        aesKey: 111 # 接口配置里的EncodingAESKey值

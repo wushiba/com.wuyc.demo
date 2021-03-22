@@ -1,7 +1,7 @@
 ---
 spring:
   application:
-    name: yfshop-admin-web
+    name: yfshop-admin-wx
   profiles:
     active: @profiles.active@
   jackson:
