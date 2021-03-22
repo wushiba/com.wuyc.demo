@@ -71,7 +71,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
             public Date convert(@Nullable String dateString) {
                 if (StringUtils.isBlank(dateString)) {
                     return null;
-                } else if (NumberUtils.isParsable(dateString)) {
+                } else if (NumberUtils.isParsable(dateString) && dateString.length() == 13) {
                     // 时间戳
                     return new Date(Long.parseLong(dateString));
                 } else {
