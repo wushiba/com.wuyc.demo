@@ -1,5 +1,7 @@
 package com.yfshop.admin.config;
 
+import cn.dev33.satoken.interceptor.SaAnnotationInterceptor;
+import cn.dev33.satoken.interceptor.SaRouteInterceptor;
 import cn.hutool.core.date.DateUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -48,6 +50,10 @@ public class WebMvcConfig implements WebMvcConfigurer {
      */
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
+        new SaRouteInterceptor();
+        registry.addInterceptor(new SaAnnotationInterceptor())
+                .addPathPatterns("/**")
+                .excludePathPatterns("");
     }
 
     /**
