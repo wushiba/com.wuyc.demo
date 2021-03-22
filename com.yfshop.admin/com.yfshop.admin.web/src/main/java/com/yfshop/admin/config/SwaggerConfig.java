@@ -35,8 +35,8 @@ public class SwaggerConfig {
 
     private ApiInfo apiInfo() {
         return new ApiInfoBuilder()
-                .title("羽凡admin端文档")
-                .description("羽凡admin端文档api文档")
+                .title("雨帆admin端文档")
+                .description("雨帆admin端文档api文档")
                 .version("1.0")
                 .build();
     }
