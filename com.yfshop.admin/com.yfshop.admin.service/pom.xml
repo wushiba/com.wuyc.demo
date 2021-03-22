@@ -14,6 +14,10 @@
     <description>后台管理业务模块</description>
 
     <dependencies>
+        <dependency>
+            <groupId>com.yfshop.parent</groupId>
+            <artifactId>com.yfshop.common</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>org.apache.commons</groupId>
