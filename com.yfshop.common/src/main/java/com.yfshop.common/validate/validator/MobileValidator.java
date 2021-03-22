@@ -27,7 +27,7 @@ public class MobileValidator implements ConstraintValidator<Mobile, String> {
 
     private static final Pattern STRICT_PATTERN = Pattern.compile(STRICT_REGEX_MOBILE);
 
-    private boolean isStrict = true;
+    private boolean isStrict;
 
     @Override
     public void initialize(Mobile annotation) {
