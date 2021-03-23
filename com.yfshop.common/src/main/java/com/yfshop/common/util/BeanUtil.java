@@ -10,6 +10,9 @@ import java.util.List;
 public class BeanUtil {
 
     public static <T> T convert(Object source, Class<T> clazz) {
+        if (source == null) {
+            return null;
+        }
         T instantiate = BeanUtils.instantiateClass(clazz);
         copyProperties(source, instantiate);
         return instantiate;
