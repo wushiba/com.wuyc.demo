@@ -1,14 +1,16 @@
 package com.yfshop.admin.controller;
 
-import cn.dev33.satoken.annotation.SaCheckLogin;
-import cn.dev33.satoken.annotation.SaCheckPermission;
+import cn.dev33.satoken.stp.StpUtil;
 import com.sun.org.slf4j.internal.Logger;
 import com.sun.org.slf4j.internal.LoggerFactory;
-import com.yfshop.admin.api.mall.request.CreateItemCategoryReq;
+import com.yfshop.admin.api.enums.CaptchaSourceEnum;
+import com.yfshop.admin.api.service.CaptchaService;
+import com.yfshop.admin.api.service.merchant.MerchantLoginService;
+import com.yfshop.admin.api.service.merchant.result.MerchantResult;
 import com.yfshop.common.api.CommonResult;
 import com.yfshop.common.base.BaseController;
 import com.yfshop.common.validate.annotation.Mobile;
-import org.hibernate.validator.constraints.Length;
+import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -23,21 +25,50 @@ import javax.validation.constraints.NotNull;
 class MerchantLoginController implements BaseController {
     private static final Logger logger = LoggerFactory.getLogger(MerchantLoginController.class);
 
+    @DubboReference(check = false)
+    private MerchantLoginService merchantLoginService;
+    @DubboReference(check = false)
+    private CaptchaService captchaService;
 
+    /**
+     * 密码登录
+     *
+     * @param mobile
+     * @param pwd
+     * @return
+     */
     @RequestMapping(value = "/loginByPwd", method = {RequestMethod.POST})
-    @ResponseBody
-    @SaCheckLogin
-    @SaCheckPermission
-    public CommonResult<Void> loginByPwd(@Mobile(message = "手机号不正确") String mobile, @NotNull(message = "密码不能为空") String pwd) {
-        return CommonResult.failed();
+    public CommonResult<MerchantResult> loginByPwd(@Mobile(message = "手机号不正确") String mobile, @NotNull(message = "密码不能为空") String pwd) {
+        MerchantResult merchantResult = merchantLoginService.loginByPwd(mobile, pwd);
+        StpUtil.setLoginId(merchantResult.getId());
+        return CommonResult.success(merchantResult);
     }
 
-    @RequestMapping(value = "/loginByCode", method = {RequestMethod.POST})
+    /**
+     * 验证码登录
+     *
+     * @param mobile
+     * @return
+     */
+    @RequestMapping(value = "/loginByCaptcha", method = {RequestMethod.POST})
     @ResponseBody
-    @SaCheckLogin
-    @SaCheckPermission
-    public CommonResult<Void> loginByCode(@Mobile(message = "手机号不正确") String mobile, @NotNull(message = "验证码不能为空") String code) {
-        return CommonResult.failed();
+    public CommonResult<MerchantResult> loginByCaptcha(@Mobile(message = "手机号不正确") String mobile, @NotNull(message = "验证码不能为空") String captcha) {
+        MerchantResult merchantResult = merchantLoginService.loginByCaptcha(mobile, captcha);
+        StpUtil.setLoginId(merchantResult.getId());
+        return CommonResult.success(merchantResult);
+    }
+
+
+    /**
+     * 验证码发送
+     *
+     * @param mobile
+     * @return
+     */
+    @RequestMapping(value = "/sendCaptcha", method = {RequestMethod.POST})
+    @ResponseBody
+    public CommonResult<Void> sendCaptcha(@Mobile(message = "手机号不正确") String mobile) {
+        return CommonResult.success(captchaService.sendCaptcha(mobile, CaptchaSourceEnum.LOGIN_CAPTCHA));
     }
 
 }
