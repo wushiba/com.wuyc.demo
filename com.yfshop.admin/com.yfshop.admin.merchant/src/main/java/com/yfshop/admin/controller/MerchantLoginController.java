@@ -1,8 +1,6 @@
 package com.yfshop.admin.controller;
 
 import cn.dev33.satoken.stp.StpUtil;
-import com.sun.org.slf4j.internal.Logger;
-import com.sun.org.slf4j.internal.LoggerFactory;
 import com.yfshop.admin.api.enums.CaptchaSourceEnum;
 import com.yfshop.admin.api.service.CaptchaService;
 import com.yfshop.admin.api.service.merchant.MerchantLoginService;
@@ -11,6 +9,8 @@ import com.yfshop.common.api.CommonResult;
 import com.yfshop.common.base.BaseController;
 import com.yfshop.common.validate.annotation.Mobile;
 import org.apache.dubbo.config.annotation.DubboReference;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -23,10 +23,12 @@ import javax.validation.constraints.NotNull;
 @RestController
 @RequestMapping("merchant/login")
 class MerchantLoginController implements BaseController {
+
     private static final Logger logger = LoggerFactory.getLogger(MerchantLoginController.class);
 
     @DubboReference(check = false)
     private MerchantLoginService merchantLoginService;
+
     @DubboReference(check = false)
     private CaptchaService captchaService;
 
