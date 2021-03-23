@@ -39,6 +39,7 @@ public class Item extends Model<Item> {
 
     /**
      * 配送方式 ALL(配送自提都支持), ZT(自提) | PS(配送)
+     * @see com.yfshop.common.enums.ReceiveWayEnum
      */
     private String receiveWay;
 

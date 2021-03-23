@@ -1,5 +1,4 @@
 package com.yfshop.admin.service.mall;
-import java.math.BigDecimal;
 
 import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -20,11 +19,15 @@ import com.yfshop.admin.api.mall.result.BannerResult;
 import com.yfshop.admin.api.mall.result.ItemCategoryResult;
 import com.yfshop.code.mapper.BannerMapper;
 import com.yfshop.code.mapper.ItemCategoryMapper;
+import com.yfshop.code.mapper.ItemContentMapper;
+import com.yfshop.code.mapper.ItemImageMapper;
 import com.yfshop.code.mapper.ItemMapper;
 import com.yfshop.code.mapper.ItemSkuMapper;
 import com.yfshop.code.model.Banner;
 import com.yfshop.code.model.Item;
 import com.yfshop.code.model.ItemCategory;
+import com.yfshop.code.model.ItemContent;
+import com.yfshop.code.model.ItemImage;
 import com.yfshop.code.model.ItemSku;
 import com.yfshop.common.exception.ApiException;
 import com.yfshop.common.exception.Asserts;
@@ -34,7 +37,9 @@ import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
 import javax.validation.constraints.NotNull;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -52,6 +57,10 @@ public class AdminMallManageServiceImpl implements AdminMallManageService {
     private BannerMapper bannerMapper;
     @Resource
     private ItemMapper itemMapper;
+    @Resource
+    private ItemContentMapper itemContentMapper;
+    @Resource
+    private ItemImageMapper itemImageMapper;
     @Resource
     private ItemSkuMapper skuMapper;
 
@@ -192,45 +201,50 @@ public class AdminMallManageServiceImpl implements AdminMallManageService {
     @Override
     public Void createItem(@NotNull ItemCreateReq req) throws ApiException {
         ItemCategory itemCategory = categoryMapper.selectById(req.getCategoryId());
-
+        Asserts.assertNonNull(itemCategory, 500, "分类信息不存在");
 
         // 创建商品
         Item item = new Item();
         item.setCreateTime(LocalDateTime.now());
         item.setUpdateTime(LocalDateTime.now());
         item.setCategoryId(req.getCategoryId());
-
-        item.setItemTitle(req.getTitle());
-        item.setItemSubTitle(req.getSubTitle());
-        item.setItemCover(req.getItemCover());
-        item.setItemChannel(itemChannel);
-        item.setItemDeliveryChannel(itemDeliveryChannel);
-        item.setFirstCategoryId(firstCategoryId);
-        item.setSecondCategoryId(secondCategoryId);
-        //item.setIsVirtualItem(isVirtualItem);
-        item.setIsVirtualItem("N");
-        item.setPrice(price);
-        item.setMarketPrice(marketPrice);
-        // 默认下架
-        item.setIsEnable("N");
-        item.setSort(sort);
-        item.setIsHot(isHot);
-        // 此时没有规格，默认是0
+        item.setReceiveWay(req.getReceiveWay());
+        item.setItemTitle(req.getItemTitle());
+        item.setItemSubTitle(req.getItemSubTitle());
+        item.setIsEnable(req.getIsEnable());
+        item.setItemPrice(BigDecimal.ZERO);
+        item.setItemMarketPrice(BigDecimal.ZERO);
+        item.setFreight(BigDecimal.ZERO);
+        item.setItemStock(0);
+        item.setItemCover(null);
+        item.setIsDelete("N");
         item.setSpecNum(0);
-        itemManager.create(item);
-
-        // 创建商品图片
-        itemImageManager.batchCreateItemImages(item.getId(), itemImages);
+        item.setSort(0);
+        itemMapper.insert(item);
 
         // 创建商品详情
-        BenefitShopItemContent shopItemContent = new BenefitShopItemContent();
-        shopItemContent.setItemId(item.getId());
-        shopItemContent.setContent(itemContent);
-        itemContentManager.create(shopItemContent);
+        ItemContent itemContent = new ItemContent();
+        itemContent.setCreateTime(LocalDateTime.now());
+        itemContent.setUpdateTime(LocalDateTime.now());
+        itemContent.setItemId(item.getId());
+        itemContent.setContent(req.getItemContent());
+        itemContentMapper.insert(itemContent);
 
-
-
-
+        // 创建商品图片
+        List<ItemImage> itemImages = new ArrayList<>();
+        for (int i = 0; i < req.getItemImages().size(); i++) {
+            String imageUrl = req.getItemImages().get(i);
+            ItemImage itemImage = new ItemImage();
+            itemImage.setCreateTime(LocalDateTime.now());
+            itemImage.setUpdateTime(LocalDateTime.now());
+            itemImage.setItemId(item.getId());
+            itemImage.setImageUrl(imageUrl);
+            itemImage.setSort(i + 1);
+            itemImages.add(itemImage);
+        }
+        for (ItemImage itemImage : itemImages) {
+            itemImageMapper.insert(itemImage);
+        }
         return null;
     }
 
