@@ -23,8 +23,11 @@ import com.yfshop.admin.api.mall.request.UpdateItemCategoryReq;
 import com.yfshop.admin.api.mall.result.BannerResult;
 import com.yfshop.admin.api.mall.result.ItemCategoryResult;
 import com.yfshop.admin.api.mall.result.ItemContentResult;
+import com.yfshop.admin.api.mall.result.ItemImageResult;
 import com.yfshop.admin.api.mall.result.ItemResult;
 import com.yfshop.admin.api.mall.result.ItemSkuResult;
+import com.yfshop.admin.api.mall.result.ItemSpecNameResult;
+import com.yfshop.admin.api.mall.result.ItemSpecValueResult;
 import com.yfshop.code.manager.ItemContentManager;
 import com.yfshop.code.manager.ItemImageManager;
 import com.yfshop.code.manager.ItemSkuManager;
@@ -285,25 +288,37 @@ public class AdminMallManageServiceImpl implements AdminMallManageService {
         // 查询分类信息
         ItemCategory itemCategory = categoryMapper.selectById(item.getCategoryId());
         if (itemCategory != null) {
-            ItemCategoryResult bean = new ItemCategoryResult();
-            BeanUtil.copyProperties(itemCategory, bean);
-            itemResult.setItemCategory(bean);
+            itemResult.setItemCategory(BeanUtil.convert(itemCategory, ItemCategoryResult.class));
         }
         // 查询商品的详情
         ItemContent itemContent = itemContentManager.getOne(Wrappers.lambdaQuery(ItemContent.class).eq(ItemContent::getItemId, item));
         if (itemContent != null) {
-            ItemContentResult bean = new ItemContentResult();
-            BeanUtil.copyProperties(itemContent, bean);
-            itemResult.setItemContent(bean);
+            itemResult.setItemContent(BeanUtil.convert(itemContent, ItemContentResult.class));
         }
         // 查询商品的图片
         List<ItemImage> itemImages = itemImageMapper.selectList(Wrappers.lambdaQuery(ItemImage.class).eq(ItemImage::getItemId, itemId));
+        if (CollectionUtil.isNotEmpty(itemImages)) {
+            itemResult.setItemImages(BeanUtil.convertList(itemImages, ItemImageResult.class));
+        }
         // 查询商品的sku信息
         List<ItemSku> itemSkuList = skuMapper.selectList(Wrappers.lambdaQuery(ItemSku.class).eq(ItemSku::getItemId, itemId));
+        if (CollectionUtil.isNotEmpty(itemSkuList)) {
+            itemResult.setItemSkuList(BeanUtil.convertList(itemSkuList, ItemSkuResult.class));
+        }
         // 查询商品的规格
         List<ItemSpecName> specNames = specNameMapper.selectList(Wrappers.lambdaQuery(ItemSpecName.class).eq(ItemSpecName::getItemId, itemId));
-        // 查询商品的规格值
-        List<ItemSpecValue> specValues = specValueMapper.selectList(Wrappers.lambdaQuery(ItemSpecValue.class).eq(ItemSpecValue::getItemId, itemId));
+        if (CollectionUtil.isNotEmpty(specNames)) {
+            // 查询商品的规格值
+            Map<Integer, List<ItemSpecValue>> specValueIndexMap = specValueMapper.selectList(Wrappers.lambdaQuery(ItemSpecValue.class).eq(ItemSpecValue::getItemId, itemId))
+                    .stream().collect(Collectors.groupingBy(ItemSpecValue::getSpecId));
+            List<ItemSpecNameResult> specNameResults = specNames.stream().map(itemSpecName -> {
+                ItemSpecNameResult itemSpecNameResult = BeanUtil.convert(itemSpecName, ItemSpecNameResult.class);
+                List<ItemSpecValueResult> values = BeanUtil.convertList(specValueIndexMap.get(itemSpecName.getId()), ItemSpecValueResult.class);
+                itemSpecNameResult.setSpecValues(values);
+                return itemSpecNameResult;
+            }).collect(Collectors.toList());
+            itemResult.setSpecNames(specNameResults);
+        }
         return itemResult;
     }
 
