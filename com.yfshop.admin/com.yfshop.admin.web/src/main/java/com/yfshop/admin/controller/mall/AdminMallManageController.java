@@ -1,7 +1,7 @@
 package com.yfshop.admin.controller.mall;
 
 import cn.dev33.satoken.annotation.SaCheckLogin;
-import cn.dev33.satoken.annotation.SaCheckPermission;
+import cn.dev33.satoken.annotation.SaCheckRole;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.yfshop.admin.api.mall.AdminMallManageService;
 import com.yfshop.admin.api.mall.request.CreateBannerReq;
@@ -62,7 +62,7 @@ public class AdminMallManageController implements BaseController {
     @RequestMapping(value = "/createCategory", method = {RequestMethod.POST})
     @ResponseBody
     @SaCheckLogin
-    @SaCheckPermission
+    @SaCheckRole(value = "sys")
     public CommonResult<Void> createCategory(@NotNull(message = "创建分类信息不能为空") CreateItemCategoryReq req) {
         return CommonResult.success(adminMallManageService.createCategory(req));
     }
@@ -74,7 +74,7 @@ public class AdminMallManageController implements BaseController {
     @RequestMapping(value = "/queryCategory", method = {RequestMethod.GET, RequestMethod.POST})
     @ResponseBody
     @SaCheckLogin
-    @SaCheckPermission
+    @SaCheckRole(value = "sys")
     public CommonResult<List<ItemCategoryResult>> queryCategory(String isEnable) {
         return CommonResult.success(adminMallManageService.queryCategory(
                 StringUtils.isBlank(isEnable) ? null : "Y".equalsIgnoreCase(isEnable))
@@ -88,7 +88,7 @@ public class AdminMallManageController implements BaseController {
     @RequestMapping(value = "/deleteCategory", method = {RequestMethod.GET, RequestMethod.POST})
     @ResponseBody
     @SaCheckLogin
-    @SaCheckPermission
+    @SaCheckRole(value = "sys")
     public CommonResult<Void> deleteCategory(@NotNull(message = "分类id不能为空") Integer categoryId) {
         return CommonResult.success(adminMallManageService.deleteCategory(categoryId));
     }
@@ -101,7 +101,7 @@ public class AdminMallManageController implements BaseController {
     @RequestMapping(value = "/editCategory", method = {RequestMethod.POST})
     @ResponseBody
     @SaCheckLogin
-    @SaCheckPermission
+    @SaCheckRole(value = "sys")
     public CommonResult<Void> editCategory(@NotNull(message = "编辑的分类信息不能为空") UpdateItemCategoryReq req) {
         return CommonResult.success(adminMallManageService.editCategory(req));
     }
@@ -117,7 +117,7 @@ public class AdminMallManageController implements BaseController {
     @RequestMapping(value = "/createHomeBanner", method = {RequestMethod.GET, RequestMethod.POST})
     @ResponseBody
     @SaCheckLogin
-    @SaCheckPermission
+    @SaCheckRole(value = "sys")
     public CommonResult<Void> createHomeBanner(@NotBlank(message = "banner名称不能为空") String bannerName,
                                                @NotBlank(message = "banner图片链接不能为空") String imageUrl,
                                                @NotBlank(message = "banner跳转链接不能为空") String jumpUrl,
@@ -140,7 +140,7 @@ public class AdminMallManageController implements BaseController {
     @RequestMapping(value = "/deleteHomeBanner", method = {RequestMethod.GET, RequestMethod.POST})
     @ResponseBody
     @SaCheckLogin
-    @SaCheckPermission
+    @SaCheckRole(value = "sys")
     public CommonResult<Void> deleteHomeBanner(@NotNull(message = "bannerId不能为空") Integer bannerId) {
         return CommonResult.success(adminMallManageService.deleteBanner(bannerId));
     }
@@ -153,7 +153,7 @@ public class AdminMallManageController implements BaseController {
     @RequestMapping(value = "/pageQueryHomeBanner", method = {RequestMethod.GET, RequestMethod.POST})
     @ResponseBody
     @SaCheckLogin
-    @SaCheckPermission
+    @SaCheckRole(value = "sys")
     public CommonResult<IPage<BannerResult>> pageQueryHomeBanner(@RequestParam(name = "pageIndex", required = false, defaultValue = "1") Integer pageIndex,
                                                                  @RequestParam(name = "pageSize", required = false, defaultValue = "10") Integer pageSize) {
         return CommonResult.success(adminMallManageService.pageQueryBanner(pageIndex, pageSize, BannerPositionsEnum.HOME.getCode()));
@@ -171,7 +171,7 @@ public class AdminMallManageController implements BaseController {
     @RequestMapping(value = "/editHomeBanner", method = {RequestMethod.GET, RequestMethod.POST})
     @ResponseBody
     @SaCheckLogin
-    @SaCheckPermission
+    @SaCheckRole(value = "sys")
     public CommonResult<Void> editHomeBanner(@NotNull(message = "bannerId不能为空") Integer bannerId,
                                              @NotBlank(message = "banner名称不能为空") String bannerName,
                                              @NotBlank(message = "banner图片链接不能为空") String imageUrl,
@@ -199,7 +199,7 @@ public class AdminMallManageController implements BaseController {
     @RequestMapping(value = "/createLoopBanner", method = {RequestMethod.GET, RequestMethod.POST})
     @ResponseBody
     @SaCheckLogin
-    @SaCheckPermission
+    @SaCheckRole(value = "sys")
     public CommonResult<Void> createLoopBanner(@NotBlank(message = "banner名称不能为空") String bannerName,
                                                @NotBlank(message = "banner图片链接不能为空") String imageUrl,
                                                @NotBlank(message = "banner跳转链接不能为空") String jumpUrl,
@@ -222,7 +222,7 @@ public class AdminMallManageController implements BaseController {
     @RequestMapping(value = "/deleteLoopBanner", method = {RequestMethod.GET, RequestMethod.POST})
     @ResponseBody
     @SaCheckLogin
-    @SaCheckPermission
+    @SaCheckRole(value = "sys")
     public CommonResult<Void> deleteLoopBanner(@NotNull(message = "bannerId不能为空") Integer bannerId) {
         return CommonResult.success(adminMallManageService.deleteBanner(bannerId));
     }
@@ -235,7 +235,7 @@ public class AdminMallManageController implements BaseController {
     @RequestMapping(value = "/pageQueryLoopBanner", method = {RequestMethod.GET, RequestMethod.POST})
     @ResponseBody
     @SaCheckLogin
-    @SaCheckPermission
+    @SaCheckRole(value = "sys")
     public CommonResult<IPage<BannerResult>> pageQueryLoopBanner(@RequestParam(name = "pageIndex", required = false, defaultValue = "1") Integer pageIndex,
                                                                  @RequestParam(name = "pageSize", required = false, defaultValue = "10") Integer pageSize) {
         return CommonResult.success(adminMallManageService.pageQueryBanner(pageIndex, pageSize, BannerPositionsEnum.BANNER.getCode()));
@@ -253,7 +253,7 @@ public class AdminMallManageController implements BaseController {
     @RequestMapping(value = "/editLoopBanner", method = {RequestMethod.GET, RequestMethod.POST})
     @ResponseBody
     @SaCheckLogin
-    @SaCheckPermission
+    @SaCheckRole(value = "sys")
     public CommonResult<Void> editLoopBanner(@NotNull(message = "bannerId不能为空") Integer bannerId,
                                              @NotBlank(message = "banner名称不能为空") String bannerName,
                                              @NotBlank(message = "banner图片链接不能为空") String imageUrl,
@@ -274,7 +274,7 @@ public class AdminMallManageController implements BaseController {
     @RequestMapping(value = "/createItem", method = {RequestMethod.POST})
     @ResponseBody
     @SaCheckLogin
-    @SaCheckPermission
+    @SaCheckRole(value = "sys")
     public CommonResult<Void> createItem(@NotNull @RequestBody ItemCreateReq req) {
         return CommonResult.success(adminMallManageService.createItem(req));
     }
@@ -283,7 +283,7 @@ public class AdminMallManageController implements BaseController {
     @RequestMapping(value = "/editItem", method = {RequestMethod.POST})
     @ResponseBody
     @SaCheckLogin
-    @SaCheckPermission
+    @SaCheckRole(value = "sys")
     public CommonResult<Void> editItem(@NotNull @RequestBody ItemUpdateReq req) {
         return CommonResult.success(adminMallManageService.editItem(req));
     }
@@ -295,7 +295,7 @@ public class AdminMallManageController implements BaseController {
     @RequestMapping(value = "/deleteItem", method = {RequestMethod.GET, RequestMethod.POST})
     @ResponseBody
     @SaCheckLogin
-    @SaCheckPermission
+    @SaCheckRole(value = "sys")
     public CommonResult<Void> deleteItem(@NotNull(message = "商品id不能为空") Integer itemId) {
         return CommonResult.success(adminMallManageService.deleteItem(itemId));
     }
@@ -304,7 +304,7 @@ public class AdminMallManageController implements BaseController {
     @RequestMapping(value = "/pageQueryItems", method = {RequestMethod.GET, RequestMethod.POST})
     @ResponseBody
     @SaCheckLogin
-    @SaCheckPermission
+    @SaCheckRole(value = "sys")
     public CommonResult<IPage<ItemResult>> pageQueryItems(QueryItemReq req) {
         return CommonResult.success(adminMallManageService.pageQueryItems(req));
     }
@@ -316,7 +316,7 @@ public class AdminMallManageController implements BaseController {
     @RequestMapping(value = "/findItemSpecAndSkuList", method = {RequestMethod.GET, RequestMethod.POST})
     @ResponseBody
     @SaCheckLogin
-    @SaCheckPermission
+    @SaCheckRole(value = "sys")
     public CommonResult<Object> findItemSpecAndSkuList(@NotNull(message = "商品id不能为空") Integer itemId) {
         return CommonResult.success(adminMallManageService.findItemDetailAndSkuList(itemId));
     }
@@ -325,7 +325,7 @@ public class AdminMallManageController implements BaseController {
     @RequestMapping(value = "/previewItemSku", method = {RequestMethod.POST})
     @ResponseBody
     @SaCheckLogin
-    @SaCheckPermission
+    @SaCheckRole(value = "sys")
     public CommonResult<List<ItemSkuResult>> previewItemSku(@NotNull @RequestBody GenerateItemSkuReq req) {
         return CommonResult.success(adminMallManageService.previewItemSku(req));
     }
@@ -334,7 +334,7 @@ public class AdminMallManageController implements BaseController {
     @RequestMapping(value = "/saveItemSku", method = {RequestMethod.POST})
     @ResponseBody
     @SaCheckLogin
-    @SaCheckPermission
+    @SaCheckRole(value = "sys")
     public CommonResult<Void> saveItemSku(@NotNull @RequestBody SaveItemSkuReq req) {
         return CommonResult.success(adminMallManageService.saveItemSku(req));
     }
@@ -346,7 +346,7 @@ public class AdminMallManageController implements BaseController {
     @RequestMapping(value = "/disableSku", method = {RequestMethod.GET, RequestMethod.POST})
     @ResponseBody
     @SaCheckLogin
-    @SaCheckPermission
+    @SaCheckRole(value = "sys")
     public CommonResult<Void> disableSku(@NotNull(message = "skuId不能为空") Integer skuId) {
         return CommonResult.success(adminMallManageService.updateSkuIsEnable(skuId, false));
     }
@@ -358,7 +358,7 @@ public class AdminMallManageController implements BaseController {
     @RequestMapping(value = "/upperShelfSku", method = {RequestMethod.GET, RequestMethod.POST})
     @ResponseBody
     @SaCheckLogin
-    @SaCheckPermission
+    @SaCheckRole(value = "sys")
     public CommonResult<Void> upperShelfSku(@NotNull(message = "skuId不能为空") Integer skuId) {
         return CommonResult.success(adminMallManageService.updateSkuIsEnable(skuId, true));
     }
