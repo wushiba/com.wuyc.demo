@@ -24,7 +24,7 @@ import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import javax.validation.Validator;
 
-@MapperScan("com.yfshop.admin")
+@MapperScan("com.yfshop")
 @SpringBootApplication
 public class AdminServiceApplication {
     public static void main(String[] args) {

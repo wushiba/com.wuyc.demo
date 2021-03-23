@@ -10,13 +10,13 @@ dubbo:
   configcenter:
     address: zookeeper://127.0.0.1:2181
   application:
-    name: yfshop-admin-web
+    name: yfshop-admin-merchant
   consumer:
     timeout: 30000
     retries: 0
     check: false
   scan:
-    base-packages: com.yfshop.admin.controlle
+    base-packages: com.yfshop.admin
     
     
 spring:

@@ -8,12 +8,11 @@
         <result column="create_time" property="createTime" />
         <result column="update_time" property="updateTime" />
         <result column="type_name" property="typeName" />
-        <result column="type_num" property="typeNum" />
     </resultMap>
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        id, create_time, update_time, type_name, type_num
+        id, create_time, update_time, type_name
     </sql>
 
 </mapper>

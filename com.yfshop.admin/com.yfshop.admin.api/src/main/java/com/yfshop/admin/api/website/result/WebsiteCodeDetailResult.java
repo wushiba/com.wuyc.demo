@@ -20,7 +20,6 @@ import java.time.LocalDateTime;
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
-@TableName("yf_website_code_detail")
 public class WebsiteCodeDetailResult implements Serializable {
 
     private static final long serialVersionUID = 1L;

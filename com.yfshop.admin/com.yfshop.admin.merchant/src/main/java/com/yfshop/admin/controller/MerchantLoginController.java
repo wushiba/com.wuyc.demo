@@ -10,25 +10,30 @@ import com.yfshop.admin.api.service.merchant.result.MerchantResult;
 import com.yfshop.common.api.CommonResult;
 import com.yfshop.common.base.BaseController;
 import com.yfshop.common.validate.annotation.Mobile;
+import lombok.AllArgsConstructor;
+import me.chanjar.weixin.common.bean.WxOAuth2UserInfo;
+import me.chanjar.weixin.common.bean.oauth2.WxOAuth2AccessToken;
+import me.chanjar.weixin.common.error.WxErrorException;
+import me.chanjar.weixin.mp.api.WxMpService;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.NotNull;
 
+@AllArgsConstructor
 @Validated
 @RestController
 @RequestMapping("merchant/login")
 class MerchantLoginController implements BaseController {
     private static final Logger logger = LoggerFactory.getLogger(MerchantLoginController.class);
 
-    @DubboReference(check = false)
+    //@DubboReference(check = false)
     private MerchantLoginService merchantLoginService;
     @DubboReference(check = false)
     private CaptchaService captchaService;
+
+    private final WxMpService wxService;
 
     /**
      * 密码登录
@@ -58,6 +63,28 @@ class MerchantLoginController implements BaseController {
         return CommonResult.success(merchantResult);
     }
 
+    /**
+     * 微信授权登录
+     *
+     * @param appid
+     * @param code
+     * @return
+     */
+    @RequestMapping("/loginByCode")
+    public CommonResult<Void> loginByCode(@RequestParam String appid, @RequestParam String code) {
+        if (!this.wxService.switchover(appid)) {
+            throw new IllegalArgumentException(String.format("未找到对应appid=[%s]的配置，请核实！", appid));
+        }
+        try {
+            WxOAuth2AccessToken accessToken = wxService.getOAuth2Service().getAccessToken(code);
+            WxOAuth2UserInfo user = wxService.getOAuth2Service().getUserInfo(accessToken, null);
+            StpUtil.setLoginId(user.getOpenid());
+        } catch (WxErrorException e) {
+            e.printStackTrace();
+        }
+
+        return CommonResult.success(null);
+    }
 
     /**
      * 验证码发送
@@ -70,5 +97,6 @@ class MerchantLoginController implements BaseController {
     public CommonResult<Void> sendCaptcha(@Mobile(message = "手机号不正确") String mobile) {
         return CommonResult.success(captchaService.sendCaptcha(mobile, CaptchaSourceEnum.LOGIN_CAPTCHA));
     }
+
 
 }

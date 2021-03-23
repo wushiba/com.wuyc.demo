@@ -3,18 +3,21 @@ package com.yfshop.admin.service.merchant;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.yfshop.admin.api.service.merchant.MerchantInfoService;
 import com.yfshop.admin.api.service.merchant.result.MerchantResult;
+import com.yfshop.admin.api.website.req.WebsiteReq;
 import com.yfshop.admin.api.website.result.WebsiteCodeDetailResult;
+import com.yfshop.admin.api.website.result.WebsiteTypeResult;
 import com.yfshop.code.mapper.MerchantDetailMapper;
 import com.yfshop.code.mapper.MerchantMapper;
 import com.yfshop.code.mapper.WebsiteCodeDetailMapper;
-import com.yfshop.code.model.Merchant;
-import com.yfshop.code.model.MerchantDetail;
-import com.yfshop.code.model.WebsiteCode;
-import com.yfshop.code.model.WebsiteCodeDetail;
+import com.yfshop.code.mapper.WebsiteTypeMapper;
+import com.yfshop.code.model.*;
+import com.yfshop.common.enums.GroupRoleEnum;
 import com.yfshop.common.exception.ApiException;
 import com.yfshop.common.exception.Asserts;
 import com.yfshop.common.util.BeanUtil;
+import com.yfshop.common.util.GeoUtils;
 import org.apache.dubbo.config.annotation.DubboService;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
@@ -34,14 +37,16 @@ import java.util.List;
 public class MerchantInfoServiceImpl implements MerchantInfoService {
 
     @Resource
-    MerchantMapper merchantMapper;
+    private MerchantMapper merchantMapper;
 
     @Resource
-    MerchantDetailMapper merchantDetailMapper;
+    private MerchantDetailMapper merchantDetailMapper;
 
     @Resource
-    WebsiteCodeDetailMapper websiteCodeDetailMapper;
+    private WebsiteCodeDetailMapper websiteCodeDetailMapper;
 
+    @Resource
+    private WebsiteTypeMapper websiteTypeMapper;
 
     @Override
     public MerchantResult getWebsiteInfo(Integer merchantId) throws ApiException {
@@ -62,6 +67,52 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
                 .eq(WebsiteCodeDetail::getMerchantId, merchantId)
                 .orderByDesc(WebsiteCodeDetail::getUpdateTime));
         return BeanUtil.convertList(websiteCodeDetails, WebsiteCodeDetailResult.class);
+    }
+
+    @Override
+    public List<WebsiteTypeResult> getWebsiteType() throws ApiException {
+        List<WebsiteType> websiteTypeList = websiteTypeMapper.selectList(Wrappers.emptyWrapper());
+        return BeanUtil.convertList(websiteTypeList, WebsiteTypeResult.class);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public Void websiteCodeBind(WebsiteReq websiteReq) throws ApiException {
+        WebsiteCodeDetail websiteCodeDetail = websiteCodeDetailMapper.selectOne(Wrappers.<WebsiteCodeDetail>lambdaQuery()
+                .eq(WebsiteCodeDetail::getAlias, websiteReq.getWebsiteCode())
+                .eq(WebsiteCodeDetail::getIsActivate, 'N'));
+        Asserts.assertNonNull(websiteCodeDetail, 500, "网点码已被绑定！");
+        Merchant merchant = merchantMapper.selectOne(Wrappers.<Merchant>lambdaQuery()
+                .eq(Merchant::getOpenId, websiteReq.getOpenId()));
+        if (merchant == null) {
+            merchant = BeanUtil.convert(websiteReq, Merchant.class);
+            merchant.setRoleAlias(GroupRoleEnum.WD.getCode());
+            merchant.setRoleName(GroupRoleEnum.WD.getDescription());
+//            merchant.setPid(websiteCodeDetail.get);
+            merchantMapper.insert(merchant);
+            MerchantDetail merchantDetail = BeanUtil.convert(websiteReq, MerchantDetail.class);
+            merchantDetail.setMerchantId(merchant.getId());
+            merchantDetail.setGeoHash(GeoUtils.toBase32(websiteReq.getLatitude(), websiteReq.getLongitude(), 12));
+            merchantDetailMapper.insert(merchantDetail);
+        } else {
+            Integer merchantId = merchant.getId();
+            merchant = BeanUtil.convert(websiteReq, Merchant.class);
+            merchant.setRoleAlias(GroupRoleEnum.WD.getCode());
+            merchant.setId(merchantId);
+            MerchantDetail merchantDetail = merchantDetailMapper.selectOne(Wrappers.<MerchantDetail>lambdaQuery()
+                    .eq(MerchantDetail::getMerchantId, merchantId));
+            Integer merchantDetailId = merchantDetail.getId();
+            merchantDetail = BeanUtil.convert(websiteReq, MerchantDetail.class);
+            merchantDetail.setMerchantId(merchant.getId());
+            merchantDetail.setId(merchantDetailId);
+            merchantMapper.updateById(merchant);
+            merchantDetailMapper.updateById(merchantDetail);
+        }
+        websiteCodeDetail.setMerchantId(merchant.getId());
+        websiteCodeDetail.setMobile(merchant.getMobile());
+        websiteCodeDetail.setIsActivate("Y");
+        websiteCodeDetailMapper.updateById(websiteCodeDetail);
+        return null;
     }
 
 }

@@ -19,8 +19,8 @@ public class CacheConfig {
 
     private static final long AVAILABLE_TIME = 10;
 
-    @Bean
-    @Profile(value = {"dev", "uat"})
+//    @Bean
+//    @Profile(value = {"dev", "uat"})
     public CaffeineCacheManager cacheManager() {
         Caffeine<Object, Object> caffeine = Caffeine.newBuilder()
                 // 最后一次写入后经过固定时间过期

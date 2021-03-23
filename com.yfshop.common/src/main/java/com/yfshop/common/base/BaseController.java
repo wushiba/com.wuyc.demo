@@ -29,6 +29,14 @@ public interface BaseController {
     }
 
     /**
+     * 获取当前登录用户的openId
+     * @return
+     */
+    default String getCurrentAdminOpenId() {
+        return StpUtil.getLoginIdAsString();
+    }
+
+    /**
      * 获取cookie的值
      *
      * @param cookieName the cookie name

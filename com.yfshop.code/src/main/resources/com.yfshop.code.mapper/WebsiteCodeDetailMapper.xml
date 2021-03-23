@@ -13,11 +13,13 @@
         <result column="merchant_id" property="merchantId" />
         <result column="merchant_name" property="merchantName" />
         <result column="mobile" property="mobile" />
+        <result column="pid" property="pid" />
+        <result column="pid_path" property="pidPath" />
     </resultMap>
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        id, create_time, update_time, batch_id, alias, is_activate, merchant_id, merchant_name, mobile
+        id, create_time, update_time, batch_id, alias, is_activate, merchant_id, merchant_name, mobile, pid, pid_path
     </sql>
 
 </mapper>

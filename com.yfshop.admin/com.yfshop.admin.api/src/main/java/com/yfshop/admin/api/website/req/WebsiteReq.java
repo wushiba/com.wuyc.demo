@@ -1,13 +1,10 @@
-package com.yfshop.code.model;
+package com.yfshop.admin.api.website.req;
 
-import com.baomidou.mybatisplus.annotation.TableName;
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.extension.activerecord.Model;
-import com.baomidou.mybatisplus.annotation.TableId;
-import java.time.LocalDateTime;
-import java.io.Serializable;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+
+import java.io.Serializable;
+import java.time.LocalDateTime;
 
 /**
  * <p>
@@ -15,16 +12,14 @@ import lombok.EqualsAndHashCode;
  * </p>
  *
  * @author yoush
- * @since 2021-03-23
+ * @since 2021-03-22
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
-@TableName("yf_merchant")
-public class Merchant extends Model<Merchant> {
+public class WebsiteReq implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
 
     /**
@@ -36,8 +31,6 @@ public class Merchant extends Model<Merchant> {
      * 更新时间
      */
     private LocalDateTime updateTime;
-
-    private String openId;
 
     private Integer pid;
 
@@ -64,11 +57,6 @@ public class Merchant extends Model<Merchant> {
      * 商户手机号
      */
     private String mobile;
-
-    /**
-     * 密码
-     */
-    private String password;
 
     /**
      * 联系人
@@ -101,20 +89,27 @@ public class Merchant extends Model<Merchant> {
      */
     private String address;
 
-    /**
-     * 是否可用: Y(可用), N(禁用)
-     */
-    private String isEnable;
+    private String websiteTypeName;
 
     /**
-     * 是否删除， Y(删除)， N（未删除）, 默认未删除
+     * 是否有冰箱， Y(有)， N(无)
      */
-    private String isDelete;
+    private String isRefrigerator;
 
+    /**
+     * 经度
+     */
+    private Double longitude;
 
-    @Override
-    protected Serializable pkVal() {
-        return this.id;
-    }
+    /**
+     * 纬度
+     */
+    private Double latitude;
+
+    private String geoHash;
+
+    private String websiteCode;
+
+    private String openId;
 
 }

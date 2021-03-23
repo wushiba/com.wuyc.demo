@@ -1,27 +1,21 @@
 package com.yfshop.admin.controller;
 
 import cn.dev33.satoken.annotation.SaCheckLogin;
-import cn.dev33.satoken.stp.StpUtil;
 import com.sun.org.slf4j.internal.Logger;
 import com.sun.org.slf4j.internal.LoggerFactory;
-import com.yfshop.admin.api.enums.CaptchaSourceEnum;
-import com.yfshop.admin.api.service.CaptchaService;
 import com.yfshop.admin.api.service.merchant.MerchantInfoService;
-import com.yfshop.admin.api.service.merchant.MerchantLoginService;
 import com.yfshop.admin.api.service.merchant.result.MerchantResult;
-import com.yfshop.admin.api.website.result.WebsiteBillDayResult;
+import com.yfshop.admin.api.website.req.WebsiteReq;
 import com.yfshop.admin.api.website.result.WebsiteCodeDetailResult;
+import com.yfshop.admin.api.website.result.WebsiteTypeResult;
 import com.yfshop.common.api.CommonResult;
 import com.yfshop.common.base.BaseController;
-import com.yfshop.common.validate.annotation.Mobile;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @Validated
@@ -32,7 +26,6 @@ class MerchantInfoController implements BaseController {
 
     @DubboReference(check = false)
     private MerchantInfoService merchantInfoService;
-
 
     /**
      * 获取网点用户信息
@@ -46,8 +39,10 @@ class MerchantInfoController implements BaseController {
         return CommonResult.success(merchantResult);
     }
 
+
     /**
      * 获取网点码
+     *
      * @return
      */
     @SaCheckLogin
@@ -55,6 +50,30 @@ class MerchantInfoController implements BaseController {
     public CommonResult<List<WebsiteCodeDetailResult>> getWebsiteCode() {
         List<WebsiteCodeDetailResult> websiteCodeDetailResults = merchantInfoService.getWebsiteCode(getCurrentAdminUserId().intValue());
         return CommonResult.success(websiteCodeDetailResults);
+    }
+
+
+    /**
+     * 绑点网点码
+     *
+     * @return
+     */
+    @SaCheckLogin
+    @RequestMapping(value = "/websiteCodeBind", method = {RequestMethod.POST})
+    public CommonResult<Void> websiteCodeBind(WebsiteReq websiteReq) {
+        websiteReq.setOpenId(getCurrentAdminOpenId());
+        return CommonResult.success(merchantInfoService.websiteCodeBind(websiteReq));
+    }
+
+    /**
+     * 获取网点类型
+     *
+     * @return
+     */
+    @RequestMapping(value = "/websiteType", method = {RequestMethod.GET})
+    public CommonResult<List<WebsiteTypeResult>> getWebsiteType() {
+        List<WebsiteTypeResult> websiteTypeResults = merchantInfoService.getWebsiteType();
+        return CommonResult.success(websiteTypeResults);
     }
 
 

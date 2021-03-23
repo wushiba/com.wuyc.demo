@@ -34,7 +34,7 @@ public class CaptchaServiceImpl implements CaptchaService {
     @Resource
     CaptchaMapper captchaMapper;
 
-    @Autowired
+    //@Autowired
     private RedisService redisService;
 
 

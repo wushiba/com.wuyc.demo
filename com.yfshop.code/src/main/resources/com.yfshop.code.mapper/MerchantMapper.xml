@@ -7,6 +7,7 @@
         <id column="id" property="id" />
         <result column="create_time" property="createTime" />
         <result column="update_time" property="updateTime" />
+        <result column="open_id" property="openId" />
         <result column="pid" property="pid" />
         <result column="p_merchant_name" property="pMerchantName" />
         <result column="pid_path" property="pidPath" />
@@ -29,7 +30,7 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        id, create_time, update_time, pid, p_merchant_name, pid_path, role_alias, role_name, merchant_name, mobile, password, contacts, province, city, district, province_id, city_id, district_id, address, is_enable, is_delete
+        id, create_time, update_time, open_id, pid, p_merchant_name, pid_path, role_alias, role_name, merchant_name, mobile, password, contacts, province, city, district, province_id, city_id, district_id, address, is_enable, is_delete
     </sql>
 
 </mapper>

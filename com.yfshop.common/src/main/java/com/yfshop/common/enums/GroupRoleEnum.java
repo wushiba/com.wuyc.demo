@@ -2,6 +2,7 @@ package com.yfshop.common.enums;
 
 /**
  * 角色标识枚举
+ *
  * @author Xulg
  * Created in 2021-03-23 9:27
  */
@@ -17,7 +18,10 @@ public enum GroupRoleEnum {
 
     YWY("ywy", "业务员"),
 
-    CXY("zb", "促销员");
+    CXY("zb", "促销员"),
+    GC("gc", "工厂"),
+    WL("wl", "物料"),
+    WD("wd", "网点");
 
     /**
      * 枚举编码
