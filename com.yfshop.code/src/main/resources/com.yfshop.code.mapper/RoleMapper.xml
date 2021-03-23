@@ -16,5 +16,34 @@
     <sql id="Base_Column_List">
         id, create_time, update_time, role_name, role_alias, can_delete
     </sql>
+    <sql id="table_name">
+        yf_role
+    </sql>
 
+    <select id="findByAlias" resultType="com.yfshop.code.model.Role">
+        select
+        <include refid="Base_Column_List"/>
+        from
+        <include refid="table_name"/>
+        where role_alias = #{alias}
+    </select>
+    <select id="findByAliases" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from
+        <include refid="table_name"/>
+        <where>
+            <choose>
+                <when test="list != null and !list.empty">
+                    role_alias in
+                    <foreach collection="list" index="index" item="alias" open="(" separator="," close=")">
+                        #{alias}
+                    </foreach>
+                </when>
+                <otherwise>
+                    false
+                </otherwise>
+            </choose>
+        </where>
+    </select>
 </mapper>

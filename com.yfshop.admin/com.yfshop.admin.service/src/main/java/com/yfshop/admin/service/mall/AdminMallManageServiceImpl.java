@@ -214,7 +214,7 @@ public class AdminMallManageServiceImpl implements AdminMallManageService {
                 .orderByDesc(Item::getCreateTime);
         Page<Item> itemPage = itemMapper.selectPage(new Page<>(req.getCurrentPage(), req.getPageSize()), queryWrapper);
         Page<ItemResult> page = new Page<>(itemPage.getCurrent(), itemPage.getSize(), itemPage.getTotal());
-        BeanUtil.convertList(itemPage.getRecords(), ItemResult.class);
+        page.setRecords(BeanUtil.convertList(itemPage.getRecords(), ItemResult.class));
         return page;
     }
 
