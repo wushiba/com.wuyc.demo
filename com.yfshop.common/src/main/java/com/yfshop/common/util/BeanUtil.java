@@ -18,6 +18,12 @@ public class BeanUtil {
         return instantiate;
     }
 
+    /**
+     * copy class
+     * @param source    源对象
+     * @param target    得到值的对象
+     * @throws BeansException
+     */
     public static void copyProperties(Object source, Object target) throws BeansException {
         BeanUtils.copyProperties(source, target);
     }
