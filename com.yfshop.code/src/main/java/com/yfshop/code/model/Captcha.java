@@ -11,7 +11,7 @@ import lombok.EqualsAndHashCode;
 
 /**
  * <p>
- * 
+ * 验证码
  * </p>
  *
  * @author yoush
@@ -19,8 +19,8 @@ import lombok.EqualsAndHashCode;
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
-@TableName("yf_order_address")
-public class OrderAddress extends Model<OrderAddress> {
+@TableName("yf_captcha")
+public class Captcha extends Model<Captcha> {
 
     private static final long serialVersionUID = 1L;
 
@@ -32,54 +32,29 @@ public class OrderAddress extends Model<OrderAddress> {
     private LocalDateTime updateTime;
 
     /**
-     * 订单id
+     * 来源
      */
-    private Long orderId;
+    private String source;
 
     /**
-     * 收货人手机号
+     * 手机号
      */
     private String mobile;
 
     /**
-     * 收货人姓名
+     * 验证码
      */
-    private String realname;
+    private String captcha;
 
     /**
-     * 省id
+     * 短信模板
      */
-    private Integer provinceId;
+    private String smsTemplate;
 
     /**
-     * 省份
+     * 失效时间
      */
-    private String province;
-
-    /**
-     * 市id
-     */
-    private Integer cityId;
-
-    /**
-     * 市
-     */
-    private String city;
-
-    /**
-     * 区id
-     */
-    private Integer districtId;
-
-    /**
-     * 区
-     */
-    private String district;
-
-    /**
-     * 收货详细地址
-     */
-    private String address;
+    private LocalDateTime expireTime;
 
 
     @Override

@@ -29,14 +29,14 @@ public class Generator {
     //作者
     private static String authorName="yoush";
     //要生成的表名
-    private static String[] tables= {"yf_act_code_batch","yf_act_code_batch_detail","yf_act_code_batch_record","yf_banner","yf_coupon","yf_item","yf_item_category","yf_item_content","yf_item_image","yf_item_sku","yf_item_spec_name","yf_item_spec_value","yf_menu","yf_merchant","yf_merchant_detail","yf_order","yf_order_address","yf_order_detail","yf_permission","yf_region","yf_rl_role_permission","yf_role","yf_source_factory","yf_user","yf_user_address","yf_user_cart","yf_user_coupon","yf_website_code","yf_website_code_detail","yf_website_type"};
+    private static String[] tables= {"yf_website_bill","yf_captcha","yf_user_coupon","yf_order","yf_order_address","yf_order_detail"};
     private static String prefix="yf_";
 
     //数据库配置四要素
     private static String driverName = "com.mysql.cj.jdbc.Driver";
-    private static String url = "jdbc:mysql://127.0.0.1:3306/yfshop?useUnicode=true&characterEncoding=UTF-8&zeroDateTimeBehavior=convertToNull&serverTimezone=UTC";
+    private static String url = "jdbc:mysql://121.40.70.203:3306/yf_shop?useUnicode=true&characterEncoding=UTF-8&zeroDateTimeBehavior=convertToNull&serverTimezone=UTC";
     private static String username = "root";
-    private static String password = "root";
+    private static String password = "Wuyc521125!";
 
 
     public static void main(String[] args) {

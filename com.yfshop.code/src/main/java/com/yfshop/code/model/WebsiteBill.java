@@ -1,5 +1,6 @@
 package com.yfshop.code.model;
 
+import java.math.BigDecimal;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.extension.activerecord.Model;
@@ -11,7 +12,7 @@ import lombok.EqualsAndHashCode;
 
 /**
  * <p>
- * 
+ * 网点记账
  * </p>
  *
  * @author yoush
@@ -19,8 +20,8 @@ import lombok.EqualsAndHashCode;
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
-@TableName("yf_order_address")
-public class OrderAddress extends Model<OrderAddress> {
+@TableName("yf_website_bill")
+public class WebsiteBill extends Model<WebsiteBill> {
 
     private static final long serialVersionUID = 1L;
 
@@ -32,54 +33,46 @@ public class OrderAddress extends Model<OrderAddress> {
     private LocalDateTime updateTime;
 
     /**
+     * 网点商户id
+     */
+    private Integer merchantId;
+
+    private String pidPath;
+
+    /**
+     * 用户id
+     */
+    private Integer userId;
+
+    /**
+     * 用户微信昵称
+     */
+    private String mobile;
+
+    /**
      * 订单id
      */
     private Long orderId;
 
     /**
-     * 收货人手机号
+     * 商品名
      */
-    private String mobile;
+    private String itemTitle;
 
     /**
-     * 收货人姓名
+     * 支付价格
      */
-    private String realname;
+    private BigDecimal payPrice;
 
     /**
-     * 省id
+     * 支付流水编号
      */
-    private Integer provinceId;
+    private String billNo;
 
     /**
-     * 省份
+     * N 待确认 Y 已确认
      */
-    private String province;
-
-    /**
-     * 市id
-     */
-    private Integer cityId;
-
-    /**
-     * 市
-     */
-    private String city;
-
-    /**
-     * 区id
-     */
-    private Integer districtId;
-
-    /**
-     * 区
-     */
-    private String district;
-
-    /**
-     * 收货详细地址
-     */
-    private String address;
+    private String isConfirm;
 
 
     @Override
