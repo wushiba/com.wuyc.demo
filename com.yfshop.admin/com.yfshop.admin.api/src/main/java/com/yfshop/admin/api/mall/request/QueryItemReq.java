@@ -15,7 +15,7 @@ import java.io.Serializable;
 public class QueryItemReq implements Serializable {
     private static final long serialVersionUID = 1L;
     @ApiModelProperty(value = "页码")
-    private Integer currentPage = 1;
+    private Integer pageIndex = 1;
     @ApiModelProperty(value = "每页展示数量")
     private Integer pageSize = 10;
     @ApiModelProperty(value = "商品ID")

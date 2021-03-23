@@ -16,10 +16,12 @@ import com.yfshop.code.model.Permission;
 import com.yfshop.code.model.RlRolePermission;
 import com.yfshop.code.model.Role;
 import com.yfshop.common.api.ErrorCode;
+import com.yfshop.common.constants.CacheConstants;
 import com.yfshop.common.enums.GroupRoleEnum;
 import com.yfshop.common.exception.ApiException;
 import com.yfshop.common.exception.Asserts;
 import org.apache.dubbo.config.annotation.DubboService;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
@@ -118,12 +120,16 @@ public class RolePermissionManageServiceImpl implements RolePermissionManageServ
         return rls.stream().map(RlRolePermission::getPermissionAlias).collect(Collectors.toList());
     }
 
+    @Cacheable(cacheNames = CacheConstants.MERCHANT_ROLE_CACHE_NAME,
+            key = "'" + CacheConstants.MERCHANT_ROLE_CACHE_KEY_PREFIX + "' + #root.args[0]")
     @Override
     public String findMerchantRole(Integer merchantId) {
         Merchant merchant = merchantMapper.selectById(merchantId);
         return merchant == null ? null : merchant.getRoleAlias();
     }
 
+    @Cacheable(cacheNames = CacheConstants.MERCHANT_PERMISSIONS_CACHE_NAME,
+            key = "'" + CacheConstants.MERCHANT_PERMISSIONS_CACHE_KEY_PREFIX + "' + #root.args[0]")
     @Override
     public List<String> queryMerchantPermissions(Integer merchantId) {
         String merchantRole = findMerchantRole(merchantId);

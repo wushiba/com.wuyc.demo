@@ -131,6 +131,11 @@
             <artifactId>hutool-all</artifactId>
         </dependency>
         <!--工具类集合 end-->
+
+        <dependency>
+            <groupId>com.github.ben-manes.caffeine</groupId>
+            <artifactId>caffeine</artifactId>
+        </dependency>
     </dependencies>
 
     <build>

@@ -56,12 +56,12 @@ public interface AdminMallManageService {
     /**
      * 分页查询首页banner
      *
-     * @param currentPage 页码
-     * @param pageSize    每页显示个数
-     * @param positions   home|banner
+     * @param pageIndex 页码
+     * @param pageSize  每页显示个数
+     * @param positions home|banner
      * @return the page data
      */
-    IPage<BannerResult> pageQueryBanner(Integer currentPage, Integer pageSize, String positions);
+    IPage<BannerResult> pageQueryBanner(Integer pageIndex, Integer pageSize, String positions);
 
     /**
      * 创建分类

@@ -148,13 +148,13 @@ public class AdminMallManageServiceImpl implements AdminMallManageService {
     }
 
     @Override
-    public IPage<BannerResult> pageQueryBanner(Integer currentPage, Integer pageSize, String positions) {
+    public IPage<BannerResult> pageQueryBanner(Integer pageIndex, Integer pageSize, String positions) {
         LambdaQueryWrapper<Banner> queryWrapper = Wrappers.lambdaQuery(Banner.class)
                 .eq(Banner::getPositions, positions)
                 .orderByDesc(Banner::getCreateTime);
-        Page<Banner> page = bannerMapper.selectPage(new Page<>(currentPage, pageSize), queryWrapper);
+        Page<Banner> page = bannerMapper.selectPage(new Page<>(pageIndex, pageSize), queryWrapper);
         // wrapper
-        Page<BannerResult> data = new Page<>(currentPage, pageSize, page.getTotal());
+        Page<BannerResult> data = new Page<>(pageIndex, pageSize, page.getTotal());
         data.setRecords(BeanUtil.convertList(page.getRecords(), BannerResult.class));
         return data;
     }
@@ -208,11 +208,11 @@ public class AdminMallManageServiceImpl implements AdminMallManageService {
         LambdaQueryWrapper<Item> queryWrapper = Wrappers.lambdaQuery(Item.class)
                 .eq(Item::getIsDelete, "N")
                 .eq(req.getItemId() != null, Item::getId, req.getItemId())
-                .eq(req.getCategoryId() != null, Item::getId, req.getCategoryId())
-                .eq(StringUtils.isNotBlank(req.getIsEnable()), Item::getId, req.getIsEnable())
+                .eq(req.getCategoryId() != null, Item::getCategoryId, req.getCategoryId())
+                .eq(StringUtils.isNotBlank(req.getIsEnable()), Item::getIsEnable, req.getIsEnable())
                 .like(StringUtils.isNotBlank(req.getItemTitle()), Item::getItemTitle, req.getItemTitle())
                 .orderByDesc(Item::getCreateTime);
-        Page<Item> itemPage = itemMapper.selectPage(new Page<>(req.getCurrentPage(), req.getPageSize()), queryWrapper);
+        Page<Item> itemPage = itemMapper.selectPage(new Page<>(req.getPageIndex(), req.getPageSize()), queryWrapper);
         Page<ItemResult> page = new Page<>(itemPage.getCurrent(), itemPage.getSize(), itemPage.getTotal());
         page.setRecords(BeanUtil.convertList(itemPage.getRecords(), ItemResult.class));
         return page;

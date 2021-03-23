@@ -147,16 +147,16 @@ public class AdminMallManageController implements BaseController {
 
     @ApiOperation(value = "分页查询首页banner", httpMethod = "GET")
     @ApiImplicitParams(value = {
-            @ApiImplicitParam(paramType = "query", name = "currentPage", value = "页码", required = false),
+            @ApiImplicitParam(paramType = "query", name = "pageIndex", value = "页码", required = false),
             @ApiImplicitParam(paramType = "query", name = "pageSize", value = "每页显示个数", required = false)
     })
     @RequestMapping(value = "/pageQueryHomeBanner", method = {RequestMethod.GET, RequestMethod.POST})
     @ResponseBody
     @SaCheckLogin
     @SaCheckPermission
-    public CommonResult<IPage<BannerResult>> pageQueryHomeBanner(@RequestParam(name = "currentPage", required = false, defaultValue = "1") Integer currentPage,
+    public CommonResult<IPage<BannerResult>> pageQueryHomeBanner(@RequestParam(name = "pageIndex", required = false, defaultValue = "1") Integer pageIndex,
                                                                  @RequestParam(name = "pageSize", required = false, defaultValue = "10") Integer pageSize) {
-        return CommonResult.success(adminMallManageService.pageQueryBanner(currentPage, pageSize, BannerPositionsEnum.HOME.getCode()));
+        return CommonResult.success(adminMallManageService.pageQueryBanner(pageIndex, pageSize, BannerPositionsEnum.HOME.getCode()));
     }
 
     @ApiOperation(value = "编辑首页banner", httpMethod = "GET")
@@ -229,16 +229,16 @@ public class AdminMallManageController implements BaseController {
 
     @ApiOperation(value = "分页查询轮播banner", httpMethod = "GET")
     @ApiImplicitParams(value = {
-            @ApiImplicitParam(paramType = "query", name = "currentPage", value = "页码", required = false),
+            @ApiImplicitParam(paramType = "query", name = "pageIndex", value = "页码", required = false),
             @ApiImplicitParam(paramType = "query", name = "pageSize", value = "每页显示个数", required = false)
     })
     @RequestMapping(value = "/pageQueryLoopBanner", method = {RequestMethod.GET, RequestMethod.POST})
     @ResponseBody
     @SaCheckLogin
     @SaCheckPermission
-    public CommonResult<IPage<BannerResult>> pageQueryLoopBanner(@RequestParam(name = "currentPage", required = false, defaultValue = "1") Integer currentPage,
+    public CommonResult<IPage<BannerResult>> pageQueryLoopBanner(@RequestParam(name = "pageIndex", required = false, defaultValue = "1") Integer pageIndex,
                                                                  @RequestParam(name = "pageSize", required = false, defaultValue = "10") Integer pageSize) {
-        return CommonResult.success(adminMallManageService.pageQueryBanner(currentPage, pageSize, BannerPositionsEnum.BANNER.getCode()));
+        return CommonResult.success(adminMallManageService.pageQueryBanner(pageIndex, pageSize, BannerPositionsEnum.BANNER.getCode()));
     }
 
     @ApiOperation(value = "编辑轮播banner", httpMethod = "GET")
