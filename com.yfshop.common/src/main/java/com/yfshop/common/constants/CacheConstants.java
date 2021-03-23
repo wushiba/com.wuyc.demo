@@ -11,4 +11,6 @@ public interface CacheConstants {
     String MERCHANT_ROLE_CACHE_KEY_PREFIX = "merchant_role_";
     String MERCHANT_PERMISSIONS_CACHE_NAME = "MerchantPermissionsCacheName";
     String MERCHANT_PERMISSIONS_CACHE_KEY_PREFIX = "merchant_permissions_";
+    String MERCHANT_MENUS_CACHE_NAME = "MerchantMenusCacheName";
+    String MERCHANT_MENUS_CACHE_KEY_PREFIX = "merchant_menus_";
 }
