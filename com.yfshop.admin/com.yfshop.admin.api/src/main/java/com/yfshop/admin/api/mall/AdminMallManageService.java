@@ -11,6 +11,7 @@ import com.yfshop.admin.api.mall.request.SaveItemSkuReq;
 import com.yfshop.admin.api.mall.request.UpdateBannerReq;
 import com.yfshop.admin.api.mall.request.UpdateItemCategoryReq;
 import com.yfshop.admin.api.mall.result.BannerResult;
+import com.yfshop.admin.api.mall.result.ItemCategoryResult;
 import com.yfshop.common.exception.ApiException;
 
 import java.util.List;
@@ -91,7 +92,7 @@ public interface AdminMallManageService {
      * @param isEnable 是否可用
      * @return the first category list
      */
-    List<Object> queryCategory(Boolean isEnable);
+    List<ItemCategoryResult> queryCategory(Boolean isEnable);
 
     /**
      * 分页条件查询商品

@@ -9,6 +9,7 @@ import com.yfshop.admin.api.mall.request.CreateItemCategoryReq;
 import com.yfshop.admin.api.mall.request.UpdateBannerReq;
 import com.yfshop.admin.api.mall.request.UpdateItemCategoryReq;
 import com.yfshop.admin.api.mall.result.BannerResult;
+import com.yfshop.admin.api.mall.result.ItemCategoryResult;
 import com.yfshop.common.api.CommonResult;
 import com.yfshop.common.base.BaseController;
 import com.yfshop.common.validate.annotation.CandidateValue;
@@ -65,7 +66,7 @@ public class AdminMallManageController implements BaseController {
     @ResponseBody
     @SaCheckLogin
     @SaCheckPermission
-    public CommonResult<List<Object>> queryCategory(String isEnable) {
+    public CommonResult<List<ItemCategoryResult>> queryCategory(String isEnable) {
         return CommonResult.success(adminMallManageService.queryCategory(
                 StringUtils.isBlank(isEnable) ? null : "Y".equalsIgnoreCase(isEnable))
         );
