@@ -10,17 +10,18 @@
         <result column="merchant_id" property="merchantId" />
         <result column="pid_path" property="pidPath" />
         <result column="user_id" property="userId" />
-        <result column="mobile" property="mobile" />
+        <result column="nickname" property="nickname" />
         <result column="order_id" property="orderId" />
         <result column="item_title" property="itemTitle" />
         <result column="pay_price" property="payPrice" />
         <result column="bill_no" property="billNo" />
         <result column="is_confirm" property="isConfirm" />
+        <result column="website_code" property="websiteCode" />
     </resultMap>
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        id, create_time, update_time, merchant_id, pid_path, user_id, mobile, order_id, item_title, pay_price, bill_no, is_confirm
+        id, create_time, update_time, merchant_id, pid_path, user_id, nickname, order_id, item_title, pay_price, bill_no, is_confirm, website_code
     </sql>
 
 </mapper>

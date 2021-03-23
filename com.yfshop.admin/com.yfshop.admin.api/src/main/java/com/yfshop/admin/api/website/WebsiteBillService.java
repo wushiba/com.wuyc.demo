@@ -18,7 +18,7 @@ import java.util.List;
 public interface WebsiteBillService {
 
     /**
-     * 获取网店记账列表
+     * 获取网点记账列表
      *
      * @param merchantId
      * @param dateTime
@@ -28,13 +28,23 @@ public interface WebsiteBillService {
     WebsiteBillDayResult getBillListByMerchantId(Integer merchantId, Date dateTime, String status) throws ApiException;
 
     /**
+     * 获取网点记账列表
+     *
+     * @param merchantId
+     * @param websiteCode
+     * @param dateTime
+     * @return
+     */
+    WebsiteBillDayResult getBillByWebsiteCode(Integer merchantId, String websiteCode, Date dateTime);
+
+    /**
      * 账单确认
      *
      * @param merchantId
      * @param billIds
      * @return
      */
-    Void billConfirm(Integer merchantId, List<Integer> billIds) throws ApiException;
+    Void billConfirm(Integer merchantId, List<Long> billIds) throws ApiException;
 
     /**
      * 一键确认
@@ -43,4 +53,5 @@ public interface WebsiteBillService {
      * @return
      */
     Void billAllConfirm(Integer merchantId) throws ApiException;
+
 }

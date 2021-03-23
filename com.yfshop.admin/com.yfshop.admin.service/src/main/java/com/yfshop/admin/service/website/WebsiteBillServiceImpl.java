@@ -9,6 +9,7 @@ import com.yfshop.code.mapper.OrderDetailMapper;
 import com.yfshop.code.mapper.WebsiteBillMapper;
 import com.yfshop.code.model.OrderDetail;
 import com.yfshop.code.model.WebsiteBill;
+import com.yfshop.code.model.WebsiteCodeDetail;
 import com.yfshop.common.exception.ApiException;
 import com.yfshop.common.util.BeanUtil;
 import com.yfshop.common.util.DateUtil;
@@ -52,9 +53,37 @@ public class WebsiteBillServiceImpl implements WebsiteBillService {
     public WebsiteBillDayResult getBillListByMerchantId(Integer merchantId, Date dateTime, String status) throws ApiException {
         Date nextDate = DateUtil.plusDays(dateTime, 1);
         List<WebsiteBill> websiteBills = websiteBillMapper.selectList(Wrappers.<WebsiteBill>lambdaQuery()
-                .eq(WebsiteBill::getMerchantId, merchantId).ge(WebsiteBill::getCreateTime, DateUtil.dateToLocalDateTime(dateTime))
+                .eq(WebsiteBill::getMerchantId, merchantId)
+                .ge(WebsiteBill::getCreateTime, DateUtil.dateToLocalDateTime(dateTime))
                 .lt(WebsiteBill::getCreateTime, DateUtil.dateToLocalDateTime(nextDate))
-                .eq(WebsiteBill::getIsConfirm, status));
+                .eq(WebsiteBill::getIsConfirm, status)
+                .orderByDesc(WebsiteBill::getCreateTime));
+        WebsiteBillDayResult websiteBillDayResult = new WebsiteBillDayResult();
+        List<WebsiteBillResult> websiteBillResults = new ArrayList<>();
+        AtomicReference<BigDecimal> totalAmount = new AtomicReference<>(new BigDecimal("0"));
+        Integer totalQuantity = websiteBills.size();
+        websiteBills.forEach(item -> {
+            WebsiteBillResult websiteBillResult = new WebsiteBillResult();
+            BeanUtil.copyProperties(item, websiteBillResults);
+            websiteBillResults.add(websiteBillResult);
+            totalAmount.set(websiteBillResult.getPayPrice().add(totalAmount.get()));
+        });
+        websiteBillDayResult.setWebSiteBillList(websiteBillResults);
+        websiteBillDayResult.setTotalAmount(totalAmount.get().doubleValue());
+        websiteBillDayResult.setTotalQuantity(totalQuantity);
+        return websiteBillDayResult;
+    }
+
+    @Override
+    public WebsiteBillDayResult getBillByWebsiteCode(Integer merchantId, String websiteCode, Date dateTime) {
+        Date nextDate = DateUtil.plusDays(dateTime, 1);
+        List<WebsiteBill> websiteBills = websiteBillMapper.selectList(Wrappers.<WebsiteBill>lambdaQuery()
+                .eq(WebsiteBill::getMerchantId, merchantId)
+                .eq(WebsiteBill::getWebsiteCode, websiteCode)
+                .ge(WebsiteBill::getCreateTime, DateUtil.dateToLocalDateTime(dateTime))
+                .lt(WebsiteBill::getCreateTime, DateUtil.dateToLocalDateTime(nextDate))
+                .eq(WebsiteBill::getIsConfirm, 'Y')
+                .orderByDesc(WebsiteBill::getCreateTime));
         WebsiteBillDayResult websiteBillDayResult = new WebsiteBillDayResult();
         List<WebsiteBillResult> websiteBillResults = new ArrayList<>();
         AtomicReference<BigDecimal> totalAmount = new AtomicReference<>(new BigDecimal("0"));
@@ -80,7 +109,7 @@ public class WebsiteBillServiceImpl implements WebsiteBillService {
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Void billConfirm(Integer merchantId, List<Integer> billIds) throws ApiException {
+    public Void billConfirm(Integer merchantId, List<Long> billIds) throws ApiException {
         LambdaQueryWrapper<WebsiteBill> lambdaQueryWrapper = Wrappers.<WebsiteBill>lambdaQuery()
                 .eq(WebsiteBill::getMerchantId, merchantId)
                 .in(WebsiteBill::getId, billIds)
@@ -89,7 +118,7 @@ public class WebsiteBillServiceImpl implements WebsiteBillService {
         WebsiteBill updateWebsiteBill = new WebsiteBill();
         updateWebsiteBill.setIsConfirm("Y");
         websiteBillMapper.update(updateWebsiteBill, lambdaQueryWrapper);
-        List<Integer> orderIds = websiteBills.stream().map(WebsiteBill::getOrderId).collect(Collectors.toList());
+        List<Long> orderIds = websiteBills.stream().map(WebsiteBill::getOrderId).collect(Collectors.toList());
         orderConfirm(orderIds);
         return null;
     }
@@ -110,7 +139,7 @@ public class WebsiteBillServiceImpl implements WebsiteBillService {
         WebsiteBill updateWebsiteBill = new WebsiteBill();
         updateWebsiteBill.setIsConfirm("Y");
         websiteBillMapper.update(updateWebsiteBill, lambdaQueryWrapper);
-        List<Integer> orderIds = websiteBills.stream().map(WebsiteBill::getOrderId).collect(Collectors.toList());
+        List<Long> orderIds = websiteBills.stream().map(WebsiteBill::getOrderId).collect(Collectors.toList());
         orderConfirm(orderIds);
         return null;
     }
@@ -121,7 +150,7 @@ public class WebsiteBillServiceImpl implements WebsiteBillService {
      *
      * @param orderIds
      */
-    private void orderConfirm(List<Integer> orderIds) {
+    private void orderConfirm(List<Long> orderIds) {
         LambdaQueryWrapper<OrderDetail> lambdaQueryWrapper = Wrappers.<OrderDetail>lambdaQuery()
                 .in(OrderDetail::getOrderId, orderIds);
         OrderDetail orderDetail = new OrderDetail();
