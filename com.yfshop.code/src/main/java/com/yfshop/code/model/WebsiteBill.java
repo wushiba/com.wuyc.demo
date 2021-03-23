@@ -26,7 +26,7 @@ public class WebsiteBill extends Model<WebsiteBill> {
     private static final long serialVersionUID = 1L;
 
     @TableId(value = "id", type = IdType.AUTO)
-    private Integer id;
+    private Long id;
 
     private LocalDateTime createTime;
 
@@ -52,7 +52,7 @@ public class WebsiteBill extends Model<WebsiteBill> {
     /**
      * 订单id
      */
-    private Integer orderId;
+    private Long orderId;
 
     /**
      * 商品名

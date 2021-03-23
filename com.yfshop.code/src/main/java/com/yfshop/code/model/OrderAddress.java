@@ -15,7 +15,7 @@ import lombok.EqualsAndHashCode;
  * </p>
  *
  * @author yoush
- * @since 2021-03-22
+ * @since 2021-03-23
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -25,7 +25,7 @@ public class OrderAddress extends Model<OrderAddress> {
     private static final long serialVersionUID = 1L;
 
     @TableId(value = "id", type = IdType.AUTO)
-    private Integer id;
+    private Long id;
 
     private LocalDateTime createTime;
 
@@ -34,7 +34,7 @@ public class OrderAddress extends Model<OrderAddress> {
     /**
      * 订单id
      */
-    private Integer orderId;
+    private Long orderId;
 
     /**
      * 收货人手机号

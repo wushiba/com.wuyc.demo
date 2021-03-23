@@ -63,11 +63,6 @@ public class MerchantResult implements Serializable {
     private String mobile;
 
     /**
-     * 密码
-     */
-    private String password;
-
-    /**
      * 联系人
      */
     private String contacts;
@@ -98,15 +93,23 @@ public class MerchantResult implements Serializable {
      */
     private String address;
 
-    /**
-     * 是否可用: Y(可用), N(禁用)
-     */
-    private String isEnable;
+    private String websiteTypeName;
 
     /**
-     * 是否删除， Y(删除)， N（未删除）, 默认未删除
+     * 是否有冰箱， Y(有)， N(无)
      */
-    private String isDelete;
+    private String isRefrigerator;
 
+    /**
+     * 经度
+     */
+    private Double longitude;
+
+    /**
+     * 纬度
+     */
+    private Double latitude;
+
+    private String geoHash;
 
 }

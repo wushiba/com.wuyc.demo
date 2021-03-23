@@ -16,7 +16,7 @@ import lombok.EqualsAndHashCode;
  * </p>
  *
  * @author yoush
- * @since 2021-03-22
+ * @since 2021-03-23
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -40,7 +40,7 @@ public class OrderDetail extends Model<OrderDetail> {
     /**
      * 订单id
      */
-    private Integer orderId;
+    private Long orderId;
 
     private Integer merchantId;
 

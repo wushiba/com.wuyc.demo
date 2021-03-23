@@ -25,7 +25,7 @@ public class Captcha extends Model<Captcha> {
     private static final long serialVersionUID = 1L;
 
     @TableId(value = "id", type = IdType.AUTO)
-    private Integer id;
+    private Long id;
 
     private LocalDateTime createTime;
 
