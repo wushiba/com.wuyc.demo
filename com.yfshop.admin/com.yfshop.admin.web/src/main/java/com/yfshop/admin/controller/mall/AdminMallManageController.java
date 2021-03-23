@@ -12,6 +12,7 @@ import com.yfshop.admin.api.mall.result.BannerResult;
 import com.yfshop.admin.api.mall.result.ItemCategoryResult;
 import com.yfshop.common.api.CommonResult;
 import com.yfshop.common.base.BaseController;
+import com.yfshop.common.enums.BannerPositionsEnum;
 import com.yfshop.common.validate.annotation.CandidateValue;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -116,7 +117,7 @@ public class AdminMallManageController implements BaseController {
                                                @RequestParam(name = "sort", required = false, defaultValue = "0") Integer sort) {
         CreateBannerReq req = new CreateBannerReq();
         req.setBannerName(bannerName);
-        req.setPositions("home");
+        req.setPositions(BannerPositionsEnum.HOME.getCode());
         req.setImageUrl(imageUrl);
         req.setJumpUrl(jumpUrl);
         req.setIsEnable(isEnable);
@@ -147,7 +148,7 @@ public class AdminMallManageController implements BaseController {
     @SaCheckPermission
     public CommonResult<IPage<BannerResult>> pageQueryHomeBanner(@RequestParam(name = "currentPage", required = false, defaultValue = "1") Integer currentPage,
                                                            @RequestParam(name = "pageSize", required = false, defaultValue = "10") Integer pageSize) {
-        return CommonResult.success(adminMallManageService.pageQueryBanner(currentPage, pageSize, "home"));
+        return CommonResult.success(adminMallManageService.pageQueryBanner(currentPage, pageSize, BannerPositionsEnum.HOME.getCode()));
     }
 
     @ApiOperation(value = "编辑首页banner", httpMethod = "GET")
@@ -198,7 +199,7 @@ public class AdminMallManageController implements BaseController {
                                                @RequestParam(name = "sort", required = false, defaultValue = "0") Integer sort) {
         CreateBannerReq req = new CreateBannerReq();
         req.setBannerName(bannerName);
-        req.setPositions("banner");
+        req.setPositions(BannerPositionsEnum.BANNER.getCode());
         req.setImageUrl(imageUrl);
         req.setJumpUrl(jumpUrl);
         req.setIsEnable(isEnable);
@@ -229,7 +230,7 @@ public class AdminMallManageController implements BaseController {
     @SaCheckPermission
     public CommonResult<IPage<BannerResult>> pageQueryLoopBanner(@RequestParam(name = "currentPage", required = false, defaultValue = "1") Integer currentPage,
                                                                  @RequestParam(name = "pageSize", required = false, defaultValue = "10") Integer pageSize) {
-        return CommonResult.success(adminMallManageService.pageQueryBanner(currentPage, pageSize, "banner"));
+        return CommonResult.success(adminMallManageService.pageQueryBanner(currentPage, pageSize, BannerPositionsEnum.BANNER.getCode()));
     }
 
     @ApiOperation(value = "编辑轮播banner", httpMethod = "GET")

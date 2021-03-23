@@ -1,6 +1,8 @@
 package com.yfshop.admin.api.mall.request;
 
+import com.yfshop.common.enums.BannerPositionsEnum;
 import com.yfshop.common.validate.annotation.CandidateValue;
+import com.yfshop.common.validate.annotation.CheckEnum;
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
@@ -16,7 +18,7 @@ public class CreateBannerReq implements Serializable {
     @NotBlank(message = "banner名称不能为空")
     private String bannerName;
     @NotBlank(message = "banner类型不能为空")
-    @CandidateValue(candidateValue = {"home", "banner"}, message = "banner类型只能是home|banner")
+    @CheckEnum(value = BannerPositionsEnum.class, message = "banner类型只能是home|banner")
     private String positions;
     @NotBlank(message = "banner图片链接不能为空")
     private String imageUrl;
