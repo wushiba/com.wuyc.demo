@@ -3,6 +3,7 @@ package com.yfshop.admin.api.website.result;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -10,7 +11,7 @@ import java.util.List;
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class WebsiteBillDayResult {
+public class WebsiteBillDayResult implements Serializable {
 
     private Double totalAmount;
     private Integer totalQuantity;

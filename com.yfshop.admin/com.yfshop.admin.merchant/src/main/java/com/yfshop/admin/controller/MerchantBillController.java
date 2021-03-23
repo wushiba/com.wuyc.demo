@@ -36,10 +36,18 @@ class MerchantBillController implements BaseController {
         return CommonResult.success(websiteBillService.getBillListByMerchantId(getCurrentAdminUserId().intValue(),dateTime,status));
     }
 
+
+    @RequestMapping(value = "/getBillByWebsiteCode", method = {RequestMethod.GET})
+    @SaCheckLogin
+    @SaCheckPermission
+    public CommonResult<WebsiteBillDayResult> getBillByWebsiteCode(String websiteCode,Date dateTime) {
+        return CommonResult.success(websiteBillService.getBillByWebsiteCode(getCurrentAdminUserId().intValue(),websiteCode,dateTime));
+    }
+
     @RequestMapping(value = "/billConfirm", method = {RequestMethod.GET})
     @SaCheckLogin
     @SaCheckPermission
-    public CommonResult<Void> billConfirm(List<Integer> ids) {
+    public CommonResult<Void> billConfirm(List<Long> ids) {
         return CommonResult.success(websiteBillService.billConfirm(getCurrentAdminUserId().intValue(),ids));
     }
 

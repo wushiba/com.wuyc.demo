@@ -47,7 +47,7 @@ public class WebsiteBill extends Model<WebsiteBill> {
     /**
      * 用户微信昵称
      */
-    private String mobile;
+    private String nickname;
 
     /**
      * 订单id
@@ -73,6 +73,11 @@ public class WebsiteBill extends Model<WebsiteBill> {
      * N 待确认 Y 已确认
      */
     private String isConfirm;
+
+    /**
+     * 网点码
+     */
+    private String websiteCode;
 
 
     @Override
