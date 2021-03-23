@@ -38,6 +38,7 @@ public class Banner extends Model<Banner> {
 
     /**
      * home(首页图片) | banner(轮播图)
+     * @see com.yfshop.common.enums.BannerPositionsEnum
      */
     private String positions;
 
