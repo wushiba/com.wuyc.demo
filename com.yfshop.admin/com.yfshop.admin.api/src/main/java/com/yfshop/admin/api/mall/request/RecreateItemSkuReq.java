@@ -17,7 +17,7 @@ import java.util.List;
  */
 @ApiModel
 @Data
-public class GenerateItemSkuReq implements Serializable {
+public class RecreateItemSkuReq implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @ApiModelProperty(value = "商品编号", required = true)
@@ -27,5 +27,4 @@ public class GenerateItemSkuReq implements Serializable {
 
     @ApiModelProperty(value = "规格名称和规格值列表")
     private List<ItemSpecNameAndValue> specNameAndValues;
-
 }

@@ -6,10 +6,17 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.yfshop.admin.api.mall.AdminMallManageService;
 import com.yfshop.admin.api.mall.request.CreateBannerReq;
 import com.yfshop.admin.api.mall.request.CreateItemCategoryReq;
+import com.yfshop.admin.api.mall.request.GenerateItemSkuReq;
+import com.yfshop.admin.api.mall.request.ItemCreateReq;
+import com.yfshop.admin.api.mall.request.ItemUpdateReq;
+import com.yfshop.admin.api.mall.request.QueryItemReq;
+import com.yfshop.admin.api.mall.request.SaveItemSkuReq;
 import com.yfshop.admin.api.mall.request.UpdateBannerReq;
 import com.yfshop.admin.api.mall.request.UpdateItemCategoryReq;
 import com.yfshop.admin.api.mall.result.BannerResult;
 import com.yfshop.admin.api.mall.result.ItemCategoryResult;
+import com.yfshop.admin.api.mall.result.ItemResult;
+import com.yfshop.admin.api.mall.result.ItemSkuResult;
 import com.yfshop.common.api.CommonResult;
 import com.yfshop.common.base.BaseController;
 import com.yfshop.common.enums.BannerPositionsEnum;
@@ -23,6 +30,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -147,7 +155,7 @@ public class AdminMallManageController implements BaseController {
     @SaCheckLogin
     @SaCheckPermission
     public CommonResult<IPage<BannerResult>> pageQueryHomeBanner(@RequestParam(name = "currentPage", required = false, defaultValue = "1") Integer currentPage,
-                                                           @RequestParam(name = "pageSize", required = false, defaultValue = "10") Integer pageSize) {
+                                                                 @RequestParam(name = "pageSize", required = false, defaultValue = "10") Integer pageSize) {
         return CommonResult.success(adminMallManageService.pageQueryBanner(currentPage, pageSize, BannerPositionsEnum.HOME.getCode()));
     }
 
@@ -262,4 +270,96 @@ public class AdminMallManageController implements BaseController {
         return CommonResult.success(adminMallManageService.editBanner(req));
     }
 
+    @ApiOperation(value = "创建商品", httpMethod = "GET")
+    @RequestMapping(value = "/createItem", method = {RequestMethod.POST})
+    @ResponseBody
+    @SaCheckLogin
+    @SaCheckPermission
+    public CommonResult<Void> createItem(@NotNull @RequestBody ItemCreateReq req) {
+        return CommonResult.success(adminMallManageService.createItem(req));
+    }
+
+    @ApiOperation(value = "编辑商品基本信息", httpMethod = "POST")
+    @RequestMapping(value = "/editItem", method = {RequestMethod.POST})
+    @ResponseBody
+    @SaCheckLogin
+    @SaCheckPermission
+    public CommonResult<Void> editItem(@NotNull @RequestBody ItemUpdateReq req) {
+        return CommonResult.success(adminMallManageService.editItem(req));
+    }
+
+    @ApiOperation(value = "删除商品", httpMethod = "GET")
+    @ApiImplicitParams(value = {
+            @ApiImplicitParam(paramType = "query", name = "itemId", value = "商品id", required = true)
+    })
+    @RequestMapping(value = "/deleteItem", method = {RequestMethod.GET, RequestMethod.POST})
+    @ResponseBody
+    @SaCheckLogin
+    @SaCheckPermission
+    public CommonResult<Void> deleteItem(@NotNull(message = "商品id不能为空") Integer itemId) {
+        return CommonResult.success(adminMallManageService.deleteItem(itemId));
+    }
+
+    @ApiOperation(value = "分页查询商品列表", httpMethod = "GET")
+    @RequestMapping(value = "/pageQueryItems", method = {RequestMethod.GET, RequestMethod.POST})
+    @ResponseBody
+    @SaCheckLogin
+    @SaCheckPermission
+    public CommonResult<IPage<ItemResult>> pageQueryItems(QueryItemReq req) {
+        return CommonResult.success(adminMallManageService.pageQueryItems(req));
+    }
+
+    @ApiOperation(value = "查询商品的规格和sku信息", httpMethod = "GET")
+    @ApiImplicitParams(value = {
+            @ApiImplicitParam(paramType = "query", name = "itemId", value = "商品id", required = true)
+    })
+    @RequestMapping(value = "/findItemSpecAndSkuList", method = {RequestMethod.GET, RequestMethod.POST})
+    @ResponseBody
+    @SaCheckLogin
+    @SaCheckPermission
+    public CommonResult<Object> findItemSpecAndSkuList(@NotNull(message = "商品id不能为空") Integer itemId) {
+        return CommonResult.success(adminMallManageService.findItemDetailAndSkuList(itemId));
+    }
+
+    @ApiOperation(value = "生成预览的商品sku信息", httpMethod = "GET")
+    @RequestMapping(value = "/previewItemSku", method = {RequestMethod.POST})
+    @ResponseBody
+    @SaCheckLogin
+    @SaCheckPermission
+    public CommonResult<List<ItemSkuResult>> previewItemSku(@NotNull @RequestBody GenerateItemSkuReq req) {
+        return CommonResult.success(adminMallManageService.previewItemSku(req));
+    }
+
+    @ApiOperation(value = "保存商品的规格和sku信息", httpMethod = "POST")
+    @RequestMapping(value = "/saveItemSku", method = {RequestMethod.POST})
+    @ResponseBody
+    @SaCheckLogin
+    @SaCheckPermission
+    public CommonResult<Void> saveItemSku(@NotNull @RequestBody SaveItemSkuReq req) {
+        return CommonResult.success(adminMallManageService.saveItemSku(req));
+    }
+
+    @ApiOperation(value = "sku下架", httpMethod = "GET")
+    @ApiImplicitParams(value = {
+            @ApiImplicitParam(paramType = "query", name = "skuId", value = "商品skuId", required = true)
+    })
+    @RequestMapping(value = "/disableSku", method = {RequestMethod.GET, RequestMethod.POST})
+    @ResponseBody
+    @SaCheckLogin
+    @SaCheckPermission
+    public CommonResult<Void> disableSku(@NotNull(message = "skuId不能为空") Integer skuId) {
+        return CommonResult.success(adminMallManageService.updateSkuIsEnable(skuId, false));
+    }
+
+    @ApiOperation(value = "sku上架", httpMethod = "GET")
+    @ApiImplicitParams(value = {
+            @ApiImplicitParam(paramType = "query", name = "skuId", value = "商品skuId", required = true)
+    })
+    @RequestMapping(value = "/upperShelfSku", method = {RequestMethod.GET, RequestMethod.POST})
+    @ResponseBody
+    @SaCheckLogin
+    @SaCheckPermission
+    public CommonResult<Void> upperShelfSku(@NotNull(message = "skuId不能为空") Integer skuId) {
+        return CommonResult.success(adminMallManageService.updateSkuIsEnable(skuId, true));
+    }
 }

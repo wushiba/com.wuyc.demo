@@ -9,6 +9,12 @@ import java.util.List;
 
 public class BeanUtil {
 
+    public static <T> T convert(Object source, Class<T> clazz) {
+        T instantiate = BeanUtils.instantiateClass(clazz);
+        copyProperties(source, instantiate);
+        return instantiate;
+    }
+
     public static void copyProperties(Object source, Object target) throws BeansException {
         BeanUtils.copyProperties(source, target);
     }

@@ -7,11 +7,14 @@ import com.yfshop.admin.api.mall.request.GenerateItemSkuReq;
 import com.yfshop.admin.api.mall.request.ItemCreateReq;
 import com.yfshop.admin.api.mall.request.ItemUpdateReq;
 import com.yfshop.admin.api.mall.request.QueryItemReq;
+import com.yfshop.admin.api.mall.request.RecreateItemSkuReq;
 import com.yfshop.admin.api.mall.request.SaveItemSkuReq;
 import com.yfshop.admin.api.mall.request.UpdateBannerReq;
 import com.yfshop.admin.api.mall.request.UpdateItemCategoryReq;
 import com.yfshop.admin.api.mall.result.BannerResult;
 import com.yfshop.admin.api.mall.result.ItemCategoryResult;
+import com.yfshop.admin.api.mall.result.ItemResult;
+import com.yfshop.admin.api.mall.result.ItemSkuResult;
 import com.yfshop.common.exception.ApiException;
 
 import java.util.List;
@@ -100,7 +103,7 @@ public interface AdminMallManageService {
      * @param req the req
      * @return the page data
      */
-    IPage<Object> pageQueryItems(QueryItemReq req);
+    IPage<ItemResult> pageQueryItems(QueryItemReq req);
 
     /**
      * 商品上架/下架
@@ -165,7 +168,7 @@ public interface AdminMallManageService {
      * @return the sku list
      * @throws ApiException e
      */
-    List<Object> generateItemSku(GenerateItemSkuReq req) throws ApiException;
+    List<ItemSkuResult> previewItemSku(GenerateItemSkuReq req) throws ApiException;
 
     /**
      * 重建商品的sku信息
@@ -174,7 +177,7 @@ public interface AdminMallManageService {
      * @return void
      * @throws ApiException e
      */
-    Void recreateItemSku(GenerateItemSkuReq req) throws ApiException;
+    Void recreateItemSku(RecreateItemSkuReq req) throws ApiException;
 
     /**
      * 保存商品的sku信息
