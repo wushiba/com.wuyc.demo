@@ -4,6 +4,8 @@ import cn.dev33.satoken.stp.StpUtil;
 import com.yfshop.admin.api.enums.CaptchaSourceEnum;
 import com.yfshop.admin.api.service.CaptchaService;
 import com.yfshop.admin.api.service.merchant.MerchantLoginService;
+import com.yfshop.admin.api.service.merchant.req.MerchantCaptchaReq;
+import com.yfshop.admin.api.service.merchant.req.MerchantLoginReq;
 import com.yfshop.admin.api.service.merchant.result.MerchantResult;
 import com.yfshop.common.api.CommonResult;
 import com.yfshop.common.base.BaseController;
@@ -16,8 +18,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
-
-import javax.validation.constraints.NotNull;
 
 
 @Validated
@@ -36,13 +36,11 @@ class MerchantLoginController implements BaseController {
     /**
      * 密码登录
      *
-     * @param mobile
-     * @param pwd
      * @return
      */
     @RequestMapping(value = "/loginByPwd", method = {RequestMethod.POST})
-    public CommonResult<MerchantResult> loginByPwd(@Mobile(message = "手机号不正确") String mobile, @NotNull(message = "密码不能为空") String pwd) {
-        MerchantResult merchantResult = merchantLoginService.loginByPwd(mobile, pwd);
+    public CommonResult<MerchantResult> loginByPwd(MerchantLoginReq merchantLoginReq) {
+        MerchantResult merchantResult = merchantLoginService.loginByPwd(merchantLoginReq.getMobile(), merchantLoginReq.getPwd());
         StpUtil.setLoginId(merchantResult.getId());
         return CommonResult.success(merchantResult);
     }
@@ -50,13 +48,12 @@ class MerchantLoginController implements BaseController {
     /**
      * 验证码登录
      *
-     * @param mobile
      * @return
      */
     @RequestMapping(value = "/loginByCaptcha", method = {RequestMethod.POST})
     @ResponseBody
-    public CommonResult<MerchantResult> loginByCaptcha(@Mobile(message = "手机号不正确") String mobile, @NotNull(message = "验证码不能为空") String captcha) {
-        MerchantResult merchantResult = merchantLoginService.loginByCaptcha(mobile, captcha);
+    public CommonResult<MerchantResult> loginByCaptcha(MerchantCaptchaReq merchantCaptchaReq) {
+        MerchantResult merchantResult = merchantLoginService.loginByCaptcha(merchantCaptchaReq.getMobile(), merchantCaptchaReq.getCaptcha());
         StpUtil.setLoginId(merchantResult.getId());
         return CommonResult.success(merchantResult);
     }

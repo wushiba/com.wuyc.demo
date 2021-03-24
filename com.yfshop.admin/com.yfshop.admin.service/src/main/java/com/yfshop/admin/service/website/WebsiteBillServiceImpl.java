@@ -52,11 +52,14 @@ public class WebsiteBillServiceImpl implements WebsiteBillService {
      */
     @Override
     public WebsiteBillDayResult getBillListByMerchantId(Integer merchantId, Date dateTime, String status) throws ApiException {
-        Date nextDate = DateUtil.plusDays(dateTime, 1);
+        Date nextDate = null;
+        if (dateTime != null) {
+            nextDate = DateUtil.plusDays(dateTime, 1);
+        }
         List<WebsiteBill> websiteBills = websiteBillMapper.selectList(Wrappers.<WebsiteBill>lambdaQuery()
                 .eq(WebsiteBill::getMerchantId, merchantId)
-                .ge(WebsiteBill::getCreateTime, DateUtil.dateToLocalDateTime(dateTime))
-                .lt(WebsiteBill::getCreateTime, DateUtil.dateToLocalDateTime(nextDate))
+                .ge(dateTime != null,WebsiteBill::getCreateTime, dateTime)
+                .lt(nextDate != null, WebsiteBill::getCreateTime, nextDate)
                 .eq(WebsiteBill::getIsConfirm, status)
                 .orderByDesc(WebsiteBill::getCreateTime));
         WebsiteBillDayResult websiteBillDayResult = new WebsiteBillDayResult();
@@ -76,13 +79,15 @@ public class WebsiteBillServiceImpl implements WebsiteBillService {
     }
 
     @Override
-    public WebsiteBillDayResult getBillByWebsiteCode(Integer merchantId, String websiteCode, Date dateTime) {
-        Date nextDate = DateUtil.plusDays(dateTime, 1);
+    public WebsiteBillDayResult getBillByWebsiteCode(String websiteCode, Date dateTime) {
+        Date nextDate = null;
+        if (dateTime != null) {
+            nextDate = DateUtil.plusDays(dateTime, 1);
+        }
         List<WebsiteBill> websiteBills = websiteBillMapper.selectList(Wrappers.<WebsiteBill>lambdaQuery()
-                .eq(WebsiteBill::getMerchantId, merchantId)
                 .eq(WebsiteBill::getWebsiteCode, websiteCode)
-                .ge(WebsiteBill::getCreateTime, DateUtil.dateToLocalDateTime(dateTime))
-                .lt(WebsiteBill::getCreateTime, DateUtil.dateToLocalDateTime(nextDate))
+                .ge(dateTime != null,WebsiteBill::getCreateTime, dateTime)
+                .lt(nextDate != null, WebsiteBill::getCreateTime, nextDate)
                 .eq(WebsiteBill::getIsConfirm, 'Y')
                 .orderByDesc(WebsiteBill::getCreateTime));
         WebsiteBillDayResult websiteBillDayResult = new WebsiteBillDayResult();

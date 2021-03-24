@@ -1,6 +1,8 @@
 package com.yfshop.common.util;
 
 import cn.hutool.core.collection.CollectionUtil;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.BeansException;
 
@@ -18,10 +20,21 @@ public class BeanUtil {
         return instantiate;
     }
 
+    public static <T> IPage<T> iPageConvert(IPage source, Class<T> clazz) {
+        if (source == null) {
+            return null;
+        }
+        Page page = new Page();
+        copyProperties(source, page);
+        page.setRecords(convertList(source.getRecords(), clazz));
+        return page;
+    }
+
     /**
      * copy class
-     * @param source    源对象
-     * @param target    得到值的对象
+     *
+     * @param source 源对象
+     * @param target 得到值的对象
      * @throws BeansException
      */
     public static void copyProperties(Object source, Object target) throws BeansException {
