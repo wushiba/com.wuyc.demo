@@ -3,6 +3,7 @@ package com.yfshop.admin.api.coupon.result;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 /**
@@ -20,7 +21,11 @@ public class YfUserCouponResult implements Serializable{
 	
     /**  */
     private Long id;
-	
+
+    private LocalDateTime createTime;
+
+    private LocalDateTime updateTime;
+
     /** 用户id编号 */
     private Integer userId;
 	

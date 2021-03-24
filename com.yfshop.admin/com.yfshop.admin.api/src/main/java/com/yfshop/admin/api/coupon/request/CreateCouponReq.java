@@ -10,6 +10,7 @@ import java.util.Date;
 @ApiModel
 @Data
 public class CreateCouponReq implements Serializable {
+
     private static final long serialVersionUID = 1L;
 
     /** 优惠券标题 */

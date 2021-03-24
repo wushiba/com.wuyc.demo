@@ -65,22 +65,20 @@ public class DrawProvinceRate extends Model<DrawProvinceRate> {
     /**
      * 一等奖id
      */
-    private Integer sencondPrizeId;
+    private Integer secondPrizeId;
+
+    /** 二等奖小盒中奖概率 */
+    private Integer secondSmallBoxWinRate;
 
     /**
      * 二等奖中奖几率
      */
-    private Integer sencondWinRate;
+    private Integer secondWinRate;
 
     /**
      * 三等奖id
      */
     private Integer thirdPrizeId;
-
-    /**
-     * 三等奖中奖几率
-     */
-    private Integer thirdWinRate;
 
     /**
      * 排序

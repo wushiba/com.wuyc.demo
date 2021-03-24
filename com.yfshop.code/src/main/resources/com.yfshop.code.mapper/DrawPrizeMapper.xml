@@ -10,6 +10,7 @@
         <result column="act_id" property="actId" />
         <result column="prize_level" property="prizeLevel" />
         <result column="prize_title" property="prizeTitle" />
+        <result column="coupon_id" property="couponId" />
         <result column="prize_count" property="prizeCount" />
         <result column="prize_icon" property="prizeIcon" />
         <result column="win_rate" property="winRate" />
@@ -18,7 +19,7 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        id, create_time, update_time, act_id, prize_level, prize_title, prize_count, prize_icon, win_rate, sort
+        id, create_time, update_time, act_id, prize_level, prize_title, coupon_id, prize_count, prize_icon, win_rate, sort
     </sql>
 
 </mapper>
