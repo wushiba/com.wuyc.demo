@@ -19,5 +19,11 @@
     <sql id="Base_Column_List">
         id, create_time, update_time, ip_start_str, ip_end_str, ip_start_long, ip_end_long, address, operator
     </sql>
+    
+    <select id="getYfIpAddressByIpLong" resultMap="BaseResultMap" >
+        select * from yf_ip_address
+        where #{ipLong} &gt;= ip_start_long and
+        #{ipLong} &lt;= ip_end_long limit 1
+    </select>
 
 </mapper>

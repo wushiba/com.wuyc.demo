@@ -5,6 +5,7 @@ import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cache.caffeine.CaffeineCacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
 
 import java.util.concurrent.TimeUnit;
@@ -19,9 +20,10 @@ public class CacheConfig {
 
     private static final long AVAILABLE_TIME = 10;
 
-//    @Bean
-//    @Profile(value = {"dev", "uat"})
-    public CaffeineCacheManager cacheManager() {
+    @Primary
+    @Bean
+    @Profile(value = {"dev", "uat"})
+    public CaffeineCacheManager caffeineCacheManager() {
         Caffeine<Object, Object> caffeine = Caffeine.newBuilder()
                 // 最后一次写入后经过固定时间过期
                 .expireAfterWrite(AVAILABLE_TIME, TimeUnit.MINUTES)
@@ -30,6 +32,7 @@ public class CacheConfig {
         CaffeineCacheManager caffeineCacheManager = new CaffeineCacheManager();
         caffeineCacheManager.setAllowNullValues(true);
         caffeineCacheManager.setCaffeine(caffeine);
+        System.out.println("==================创建CaffeineCacheManager==================");
         return caffeineCacheManager;
     }
 

@@ -2,6 +2,7 @@ package com.yfshop.shop.config;
 
 import cn.dev33.satoken.interceptor.SaAnnotationInterceptor;
 import cn.hutool.core.date.DateUtil;
+import com.yfshop.common.exception.CustomGlobalExceptionResolver;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.boot.web.server.ConfigurableWebServerFactory;
@@ -42,6 +43,11 @@ public class WebMvcConfig implements WebMvcConfigurer {
                 factory.addErrorPages(error404Page, error500Page);
             }
         };
+    }
+
+    @Bean
+    public CustomGlobalExceptionResolver customGlobalExceptionResolver() {
+        return new CustomGlobalExceptionResolver();
     }
 
     /**

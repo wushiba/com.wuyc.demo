@@ -45,7 +45,8 @@ public class AdminMenuManageServiceImpl implements AdminMenuManageService {
     @Resource
     private MenuMapper menuMapper;
 
-    @Cacheable(cacheNames = CacheConstants.MERCHANT_MENUS_CACHE_NAME,
+    @Cacheable(cacheManager = "caffeineCacheManager",
+            cacheNames = CacheConstants.MERCHANT_MENUS_CACHE_NAME,
             key = "'" + CacheConstants.MERCHANT_MENUS_CACHE_KEY_PREFIX + "' + #root.args[0]")
     @Override
     public List<MenuResult> queryMerchantMenus(Integer merchantId) {

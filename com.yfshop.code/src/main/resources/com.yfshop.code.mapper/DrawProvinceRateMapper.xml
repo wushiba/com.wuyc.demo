@@ -12,16 +12,15 @@
         <result column="province_name" property="provinceName" />
         <result column="first_prize_id" property="firstPrizeId" />
         <result column="first_win_rate" property="firstWinRate" />
-        <result column="sencond_prize_id" property="sencondPrizeId" />
-        <result column="sencond_win_rate" property="sencondWinRate" />
+        <result column="second_prize_id" property="secondPrizeId" />
+        <result column="second_win_rate" property="secondWinRate" />
         <result column="third_prize_id" property="thirdPrizeId" />
-        <result column="third_win_rate" property="thirdWinRate" />
         <result column="sort" property="sort" />
     </resultMap>
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        id, create_time, update_time, act_id, province_id, province_name, first_prize_id, first_win_rate, sencond_prize_id, sencond_win_rate, third_prize_id, third_win_rate, sort
+        id, create_time, update_time, act_id, province_id, province_name, first_prize_id, first_win_rate, second_prize_id, second_win_rate, third_prize_id,  sort
     </sql>
 
 </mapper>

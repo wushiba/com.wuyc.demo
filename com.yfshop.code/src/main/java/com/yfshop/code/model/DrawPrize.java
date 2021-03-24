@@ -53,6 +53,11 @@ public class DrawPrize extends Model<DrawPrize> {
     private String prizeTitle;
 
     /**
+     * 优惠券id
+     */
+    private Integer couponId;
+
+    /**
      * 奖品数量
      */
     private Integer prizeCount;
@@ -66,6 +71,9 @@ public class DrawPrize extends Model<DrawPrize> {
      * 中奖几率, 1%存100
      */
     private Integer winRate;
+
+    /** 二等奖小盒中奖概率 */
+    private Integer smallBoxRate;
 
     /**
      * 排序
