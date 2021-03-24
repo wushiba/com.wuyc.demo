@@ -49,6 +49,7 @@ public interface MerchantInfoService {
 
     /**
      * 我申请的网点码
+     *
      * @param merchantId
      * @param status
      * @param dateTime
@@ -59,11 +60,31 @@ public interface MerchantInfoService {
 
     /**
      * 获取待申请网点码
+     *
      * @param merchantId
      * @param status
      * @param pageIndex
      * @param pageSize
      * @return
      */
-    IPage<WebsiteCodeResult> getApplyWebsiteCode(Integer merchantId, String status, Integer pageIndex, Integer pageSize);
+    IPage<WebsiteCodeResult> applyWebsiteCodeStatus(Integer merchantId, String status, Integer pageIndex, Integer pageSize) throws ApiException;
+
+    /**
+     * 更新待申请网点码
+     *
+     * @param id
+     * @param status
+     * @throws ApiException
+     */
+    Void updateApplyWebsiteCode(Integer id, String status) throws ApiException;
+
+    /**
+     * 申请网点码
+     *
+     * @param merchantId
+     * @param count
+     * @param email
+     * @throws ApiException
+     */
+    Void applyWebsiteCode(Integer merchantId, Integer count, String email) throws ApiException;
 }

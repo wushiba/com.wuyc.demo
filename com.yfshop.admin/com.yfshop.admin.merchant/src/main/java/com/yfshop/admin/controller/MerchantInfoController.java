@@ -5,7 +5,8 @@ import cn.dev33.satoken.stp.StpUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.yfshop.admin.api.service.merchant.MerchantInfoService;
 import com.yfshop.admin.api.service.merchant.result.MerchantResult;
-import com.yfshop.admin.api.website.req.WebsiteCodeApplyReq;
+import com.yfshop.admin.api.website.req.WebsiteCodeApplyReq1;
+import com.yfshop.admin.api.website.req.WebsiteCodeApplyStatusReq;
 import com.yfshop.admin.api.website.req.WebsiteCodeBindReq;
 import com.yfshop.admin.api.website.req.WebsiteCodeReq;
 import com.yfshop.admin.api.website.result.WebsiteCodeDetailResult;
@@ -21,7 +22,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Date;
 import java.util.List;
 
 @Validated
@@ -68,7 +68,7 @@ class MerchantInfoController implements BaseController {
     @SaCheckLogin
     @RequestMapping(value = "/myWebsiteCode", method = {RequestMethod.POST})
     public CommonResult<List<WebsiteCodeDetailResult>> getMyWebsiteCode(WebsiteCodeReq websiteCodeReq) {
-        List<WebsiteCodeDetailResult> websiteCodeDetailResults = merchantInfoService.getMyWebsiteCode(getCurrentAdminUserId(),websiteCodeReq.getStatus(),websiteCodeReq.getDateTime());
+        List<WebsiteCodeDetailResult> websiteCodeDetailResults = merchantInfoService.getMyWebsiteCode(getCurrentAdminUserId(), websiteCodeReq.getStatus(), websiteCodeReq.getDateTime());
         return CommonResult.success(websiteCodeDetailResults);
     }
 
@@ -79,7 +79,7 @@ class MerchantInfoController implements BaseController {
      */
     @RequestMapping(value = "/websiteCodeBind", method = {RequestMethod.POST})
     public CommonResult<Void> websiteCodeBind(WebsiteCodeBindReq websiteReq) {
-        if (StpUtil.isLogin()){
+        if (StpUtil.isLogin()) {
             websiteReq.setId(StpUtil.getLoginIdAsInt());
         }
         return CommonResult.success(merchantInfoService.websiteCodeBind(websiteReq));
@@ -102,10 +102,34 @@ class MerchantInfoController implements BaseController {
      *
      * @return
      */
-    @RequestMapping(value = "/applyWebsiteCode", method = {RequestMethod.POST})
-    public CommonResult<IPage<WebsiteCodeResult>> getApplyWebsiteCode(WebsiteCodeApplyReq websiteCodeApplyReq) {
-        IPage<WebsiteCodeResult> websiteTypeResults = merchantInfoService.getApplyWebsiteCode(getCurrentAdminUserId(),websiteCodeApplyReq.getStatus(),websiteCodeApplyReq.getPageIndex(),websiteCodeApplyReq.getPageSize());
+    @RequestMapping(value = "/applyWebsiteCodeStatus", method = {RequestMethod.POST})
+    public CommonResult<IPage<WebsiteCodeResult>> applyWebsiteCodeStatus(WebsiteCodeApplyStatusReq websiteCodeApplyReq) {
+        IPage<WebsiteCodeResult> websiteTypeResults = merchantInfoService.applyWebsiteCodeStatus(getCurrentAdminUserId(), websiteCodeApplyReq.getStatus(), websiteCodeApplyReq.getPageIndex(), websiteCodeApplyReq.getPageSize());
         return CommonResult.success(websiteTypeResults);
+    }
+
+
+    /**
+     * 更新申请网点码状态
+     *
+     * @return
+     */
+    @RequestMapping(value = "/updateApplyWebsiteCode", method = {RequestMethod.POST})
+    public CommonResult<Void> updateApplyWebsiteCode(WebsiteCodeApplyStatusReq websiteCodeApplyReq) {
+        merchantInfoService.updateApplyWebsiteCode(websiteCodeApplyReq.getId(), websiteCodeApplyReq.getStatus());
+        return CommonResult.success(null);
+    }
+
+
+    /**
+     * 申请网点码
+     *
+     * @return
+     */
+    @RequestMapping(value = "/applyWebsiteCode", method = {RequestMethod.POST})
+    public CommonResult<Void> applyWebsiteCode(WebsiteCodeApplyReq1 websiteCodeApplyReq) {
+        merchantInfoService.applyWebsiteCode(getCurrentAdminUserId(), websiteCodeApplyReq.getCount(), websiteCodeApplyReq.getEmail());
+        return CommonResult.success(null);
     }
 
 

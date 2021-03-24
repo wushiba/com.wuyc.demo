@@ -1,5 +1,7 @@
 package com.yfshop.admin.service.merchant;
 
+import java.time.LocalDateTime;
+
 import com.google.common.collect.Lists;
 
 import cn.hutool.core.collection.CollectionUtil;
@@ -143,7 +145,7 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
     }
 
     @Override
-    public IPage<WebsiteCodeResult> getApplyWebsiteCode(Integer merchantId, String status, Integer pageIndex, Integer pageSize) {
+    public IPage<WebsiteCodeResult> applyWebsiteCodeStatus(Integer merchantId, String status, Integer pageIndex, Integer pageSize) {
         List<String> allStatus = new ArrayList<>();
         if ("ALL".equals(status)) {
             allStatus.add("WAIT");
@@ -156,8 +158,27 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
                 .eq(StringUtils.isNotBlank(status) && !"ALL".equals(status), WebsiteCode::getOrderStatus, allStatus)
                 .orderByDesc(WebsiteCode::getId);
         IPage<WebsiteCode> websiteCodeIPage = websiteCodeMapper.selectPage(new Page<>(pageIndex, pageSize), lambdaQueryWrapper);
-        List<WebsiteCodeResult> results = BeanUtil.convertList(websiteCodeIPage.getRecords(), WebsiteCodeResult.class);
-        return iPage;
+        return BeanUtil.iPageConvert(websiteCodeIPage, WebsiteCodeResult.class);
+    }
+
+    @Override
+    public Void updateApplyWebsiteCode(Integer id, String status) throws ApiException {
+        WebsiteCode websiteCode = new WebsiteCode();
+        websiteCode.setOrderStatus(status);
+        websiteCode.setId(id);
+        websiteCodeMapper.updateById(websiteCode);
+        return null;
+    }
+
+    @Override
+    public Void applyWebsiteCode(Integer merchantId, Integer count, String email) throws ApiException {
+        Merchant merchant = merchantMapper.selectById(merchantId);
+        WebsiteCode websiteCode = new WebsiteCode();
+        websiteCode.setMerchantId(merchant.getId());
+        websiteCode.setPidPath(merchant.getPidPath());
+        websiteCode.setQuantity(count);
+        websiteCodeMapper.insert(websiteCode);
+        return null;
     }
 
 }
