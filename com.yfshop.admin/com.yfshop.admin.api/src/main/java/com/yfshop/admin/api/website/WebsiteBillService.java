@@ -30,12 +30,11 @@ public interface WebsiteBillService {
     /**
      * 获取网点记账列表
      *
-     * @param merchantId
      * @param websiteCode
      * @param dateTime
      * @return
      */
-    WebsiteBillDayResult getBillByWebsiteCode(Integer merchantId, String websiteCode, Date dateTime);
+    WebsiteBillDayResult getBillByWebsiteCode(String websiteCode, Date dateTime);
 
     /**
      * 账单确认

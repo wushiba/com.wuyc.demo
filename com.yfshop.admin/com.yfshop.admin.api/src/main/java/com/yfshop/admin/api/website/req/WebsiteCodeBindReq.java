@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class WebsiteReq implements Serializable {
+public class WebsiteCodeBindReq implements Serializable {
 
     private static final long serialVersionUID = 1L;
 

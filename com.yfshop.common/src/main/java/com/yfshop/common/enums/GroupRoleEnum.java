@@ -18,9 +18,14 @@ public enum GroupRoleEnum {
 
     YWY("ywy", "业务员"),
 
-    CXY("zb", "促销员"),
+    CXY("cxy", "促销员"),
+
     GC("gc", "工厂"),
+
+    CK("ck", "仓库"),
+
     WL("wl", "物料"),
+
     WD("wd", "网点");
 
     /**
