@@ -1,4 +1,4 @@
-package com.yfshop.admin.api.enums;
+package com.yfshop.common.enums;
 
 public enum CaptchaSourceEnum {
 
