@@ -41,7 +41,6 @@
             <version>1.0-SNAPSHOT</version>
         </dependency>
 
-
         <!--swagger依赖 start-->
         <dependency>
             <groupId>com.spring4all</groupId>
@@ -102,18 +101,6 @@
         </dependency>
         <!--好用的反射工具 end-->
 
-        <!--工具类集合 start-->
-        <dependency>
-            <groupId>cn.hutool</groupId>
-            <artifactId>hutool-all</artifactId>
-        </dependency>
-        <!--工具类集合 end-->
-
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <optional>true</optional>
-        </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-autoconfigure</artifactId>

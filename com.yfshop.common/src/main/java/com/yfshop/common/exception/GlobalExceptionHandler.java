@@ -1,6 +1,7 @@
 package com.yfshop.common.exception;
 
 import com.yfshop.common.api.CommonResult;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
  * 全局异常处理
  */
 //@ControllerAdvice
+//@ConditionalOnWebApplication
 public class GlobalExceptionHandler {
 
     @ResponseBody

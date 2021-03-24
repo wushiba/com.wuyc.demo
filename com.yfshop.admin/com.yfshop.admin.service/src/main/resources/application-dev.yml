@@ -28,7 +28,9 @@ spring:
     testOnReturn: false
     driverClassName: com.mysql.cj.jdbc.Driver
     maxActive: 20
-  
+  redis:
+    host: 192.168.11.197
+    port: 6379
 dubbo:
   registry:
     address: zookeeper://127.0.0.1:2181

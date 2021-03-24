@@ -17,6 +17,8 @@ import com.yfshop.admin.api.mall.result.ItemResult;
 import com.yfshop.admin.api.mall.result.ItemSkuResult;
 import com.yfshop.common.exception.ApiException;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 /**
@@ -34,7 +36,7 @@ public interface AdminMallManageService {
      * @return void
      * @throws ApiException e
      */
-    Void createBanner(CreateBannerReq req) throws ApiException;
+    Void createBanner(@Valid @NotNull(message = "创建banner信息不能为空") CreateBannerReq req) throws ApiException;
 
     /**
      * 编辑banner
@@ -43,7 +45,7 @@ public interface AdminMallManageService {
      * @return void
      * @throws ApiException e
      */
-    Void editBanner(UpdateBannerReq req) throws ApiException;
+    Void editBanner(@Valid @NotNull(message = "编辑banner信息不能为空") UpdateBannerReq req) throws ApiException;
 
     /**
      * 删除banner
@@ -51,7 +53,7 @@ public interface AdminMallManageService {
      * @param bannerId the banner id
      * @return void
      */
-    Void deleteBanner(Integer bannerId);
+    Void deleteBanner(@NotNull(message = "bannerId不能为空") Integer bannerId);
 
     /**
      * 分页查询首页banner
@@ -70,7 +72,7 @@ public interface AdminMallManageService {
      * @return void
      * @throws ApiException e
      */
-    Void createCategory(CreateItemCategoryReq req) throws ApiException;
+    Void createCategory(@Valid @NotNull(message = "创建分类信息不能为空") CreateItemCategoryReq req) throws ApiException;
 
     /**
      * 编辑分类
@@ -79,7 +81,7 @@ public interface AdminMallManageService {
      * @return void
      * @throws ApiException e
      */
-    Void editCategory(UpdateItemCategoryReq req) throws ApiException;
+    Void editCategory(@Valid @NotNull(message = "编辑分类信息不能为空") UpdateItemCategoryReq req) throws ApiException;
 
     /**
      * 删除类目
@@ -113,7 +115,7 @@ public interface AdminMallManageService {
      * @return void
      * @throws ApiException e
      */
-    Void updateItemIsEnable(Integer itemId, boolean isEnable) throws ApiException;
+    Void updateItemIsEnable(@NotNull(message = "商品id不能为空") Integer itemId, boolean isEnable) throws ApiException;
 
     /**
      * sku上架/下架
@@ -123,7 +125,7 @@ public interface AdminMallManageService {
      * @return void
      * @throws ApiException e
      */
-    Void updateSkuIsEnable(Integer skuId, boolean isEnable) throws ApiException;
+    Void updateSkuIsEnable(@NotNull(message = "规格id不能为空") Integer skuId, boolean isEnable) throws ApiException;
 
     /**
      * 删除商品
@@ -132,7 +134,7 @@ public interface AdminMallManageService {
      * @return void
      * @throws ApiException e
      */
-    Void deleteItem(Integer itemId) throws ApiException;
+    Void deleteItem(@NotNull(message = "规格id不能为空") Integer itemId) throws ApiException;
 
     /**
      * 查询商品的详情及其sku列表
@@ -150,7 +152,7 @@ public interface AdminMallManageService {
      * @return void
      * @throws ApiException e
      */
-    Void createItem(ItemCreateReq req) throws ApiException;
+    Void createItem(@Valid @NotNull ItemCreateReq req) throws ApiException;
 
     /**
      * 编辑商品的基本信息
@@ -159,7 +161,7 @@ public interface AdminMallManageService {
      * @return void
      * @throws ApiException e
      */
-    Void editItem(ItemUpdateReq req) throws ApiException;
+    Void editItem(@Valid @NotNull ItemUpdateReq req) throws ApiException;
 
     /**
      * 根据规格生成sku信息用于预览
@@ -168,7 +170,7 @@ public interface AdminMallManageService {
      * @return the sku list
      * @throws ApiException e
      */
-    List<ItemSkuResult> previewItemSku(GenerateItemSkuReq req) throws ApiException;
+    List<ItemSkuResult> previewItemSku(@Valid @NotNull GenerateItemSkuReq req) throws ApiException;
 
     /**
      * 重建商品的sku信息
@@ -177,7 +179,7 @@ public interface AdminMallManageService {
      * @return void
      * @throws ApiException e
      */
-    Void recreateItemSku(RecreateItemSkuReq req) throws ApiException;
+    Void recreateItemSku(@Valid @NotNull RecreateItemSkuReq req) throws ApiException;
 
     /**
      * 保存商品的sku信息
@@ -186,6 +188,6 @@ public interface AdminMallManageService {
      * @return void
      * @throws ApiException e
      */
-    Void saveItemSku(SaveItemSkuReq req) throws ApiException;
+    Void saveItemSku(@Valid @NotNull SaveItemSkuReq req) throws ApiException;
 
 }

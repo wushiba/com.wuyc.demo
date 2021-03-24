@@ -60,6 +60,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -109,7 +110,7 @@ public class AdminMallManageServiceImpl implements AdminMallManageService {
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public Void createBanner(@NotNull(message = "创建banner信息不能为空") CreateBannerReq req) throws ApiException {
+    public Void createBanner(@Valid @NotNull(message = "创建banner信息不能为空") CreateBannerReq req) throws ApiException {
         Banner banner = new Banner();
         banner.setCreateTime(LocalDateTime.now());
         banner.setUpdateTime(LocalDateTime.now());
@@ -125,7 +126,7 @@ public class AdminMallManageServiceImpl implements AdminMallManageService {
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public Void editBanner(@NotNull(message = "编辑banner信息不能为空") UpdateBannerReq req) throws ApiException {
+    public Void editBanner(@Valid @NotNull(message = "编辑banner信息不能为空") UpdateBannerReq req) throws ApiException {
         Banner banner = new Banner();
         banner.setId(req.getBannerId());
         banner.setUpdateTime(LocalDateTime.now());
@@ -161,7 +162,7 @@ public class AdminMallManageServiceImpl implements AdminMallManageService {
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public Void createCategory(@NotNull(message = "创建分类信息不能为空") CreateItemCategoryReq req) throws ApiException {
+    public Void createCategory(@Valid @NotNull(message = "创建分类信息不能为空") CreateItemCategoryReq req) throws ApiException {
         ItemCategory category = new ItemCategory();
         category.setCreateTime(LocalDateTime.now());
         category.setUpdateTime(LocalDateTime.now());
@@ -174,7 +175,7 @@ public class AdminMallManageServiceImpl implements AdminMallManageService {
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public Void editCategory(@NotNull(message = "编辑分类信息不能为空") UpdateItemCategoryReq req) throws ApiException {
+    public Void editCategory(@Valid @NotNull(message = "编辑分类信息不能为空") UpdateItemCategoryReq req) throws ApiException {
         ItemCategory category = new ItemCategory();
         category.setId(req.getCategoryId());
         category.setUpdateTime(LocalDateTime.now());
@@ -324,7 +325,7 @@ public class AdminMallManageServiceImpl implements AdminMallManageService {
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public Void createItem(@NotNull ItemCreateReq req) throws ApiException {
+    public Void createItem(@Valid @NotNull ItemCreateReq req) throws ApiException {
         ItemCategory itemCategory = categoryMapper.selectById(req.getCategoryId());
         Asserts.assertNonNull(itemCategory, 500, "分类信息不存在");
 
@@ -373,7 +374,7 @@ public class AdminMallManageServiceImpl implements AdminMallManageService {
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public Void editItem(@NotNull ItemUpdateReq req) throws ApiException {
+    public Void editItem(@Valid @NotNull ItemUpdateReq req) throws ApiException {
         ItemCategory itemCategory = categoryMapper.selectById(req.getCategoryId());
         Asserts.assertNonNull(itemCategory, 500, "分类信息不存在");
 
@@ -420,7 +421,7 @@ public class AdminMallManageServiceImpl implements AdminMallManageService {
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public List<ItemSkuResult> previewItemSku(@NotNull GenerateItemSkuReq req) throws ApiException {
+    public List<ItemSkuResult> previewItemSku(@Valid @NotNull GenerateItemSkuReq req) throws ApiException {
         // 校验规格数据
         if (CollectionUtils.isNotEmpty(req.getSpecNameAndValues())) {
             this.checkSpec(req.getSpecNameAndValues());
@@ -472,7 +473,7 @@ public class AdminMallManageServiceImpl implements AdminMallManageService {
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public Void recreateItemSku(@NotNull RecreateItemSkuReq req) throws ApiException {
+    public Void recreateItemSku(@Valid @NotNull RecreateItemSkuReq req) throws ApiException {
         Integer itemId = req.getItemId();
         Item item = itemMapper.selectById(itemId);
         Asserts.assertNonNull(item, 500, "商品不存在");
@@ -603,7 +604,7 @@ public class AdminMallManageServiceImpl implements AdminMallManageService {
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public Void saveItemSku(@NotNull SaveItemSkuReq req) throws ApiException {
+    public Void saveItemSku(@Valid @NotNull SaveItemSkuReq req) throws ApiException {
         GenerateItemSkuReq skuRequest = req.getSpecInfo();
         Asserts.assertNonNull(skuRequest, 500, "保存商品sku没有规格数据");
 

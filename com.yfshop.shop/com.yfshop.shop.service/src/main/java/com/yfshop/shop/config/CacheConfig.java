@@ -1,4 +1,4 @@
-package com.yfshop.admin.config;
+package com.yfshop.shop.config;
 
 import com.github.benmanes.caffeine.cache.Caffeine;
 import org.springframework.cache.annotation.EnableCaching;

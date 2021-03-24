@@ -13,11 +13,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.core.PriorityOrdered;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.lang.Nullable;
-import org.springframework.stereotype.Component;
 import org.springframework.validation.BindException;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
@@ -51,7 +51,7 @@ import java.util.Set;
  *
  * @author xulg
  */
-@Component
+@ConditionalOnWebApplication
 public class CustomGlobalExceptionResolver implements HandlerExceptionResolver, PriorityOrdered, InitializingBean {
     private static final Logger logger = LoggerFactory.getLogger(CustomGlobalExceptionResolver.class);
 
