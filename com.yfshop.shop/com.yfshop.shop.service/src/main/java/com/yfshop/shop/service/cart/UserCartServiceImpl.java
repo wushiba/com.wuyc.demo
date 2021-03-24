@@ -163,7 +163,7 @@ public class UserCartServiceImpl implements UserCartService {
     @Transactional(rollbackFor = Exception.class)
     @Override
     public Void deleteUserCarts(@NotNull(message = "用户ID不能为空") Integer userId,
-                                @NotEmpty(message = "购物车列表不能为空") List<Integer> skuIds) {
+                                @NotEmpty(message = "购物车列表不能为空") List<Integer> skuIds) throws ApiException {
         cartMapper.delete(Wrappers.lambdaQuery(UserCart.class)
                 .eq(UserCart::getUserId, userId).in(UserCart::getSkuId, skuIds));
         return null;

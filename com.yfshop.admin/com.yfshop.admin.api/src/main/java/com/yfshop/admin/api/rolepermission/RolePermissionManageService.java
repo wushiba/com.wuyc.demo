@@ -5,6 +5,7 @@ import com.yfshop.admin.api.rolepermission.request.CreatePermissionReq;
 import com.yfshop.admin.api.rolepermission.result.RoleResult;
 import com.yfshop.common.exception.ApiException;
 
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 /**
@@ -23,7 +24,7 @@ public interface RolePermissionManageService {
      * @return void
      * @throws ApiException e
      */
-    Void createPermission(Integer merchantId, CreatePermissionReq req) throws ApiException;
+    Void createPermission(Integer merchantId, @NotNull CreatePermissionReq req) throws ApiException;
 
     /**
      * 关联角色和权限
@@ -32,7 +33,7 @@ public interface RolePermissionManageService {
      * @return void
      * @throws ApiException e
      */
-    Void associateRolePermission(AssociateRolePermissionReq req) throws ApiException;
+    Void associateRolePermission(@NotNull AssociateRolePermissionReq req) throws ApiException;
 
     /**
      * 查询所有的角色

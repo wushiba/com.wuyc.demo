@@ -1,6 +1,6 @@
 package com.yfshop.admin.api.service;
 
-import com.yfshop.admin.api.enums.CaptchaSourceEnum;
+import com.yfshop.common.enums.CaptchaSourceEnum;
 import com.yfshop.common.exception.ApiException;
 
 public interface CaptchaService {
