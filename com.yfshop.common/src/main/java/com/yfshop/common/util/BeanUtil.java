@@ -34,7 +34,7 @@ public class BeanUtil {
             try {
                 for (T original : origList) {
                     K result = clazz.newInstance();
-                    copyProperties(result, original);
+                    copyProperties(original, result);
                     destList.add(result);
                 }
             } catch (IllegalAccessException e) {

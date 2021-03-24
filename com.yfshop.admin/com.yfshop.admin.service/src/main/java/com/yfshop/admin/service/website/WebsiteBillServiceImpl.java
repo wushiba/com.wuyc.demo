@@ -1,5 +1,6 @@
 package com.yfshop.admin.service.website;
 
+import cn.hutool.core.collection.CollectionUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.yfshop.admin.api.website.WebsiteBillService;
@@ -64,7 +65,7 @@ public class WebsiteBillServiceImpl implements WebsiteBillService {
         Integer totalQuantity = websiteBills.size();
         websiteBills.forEach(item -> {
             WebsiteBillResult websiteBillResult = new WebsiteBillResult();
-            BeanUtil.copyProperties(item, websiteBillResults);
+            BeanUtil.copyProperties(item, websiteBillResult);
             websiteBillResults.add(websiteBillResult);
             totalAmount.set(websiteBillResult.getPayPrice().add(totalAmount.get()));
         });
@@ -151,11 +152,13 @@ public class WebsiteBillServiceImpl implements WebsiteBillService {
      * @param orderIds
      */
     private void orderConfirm(List<Long> orderIds) {
-        LambdaQueryWrapper<OrderDetail> lambdaQueryWrapper = Wrappers.<OrderDetail>lambdaQuery()
-                .in(OrderDetail::getOrderId, orderIds);
-        OrderDetail orderDetail = new OrderDetail();
-        orderDetail.setOrderStatus("YWC");
-        orderDetailMapper.update(orderDetail, lambdaQueryWrapper);
+        if (!CollectionUtil.isEmpty(orderIds)) {
+            LambdaQueryWrapper<OrderDetail> lambdaQueryWrapper = Wrappers.<OrderDetail>lambdaQuery()
+                    .in(OrderDetail::getOrderId, orderIds);
+            OrderDetail orderDetail = new OrderDetail();
+            orderDetail.setOrderStatus("YWC");
+            orderDetailMapper.update(orderDetail, lambdaQueryWrapper);
+        }
     }
 
 }

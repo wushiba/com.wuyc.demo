@@ -1,15 +1,15 @@
 package com.yfshop.admin.controller;
 
-import cn.dev33.satoken.annotation.SaCheckLogin;
-import cn.dev33.satoken.annotation.SaCheckPermission;
-import com.sun.org.slf4j.internal.Logger;
-import com.sun.org.slf4j.internal.LoggerFactory;
+
 import com.yfshop.admin.api.website.WebsiteBillService;
 import com.yfshop.admin.api.website.result.WebsiteBillDayResult;
 import com.yfshop.common.api.CommonResult;
 import com.yfshop.common.base.BaseController;
 import org.apache.dubbo.config.annotation.DubboReference;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -37,12 +37,12 @@ class MerchantBillController implements BaseController {
         return CommonResult.success(websiteBillService.getBillByWebsiteCode(10358, websiteCode, dateTime));
     }
 
-    @RequestMapping(value = "/billConfirm", method = {RequestMethod.GET})
-    public CommonResult<Void> billConfirm(List<Long> ids) {
+    @RequestMapping(value = "/billConfirm", method = {RequestMethod.POST})
+    public CommonResult<Void> billConfirm(@RequestBody List<Long> ids) {
         return CommonResult.success(websiteBillService.billConfirm(10358, ids));
     }
 
-    @RequestMapping(value = "/billAllConfirm", method = {RequestMethod.GET})
+    @RequestMapping(value = "/billAllConfirm", method = {RequestMethod.POST})
     public CommonResult<Void> billAllConfirm() {
         return CommonResult.success(websiteBillService.billAllConfirm(10358));
     }
