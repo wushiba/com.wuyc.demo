@@ -1,7 +1,6 @@
 package com.yfshop.admin.controller;
 
 import cn.dev33.satoken.stp.StpUtil;
-import com.yfshop.admin.api.enums.CaptchaSourceEnum;
 import com.yfshop.admin.api.service.CaptchaService;
 import com.yfshop.admin.api.service.merchant.MerchantLoginService;
 import com.yfshop.admin.api.service.merchant.req.MerchantCaptchaReq;
@@ -9,6 +8,7 @@ import com.yfshop.admin.api.service.merchant.req.MerchantLoginReq;
 import com.yfshop.admin.api.service.merchant.result.MerchantResult;
 import com.yfshop.common.api.CommonResult;
 import com.yfshop.common.base.BaseController;
+import com.yfshop.common.enums.CaptchaSourceEnum;
 import com.yfshop.common.validate.annotation.Mobile;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.slf4j.Logger;
