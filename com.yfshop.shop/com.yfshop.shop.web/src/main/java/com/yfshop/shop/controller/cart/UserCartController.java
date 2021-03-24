@@ -8,6 +8,8 @@ import com.yfshop.shop.controller.vo.UserCartPageData;
 import com.yfshop.shop.service.cart.UserCartService;
 import com.yfshop.shop.service.cart.result.UserCartResult;
 import com.yfshop.shop.service.cart.result.UserCartSummary;
+import com.yfshop.shop.service.coupon.result.YfUserCouponResult;
+import com.yfshop.shop.service.coupon.service.FrontUserCouponService;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
@@ -41,6 +43,8 @@ public class UserCartController implements BaseController {
 
     @DubboReference(check = false)
     private UserCartService userCartService;
+    @DubboReference(check = false)
+    private FrontUserCouponService userCouponService;
 
     @ApiOperation(value = "查询购物车页面数据", httpMethod = "GET")
     @RequestMapping(value = "/queryUserCartPageData", method = {RequestMethod.GET, RequestMethod.POST})
@@ -49,11 +53,12 @@ public class UserCartController implements BaseController {
     public CommonResult<UserCartPageData> queryUserCartPageData() {
         CompletableFuture<List<UserCartResult>> userCartsFuture = CompletableFuture.supplyAsync(
                 () -> userCartService.queryUserCarts(getCurrentUserId()));
-        // TODO: 2021/3/24 查询用户的优惠券列表
+        CompletableFuture<List<YfUserCouponResult>> userCouponsFuture = CompletableFuture.supplyAsync(
+                () -> userCouponService.findUserCanUseCouponList(getCurrentUserId(), "Y"));
         try {
             UserCartPageData userCartPageData = new UserCartPageData();
             userCartPageData.setCarts(userCartsFuture.get(10, TimeUnit.SECONDS));
-            userCartPageData.setCoupons(null);
+            userCartPageData.setCoupons(userCouponsFuture.get(10, TimeUnit.SECONDS));
             return CommonResult.success(userCartPageData);
         } catch (Exception e) {
             throw new ApiException("查询超时，请稍后再试！");
