@@ -9,7 +9,7 @@ import java.util.Date;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class WebsiteCodeApplyReq implements Serializable {
+public class WebsiteCodeApplyStatusReq implements Serializable {
     Integer pageIndex;
     Integer pageSize;
     String status;
