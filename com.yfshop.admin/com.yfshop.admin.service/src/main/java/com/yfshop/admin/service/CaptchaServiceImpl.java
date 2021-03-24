@@ -2,10 +2,10 @@ package com.yfshop.admin.service;
 
 import cn.hutool.core.util.RandomUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
-import com.yfshop.admin.api.enums.CaptchaSourceEnum;
 import com.yfshop.admin.api.service.CaptchaService;
 import com.yfshop.code.mapper.CaptchaMapper;
 import com.yfshop.code.model.Captcha;
+import com.yfshop.common.enums.CaptchaSourceEnum;
 import com.yfshop.common.exception.ApiException;
 import com.yfshop.common.exception.Asserts;
 import com.yfshop.common.service.RedisService;

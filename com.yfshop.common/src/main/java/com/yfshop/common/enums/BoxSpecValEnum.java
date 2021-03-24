@@ -1,32 +1,15 @@
 package com.yfshop.common.enums;
 
 /**
- * 角色标识枚举
- *
- * @author Xulg
- * Created in 2021-03-23 9:27
- */
-public enum GroupRoleEnum {
+ * 牛奶盒子枚举
+ * @author wuyc
+ * created 2021/3/24 16:47
+ **/
+public enum BoxSpecValEnum {
 
-    SYS("sys", "系统管理员"),
+    SMALL("small", "小盒"),
 
-    ZB("zb", "总部"),
-
-    FGS("fgs", "分公司"),
-
-    JXS("jxs", "经销商"),
-
-    YWY("ywy", "业务员"),
-
-    CXY("cxy", "促销员"),
-
-    GC("gc", "工厂"),
-
-    CK("ck", "仓库"),
-
-    WL("wl", "物料"),
-
-    WD("wd", "网点");
+    BIG("big", "大盒");
 
     /**
      * 枚举编码
@@ -38,16 +21,16 @@ public enum GroupRoleEnum {
      */
     private final String description;
 
-    GroupRoleEnum(String code, String description) {
+    BoxSpecValEnum(String code, String description) {
         this.code = code;
         this.description = description;
     }
 
-    public static GroupRoleEnum getByCode(String code) {
+    public static BoxSpecValEnum getByCode(String code) {
         if (code == null) {
             return null;
         }
-        for (GroupRoleEnum value : values()) {
+        for (BoxSpecValEnum value : values()) {
             if (value.getCode().equals(code)) {
                 return value;
             }

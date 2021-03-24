@@ -1,29 +1,36 @@
 package com.yfshop.admin.service.merchant;
 
+import java.time.LocalDateTime;
+
+import com.google.common.collect.Lists;
+
+import cn.hutool.core.collection.CollectionUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.yfshop.admin.api.service.merchant.MerchantInfoService;
 import com.yfshop.admin.api.service.merchant.result.MerchantResult;
-import com.yfshop.admin.api.website.req.WebsiteReq;
+import com.yfshop.admin.api.website.req.WebsiteCodeBindReq;
 import com.yfshop.admin.api.website.result.WebsiteCodeDetailResult;
+import com.yfshop.admin.api.website.result.WebsiteCodeResult;
 import com.yfshop.admin.api.website.result.WebsiteTypeResult;
-import com.yfshop.code.mapper.MerchantDetailMapper;
-import com.yfshop.code.mapper.MerchantMapper;
-import com.yfshop.code.mapper.WebsiteCodeDetailMapper;
-import com.yfshop.code.mapper.WebsiteTypeMapper;
+import com.yfshop.code.mapper.*;
 import com.yfshop.code.model.*;
 import com.yfshop.common.enums.GroupRoleEnum;
 import com.yfshop.common.exception.ApiException;
 import com.yfshop.common.exception.Asserts;
 import com.yfshop.common.util.BeanUtil;
+import com.yfshop.common.util.DateUtil;
 import com.yfshop.common.util.GeoUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
-import java.lang.reflect.Array;
-import java.nio.file.Watchable;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -44,6 +51,9 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
 
     @Resource
     private WebsiteCodeDetailMapper websiteCodeDetailMapper;
+
+    @Resource
+    private WebsiteCodeMapper websiteCodeMapper;
 
     @Resource
     private WebsiteTypeMapper websiteTypeMapper;
@@ -77,7 +87,7 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Void websiteCodeBind(WebsiteReq websiteReq) throws ApiException {
+    public Void websiteCodeBind(WebsiteCodeBindReq websiteReq) throws ApiException {
         WebsiteCodeDetail websiteCodeDetail = websiteCodeDetailMapper.selectOne(Wrappers.<WebsiteCodeDetail>lambdaQuery()
                 .eq(WebsiteCodeDetail::getAlias, websiteReq.getWebsiteCode())
                 .eq(WebsiteCodeDetail::getIsActivate, 'N'));
@@ -116,6 +126,58 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
         websiteCodeDetail.setMobile(merchant.getMobile());
         websiteCodeDetail.setIsActivate("Y");
         websiteCodeDetailMapper.updateById(websiteCodeDetail);
+        return null;
+    }
+
+    @Override
+    public List<WebsiteCodeDetailResult> getMyWebsiteCode(Integer merchantId, String status, Date dateTime) throws ApiException {
+        Date nextDate = null;
+        if (dateTime != null) {
+            nextDate = DateUtil.plusDays(dateTime, 1);
+        }
+        List<WebsiteCodeDetail> websiteCodeDetails = websiteCodeDetailMapper.selectList(Wrappers.<WebsiteCodeDetail>lambdaQuery()
+                .like(WebsiteCodeDetail::getPidPath, merchantId)
+                .eq(WebsiteCodeDetail::getIsActivate, status)
+                .ge(dateTime != null, WebsiteCodeDetail::getCreateTime, dateTime)
+                .lt(nextDate != null, WebsiteCodeDetail::getCreateTime, nextDate)
+                .orderByDesc(WebsiteCodeDetail::getUpdateTime));
+        return BeanUtil.convertList(websiteCodeDetails, WebsiteCodeDetailResult.class);
+    }
+
+    @Override
+    public IPage<WebsiteCodeResult> applyWebsiteCodeStatus(Integer merchantId, String status, Integer pageIndex, Integer pageSize) {
+        List<String> allStatus = new ArrayList<>();
+        if ("ALL".equals(status)) {
+            allStatus.add("WAIT");
+            allStatus.add("DELIVERY");
+            allStatus.add("SUCCESS");
+        }
+        LambdaQueryWrapper<WebsiteCode> lambdaQueryWrapper = Wrappers.<WebsiteCode>lambdaQuery()
+                .like(WebsiteCode::getPidPath, merchantId)
+                .in(CollectionUtil.isNotEmpty(allStatus), WebsiteCode::getOrderStatus, allStatus)
+                .eq(StringUtils.isNotBlank(status) && !"ALL".equals(status), WebsiteCode::getOrderStatus, allStatus)
+                .orderByDesc(WebsiteCode::getId);
+        IPage<WebsiteCode> websiteCodeIPage = websiteCodeMapper.selectPage(new Page<>(pageIndex, pageSize), lambdaQueryWrapper);
+        return BeanUtil.iPageConvert(websiteCodeIPage, WebsiteCodeResult.class);
+    }
+
+    @Override
+    public Void updateApplyWebsiteCode(Integer id, String status) throws ApiException {
+        WebsiteCode websiteCode = new WebsiteCode();
+        websiteCode.setOrderStatus(status);
+        websiteCode.setId(id);
+        websiteCodeMapper.updateById(websiteCode);
+        return null;
+    }
+
+    @Override
+    public Void applyWebsiteCode(Integer merchantId, Integer count, String email) throws ApiException {
+        Merchant merchant = merchantMapper.selectById(merchantId);
+        WebsiteCode websiteCode = new WebsiteCode();
+        websiteCode.setMerchantId(merchant.getId());
+        websiteCode.setPidPath(merchant.getPidPath());
+        websiteCode.setQuantity(count);
+        websiteCodeMapper.insert(websiteCode);
         return null;
     }
 

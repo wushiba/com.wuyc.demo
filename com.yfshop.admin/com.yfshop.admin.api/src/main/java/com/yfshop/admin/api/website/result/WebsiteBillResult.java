@@ -26,7 +26,7 @@ public class WebsiteBillResult implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private Integer id;
+    private Long id;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", locale = "zh", timezone = "GMT+8")
     private LocalDateTime createTime;
@@ -49,12 +49,12 @@ public class WebsiteBillResult implements Serializable {
     /**
      * 用户微信昵称
      */
-    private String mobile;
+    private String nickname;
 
     /**
      * 订单id
      */
-    private Integer orderId;
+    private Long orderId;
 
     /**
      * 商品名
@@ -75,6 +75,11 @@ public class WebsiteBillResult implements Serializable {
      * N 待确认 Y 已确认
      */
     private String isConfirm;
+
+    /**
+     * 网点码
+     */
+    private String websiteCode;
 
 
 }

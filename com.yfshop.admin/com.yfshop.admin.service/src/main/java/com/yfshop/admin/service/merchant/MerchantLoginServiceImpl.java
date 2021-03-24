@@ -2,21 +2,17 @@ package com.yfshop.admin.service.merchant;
 
 import cn.hutool.crypto.SecureUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
-import com.yfshop.admin.api.enums.CaptchaSourceEnum;
-import com.yfshop.admin.api.mall.AdminMallManageService;
 import com.yfshop.admin.api.service.CaptchaService;
 import com.yfshop.admin.api.service.merchant.MerchantLoginService;
 import com.yfshop.admin.api.service.merchant.result.MerchantResult;
-import com.yfshop.code.manager.MerchantManager;
 import com.yfshop.code.mapper.MerchantMapper;
 import com.yfshop.code.model.Merchant;
-import com.yfshop.common.api.IErrorCode;
+import com.yfshop.common.enums.CaptchaSourceEnum;
 import com.yfshop.common.exception.ApiException;
 import com.yfshop.common.exception.Asserts;
 import com.yfshop.common.util.BeanUtil;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;

@@ -56,6 +56,9 @@ public class ActCodeBatchDetail extends Model<ActCodeBatchDetail> {
      */
     private Integer batchId;
 
+    /** 盒子规格值： big(大盒子) | small(小盒) */
+    private String boxSpecVal;
+
 
     @Override
     protected Serializable pkVal() {
