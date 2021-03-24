@@ -5,7 +5,7 @@ import cn.dev33.satoken.stp.StpUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.yfshop.admin.api.service.merchant.MerchantInfoService;
 import com.yfshop.admin.api.service.merchant.result.MerchantResult;
-import com.yfshop.admin.api.website.req.WebsiteCodeApplyReq1;
+import com.yfshop.admin.api.website.req.WebsiteCodeApplyReq;
 import com.yfshop.admin.api.website.req.WebsiteCodeApplyStatusReq;
 import com.yfshop.admin.api.website.req.WebsiteCodeBindReq;
 import com.yfshop.admin.api.website.req.WebsiteCodeReq;
@@ -127,7 +127,7 @@ class MerchantInfoController implements BaseController {
      * @return
      */
     @RequestMapping(value = "/applyWebsiteCode", method = {RequestMethod.POST})
-    public CommonResult<Void> applyWebsiteCode(WebsiteCodeApplyReq1 websiteCodeApplyReq) {
+    public CommonResult<Void> applyWebsiteCode(WebsiteCodeApplyReq websiteCodeApplyReq) {
         merchantInfoService.applyWebsiteCode(getCurrentAdminUserId(), websiteCodeApplyReq.getCount(), websiteCodeApplyReq.getEmail());
         return CommonResult.success(null);
     }
