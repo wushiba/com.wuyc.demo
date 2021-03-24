@@ -1,13 +1,14 @@
-package com.yfshop.code.model;
+package com.yfshop.admin.api.website.result;
 
-import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.extension.activerecord.Model;
 import com.baomidou.mybatisplus.annotation.TableId;
-import java.time.LocalDateTime;
-import java.io.Serializable;
+import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.extension.activerecord.Model;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+
+import java.io.Serializable;
+import java.time.LocalDateTime;
 
 /**
  * <p>
@@ -15,16 +16,14 @@ import lombok.EqualsAndHashCode;
  * </p>
  *
  * @author yoush
- * @since 2021-03-23
+ * @since 2021-03-22
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
-@TableName("yf_website_type")
-public class WebsiteType extends Model<WebsiteType> {
+public class WebsiteTypeResult implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
 
     private LocalDateTime createTime;
@@ -37,9 +36,5 @@ public class WebsiteType extends Model<WebsiteType> {
     private String typeName;
 
 
-    @Override
-    protected Serializable pkVal() {
-        return this.id;
-    }
 
 }

@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.constraints.NotNull;
 
+
 @Validated
 @RestController
 @RequestMapping("merchant/login")
@@ -72,5 +73,6 @@ class MerchantLoginController implements BaseController {
     public CommonResult<Void> sendCaptcha(@Mobile(message = "手机号不正确") String mobile) {
         return CommonResult.success(captchaService.sendCaptcha(mobile, CaptchaSourceEnum.LOGIN_CAPTCHA));
     }
+
 
 }

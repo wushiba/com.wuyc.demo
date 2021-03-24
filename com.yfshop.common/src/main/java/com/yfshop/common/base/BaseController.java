@@ -24,8 +24,16 @@ public interface BaseController {
      *
      * @return the id
      */
-    default Long getCurrentAdminUserId() {
-        return StpUtil.getLoginIdAsLong();
+    default Integer getCurrentAdminUserId() {
+        return StpUtil.getLoginIdAsInt();
+    }
+
+    /**
+     * 获取当前登录用户的openId
+     * @return
+     */
+    default String getCurrentAdminOpenId() {
+        return StpUtil.getLoginIdAsString();
     }
 
     /**

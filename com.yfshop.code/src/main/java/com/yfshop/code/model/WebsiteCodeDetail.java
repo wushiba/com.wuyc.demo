@@ -15,7 +15,7 @@ import lombok.EqualsAndHashCode;
  * </p>
  *
  * @author yoush
- * @since 2021-03-22
+ * @since 2021-03-23
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -60,6 +60,16 @@ public class WebsiteCodeDetail extends Model<WebsiteCodeDetail> {
      * 商户手机号码
      */
     private String mobile;
+
+    /**
+     * 上级id
+     */
+    private Integer pid;
+
+    /**
+     * 上级路径
+     */
+    private String pidPath;
 
 
     @Override
