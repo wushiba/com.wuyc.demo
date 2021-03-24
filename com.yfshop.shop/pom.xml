@@ -25,10 +25,12 @@
             <dependency>
                 <groupId>com.yfshop.parent</groupId>
                 <artifactId>com.yfshop.shop.api</artifactId>
+                <version>1.0-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>com.yfshop.parent</groupId>
                 <artifactId>com.yfshop.common</artifactId>
+                <version>1.0-SNAPSHOT</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

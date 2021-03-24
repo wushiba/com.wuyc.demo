@@ -24,8 +24,8 @@ public interface BaseController {
      *
      * @return the id
      */
-    default Long getCurrentAdminUserId() {
-        return StpUtil.getLoginIdAsLong();
+    default Integer getCurrentAdminUserId() {
+        return StpUtil.getLoginIdAsInt();
     }
 
     /**

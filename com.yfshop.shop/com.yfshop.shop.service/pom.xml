@@ -20,7 +20,7 @@
             <groupId>org.apache.dubbo</groupId>
             <artifactId>dubbo</artifactId>
         </dependency>
-           <dependency>
+        <dependency>
             <groupId>org.apache.curator</groupId>
             <artifactId>curator-recipes</artifactId>
         </dependency>
@@ -71,7 +71,7 @@
                 </exclusion>
             </exclusions>
         </dependency>
-        
+
         <dependency>
             <groupId>org.jsoup</groupId>
             <artifactId>jsoup</artifactId>
@@ -104,7 +104,14 @@
         </dependency>
         <!--工具类集合 end-->
 
-
+        <dependency>
+            <groupId>com.yfshop.parent</groupId>
+            <artifactId>com.yfshop.shop.api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.yfshop.parent</groupId>
+            <artifactId>com.yfshop.common</artifactId>
+        </dependency>
     </dependencies>
     <build>
         <plugins>

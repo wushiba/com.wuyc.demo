@@ -1,5 +1,7 @@
 package com.yfshop.admin.controller;
 
+import cn.dev33.satoken.annotation.SaCheckLogin;
+import cn.dev33.satoken.annotation.SaCheckPermission;
 import com.sun.org.slf4j.internal.Logger;
 import com.sun.org.slf4j.internal.LoggerFactory;
 import com.yfshop.admin.api.website.WebsiteBillService;
@@ -20,28 +22,28 @@ import java.util.List;
 @RequestMapping("merchant/bill")
 class MerchantBillController implements BaseController {
     private static final Logger logger = LoggerFactory.getLogger(MerchantBillController.class);
+
     @DubboReference(check = false)
     private WebsiteBillService websiteBillService;
 
     @RequestMapping(value = "/getBillByDay", method = {RequestMethod.GET})
-    public CommonResult<WebsiteBillDayResult> getBillByDay(String status,Date dateTime) {
-        return CommonResult.success(websiteBillService.getBillListByMerchantId(10358,dateTime,status));
+    public CommonResult<WebsiteBillDayResult> getBillByDay(String status, Date dateTime) {
+        return CommonResult.success(websiteBillService.getBillListByMerchantId(10358, dateTime, status));
     }
 
 
     @RequestMapping(value = "/getBillByWebsiteCode", method = {RequestMethod.GET})
-    public CommonResult<WebsiteBillDayResult> getBillByWebsiteCode(String websiteCode,Date dateTime) {
-        return CommonResult.success(websiteBillService.getBillByWebsiteCode(10358,websiteCode,dateTime));
+    public CommonResult<WebsiteBillDayResult> getBillByWebsiteCode(String websiteCode, Date dateTime) {
+        return CommonResult.success(websiteBillService.getBillByWebsiteCode(10358, websiteCode, dateTime));
     }
 
     @RequestMapping(value = "/billConfirm", method = {RequestMethod.GET})
     public CommonResult<Void> billConfirm(List<Long> ids) {
-        return CommonResult.success(websiteBillService.billConfirm(10358,ids));
+        return CommonResult.success(websiteBillService.billConfirm(10358, ids));
     }
 
-    @RequestMapping(value = "/billConfirm", method = {RequestMethod.GET})
+    @RequestMapping(value = "/billAllConfirm", method = {RequestMethod.GET})
     public CommonResult<Void> billAllConfirm() {
         return CommonResult.success(websiteBillService.billAllConfirm(10358));
     }
-
 }

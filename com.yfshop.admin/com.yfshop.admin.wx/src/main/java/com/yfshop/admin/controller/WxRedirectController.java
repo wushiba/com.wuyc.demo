@@ -1,5 +1,8 @@
 package com.yfshop.admin.controller;
 
+import cn.dev33.satoken.stp.StpUtil;
+import com.yfshop.admin.api.service.merchant.result.MerchantResult;
+import com.yfshop.common.api.CommonResult;
 import lombok.AllArgsConstructor;
 import me.chanjar.weixin.common.bean.WxOAuth2UserInfo;
 import me.chanjar.weixin.common.bean.oauth2.WxOAuth2AccessToken;
@@ -20,20 +23,19 @@ import org.springframework.web.bind.annotation.RequestParam;
 public class WxRedirectController {
     private final WxMpService wxService;
 
-    @RequestMapping("/greet")
-    public String greetUser(@PathVariable String appid, @RequestParam String code, ModelMap map) {
+    @RequestMapping("/authByCode")
+    public CommonResult<MerchantResult> greetUser(@PathVariable String appid, @RequestParam String code) {
         if (!this.wxService.switchover(appid)) {
             throw new IllegalArgumentException(String.format("未找到对应appid=[%s]的配置，请核实！", appid));
         }
-
         try {
             WxOAuth2AccessToken accessToken = wxService.getOAuth2Service().getAccessToken(code);
             WxOAuth2UserInfo user = wxService.getOAuth2Service().getUserInfo(accessToken, null);
-            map.put("user", user);
+            StpUtil.setLoginId(user.getOpenid());
         } catch (WxErrorException e) {
             e.printStackTrace();
         }
 
-        return "greet_user";
+        return CommonResult.success(null);
     }
 }

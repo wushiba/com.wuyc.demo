@@ -14,7 +14,9 @@ import com.yfshop.code.mapper.MenuMapper;
 import com.yfshop.code.mapper.MerchantMapper;
 import com.yfshop.code.model.Menu;
 import com.yfshop.code.model.Merchant;
+import com.yfshop.common.constants.CacheConstants;
 import org.apache.dubbo.config.annotation.DubboService;
+import org.springframework.cache.annotation.Cacheable;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
@@ -27,7 +29,7 @@ import java.util.List;
 @DubboService
 public class AdminMenuManageServiceImpl implements AdminMenuManageService {
 
-    private static final NodeParser<Menu, String> nodeParser = (menu, tree) -> {
+    private static final NodeParser<Menu, String> NODE_PARSER = (menu, tree) -> {
         tree.setId(menu.getMenuAlias());
         tree.setParentId(menu.getParentMenuAlias());
         tree.setName(menu.getMenuName());
@@ -43,6 +45,8 @@ public class AdminMenuManageServiceImpl implements AdminMenuManageService {
     @Resource
     private MenuMapper menuMapper;
 
+    @Cacheable(cacheNames = CacheConstants.MERCHANT_MENUS_CACHE_NAME,
+            key = "'" + CacheConstants.MERCHANT_MENUS_CACHE_KEY_PREFIX + "' + #root.args[0]")
     @Override
     public List<MenuResult> queryMerchantMenus(Integer merchantId) {
         Merchant merchant = merchantMapper.selectById(merchantId);
@@ -66,7 +70,7 @@ public class AdminMenuManageServiceImpl implements AdminMenuManageService {
         treeNodeConfig.setNameKey("menuName");
         // 子名称
         treeNodeConfig.setChildrenKey("subMenus");
-        List<Tree<String>> trees = TreeUtil.build(menus, null, treeNodeConfig, nodeParser);
+        List<Tree<String>> trees = TreeUtil.build(menus, null, treeNodeConfig, NODE_PARSER);
         return JSON.parseArray(JSON.toJSONString(trees), MenuResult.class);
     }
 

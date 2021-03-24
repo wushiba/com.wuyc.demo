@@ -1,8 +1,7 @@
 package com.yfshop.admin.controller;
 
 import cn.dev33.satoken.annotation.SaCheckLogin;
-import com.sun.org.slf4j.internal.Logger;
-import com.sun.org.slf4j.internal.LoggerFactory;
+import cn.dev33.satoken.stp.StpUtil;
 import com.yfshop.admin.api.service.merchant.MerchantInfoService;
 import com.yfshop.admin.api.service.merchant.result.MerchantResult;
 import com.yfshop.admin.api.website.req.WebsiteReq;
@@ -11,6 +10,8 @@ import com.yfshop.admin.api.website.result.WebsiteTypeResult;
 import com.yfshop.common.api.CommonResult;
 import com.yfshop.common.base.BaseController;
 import org.apache.dubbo.config.annotation.DubboReference;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -27,6 +28,7 @@ class MerchantInfoController implements BaseController {
     @DubboReference(check = false)
     private MerchantInfoService merchantInfoService;
 
+
     /**
      * 获取网点用户信息
      *
@@ -35,7 +37,7 @@ class MerchantInfoController implements BaseController {
     @SaCheckLogin
     @RequestMapping(value = "/websiteInfo", method = {RequestMethod.GET})
     public CommonResult<MerchantResult> getWebsiteInfo() {
-        MerchantResult merchantResult = merchantInfoService.getWebsiteInfo(getCurrentAdminUserId().intValue());
+        MerchantResult merchantResult = merchantInfoService.getWebsiteInfo(getCurrentAdminUserId());
         return CommonResult.success(merchantResult);
     }
 
@@ -48,9 +50,10 @@ class MerchantInfoController implements BaseController {
     @SaCheckLogin
     @RequestMapping(value = "/websiteCode", method = {RequestMethod.GET})
     public CommonResult<List<WebsiteCodeDetailResult>> getWebsiteCode() {
-        List<WebsiteCodeDetailResult> websiteCodeDetailResults = merchantInfoService.getWebsiteCode(getCurrentAdminUserId().intValue());
+        List<WebsiteCodeDetailResult> websiteCodeDetailResults = merchantInfoService.getWebsiteCode(getCurrentAdminUserId());
         return CommonResult.success(websiteCodeDetailResults);
     }
+
 
 
     /**
@@ -58,10 +61,11 @@ class MerchantInfoController implements BaseController {
      *
      * @return
      */
-    @SaCheckLogin
     @RequestMapping(value = "/websiteCodeBind", method = {RequestMethod.POST})
     public CommonResult<Void> websiteCodeBind(WebsiteReq websiteReq) {
-        websiteReq.setOpenId(getCurrentAdminOpenId());
+        if (StpUtil.isLogin()){
+            websiteReq.setId(StpUtil.getLoginIdAsInt());
+        }
         return CommonResult.success(merchantInfoService.websiteCodeBind(websiteReq));
     }
 
@@ -75,6 +79,7 @@ class MerchantInfoController implements BaseController {
         List<WebsiteTypeResult> websiteTypeResults = merchantInfoService.getWebsiteType();
         return CommonResult.success(websiteTypeResults);
     }
+
 
 
 }

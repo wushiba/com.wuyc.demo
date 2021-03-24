@@ -82,32 +82,36 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
                 .eq(WebsiteCodeDetail::getAlias, websiteReq.getWebsiteCode())
                 .eq(WebsiteCodeDetail::getIsActivate, 'N'));
         Asserts.assertNonNull(websiteCodeDetail, 500, "网点码已被绑定！");
-        Merchant merchant = merchantMapper.selectOne(Wrappers.<Merchant>lambdaQuery()
-                .eq(Merchant::getOpenId, websiteReq.getOpenId()));
-        if (merchant == null) {
+        Merchant merchant;
+        if (websiteReq.getId() == null) {
             merchant = BeanUtil.convert(websiteReq, Merchant.class);
             merchant.setRoleAlias(GroupRoleEnum.WD.getCode());
             merchant.setRoleName(GroupRoleEnum.WD.getDescription());
-//            merchant.setPid(websiteCodeDetail.get);
             merchantMapper.insert(merchant);
             MerchantDetail merchantDetail = BeanUtil.convert(websiteReq, MerchantDetail.class);
             merchantDetail.setMerchantId(merchant.getId());
             merchantDetail.setGeoHash(GeoUtils.toBase32(websiteReq.getLatitude(), websiteReq.getLongitude(), 12));
             merchantDetailMapper.insert(merchantDetail);
         } else {
-            Integer merchantId = merchant.getId();
             merchant = BeanUtil.convert(websiteReq, Merchant.class);
             merchant.setRoleAlias(GroupRoleEnum.WD.getCode());
-            merchant.setId(merchantId);
             MerchantDetail merchantDetail = merchantDetailMapper.selectOne(Wrappers.<MerchantDetail>lambdaQuery()
-                    .eq(MerchantDetail::getMerchantId, merchantId));
+                    .eq(MerchantDetail::getMerchantId, websiteReq.getId()));
             Integer merchantDetailId = merchantDetail.getId();
             merchantDetail = BeanUtil.convert(websiteReq, MerchantDetail.class);
             merchantDetail.setMerchantId(merchant.getId());
             merchantDetail.setId(merchantDetailId);
-            merchantMapper.updateById(merchant);
             merchantDetailMapper.updateById(merchantDetail);
         }
+        Merchant merchantPid = merchantMapper.selectById(websiteCodeDetail.getPid());
+        if (merchantPid != null) {
+            merchant.setPid(merchantPid.getId());
+            merchant.setPidPath(merchantPid.getPidPath() + merchant.getId() + ".");
+            merchant.setPMerchantName(merchantPid.getMerchantName());
+        } else {
+            merchant.setPidPath(merchant.getId() + ".");
+        }
+        merchantMapper.updateById(merchant);
         websiteCodeDetail.setMerchantId(merchant.getId());
         websiteCodeDetail.setMobile(merchant.getMobile());
         websiteCodeDetail.setIsActivate("Y");
