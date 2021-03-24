@@ -70,7 +70,7 @@ public class UserAddressController implements BaseController {
 
     @ApiOperation(value = "设置用户的默认地址", httpMethod = "GET")
     @ApiImplicitParams(value = {
-            @ApiImplicitParam(paramType = "query", name = "userAddressId", value = "地址ID，多个使用\",\"拼接", required = true),
+            @ApiImplicitParam(paramType = "query", name = "userAddressId", value = "地址ID", required = true),
     })
     @RequestMapping(value = "/configDefaultUserAddress", method = {RequestMethod.GET, RequestMethod.POST})
     @ResponseBody

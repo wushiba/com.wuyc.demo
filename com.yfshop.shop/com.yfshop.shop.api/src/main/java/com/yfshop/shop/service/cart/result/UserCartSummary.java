@@ -4,6 +4,7 @@ import lombok.Data;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -38,4 +39,14 @@ public class UserCartSummary implements Serializable {
      * 购物车列表
      */
     private List<UserCartResult> carts;
+
+    public static UserCartSummary emptySummary() {
+        UserCartSummary userCartSummary = new UserCartSummary();
+        userCartSummary.setItemCount(0);
+        userCartSummary.setTotalMoney(BigDecimal.ZERO);
+        userCartSummary.setOldTotalMoney(BigDecimal.ZERO);
+        userCartSummary.setTotalFreight(BigDecimal.ZERO);
+        userCartSummary.setCarts(new ArrayList<>(0));
+        return userCartSummary;
+    }
 }

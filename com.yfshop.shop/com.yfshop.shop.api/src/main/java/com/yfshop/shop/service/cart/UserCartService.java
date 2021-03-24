@@ -23,23 +23,23 @@ public interface UserCartService {
     List<UserCartResult> queryUserCarts(Integer userId);
 
     /**
-     * 根据cartId查询购物车购物车支付页面详情
+     * 根据cartId计算购物车支付页面详情
      *
-     * @param userId     the user id
-     * @param cartIdList the cart id list
+     * @param userId  the user id
+     * @param cartIds the cart id list
      * @return the result
      */
-    UserCartSummary queryUserSelectedCarts(Integer userId, List<Integer> cartIdList);
+    UserCartSummary calcUserSelectedCarts(Integer userId, List<Integer> cartIds);
 
     /**
-     * 根据skuId查询购物车支付页面详情
+     * 根据skuId计算购物车支付页面详情
      *
      * @param userId the user id
      * @param skuId  the sku id
      * @param num    the item num
      * @return the result
      */
-    UserCartSummary queryUserBuySkuDetails(Integer userId, Integer skuId, Integer num);
+    UserCartSummary calcUserBuySkuDetails(Integer userId, Integer skuId, int num);
 
     /**
      * 添加商品到购物车
@@ -61,7 +61,7 @@ public interface UserCartService {
      * @return the result
      * @throws ApiException e
      */
-    Void updateCart(Integer userId, Integer skuId, int num) throws ApiException;
+    Void updateUserCart(Integer userId, Integer skuId, int num) throws ApiException;
 
     /**
      * 批量删除购物车某样商品
@@ -70,7 +70,7 @@ public interface UserCartService {
      * @param skuIds the sku id list
      * @return void
      */
-    Void removeUserCartItems(Integer userId, List<Integer> skuIds);
+    Void deleteUserCarts(Integer userId, List<Integer> skuIds);
 
     /**
      * 清空用户购物车
