@@ -20,7 +20,7 @@ import javax.servlet.http.HttpSession;
 public interface BaseController {
 
     /**
-     * 获取当前登录用户的主键信息
+     * 获取当前登录用户的主键信息(B端)
      *
      * @return the id
      */
@@ -34,6 +34,15 @@ public interface BaseController {
      */
     default String getCurrentAdminOpenId() {
         return StpUtil.getLoginIdAsString();
+    }
+
+    /**
+     * 获取当前登录用户的主键信息(C端)
+     *
+     * @return the user id
+     */
+    default Integer getCurrentUserId() {
+        return StpUtil.getLoginIdAsInt();
     }
 
     /**

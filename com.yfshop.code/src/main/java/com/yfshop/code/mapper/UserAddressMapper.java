@@ -2,6 +2,7 @@ package com.yfshop.code.mapper;
 
 import com.yfshop.code.model.UserAddress;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * <p>
@@ -13,4 +14,5 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  */
 public interface UserAddressMapper extends BaseMapper<UserAddress> {
 
+    int disableDefaultAddress(@Param("userId") Integer userId);
 }

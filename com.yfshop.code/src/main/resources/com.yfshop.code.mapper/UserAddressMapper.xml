@@ -4,26 +4,29 @@
 
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.yfshop.code.model.UserAddress">
-        <id column="id" property="id" />
-        <result column="create_time" property="createTime" />
-        <result column="update_time" property="updateTime" />
-        <result column="user_id" property="userId" />
-        <result column="is_default" property="isDefault" />
-        <result column="realname" property="realname" />
-        <result column="mobile" property="mobile" />
-        <result column="sex" property="sex" />
-        <result column="province_id" property="provinceId" />
-        <result column="city_id" property="cityId" />
-        <result column="district_id" property="districtId" />
-        <result column="province" property="province" />
-        <result column="city" property="city" />
-        <result column="district" property="district" />
-        <result column="address" property="address" />
+        <id column="id" property="id"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="user_id" property="userId"/>
+        <result column="is_default" property="isDefault"/>
+        <result column="realname" property="realname"/>
+        <result column="mobile" property="mobile"/>
+        <result column="sex" property="sex"/>
+        <result column="province_id" property="provinceId"/>
+        <result column="city_id" property="cityId"/>
+        <result column="district_id" property="districtId"/>
+        <result column="province" property="province"/>
+        <result column="city" property="city"/>
+        <result column="district" property="district"/>
+        <result column="address" property="address"/>
     </resultMap>
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
         id, create_time, update_time, user_id, is_default, realname, mobile, sex, province_id, city_id, district_id, province, city, district, address
     </sql>
+    <update id="disableDefaultAddress">
+        update yf_user_address set is_default = 'N' where user_id=#{userId}
+    </update>
 
 </mapper>
