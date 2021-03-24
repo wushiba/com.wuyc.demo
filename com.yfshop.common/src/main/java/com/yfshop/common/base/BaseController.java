@@ -20,12 +20,21 @@ import javax.servlet.http.HttpSession;
 public interface BaseController {
 
     /**
-     * 获取当前登录用户的主键信息
+     * 获取当前登录用户的主键信息(B端)
      *
      * @return the id
      */
     default Long getCurrentAdminUserId() {
         return StpUtil.getLoginIdAsLong();
+    }
+
+    /**
+     * 获取当前登录用户的主键信息(C端)
+     *
+     * @return the user id
+     */
+    default Integer getCurrentUserId() {
+        return StpUtil.getLoginIdAsInt();
     }
 
     /**
