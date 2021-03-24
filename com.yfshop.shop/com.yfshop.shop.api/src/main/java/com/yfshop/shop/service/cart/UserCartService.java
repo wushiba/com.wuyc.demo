@@ -4,6 +4,10 @@ import com.yfshop.common.exception.ApiException;
 import com.yfshop.shop.service.cart.result.UserCartResult;
 import com.yfshop.shop.service.cart.result.UserCartSummary;
 
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Positive;
 import java.util.List;
 
 /**
@@ -50,7 +54,9 @@ public interface UserCartService {
      * @return void
      * @throws ApiException e
      */
-    Void addUserCart(Integer userId, Integer skuId, int num) throws ApiException;
+    Void addUserCart(@NotNull(message = "用户ID不能为空") Integer userId,
+                     @NotNull(message = "商品SKU不能为空") Integer skuId,
+                     @Positive(message = "数量不能为负") int num) throws ApiException;
 
     /**
      * 更新购物车
@@ -61,7 +67,9 @@ public interface UserCartService {
      * @return the result
      * @throws ApiException e
      */
-    Void updateUserCart(Integer userId, Integer skuId, int num) throws ApiException;
+    Void updateUserCart(@NotNull(message = "用户ID不能为空") Integer userId,
+                        @NotNull(message = "商品SKU不能为空") Integer skuId,
+                        @Min(value = 0L, message = "数量不能为负") int num) throws ApiException;
 
     /**
      * 批量删除购物车某样商品
@@ -70,7 +78,8 @@ public interface UserCartService {
      * @param skuIds the sku id list
      * @return void
      */
-    Void deleteUserCarts(Integer userId, List<Integer> skuIds);
+    Void deleteUserCarts(@NotNull(message = "用户ID不能为空") Integer userId,
+                         @NotEmpty(message = "购物车列表不能为空") List<Integer> skuIds) throws ApiException;
 
     /**
      * 清空用户购物车
@@ -78,6 +87,6 @@ public interface UserCartService {
      * @param userId the user id
      * @return void
      */
-    Void clearUserCart(Integer userId);
+    Void clearUserCart(@NotNull(message = "用户ID不能为空") Integer userId);
 
 }
