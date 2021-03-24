@@ -41,7 +41,10 @@ public class UserAddressServiceImpl implements UserAddressService {
             return new ArrayList<>(0);
         }
         List<UserAddress> userAddresses = userAddressMapper.selectList(Wrappers
-                .lambdaQuery(UserAddress.class).eq(UserAddress::getUserId, userId));
+                .lambdaQuery(UserAddress.class).eq(UserAddress::getUserId, userId)
+                .orderByDesc(UserAddress::getCreateTime));
+        // 默认地址放第一位置
+        userAddresses.sort((u1, u2) -> u1.getIsDefault().equals(u2.getIsDefault()) ? 0 : ("Y".equals(u1.getIsDefault()) ? -1 : 1));
         return BeanUtil.convertList(userAddresses, UserAddressResult.class);
     }
 
