@@ -16,6 +16,7 @@ import com.yfshop.common.exception.Asserts;
 import com.yfshop.common.util.BeanUtil;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
@@ -33,7 +34,7 @@ public class MerchantLoginServiceImpl implements MerchantLoginService {
     @Resource
     MerchantMapper merchantMapper;
 
-    @Resource
+    @DubboReference(check = false)
     private CaptchaService captchaService;
 
     @Override
