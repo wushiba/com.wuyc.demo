@@ -3,7 +3,8 @@ server:
   port: 9095
 logging:
   level:
-    com.yfshop.admin.service.dao: debug
+    com.yfshop.admin: debug
+    com.yfshop.code.mapper: debug
 spring:
   datasource:
     connectionProperties: druid.stat.mergeSql=true;druid.stat.slowSqlMillis=5000
