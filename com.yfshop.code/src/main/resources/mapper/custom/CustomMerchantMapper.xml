@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yfshop.code.mapper.custom.CustomMerchantMapper">
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, create_time, update_time, open_id, pid, p_merchant_name, pid_path, role_alias, role_name, merchant_name, mobile, password, contacts, province, city, district, province_id, city_id, district_id, address, is_enable, is_delete
+    </sql>
+
+    <select id="queryAll" resultType="com.yfshop.code.model.Merchant">
+        select * from yf_merchant
+    </select>
+
+</mapper>

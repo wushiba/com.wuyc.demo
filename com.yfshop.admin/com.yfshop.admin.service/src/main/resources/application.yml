@@ -6,4 +6,3 @@ spring:
     web-application-type: none
   profiles:
     active: @profiles.active@
-

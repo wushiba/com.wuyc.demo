@@ -1,5 +1,6 @@
 package com.yfshop.common.exception;
 
+import com.yfshop.common.api.ErrorCode;
 import com.yfshop.common.api.IErrorCode;
 
 /**
@@ -11,6 +12,11 @@ public class ApiException extends RuntimeException {
     public ApiException(IErrorCode errorCode) {
         super(errorCode.getMessage());
         this.errorCode = errorCode;
+    }
+
+    public ApiException(int code, String message) {
+        super(message);
+        this.errorCode = new ErrorCode(code, message);
     }
 
     public ApiException(String message) {
