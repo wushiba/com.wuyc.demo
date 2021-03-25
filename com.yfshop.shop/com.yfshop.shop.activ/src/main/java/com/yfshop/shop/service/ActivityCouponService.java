@@ -31,9 +31,6 @@ public interface ActivityCouponService {
 	 * 用户抽中优惠券后生成优惠券
 	 * @param userId	用户id
 	 * @param couponId	优惠券id
-	 *
-	 *
-	 *
 	 * @return
 	 * @throws ApiException
 	 */
