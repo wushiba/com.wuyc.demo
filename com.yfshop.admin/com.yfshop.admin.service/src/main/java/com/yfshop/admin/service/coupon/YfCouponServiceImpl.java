@@ -67,7 +67,6 @@ public class YfCouponServiceImpl implements AdminCouponService {
         checkCouponParams(couponReq);
         Coupon coupon = BeanUtil.convert(couponReq, Coupon.class);
         coupon.setIsDelete("N");
-        coupon.setIsEnable("N");
         couponMapper.insert(coupon);
     }
 

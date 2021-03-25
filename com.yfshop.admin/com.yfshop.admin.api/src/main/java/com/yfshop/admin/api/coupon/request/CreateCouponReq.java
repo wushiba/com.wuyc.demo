@@ -13,6 +13,8 @@ public class CreateCouponReq implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    private Integer id;
+
     /** 优惠券标题 */
     @NotBlank(message = "优惠券标题不能为空")
     private String couponTitle;
