@@ -1,7 +1,11 @@
 package com.yfshop.admin.api.sourcefactory;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.yfshop.admin.api.sourcefactory.req.CreateSourceFactoryReq;
+import com.yfshop.admin.api.sourcefactory.req.ImportSourceFactoryReq;
+import com.yfshop.admin.api.sourcefactory.req.QuerySourceFactoriesReq;
 import com.yfshop.admin.api.sourcefactory.req.UpdateSourceFactoryReq;
+import com.yfshop.admin.api.sourcefactory.result.SourceFactoryResult;
 import com.yfshop.common.exception.ApiException;
 
 import javax.validation.constraints.NotNull;
@@ -30,4 +34,20 @@ public interface AdminSourceFactoryManageService {
      */
     Void updateSourceFactory(@NotNull UpdateSourceFactoryReq req) throws ApiException;
 
+    /**
+     * 导入工厂数据
+     *
+     * @param req the req
+     * @return void
+     * @throws ApiException e
+     */
+    Void importSourceFactory(@NotNull ImportSourceFactoryReq req) throws ApiException;
+
+    /**
+     * 分页查询工厂列表
+     *
+     * @param req the req
+     * @return the page data list
+     */
+    IPage<SourceFactoryResult> pageQuerySourceFactories(QuerySourceFactoriesReq req);
 }
