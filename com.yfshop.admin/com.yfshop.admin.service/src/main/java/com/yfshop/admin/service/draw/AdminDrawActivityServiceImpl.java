@@ -1,11 +1,14 @@
 package com.yfshop.admin.service.draw;
 import java.time.LocalDateTime;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import javax.annotation.Resource;
+
+import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -17,12 +20,13 @@ import com.yfshop.admin.api.draw.service.AdminDrawActivityService;
 import com.yfshop.code.mapper.DrawActivityMapper;
 import com.yfshop.code.mapper.DrawPrizeMapper;
 import com.yfshop.code.mapper.DrawProvinceRateMapper;
-import com.yfshop.code.model.Coupon;
 import com.yfshop.code.model.DrawActivity;
 import com.yfshop.code.model.DrawPrize;
 import com.yfshop.code.model.DrawProvinceRate;
+import com.yfshop.common.constants.CacheConstants;
 import com.yfshop.common.exception.ApiException;
 import com.yfshop.common.exception.Asserts;
+import com.yfshop.common.service.RedisService;
 import com.yfshop.common.util.BeanUtil;
 import org.apache.dubbo.config.annotation.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,6 +40,9 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service(dynamic = true)
 public class AdminDrawActivityServiceImpl implements AdminDrawActivityService {
+
+    @Resource
+    private RedisService redisService;
 
     @Resource
     private DrawPrizeMapper drawPrizeMapper;
@@ -97,6 +104,7 @@ public class AdminDrawActivityServiceImpl implements AdminDrawActivityService {
 
         // 创建奖品
         Map<Integer, DrawPrize> prizeMap = new HashMap<>(6);
+        List<DrawPrize> drawPrizeList = new ArrayList<>();
         List<CreateDrawActivityReq.DrawPrizeReq> prizeList = req.getPrizeList();
         prizeList.forEach(prize -> {
             DrawPrize drawPrize = BeanUtil.convert(prize, DrawPrize.class);
@@ -104,10 +112,12 @@ public class AdminDrawActivityServiceImpl implements AdminDrawActivityService {
             drawPrize.setUpdateTime(localDateTime);
             drawPrize.setActId(drawActivity.getId());
             drawPrizeMapper.insert(drawPrize);
+            drawPrizeList.add(drawPrize);
             prizeMap.put(prize.getPrizeLevel(), drawPrize);
         });
 
         // 特殊省份的特殊中奖概率
+        List<DrawProvinceRate> provinceRateList = new ArrayList<>();
         List<CreateDrawActivityReq.ProvinceRateReq> provinceList = req.getProvinceRateList();
         provinceList.forEach(provinceRateReq -> {
             DrawProvinceRate provinceRate = BeanUtil.convert(provinceRateReq, DrawProvinceRate.class);
@@ -117,7 +127,16 @@ public class AdminDrawActivityServiceImpl implements AdminDrawActivityService {
             provinceRate.setSecondPrizeId(prizeMap.get(2).getId());
             provinceRate.setThirdPrizeId(prizeMap.get(3).getId());
             drawProvinceRateMapper.insert(provinceRate);
+            provinceRateList.add(provinceRate);
         });
+
+        // 存入缓存，设置半年有效期有效
+        redisService.set(CacheConstants.DRAW_ACTIVITY_PREFIX + drawActivity.getId(),
+                JSON.toJSONString(drawActivity), 180 * 24 * 60 * 1000);
+        redisService.set(CacheConstants.DRAW_PRIZE_NAME_PREFIX + drawActivity.getId(),
+                JSON.toJSONString(drawPrizeList), 180 * 24 * 60 * 1000);
+        redisService.set(CacheConstants.DRAW_PROVINCE_RATE_PREFIX + drawActivity.getId(),
+                JSON.toJSONString(provinceRateList), 180 * 24 * 60 * 1000);
     }
 
     @Override
@@ -133,18 +152,20 @@ public class AdminDrawActivityServiceImpl implements AdminDrawActivityService {
 
         // 编辑奖品
         Map<Integer, DrawPrize> prizeMap = new HashMap<>(6);
+        List<DrawPrize> drawPrizeList = new ArrayList<>();
         List<CreateDrawActivityReq.DrawPrizeReq> prizeList = req.getPrizeList();
         prizeList.forEach(prize -> {
             DrawPrize drawPrize = BeanUtil.convert(prize, DrawPrize.class);
             drawPrizeMapper.updateById(drawPrize);
+            drawPrizeList.add(drawPrize);
             prizeMap.put(prize.getPrizeLevel(), drawPrize);
         });
 
         // 特殊省份的中奖概率 先删除后新增
-        LambdaQueryWrapper<DrawProvinceRate> queryWrapper = Wrappers.lambdaQuery(DrawProvinceRate.class)
-                .eq(DrawProvinceRate::getActId, req.getId());
-        drawProvinceRateMapper.delete(queryWrapper);
+        drawProvinceRateMapper.delete(Wrappers.lambdaQuery(DrawProvinceRate.class)
+                .eq(DrawProvinceRate::getActId, req.getId()));
 
+        List<DrawProvinceRate> provinceRateList = new ArrayList<>();
         List<CreateDrawActivityReq.ProvinceRateReq> provinceList = req.getProvinceRateList();
         provinceList.forEach(provinceRateReq -> {
             DrawProvinceRate provinceRate = BeanUtil.convert(provinceRateReq, DrawProvinceRate.class);
@@ -154,7 +175,16 @@ public class AdminDrawActivityServiceImpl implements AdminDrawActivityService {
             provinceRate.setSecondPrizeId(prizeMap.get(2).getId());
             provinceRate.setThirdPrizeId(prizeMap.get(3).getId());
             drawProvinceRateMapper.insert(provinceRate);
+            provinceRateList.add(provinceRate);
         });
+
+        // 存入缓存，设置半年有效期有效
+        redisService.set(CacheConstants.DRAW_ACTIVITY_PREFIX + drawActivity.getId(),
+                JSON.toJSONString(drawActivity), 180 * 24 * 60 * 1000);
+        redisService.set(CacheConstants.DRAW_PRIZE_NAME_PREFIX + drawActivity.getId(),
+                JSON.toJSONString(drawPrizeList), 180 * 24 * 60 * 1000);
+        redisService.set(CacheConstants.DRAW_PROVINCE_RATE_PREFIX + drawActivity.getId(),
+                JSON.toJSONString(provinceRateList), 180 * 24 * 60 * 1000);
     }
 
     @Override
@@ -163,6 +193,9 @@ public class AdminDrawActivityServiceImpl implements AdminDrawActivityService {
         Asserts.assertNonNull(drawActivity, 500, "抽奖活动不存在");
         drawActivity.setIsEnable(isEnable);
         drawActivityMapper.updateById(drawActivity);
+
+        redisService.set(CacheConstants.DRAW_ACTIVITY_PREFIX + drawActivity.getId(),
+                JSON.toJSONString(drawActivity), 180 * 24 * 60 * 1000);
     }
 
     @Override
@@ -170,6 +203,12 @@ public class AdminDrawActivityServiceImpl implements AdminDrawActivityService {
         DrawActivity drawActivity = drawActivityMapper.selectById(id);
         Asserts.assertNonNull(drawActivity, 500, "抽奖活动不存在");
         drawActivityMapper.deleteById(id);
+
+        List<String> keyList = new ArrayList<>();
+        keyList.add(CacheConstants.DRAW_ACTIVITY_PREFIX + id);
+        keyList.add(CacheConstants.DRAW_PRIZE_NAME_PREFIX + id);
+        keyList.add(CacheConstants.DRAW_PROVINCE_RATE_PREFIX + id);
+        redisService.del(keyList);
     }
 
     public void checkUpdateParams(CreateDrawActivityReq req) throws ApiException {
@@ -178,7 +217,6 @@ public class AdminDrawActivityServiceImpl implements AdminDrawActivityService {
         Integer levelSize = prizeList.stream().collect(Collectors.groupingBy(CreateDrawActivityReq.DrawPrizeReq::getPrizeLevel)).size();
         Asserts.assertFalse(levelSize != 3, 500, "奖品数量不正确或者等级不能重复");
 
-//        int rate = prizeList.stream().mapToInt(CreateDrawActivityReq.DrawPrizeReq::getWinRate).sum();
         int bigBoxRate = 0, smallBoxRate = 0;
         for (CreateDrawActivityReq.DrawPrizeReq prizeReq : prizeList) {
             if (prizeReq.getPrizeLevel() == 1) {

@@ -5,6 +5,7 @@ import cn.hutool.core.date.DateUtil;
 import com.yfshop.common.exception.CustomGlobalExceptionResolver;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.server.ConfigurableWebServerFactory;
 import org.springframework.boot.web.server.ErrorPage;
 import org.springframework.boot.web.server.WebServerFactoryCustomizer;
@@ -27,6 +28,9 @@ import java.util.Date;
  */
 @Configuration
 public class WebMvcConfig implements WebMvcConfigurer {
+
+    @Value("${spring.profiles.active}")
+    private String profile;
 
     /**
      * 404页面配置
@@ -55,9 +59,12 @@ public class WebMvcConfig implements WebMvcConfigurer {
      */
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(new SaAnnotationInterceptor())
-                .addPathPatterns("/**")
-                .excludePathPatterns("");
+        // dev环境关闭验证
+        if (!StringUtils.equals("dev", profile)) {
+            registry.addInterceptor(new SaAnnotationInterceptor())
+                    .addPathPatterns("/**")
+                    .excludePathPatterns("");
+        }
     }
 
     /**

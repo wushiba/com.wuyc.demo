@@ -120,7 +120,7 @@ public class RolePermissionManageServiceImpl implements RolePermissionManageServ
         return rls.stream().map(RlRolePermission::getPermissionAlias).collect(Collectors.toList());
     }
 
-    @Cacheable(cacheManager = "caffeineCacheManager",
+    @Cacheable(cacheManager = CacheConstants.CACHE_MANAGE_NAME,
             cacheNames = CacheConstants.MERCHANT_ROLE_CACHE_NAME,
             key = "'" + CacheConstants.MERCHANT_ROLE_CACHE_KEY_PREFIX + "' + #root.args[0]")
     @Override
@@ -129,7 +129,8 @@ public class RolePermissionManageServiceImpl implements RolePermissionManageServ
         return merchant == null ? null : merchant.getRoleAlias();
     }
 
-    @Cacheable(cacheNames = CacheConstants.MERCHANT_PERMISSIONS_CACHE_NAME,
+    @Cacheable(cacheManager = CacheConstants.CACHE_MANAGE_NAME,
+            cacheNames = CacheConstants.MERCHANT_PERMISSIONS_CACHE_NAME,
             key = "'" + CacheConstants.MERCHANT_PERMISSIONS_CACHE_KEY_PREFIX + "' + #root.args[0]")
     @Override
     public List<String> queryMerchantPermissions(Integer merchantId) {

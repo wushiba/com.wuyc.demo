@@ -13,12 +13,6 @@ public class ShopServiceApplication {
         ConfigurableApplicationContext applicationContext = SpringApplication.run(ShopServiceApplication.class, args);
         String property = applicationContext.getEnvironment().getProperty("spring.profiles.active");
         System.out.println("==============启动了=====com.yfshop.shop.service==================环境===" + property);
-        try {
-            UserAddressService addressService = applicationContext.getBean(UserAddressService.class);
-            System.out.println(addressService.queryUserAddresses(1));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 }
 

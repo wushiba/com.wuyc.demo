@@ -71,7 +71,7 @@ public class ActivityCouponServiceImpl implements ActivityCouponService {
 	@Override
 	public YfUserCouponResult createUserCoupon(Integer userId, Integer couponId) throws ApiException {
 		User user = userMapper.selectById(userId);
-		Asserts.assertNonNull(user, 500, "用户不存在");
+		Asserts.assertNonNull(user, 500, "用户不存在,请先授权关注公众号");
 
 		Coupon coupon = couponMapper.selectById(couponId);
 		Asserts.assertNonNull(coupon, 500, "优惠券不存在");

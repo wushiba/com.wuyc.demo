@@ -27,25 +27,6 @@ public interface UserCartService {
     List<UserCartResult> queryUserCarts(Integer userId);
 
     /**
-     * 根据cartId计算购物车支付页面详情
-     *
-     * @param userId  the user id
-     * @param cartIds the cart id list
-     * @return the result
-     */
-    UserCartSummary calcUserSelectedCarts(Integer userId, List<Integer> cartIds);
-
-    /**
-     * 根据skuId计算购物车支付页面详情
-     *
-     * @param userId the user id
-     * @param skuId  the sku id
-     * @param num    the item num
-     * @return the result
-     */
-    UserCartSummary calcUserBuySkuDetails(Integer userId, Integer skuId, int num);
-
-    /**
      * 添加商品到购物车
      *
      * @param userId the user id
@@ -88,5 +69,26 @@ public interface UserCartService {
      * @return void
      */
     Void clearUserCart(@NotNull(message = "用户ID不能为空") Integer userId);
+
+    /**
+     * 根据cartId计算购物车支付页面详情
+     *
+     * @param userId  the user id
+     * @param cartIds the cart id list
+     * @return the result
+     */
+    @Deprecated
+    UserCartSummary calcUserSelectedCarts(Integer userId, List<Integer> cartIds);
+
+    /**
+     * 根据skuId计算购物车支付页面详情
+     *
+     * @param userId the user id
+     * @param skuId  the sku id
+     * @param num    the item num
+     * @return the result
+     */
+    @Deprecated
+    UserCartSummary calcUserBuySkuDetails(Integer userId, Integer skuId, int num);
 
 }
