@@ -4,19 +4,24 @@ import cn.hutool.crypto.digest.MD5;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.yfshop.admin.api.service.merchant.AdminMerchantManageService;
 import com.yfshop.admin.api.service.merchant.req.CreateMerchantReq;
 import com.yfshop.admin.api.service.merchant.req.QueryMerchantReq;
 import com.yfshop.admin.api.service.merchant.req.UpdateMerchantReq;
+import com.yfshop.admin.api.service.merchant.result.MerchantResult;
 import com.yfshop.code.mapper.MerchantDetailMapper;
 import com.yfshop.code.mapper.MerchantMapper;
 import com.yfshop.code.mapper.RegionMapper;
+import com.yfshop.code.mapper.custom.CustomMerchantMapper;
 import com.yfshop.code.model.Merchant;
 import com.yfshop.code.model.MerchantDetail;
 import com.yfshop.code.model.Region;
+import com.yfshop.code.query.QueryMerchantDetail;
 import com.yfshop.common.enums.GroupRoleEnum;
 import com.yfshop.common.exception.ApiException;
 import com.yfshop.common.exception.Asserts;
+import com.yfshop.common.util.BeanUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,6 +31,7 @@ import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 商户管理
@@ -44,6 +50,8 @@ public class AdminMerchantManageServiceImpl implements AdminMerchantManageServic
     private MerchantMapper merchantMapper;
     @Resource
     private MerchantDetailMapper merchantDetailMapper;
+    @Resource
+    private CustomMerchantMapper customMerchantMapper;
 
     @Transactional(rollbackFor = Exception.class)
     @Override
@@ -116,7 +124,6 @@ public class AdminMerchantManageServiceImpl implements AdminMerchantManageServic
             // update detail
             MerchantDetail bean = new MerchantDetail();
             bean.setIsRefrigerator(req.getIsRefrigerator());
-            req.getHeadImage();
             LambdaQueryWrapper<MerchantDetail> queryWrapper = Wrappers.lambdaQuery(MerchantDetail.class)
                     .eq(MerchantDetail::getMerchantId, req.getMerchantId());
             Asserts.assertTrue(merchantDetailMapper.update(bean, queryWrapper) > 0,
@@ -146,11 +153,40 @@ public class AdminMerchantManageServiceImpl implements AdminMerchantManageServic
         merchant.setPidPath(this.generatePidPath(req.getPid()));
         int rows = merchantMapper.updateById(merchant);
         Asserts.assertTrue(rows > 0, 500, "编辑商户信息失败");
+
+        // 修改pMerchantName
+        if (!existMerchant.getMerchantName().equals(req.getMerchantName())) {
+            Merchant entity = new Merchant();
+            entity.setPMerchantName(req.getMerchantName());
+            merchantMapper.update(entity, Wrappers.lambdaQuery(Merchant.class).eq(Merchant::getPid, req.getMerchantId()));
+        }
+
         return null;
     }
 
     @Override
-    public IPage<Object> pageQueryMerchants(QueryMerchantReq req) {
+    public IPage<MerchantResult> pageQueryMerchants(QueryMerchantReq req) {
+        QueryMerchantDetail query = BeanUtil.convert(req, QueryMerchantDetail.class);
+        int count = customMerchantMapper.countMerchantInfo(query);
+        if (count <= 0) {
+            return BeanUtil.emptyPageData(req.getPageIndex(), req.getPageSize());
+        }
+        int startIdx = (req.getPageIndex() - 1) * req.getPageSize();
+        List<MerchantResult> list = customMerchantMapper.pageQueryMerchantInfo(query, startIdx, req.getPageSize())
+                .stream().map((m) -> BeanUtil.convert(m, MerchantResult.class)).collect(Collectors.toList());
+        IPage<MerchantResult> page = new Page<>(req.getPageIndex(), req.getPageSize(), count);
+        page.setRecords(list);
+        return page;
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public Void updateMerchantIsEnable(Integer merchantId, boolean isEnable) throws ApiException {
+        Merchant merchant = new Merchant();
+        merchant.setId(merchantId);
+        merchant.setIsEnable(isEnable ? "Y" : "N");
+        int rows = merchantMapper.updateById(merchant);
+        Asserts.assertTrue(rows > 0, 500, "修改失败");
         return null;
     }
 

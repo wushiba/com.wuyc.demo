@@ -355,11 +355,11 @@ public class AdminMallManageController implements BaseController {
     @ApiImplicitParams(value = {
             @ApiImplicitParam(paramType = "query", name = "skuId", value = "商品skuId", required = true)
     })
-    @RequestMapping(value = "/upperShelfSku", method = {RequestMethod.GET, RequestMethod.POST})
+    @RequestMapping(value = "/enableSku", method = {RequestMethod.GET, RequestMethod.POST})
     @ResponseBody
     @SaCheckLogin
     @SaCheckRole(value = "sys")
-    public CommonResult<Void> upperShelfSku(@NotNull(message = "skuId不能为空") Integer skuId) {
+    public CommonResult<Void> enableSku(@NotNull(message = "skuId不能为空") Integer skuId) {
         return CommonResult.success(adminMallManageService.updateSkuIsEnable(skuId, true));
     }
 }

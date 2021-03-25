@@ -66,6 +66,10 @@ public class MerchantDetail extends Model<MerchantDetail> {
 
     private String geoHash;
 
+    /**
+     * 门头照
+     */
+    private String headImage;
 
     @Override
     protected Serializable pkVal() {

@@ -30,6 +30,12 @@ public class BeanUtil {
         return page;
     }
 
+    public static <T> Page<T> emptyPageData(int pageIndex, int pageSize) {
+        Page<T> page = new Page<>(pageIndex, pageSize, 0);
+        page.setRecords(new ArrayList<>(0));
+        return page;
+    }
+
     /**
      * copy class
      *

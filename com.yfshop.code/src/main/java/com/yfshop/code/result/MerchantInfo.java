@@ -1,26 +1,31 @@
-package com.yfshop.admin.api.service.merchant.result;
+package com.yfshop.code.result;
 
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 
 /**
- * <p>
- * 商户表
- * </p>
- *
- * @author yoush
- * @since 2021-03-22
+ * @author Xulg
+ * Created in 2021-03-25 16:30
  */
 @Data
-@EqualsAndHashCode(callSuper = false)
-public class MerchantResult implements Serializable {
-
+public class MerchantInfo implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private Integer id;
 
+    /**
+     * 创建时间
+     */
+    private LocalDateTime createTime;
+
+    /**
+     * 更新时间
+     */
+    private LocalDateTime updateTime;
+
+    private String openId;
 
     private Integer pid;
 
@@ -47,6 +52,11 @@ public class MerchantResult implements Serializable {
      * 商户手机号
      */
     private String mobile;
+
+    /**
+     * 密码
+     */
+    private String password;
 
     /**
      * 联系人
@@ -79,6 +89,24 @@ public class MerchantResult implements Serializable {
      */
     private String address;
 
+    /**
+     * 是否可用: Y(可用), N(禁用)
+     */
+    private String isEnable;
+
+    /**
+     * 是否删除， Y(删除)， N（未删除）, 默认未删除
+     */
+    private String isDelete;
+
+    /**
+     * 网点类型id
+     */
+    private Integer websiteTypeId;
+
+    /**
+     * 网点类型名称
+     */
     private String websiteTypeName;
 
     /**
@@ -102,5 +130,4 @@ public class MerchantResult implements Serializable {
      * 门头照
      */
     private String headImage;
-
 }

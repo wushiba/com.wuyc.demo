@@ -14,11 +14,12 @@
         <result column="longitude" property="longitude" />
         <result column="latitude" property="latitude" />
         <result column="geo_hash" property="geoHash" />
+        <result column="head_image" property="headImage" />
     </resultMap>
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        id, create_time, update_time, merchant_id, website_type_id, website_type_name, is_refrigerator, longitude, latitude, geo_hash
+        id, create_time, update_time, merchant_id, website_type_id, website_type_name, is_refrigerator, longitude, latitude, geo_hash, head_image
     </sql>
 
 </mapper>

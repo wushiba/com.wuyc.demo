@@ -1,6 +1,8 @@
 package com.yfshop.code.mapper.custom;
 
-import com.yfshop.code.model.Merchant;
+import com.yfshop.code.query.QueryMerchantDetail;
+import com.yfshop.code.result.MerchantInfo;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -11,5 +13,10 @@ import java.util.List;
  * Created in 2021-03-25 14:12
  */
 public interface CustomMerchantMapper {
-    List<Merchant> queryAll();
+
+    List<MerchantInfo> pageQueryMerchantInfo(@Param("param") QueryMerchantDetail query,
+                                             @Param("startIndex") int startIndex,
+                                             @Param("pageSize") int pageSize);
+
+    int countMerchantInfo(@Param("param") QueryMerchantDetail query);
 }

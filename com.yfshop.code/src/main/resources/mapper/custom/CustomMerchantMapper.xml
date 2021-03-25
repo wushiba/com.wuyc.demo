@@ -11,4 +11,61 @@
         select * from yf_merchant
     </select>
 
+    <select id="pageQueryMerchantInfo" resultType="com.yfshop.code.result.MerchantInfo">
+        select a.*, b.website_type_id, b.website_type_name, b.is_refrigerator, b.longitude, b.latitude, b.geo_hash, b.head_image
+        from yf_merchant a inner join yf_merchant_detail on a.id = b.merchant_id
+        <include refid="query_sql"/>
+        order by a.id desc limit #{startIndex}, #{pageSize}
+    </select>
+
+    <select id="countMerchantInfo" resultType="java.lang.Integer">
+        select count(*) from yf_merchant a inner join yf_merchant_detail on a.id = b.merchant_id
+        <include refid="query_sql"/>
+    </select>
+
+    <sql id="query_sql">
+        <where>
+            <if test="param.startCreateTime != null">
+                and a.create_time >= #{param.startCreateTime}
+            </if>
+            <if test="param.endCreateTime != null">
+                <![CDATA[
+                and a.create_time <= #{param.endCreateTime}
+                ]]>
+            </if>
+            <if test="param.merchantId != null">
+                and a.id = #{param.merchantId}
+            </if>
+            <if test="param.merchantName != null">
+                and (a.merchant_name like CONCAT(CONCAT('%', #{param.merchantName}), '%'))
+            </if>
+            <if test="param.provinceId != null">
+                and a.province_id = #{param.provinceId}
+            </if>
+            <if test="param.cityId != null">
+                and a.city_id = #{param.cityId}
+            </if>
+            <if test="param.districtId != null">
+                and a.district_id = #{param.districtId}
+            </if>
+            <if test="param.roleAlias != null">
+                and a.role_alias = #{param.roleAlias}
+            </if>
+            <if test="param.mobile != null">
+                and a.mobile = #{param.mobile}
+            </if>
+            <if test="param.contacts != null">
+                and (a.contacts like CONCAT(CONCAT('%', #{param.contacts}), '%'))
+            </if>
+            <if test="param.pMerchantName != null">
+                and (a.p_merchant_name like CONCAT(CONCAT('%', #{param.pMerchantName}), '%'))
+            </if>
+            <if test="param.isEnable!=null">
+                and a.is_enable = #{param.isEnable}
+            </if>
+            <if test="param.isRefrigerator!=null">
+                and b.is_refrigerator = #{param.isRefrigerator}
+            </if>
+        </where>
+    </sql>
 </mapper>
