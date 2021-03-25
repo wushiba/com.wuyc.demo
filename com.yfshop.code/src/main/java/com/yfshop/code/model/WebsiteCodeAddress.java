@@ -11,7 +11,7 @@ import lombok.EqualsAndHashCode;
 
 /**
  * <p>
- * 商户批次码详情
+ * 商户码批次
  * </p>
  *
  * @author yoush
@@ -19,32 +19,17 @@ import lombok.EqualsAndHashCode;
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
-@TableName("yf_website_code_detail")
-public class WebsiteCodeDetail extends Model<WebsiteCodeDetail> {
+@TableName("yf_website_code_address")
+public class WebsiteCodeAddress extends Model<WebsiteCodeAddress> {
 
     private static final long serialVersionUID = 1L;
 
     @TableId(value = "id", type = IdType.AUTO)
-    private Long id;
+    private Integer id;
 
     private LocalDateTime createTime;
 
     private LocalDateTime updateTime;
-
-    /**
-     * 批次id
-     */
-    private Integer batchId;
-
-    /**
-     * 商户码 3位地区码+6位pid+6位年月日+5位序号
-     */
-    private String alias;
-
-    /**
-     * 是否激活, Y|N
-     */
-    private String isActivate;
 
     /**
      * 商户id
@@ -52,24 +37,45 @@ public class WebsiteCodeDetail extends Model<WebsiteCodeDetail> {
     private Integer merchantId;
 
     /**
-     * 绑定商户名称
+     * 收货地址
      */
-    private String merchantName;
+    private String address;
 
     /**
-     * 商户手机号码
+     * 收货手机号
      */
     private String mobile;
 
     /**
-     * 上级id
+     * 收货人姓名
      */
-    private Integer pid;
+    private String contracts;
 
     /**
-     * 上级路径
+     * 省
      */
-    private String pidPath;
+    private String province;
+
+    /**
+     * 市
+     */
+    private String city;
+
+    /**
+     * 区
+     */
+    private String district;
+
+    private Integer provinceId;
+
+    private Integer cityId;
+
+    private Integer districtId;
+
+    /**
+     * N 不是默认 Y 默认
+     */
+    private String isDefault;
 
 
     @Override

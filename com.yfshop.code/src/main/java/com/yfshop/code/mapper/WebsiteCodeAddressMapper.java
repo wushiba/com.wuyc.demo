@@ -1,6 +1,6 @@
 package com.yfshop.code.mapper;
 
-import com.yfshop.code.model.WebsiteCode;
+import com.yfshop.code.model.WebsiteCodeAddress;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 /**
@@ -9,8 +9,8 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  * </p>
  *
  * @author yoush
- * @since 2021-03-25
+ * @since 2021-03-24
  */
-public interface WebsiteCodeMapper extends BaseMapper<WebsiteCode> {
+public interface WebsiteCodeAddressMapper extends BaseMapper<WebsiteCodeAddress> {
 
 }

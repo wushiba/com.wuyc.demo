@@ -10,13 +10,14 @@
         <result column="open_id" property="openId" />
         <result column="nickname" property="nickname" />
         <result column="mobile" property="mobile" />
-        <result column="image" property="image" />
+        <result column="head_img_url" property="headImgUrl" />
         <result column="sex" property="sex" />
+        <result column="subscribe" property="subscribe" />
     </resultMap>
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        id, create_time, update_time, open_id, nickname, mobile, image, sex
+        id, create_time, update_time, open_id, nickname, mobile, head_img_url, sex, subscribe
     </sql>
 
 </mapper>

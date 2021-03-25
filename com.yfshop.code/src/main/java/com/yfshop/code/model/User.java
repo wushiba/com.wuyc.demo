@@ -15,7 +15,7 @@ import lombok.EqualsAndHashCode;
  * </p>
  *
  * @author yoush
- * @since 2021-03-22
+ * @since 2021-03-25
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -49,12 +49,17 @@ public class User extends Model<User> {
     /**
      * 用户头像
      */
-    private String image;
+    private String headImgUrl;
 
     /**
      * 性别 0:未知 1:男 2:女 
      */
     private Integer sex;
+
+    /**
+     * N 未关注 Y 已关注
+     */
+    private String subscribe;
 
 
     @Override
