@@ -9,12 +9,17 @@ import com.yfshop.code.mapper.UserCartMapper;
 import com.yfshop.code.model.Item;
 import com.yfshop.code.model.ItemSku;
 import com.yfshop.code.model.UserCart;
+import com.yfshop.common.constants.CacheConstants;
 import com.yfshop.common.exception.ApiException;
 import com.yfshop.common.exception.Asserts;
 import com.yfshop.common.util.BeanUtil;
 import com.yfshop.shop.service.cart.result.UserCartResult;
 import com.yfshop.shop.service.cart.result.UserCartSummary;
+import com.yfshop.shop.service.coupon.result.YfUserCouponResult;
+import com.yfshop.shop.service.coupon.service.FrontUserCouponService;
 import org.apache.dubbo.config.annotation.DubboService;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
@@ -43,7 +48,11 @@ public class UserCartServiceImpl implements UserCartService {
     private ItemSkuMapper skuMapper;
     @Resource
     private ItemMapper itemMapper;
+    @Resource
+    private FrontUserCouponService frontUserCouponService;
 
+    @Cacheable(cacheNames = CacheConstants.USER_CART_CACHE_NAME,
+            key = "'" + CacheConstants.USER_CART_CACHE_KEY_PREFIX + "' + #root.args[0]")
     @Override
     public List<UserCartResult> queryUserCarts(Integer userId) {
         if (userId == null || userId <= 0) {
@@ -55,49 +64,8 @@ public class UserCartServiceImpl implements UserCartService {
         return BeanUtil.convertList(userCarts, UserCartResult.class);
     }
 
-    @Override
-    public UserCartSummary calcUserSelectedCarts(Integer userId, List<Integer> cartIds) {
-        if (userId == null || userId <= 0) {
-            return null;
-        }
-        if (CollectionUtil.isEmpty(cartIds)) {
-            return UserCartSummary.emptySummary();
-        }
-        // 查询用户所有的购物车列表
-        List<UserCart> userCarts = cartMapper.selectList(Wrappers.lambdaQuery(UserCart.class)
-                .eq(UserCart::getUserId, userId).in(UserCart::getId, cartIds));
-        return this.calcUserCart(userCarts);
-    }
-
-    @Override
-    public UserCartSummary calcUserBuySkuDetails(Integer userId, Integer skuId, int num) {
-        if (userId == null || userId <= 0 || skuId == null || skuId <= 0 || num <= 0) {
-            return null;
-        }
-        ItemSku sku = skuMapper.selectById(skuId);
-        if (sku == null) {
-            return UserCartSummary.emptySummary();
-        }
-
-        // 总结算价
-        BigDecimal totalMoney = NumberUtil.mul(sku.getSkuSalePrice(), num);
-        // 购物车总市场价
-        BigDecimal oldTotalMoney = NumberUtil.mul(sku.getSkuMarketPrice(), num);
-        // 计算运费
-        BigDecimal totalFreight = calcTotalFreight();
-
-        // TODO: 2021/3/24 优惠信息
-
-        // 封装数据
-        UserCartSummary cartSummary = new UserCartSummary();
-        cartSummary.setItemCount(num);
-        cartSummary.setTotalMoney(totalMoney);
-        cartSummary.setOldTotalMoney(oldTotalMoney);
-        cartSummary.setTotalFreight(totalFreight);
-        cartSummary.setCarts(null);
-        return cartSummary;
-    }
-
+    @CacheEvict(cacheNames = CacheConstants.USER_CART_CACHE_NAME,
+            key = "'" + CacheConstants.USER_CART_CACHE_KEY_PREFIX + "' + #root.args[0]")
     @Transactional(rollbackFor = Exception.class)
     @Override
     public Void addUserCart(@NotNull(message = "用户ID不能为空") Integer userId,
@@ -126,6 +94,8 @@ public class UserCartServiceImpl implements UserCartService {
         return null;
     }
 
+    @CacheEvict(cacheNames = CacheConstants.USER_CART_CACHE_NAME,
+            key = "'" + CacheConstants.USER_CART_CACHE_KEY_PREFIX + "' + #root.args[0]")
     @Transactional(rollbackFor = Exception.class)
     @Override
     public Void updateUserCart(@NotNull(message = "用户ID不能为空") Integer userId,
@@ -160,6 +130,8 @@ public class UserCartServiceImpl implements UserCartService {
         return null;
     }
 
+    @CacheEvict(cacheNames = CacheConstants.USER_CART_CACHE_NAME,
+            key = "'" + CacheConstants.USER_CART_CACHE_KEY_PREFIX + "' + #root.args[0]")
     @Transactional(rollbackFor = Exception.class)
     @Override
     public Void deleteUserCarts(@NotNull(message = "用户ID不能为空") Integer userId,
@@ -169,11 +141,62 @@ public class UserCartServiceImpl implements UserCartService {
         return null;
     }
 
+    @CacheEvict(cacheNames = CacheConstants.USER_CART_CACHE_NAME,
+            key = "'" + CacheConstants.USER_CART_CACHE_KEY_PREFIX + "' + #root.args[0]")
     @Transactional(rollbackFor = Exception.class)
     @Override
     public Void clearUserCart(@NotNull(message = "用户ID不能为空") Integer userId) {
         cartMapper.delete(Wrappers.lambdaQuery(UserCart.class).eq(UserCart::getUserId, userId));
         return null;
+    }
+
+    @Override
+    public UserCartSummary calcUserSelectedCarts(Integer userId, List<Integer> cartIds) {
+        if (userId == null || userId <= 0) {
+            return null;
+        }
+        if (CollectionUtil.isEmpty(cartIds)) {
+            return UserCartSummary.emptySummary();
+        }
+        List<UserCart> userCarts = cartMapper.selectList(Wrappers.lambdaQuery(UserCart.class)
+                .eq(UserCart::getUserId, userId).in(UserCart::getId, cartIds));
+        // 查询用户的购物车列表
+        //List<UserCart> userCarts = getUserCarts(userId).stream()
+        //        .filter(userCartResult -> cartIds.contains(userCartResult.getId()))
+        //        .map((userCartResult) -> BeanUtil.convert(userCartResult, UserCart.class))
+        //        .collect(Collectors.toList());
+        return this.calcUserCart(userCarts);
+    }
+
+    @Override
+    public UserCartSummary calcUserBuySkuDetails(Integer userId, Integer skuId, int num) {
+        if (userId == null || userId <= 0 || skuId == null || skuId <= 0 || num <= 0) {
+            return null;
+        }
+        ItemSku sku = skuMapper.selectById(skuId);
+        if (sku == null) {
+            return UserCartSummary.emptySummary();
+        }
+
+        // 总结算价
+        BigDecimal totalMoney = NumberUtil.mul(sku.getSkuSalePrice(), num);
+        // 购物车总市场价
+        BigDecimal oldTotalMoney = NumberUtil.mul(sku.getSkuMarketPrice(), num);
+        // 计算运费
+        BigDecimal totalFreight = calcTotalFreight();
+
+        // TODO: 2021/3/24 优惠信息
+        List<YfUserCouponResult> availableCoupons = frontUserCouponService
+                .findUserCanUseCouponList(userId, "Y");
+
+        // 封装数据
+        UserCartSummary cartSummary = new UserCartSummary();
+        cartSummary.setItemCount(num);
+        cartSummary.setTotalMoney(totalMoney);
+        cartSummary.setOldTotalMoney(oldTotalMoney);
+        cartSummary.setTotalFreight(totalFreight);
+        cartSummary.setCarts(null);
+        return cartSummary;
     }
 
     private UserCartSummary calcUserCart(List<UserCart> userCarts) {
@@ -238,4 +261,20 @@ public class UserCartServiceImpl implements UserCartService {
     private BigDecimal calcTotalFreight() {
         throw new UnsupportedOperationException("运费逻辑呢？");
     }
+
+    private Object calcDiscountInfo(Integer userId, Integer itemId) {
+        if (true) {
+            throw new UnsupportedOperationException();
+        }
+        // 用户可用优惠券
+        YfUserCouponResult availableCoupon = frontUserCouponService.findUserCanUseCouponList(userId, "Y").stream()
+                .filter(userCoupon -> "ALL".equalsIgnoreCase(userCoupon.getUseRangeType())
+                        || userCoupon.getCanUseItemIds().equals(itemId.toString()))
+                .findFirst().orElse(null);
+        if (availableCoupon == null) {
+            return null;
+        }
+        return null;
+    }
+
 }

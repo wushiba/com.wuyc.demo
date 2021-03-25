@@ -114,31 +114,31 @@ public class UserCartController implements BaseController {
         return CommonResult.success(userCartService.clearUserCart(getCurrentUserId()));
     }
 
-    @ApiOperation(value = "单个SKU商品购买支付页结算数据", httpMethod = "GET")
-    @ApiImplicitParams(value = {
-            @ApiImplicitParam(paramType = "query", name = "skuId", value = "商品skuId", required = true),
-            @ApiImplicitParam(paramType = "query", name = "num", value = "数量", required = true)
-    })
-    @RequestMapping(value = "/calcUserBuySkuDetails", method = {RequestMethod.GET, RequestMethod.POST})
-    @ResponseBody
-    @SaCheckLogin
-    public CommonResult<UserCartSummary> calcUserBuySkuDetails(@NotNull(message = "skuId不能为空") Integer skuId,
-                                                               @NotNull(message = "购买数量不能为空")
-                                                               @Positive(message = "数量不能为负") Integer num) {
-        return CommonResult.success(userCartService.calcUserBuySkuDetails(getCurrentUserId(), skuId, num));
-    }
+//    @ApiOperation(value = "单个SKU商品购买支付页结算数据", httpMethod = "GET")
+//    @ApiImplicitParams(value = {
+//            @ApiImplicitParam(paramType = "query", name = "skuId", value = "商品skuId", required = true),
+//            @ApiImplicitParam(paramType = "query", name = "num", value = "数量", required = true)
+//    })
+//    @RequestMapping(value = "/calcUserBuySkuDetails", method = {RequestMethod.GET, RequestMethod.POST})
+//    @ResponseBody
+//    @SaCheckLogin
+//    public CommonResult<UserCartSummary> calcUserBuySkuDetails(@NotNull(message = "skuId不能为空") Integer skuId,
+//                                                               @NotNull(message = "购买数量不能为空")
+//                                                               @Positive(message = "数量不能为负") Integer num) {
+//        return CommonResult.success(userCartService.calcUserBuySkuDetails(getCurrentUserId(), skuId, num));
+//    }
 
-    @ApiOperation(value = "购物车支付页面详情", httpMethod = "GET")
-    @ApiImplicitParams(value = {
-            @ApiImplicitParam(paramType = "query", name = "ids", value = "购物车ID，多个使用\",\"拼接", required = true),
-    })
-    @RequestMapping(value = "/calcUserSelectedCarts")
-    @ResponseBody
-    @SaCheckLogin
-    public CommonResult<UserCartSummary> calcUserSelectedCarts(@NotBlank(message = "购物车列表不能为空") String ids) {
-        List<Integer> cartIds = Arrays.stream(StringUtils.split(ids, ","))
-                .map(Integer::valueOf).collect(Collectors.toList());
-        return CommonResult.success(userCartService.calcUserSelectedCarts(getCurrentUserId(), cartIds));
-    }
+//    @ApiOperation(value = "购物车支付页面详情", httpMethod = "GET")
+//    @ApiImplicitParams(value = {
+//            @ApiImplicitParam(paramType = "query", name = "ids", value = "购物车ID，多个使用\",\"拼接", required = true),
+//    })
+//    @RequestMapping(value = "/calcUserSelectedCarts")
+//    @ResponseBody
+//    @SaCheckLogin
+//    public CommonResult<UserCartSummary> calcUserSelectedCarts(@NotBlank(message = "购物车列表不能为空") String ids) {
+//        List<Integer> cartIds = Arrays.stream(StringUtils.split(ids, ","))
+//                .map(Integer::valueOf).collect(Collectors.toList());
+//        return CommonResult.success(userCartService.calcUserSelectedCarts(getCurrentUserId(), cartIds));
+//    }
 
 }
