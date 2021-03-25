@@ -1,6 +1,6 @@
 package com.yfshop.code.manager;
 
-import com.yfshop.code.model.WebsiteCode;
+import com.yfshop.code.model.WebsiteCodeAddress;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 /**
@@ -9,8 +9,8 @@ import com.baomidou.mybatisplus.extension.service.IService;
  * </p>
  *
  * @author yoush
- * @since 2021-03-25
+ * @since 2021-03-24
  */
-public interface WebsiteCodeManager extends IService<WebsiteCode> {
+public interface WebsiteCodeAddressManager extends IService<WebsiteCodeAddress> {
 
 }

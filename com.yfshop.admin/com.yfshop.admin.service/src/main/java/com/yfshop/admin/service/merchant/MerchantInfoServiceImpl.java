@@ -1,17 +1,16 @@
 package com.yfshop.admin.service.merchant;
 
-import java.time.LocalDateTime;
-
-import com.google.common.collect.Lists;
-
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.util.RandomUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.yfshop.admin.api.service.merchant.MerchantInfoService;
 import com.yfshop.admin.api.service.merchant.result.MerchantResult;
+import com.yfshop.admin.api.website.req.WebsiteCodeAddressReq;
 import com.yfshop.admin.api.website.req.WebsiteCodeBindReq;
+import com.yfshop.admin.api.website.result.WebsiteCodeAddressResult;
 import com.yfshop.admin.api.website.result.WebsiteCodeDetailResult;
 import com.yfshop.admin.api.website.result.WebsiteCodeResult;
 import com.yfshop.admin.api.website.result.WebsiteTypeResult;
@@ -54,6 +53,9 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
 
     @Resource
     private WebsiteCodeMapper websiteCodeMapper;
+
+    @Resource
+    private WebsiteCodeAddressMapper websiteCodeAddressMapper;
 
     @Resource
     private WebsiteTypeMapper websiteTypeMapper;
@@ -155,7 +157,7 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
         LambdaQueryWrapper<WebsiteCode> lambdaQueryWrapper = Wrappers.<WebsiteCode>lambdaQuery()
                 .like(WebsiteCode::getPidPath, merchantId)
                 .in(CollectionUtil.isNotEmpty(allStatus), WebsiteCode::getOrderStatus, allStatus)
-                .eq(StringUtils.isNotBlank(status) && !"ALL".equals(status), WebsiteCode::getOrderStatus, allStatus)
+                .eq(StringUtils.isNotBlank(status) && !"ALL".equals(status), WebsiteCode::getOrderStatus, status)
                 .orderByDesc(WebsiteCode::getId);
         IPage<WebsiteCode> websiteCodeIPage = websiteCodeMapper.selectPage(new Page<>(pageIndex, pageSize), lambdaQueryWrapper);
         return BeanUtil.iPageConvert(websiteCodeIPage, WebsiteCodeResult.class);
@@ -175,9 +177,43 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
         Merchant merchant = merchantMapper.selectById(merchantId);
         WebsiteCode websiteCode = new WebsiteCode();
         websiteCode.setMerchantId(merchant.getId());
+        websiteCode.setMerchantName(merchant.getMerchantName());
         websiteCode.setPidPath(merchant.getPidPath());
         websiteCode.setQuantity(count);
+        websiteCode.setBatchNo(cn.hutool.core.date.DateUtil.format(new Date(), "yyMMddHHmmssSSS" + RandomUtil.randomNumbers(4)));
         websiteCodeMapper.insert(websiteCode);
+        return null;
+    }
+
+    @Override
+    public Void websiteCodeAddress(WebsiteCodeAddressReq websiteCodeAddressReq) throws ApiException {
+        WebsiteCodeAddress websiteCodeAddress = BeanUtil.convert(websiteCodeAddressReq, WebsiteCodeAddress.class);
+        if (websiteCodeAddress.getId() == null) {
+            websiteCodeAddressMapper.insert(websiteCodeAddress);
+        } else {
+            websiteCodeAddressMapper.updateById(websiteCodeAddress);
+        }
+        if ("Y".equals(websiteCodeAddress.getIsDefault())) {
+            WebsiteCodeAddress newWebsiteCodeAddress = new WebsiteCodeAddress();
+            newWebsiteCodeAddress.setIsDefault("N");
+            websiteCodeAddressMapper.update(newWebsiteCodeAddress, Wrappers.<WebsiteCodeAddress>lambdaQuery()
+                    .eq(WebsiteCodeAddress::getMerchantId, websiteCodeAddress.getMerchantId())
+                    .ne(WebsiteCodeAddress::getId, websiteCodeAddress.getId()));
+        }
+        return null;
+    }
+
+    @Override
+    public List<WebsiteCodeAddressResult> getWebsiteCodeAddress(Integer merchantId) throws ApiException {
+        List<WebsiteCodeAddress> websiteCodeAddresses = websiteCodeAddressMapper.selectList(Wrappers.<WebsiteCodeAddress>lambdaQuery()
+                .eq(WebsiteCodeAddress::getMerchantId, merchantId)
+                .orderByDesc(WebsiteCodeAddress::getIsDefault, WebsiteCodeAddress::getId));
+        return BeanUtil.convertList(websiteCodeAddresses, WebsiteCodeAddressResult.class);
+    }
+
+    @Override
+    public Void deleteWebsiteCodeAddress(Integer id) {
+        websiteCodeAddressMapper.deleteById(id);
         return null;
     }
 

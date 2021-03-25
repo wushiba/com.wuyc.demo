@@ -20,4 +20,10 @@ public interface CacheConstants {
 
     String USER_CART_CACHE_NAME = "UserCartCacheName";
     String USER_CART_CACHE_KEY_PREFIX = "user_cart_";
+
+
+    String DRAW_ACTIVITY_PREFIX = "draw_activity_act_id_";
+    String DRAW_PRIZE_NAME_PREFIX = "draw_prize_act_id_";
+    String DRAW_PROVINCE_RATE_PREFIX = "draw_province_rate_act_id_";
+
 }

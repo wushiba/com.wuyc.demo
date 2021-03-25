@@ -10,7 +10,6 @@ import com.yfshop.code.mapper.OrderDetailMapper;
 import com.yfshop.code.mapper.WebsiteBillMapper;
 import com.yfshop.code.model.OrderDetail;
 import com.yfshop.code.model.WebsiteBill;
-import com.yfshop.code.model.WebsiteCodeDetail;
 import com.yfshop.common.exception.ApiException;
 import com.yfshop.common.util.BeanUtil;
 import com.yfshop.common.util.DateUtil;
@@ -96,7 +95,7 @@ public class WebsiteBillServiceImpl implements WebsiteBillService {
         Integer totalQuantity = websiteBills.size();
         websiteBills.forEach(item -> {
             WebsiteBillResult websiteBillResult = new WebsiteBillResult();
-            BeanUtil.copyProperties(item, websiteBillResults);
+            BeanUtil.copyProperties(item, websiteBillResult);
             websiteBillResults.add(websiteBillResult);
             totalAmount.set(websiteBillResult.getPayPrice().add(totalAmount.get()));
         });

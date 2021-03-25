@@ -7,8 +7,8 @@
         <id column="id" property="id" />
         <result column="create_time" property="createTime" />
         <result column="update_time" property="updateTime" />
-        <result column="merchart_id" property="merchartId" />
-        <result column="role_id" property="roleId" />
+        <result column="merchant_id" property="merchantId" />
+        <result column="merchant_name" property="merchantName" />
         <result column="pid_path" property="pidPath" />
         <result column="batch_no" property="batchNo" />
         <result column="quantity" property="quantity" />
@@ -23,11 +23,12 @@
         <result column="mobile" property="mobile" />
         <result column="contracts" property="contracts" />
         <result column="file_url" property="fileUrl" />
+        <result column="email" property="email" />
     </resultMap>
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        id, create_time, update_time, merchart_id, role_id, pid_path, batch_no, quantity, order_status, billno, pay_method, expree_name, order_amount, postage, express_no, address, mobile, contracts, file_url
+        id, create_time, update_time, merchant_id, merchant_name, pid_path, batch_no, quantity, order_status, billno, pay_method, expree_name, order_amount, postage, express_no, address, mobile, contracts, file_url, email
     </sql>
 
 </mapper>

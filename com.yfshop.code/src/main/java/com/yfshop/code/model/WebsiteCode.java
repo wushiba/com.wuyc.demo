@@ -1,5 +1,6 @@
 package com.yfshop.code.model;
 
+import java.math.BigDecimal;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.extension.activerecord.Model;
@@ -15,7 +16,7 @@ import lombok.EqualsAndHashCode;
  * </p>
  *
  * @author yoush
- * @since 2021-03-22
+ * @since 2021-03-25
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -36,7 +37,10 @@ public class WebsiteCode extends Model<WebsiteCode> {
      */
     private Integer merchantId;
 
-    private Integer roleId;
+    /**
+     * 商户名称
+     */
+    private String merchantName;
 
     /**
      * 商户pid_path
@@ -54,7 +58,7 @@ public class WebsiteCode extends Model<WebsiteCode> {
     private Integer quantity;
 
     /**
-     * 订单状态: 待支付, 已取消， WAIT(待发货), DELIVERY(待收货), SUCCESS(已完成)
+     * PENDING待支付, CANCEL已取消， WAIT(待发货), DELIVERY(待收货), SUCCESS(已完成)
      */
     private String orderStatus;
 
@@ -76,12 +80,12 @@ public class WebsiteCode extends Model<WebsiteCode> {
     /**
      * 订单金额
      */
-    private String orderAmount;
+    private BigDecimal orderAmount;
 
     /**
      * 邮费
      */
-    private String postage;
+    private BigDecimal postage;
 
     /**
      * 快递编号
@@ -107,6 +111,11 @@ public class WebsiteCode extends Model<WebsiteCode> {
      * 文件地址
      */
     private String fileUrl;
+
+    /**
+     * 邮箱地址
+     */
+    private String email;
 
 
     @Override
