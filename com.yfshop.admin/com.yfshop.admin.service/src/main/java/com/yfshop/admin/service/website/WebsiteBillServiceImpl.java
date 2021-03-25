@@ -96,7 +96,7 @@ public class WebsiteBillServiceImpl implements WebsiteBillService {
         Integer totalQuantity = websiteBills.size();
         websiteBills.forEach(item -> {
             WebsiteBillResult websiteBillResult = new WebsiteBillResult();
-            BeanUtil.copyProperties(item, websiteBillResults);
+            BeanUtil.copyProperties(item, websiteBillResult);
             websiteBillResults.add(websiteBillResult);
             totalAmount.set(websiteBillResult.getPayPrice().add(totalAmount.get()));
         });

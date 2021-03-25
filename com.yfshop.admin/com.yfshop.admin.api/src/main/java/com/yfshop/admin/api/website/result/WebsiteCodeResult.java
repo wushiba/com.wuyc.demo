@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 /**
@@ -21,7 +22,7 @@ public class WebsiteCodeResult implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private Long id;
+    private Integer id;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", locale = "zh", timezone = "GMT+8")
     private LocalDateTime createTime;
@@ -34,7 +35,10 @@ public class WebsiteCodeResult implements Serializable {
      */
     private Integer merchantId;
 
-    private Integer roleId;
+    /**
+     * 商户名称
+     */
+    private String merchantName;
 
     /**
      * 商户pid_path
@@ -52,7 +56,7 @@ public class WebsiteCodeResult implements Serializable {
     private Integer quantity;
 
     /**
-     * 订单状态: 待支付, 已取消， WAIT(待发货), DELIVERY(待收货), SUCCESS(已完成)
+     * PENDING待支付, CANCEL已取消， WAIT(待发货), DELIVERY(待收货), SUCCESS(已完成)
      */
     private String orderStatus;
 
@@ -74,12 +78,12 @@ public class WebsiteCodeResult implements Serializable {
     /**
      * 订单金额
      */
-    private String orderAmount;
+    private BigDecimal orderAmount;
 
     /**
      * 邮费
      */
-    private String postage;
+    private BigDecimal postage;
 
     /**
      * 快递编号
@@ -105,6 +109,11 @@ public class WebsiteCodeResult implements Serializable {
      * 文件地址
      */
     private String fileUrl;
+
+    /**
+     * 邮箱地址
+     */
+    private String email;
 
 
 

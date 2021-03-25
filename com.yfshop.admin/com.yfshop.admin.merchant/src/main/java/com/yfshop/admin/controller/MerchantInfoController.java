@@ -1,14 +1,13 @@
 package com.yfshop.admin.controller;
 
 import cn.dev33.satoken.annotation.SaCheckLogin;
+import cn.dev33.satoken.stp.StpLogic;
 import cn.dev33.satoken.stp.StpUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.yfshop.admin.api.service.merchant.MerchantInfoService;
 import com.yfshop.admin.api.service.merchant.result.MerchantResult;
-import com.yfshop.admin.api.website.req.WebsiteCodeApplyReq;
-import com.yfshop.admin.api.website.req.WebsiteCodeApplyStatusReq;
-import com.yfshop.admin.api.website.req.WebsiteCodeBindReq;
-import com.yfshop.admin.api.website.req.WebsiteCodeReq;
+import com.yfshop.admin.api.website.req.*;
+import com.yfshop.admin.api.website.result.WebsiteCodeAddressResult;
 import com.yfshop.admin.api.website.result.WebsiteCodeDetailResult;
 import com.yfshop.admin.api.website.result.WebsiteCodeResult;
 import com.yfshop.admin.api.website.result.WebsiteTypeResult;
@@ -32,7 +31,7 @@ class MerchantInfoController implements BaseController {
 
     @DubboReference(check = false)
     private MerchantInfoService merchantInfoService;
-
+    public static StpLogic stpLogic = new StpLogic("wx");
 
     /**
      * 获取网点用户信息
@@ -82,6 +81,7 @@ class MerchantInfoController implements BaseController {
         if (StpUtil.isLogin()) {
             websiteReq.setId(StpUtil.getLoginIdAsInt());
         }
+        websiteReq.setOpenId(stpLogic.getLoginIdAsString());
         return CommonResult.success(merchantInfoService.websiteCodeBind(websiteReq));
     }
 
@@ -132,5 +132,39 @@ class MerchantInfoController implements BaseController {
         return CommonResult.success(null);
     }
 
+    /**
+     * 创建网点码收货地址
+     *
+     * @return
+     */
+    @RequestMapping(value = "/websiteCodeAddress", method = {RequestMethod.POST})
+    public CommonResult<Void> websiteCodeAddress(WebsiteCodeAddressReq websiteCodeAddressReq) {
+        websiteCodeAddressReq.setMerchantId(getCurrentAdminUserId());
+        merchantInfoService.websiteCodeAddress(websiteCodeAddressReq);
+        return CommonResult.success(null);
+    }
 
+
+    /**
+     * 创建网点码收货地址
+     *
+     * @return
+     */
+    @RequestMapping(value = "/getWebsiteCodeAddress", method = {RequestMethod.POST})
+    public CommonResult<List<WebsiteCodeAddressResult>> getWebsiteCodeAddress() {
+        List<WebsiteCodeAddressResult> list = merchantInfoService.getWebsiteCodeAddress(getCurrentAdminUserId());
+        return CommonResult.success(list);
+    }
+
+
+    /**
+     * 删除网点码收货地址
+     *
+     * @return
+     */
+    @RequestMapping(value = "/deleteWebsiteCodeAddress", method = {RequestMethod.POST})
+    public CommonResult<Void> deleteWebsiteCodeAddress(Integer id) {
+        merchantInfoService.deleteWebsiteCodeAddress(id);
+        return CommonResult.success(null);
+    }
 }

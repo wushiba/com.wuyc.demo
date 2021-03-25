@@ -1,5 +1,6 @@
 package com.yfshop.admin.controller;
 
+import cn.dev33.satoken.stp.StpLogic;
 import cn.dev33.satoken.stp.StpUtil;
 import com.yfshop.admin.api.service.merchant.result.MerchantResult;
 import com.yfshop.common.api.CommonResult;
@@ -22,7 +23,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 @RequestMapping("/wx/redirect/{appid}")
 public class WxRedirectController {
     private final WxMpService wxService;
-
+    //public static StpLogic stpLogic = new StpLogic("wx");
     @RequestMapping("/authByCode")
     public CommonResult<MerchantResult> greetUser(@PathVariable String appid, @RequestParam String code) {
         if (!this.wxService.switchover(appid)) {
@@ -31,7 +32,7 @@ public class WxRedirectController {
         try {
             WxOAuth2AccessToken accessToken = wxService.getOAuth2Service().getAccessToken(code);
             WxOAuth2UserInfo user = wxService.getOAuth2Service().getUserInfo(accessToken, null);
-            StpUtil.setLoginId(user.getOpenid());
+           // stpLogic.setLoginId(user.getOpenid());
         } catch (WxErrorException e) {
             e.printStackTrace();
         }
