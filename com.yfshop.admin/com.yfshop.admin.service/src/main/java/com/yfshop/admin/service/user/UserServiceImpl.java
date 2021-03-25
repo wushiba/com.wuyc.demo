@@ -8,8 +8,8 @@ import com.yfshop.code.mapper.UserMapper;
 import com.yfshop.code.model.User;
 import com.yfshop.common.exception.ApiException;
 import com.yfshop.common.util.BeanUtil;
-import org.springframework.validation.annotation.Validated;
 import org.apache.dubbo.config.annotation.DubboService;
+import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
 

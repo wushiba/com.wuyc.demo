@@ -1,7 +1,5 @@
 package com.yfshop.admin;
 
-import com.yfshop.admin.api.mall.AdminMallManageService;
-import com.yfshop.admin.api.mall.request.CreateBannerReq;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.validation.ValidationAutoConfiguration;

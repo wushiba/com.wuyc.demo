@@ -1,9 +1,7 @@
 package com.yfshop.admin.service.draw;
 
-import java.util.List;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
-import javax.annotation.Resource;
 import com.yfshop.admin.api.draw.request.QueryProvinceRateReq;
 import com.yfshop.admin.api.draw.result.YfDrawProvinceResult;
 import com.yfshop.admin.api.draw.service.AdminDrawProvinceService;
@@ -13,6 +11,9 @@ import com.yfshop.common.exception.ApiException;
 import com.yfshop.common.util.BeanUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.Service;
+
+import javax.annotation.Resource;
+import java.util.List;
 
 /**
  * @Title:抽奖省份定制化中奖几率Service实现

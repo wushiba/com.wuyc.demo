@@ -10,7 +10,6 @@ import com.yfshop.code.mapper.OrderDetailMapper;
 import com.yfshop.code.mapper.WebsiteBillMapper;
 import com.yfshop.code.model.OrderDetail;
 import com.yfshop.code.model.WebsiteBill;
-import com.yfshop.code.model.WebsiteCodeDetail;
 import com.yfshop.common.exception.ApiException;
 import com.yfshop.common.util.BeanUtil;
 import com.yfshop.common.util.DateUtil;
