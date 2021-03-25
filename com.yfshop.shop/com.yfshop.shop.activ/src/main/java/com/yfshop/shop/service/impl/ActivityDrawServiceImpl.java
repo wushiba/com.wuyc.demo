@@ -15,6 +15,7 @@ import com.yfshop.common.service.RedisService;
 import com.yfshop.shop.enums.ProvinceEnum;
 import com.yfshop.shop.service.ActivityCouponService;
 import com.yfshop.shop.service.ActivityDrawService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -33,7 +34,7 @@ import java.util.stream.Collectors;
 @Service
 public class ActivityDrawServiceImpl implements ActivityDrawService {
 
-    @Resource
+    @Autowired
     private UserMapper userMapper;
 
     @Resource
