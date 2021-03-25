@@ -1,5 +1,6 @@
 package com.yfshop.admin.api.draw.result;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -20,17 +21,21 @@ public class YfDrawActivityResult implements Serializable{
     /**  */
     private Integer id;
 
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", locale = "zh", timezone = "GMT+8")
     private LocalDateTime createTime;
 
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", locale = "zh", timezone = "GMT+8")
     private LocalDateTime updateTime;
 
     /** 活动标题 */
     private String actTitle;
 	
     /** 活动开始时间 */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", locale = "zh", timezone = "GMT+8")
     private LocalDateTime startTime;
 	
     /** 活动结束时间 */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", locale = "zh", timezone = "GMT+8")
     private LocalDateTime endTime;
 	
     /** 活动banner图地址 */

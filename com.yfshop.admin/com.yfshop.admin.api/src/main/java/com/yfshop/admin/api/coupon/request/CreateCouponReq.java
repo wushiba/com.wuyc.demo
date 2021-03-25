@@ -1,10 +1,13 @@
 package com.yfshop.admin.api.coupon.request;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.yfshop.common.validate.annotation.CandidateValue;
 import io.swagger.annotations.ApiModel;
 import lombok.Data;
 import javax.validation.constraints.NotBlank;
 import java.io.Serializable;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @ApiModel
@@ -32,15 +35,17 @@ public class CreateCouponReq implements Serializable {
 
     /** 使用条件: 0代表无门槛使用, 其余数字代表到指定数字才可以使用 */
     @NotBlank(message = "使用条件不能为空")
-    private Double useConditionPrice;
+    private BigDecimal useConditionPrice;
 
     @NotBlank(message = "有效日期类型不能为空")
     @CandidateValue(candidateValue = {"DATE_RANGE", "TODAY", "FIX_DAY"}, message = "有效日期类型标识不正确")
     private String validType;
 
-    private Date validStartTime;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", locale = "zh", timezone = "GMT+8")
+    private LocalDateTime validStartTime;
 
-    private Date validEndTime;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", locale = "zh", timezone = "GMT+8")
+    private LocalDateTime validEndTime;
 
     /** 领取后有效天数 */
     private Integer validDay;

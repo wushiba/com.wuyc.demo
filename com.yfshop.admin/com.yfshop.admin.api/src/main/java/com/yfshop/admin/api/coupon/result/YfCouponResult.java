@@ -1,5 +1,6 @@
 package com.yfshop.admin.api.coupon.result;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -22,8 +23,10 @@ public class YfCouponResult implements Serializable{
     /**  */
     private Integer id;
 
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", locale = "zh", timezone = "GMT+8")
     private LocalDateTime createTime;
 
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", locale = "zh", timezone = "GMT+8")
     private LocalDateTime updateTime;
 
     /** 优惠券标题 */
@@ -45,10 +48,12 @@ public class YfCouponResult implements Serializable{
     private String validType;
 	
     /**  */
-    private Date validStartTime;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", locale = "zh", timezone = "GMT+8")
+    private LocalDateTime validStartTime;
 	
     /**  */
-    private Date validEndTime;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", locale = "zh", timezone = "GMT+8")
+    private LocalDateTime validEndTime;
 	
     /** 领取后有效天数 */
     private Integer validDay;

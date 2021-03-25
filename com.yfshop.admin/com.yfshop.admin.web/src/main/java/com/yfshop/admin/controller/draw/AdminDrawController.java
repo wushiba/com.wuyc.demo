@@ -17,6 +17,7 @@ import org.apache.dubbo.config.annotation.DubboReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -68,7 +69,7 @@ public class AdminDrawController implements BaseController {
     @ResponseBody
     @SaCheckLogin
     @SaCheckRole(value = "sys")
-    public CommonResult<Void> saveOrUpdate(@NotNull(message = "抽奖活动信息不能为空") CreateDrawActivityReq req) {
+    public CommonResult<Void> saveOrUpdate(@NotNull(message = "抽奖活动信息不能为空") @RequestBody CreateDrawActivityReq req) {
         if (req.getId() == null || req.getId() <= 0) {
             adminDrawActivityService.insertYfDrawActivity(req);
         } else {
