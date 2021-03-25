@@ -22,4 +22,8 @@
         id, create_time, update_time, merchant_id, website_type_id, website_type_name, is_refrigerator, longitude, latitude, geo_hash, head_image
     </sql>
 
+    <select id="countGroupByWebsiteType" resultType="java.util.Map">
+        select count(*) num, website_type_name typeName from yf_merchant_detail group by website_type_name
+    </select>
+
 </mapper>

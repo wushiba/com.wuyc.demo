@@ -35,6 +35,9 @@ public class WebsiteTypeResult implements Serializable {
      */
     private String typeName;
 
-
+    /**
+     * 网点数量
+     */
+    private Integer count;
 
 }

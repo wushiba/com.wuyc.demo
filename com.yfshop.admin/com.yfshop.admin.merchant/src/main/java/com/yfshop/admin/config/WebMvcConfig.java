@@ -18,6 +18,8 @@ import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import javax.annotation.Nullable;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Date;
 
 /**
@@ -92,6 +94,34 @@ public class WebMvcConfig implements WebMvcConfigurer {
                     // yyyy-MM-dd
                     // ......
                     return DateUtil.parse(dateString).toJdkDate();
+                }
+            }
+        };
+    }
+
+
+    /**
+     * 字符串转日期
+     */
+    @Bean
+    public Converter<String, LocalDateTime> localDateTimeConverter() {
+        return new Converter<String, LocalDateTime>() {
+            @Override
+            public LocalDateTime convert(@Nullable String dateString) {
+                if (StringUtils.isBlank(dateString)) {
+                    return null;
+                } else if (NumberUtils.isParsable(dateString) && dateString.length() == 13) {
+                    // 时间戳
+                    return new Date(Long.parseLong(dateString))
+                            .toInstant().atZone(ZoneId.systemDefault())
+                            .toLocalDateTime();
+                } else {
+                    // yyyy-MM-dd HH:mm:ss
+                    // yyyy-MM-dd
+                    // ......
+                    return DateUtil.parse(dateString).toJdkDate()
+                            .toInstant().atZone(ZoneId.systemDefault())
+                            .toLocalDateTime();
                 }
             }
         };
