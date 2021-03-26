@@ -14,12 +14,13 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * @author Edward
  */
 @AllArgsConstructor
-@Controller
+@RestController
 @RequestMapping("/wx/redirect/{appid}")
 public class WxRedirectController {
     private final WxMpService wxService;
@@ -35,6 +36,7 @@ public class WxRedirectController {
             stpLogic.setLoginId(user.getOpenid());
         } catch (WxErrorException e) {
             e.printStackTrace();
+            return CommonResult.failed();
         }
 
         return CommonResult.success(null);

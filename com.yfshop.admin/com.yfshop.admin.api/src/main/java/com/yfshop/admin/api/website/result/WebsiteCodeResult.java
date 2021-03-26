@@ -70,6 +70,14 @@ public class WebsiteCodeResult implements Serializable {
      */
     private String payMethod;
 
+
+    /**
+     * 支付时间
+     */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", locale = "zh", timezone = "GMT+8")
+    private LocalDateTime payTime;
+
+
     /**
      * 快递名
      */

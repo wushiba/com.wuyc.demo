@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.yfshop.admin.api.service.merchant.result.MerchantResult;
 import com.yfshop.admin.api.website.req.WebsiteCodeAddressReq;
 import com.yfshop.admin.api.website.req.WebsiteCodeBindReq;
+import com.yfshop.admin.api.website.req.WebsiteCodePayReq;
 import com.yfshop.admin.api.website.result.*;
 import com.yfshop.common.exception.ApiException;
 
@@ -110,12 +111,26 @@ public interface MerchantInfoService {
      * @param id
      * @return
      */
-    Void deleteWebsiteCodeAddress(Integer id);
+    Void deleteWebsiteCodeAddress(Integer id) throws ApiException;
 
     /**
      * 获取网点码价格
      * @param ids
      * @return
      */
-    WebsiteCodeAmountResult applyWebsiteCodeAmount(List<Integer> ids);
+    WebsiteCodeAmountResult applyWebsiteCodeAmount(List<Integer> ids) throws ApiException;
+
+    /**
+     * 获取网点码订单详情
+     * @param id
+     * @return
+     */
+    WebsiteCodeResult applyWebsiteCodeDetails(Integer id) throws ApiException;
+
+    /**
+     * 网点码支付
+     * @param websiteCodePayReq
+     * @return
+     */
+    WebsiteCodePayResult applyWebsiteCodePay(WebsiteCodePayReq websiteCodePayReq) throws ApiException;
 }

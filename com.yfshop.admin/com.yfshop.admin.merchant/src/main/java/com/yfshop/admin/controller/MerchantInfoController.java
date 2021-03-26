@@ -10,6 +10,7 @@ import com.yfshop.admin.api.website.req.*;
 import com.yfshop.admin.api.website.result.*;
 import com.yfshop.common.api.CommonResult;
 import com.yfshop.common.base.BaseController;
+import io.swagger.models.auth.In;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -108,6 +109,18 @@ class MerchantInfoController implements BaseController {
 
 
     /**
+     * 申请网点码详情
+     *
+     * @return
+     */
+    @RequestMapping(value = "/applyWebsiteCodeDetails", method = {RequestMethod.POST})
+    public CommonResult<WebsiteCodeResult> applyWebsiteCodeDetails(Integer id) {
+        WebsiteCodeResult websiteTypeResult = merchantInfoService.applyWebsiteCodeDetails(id);
+        return CommonResult.success(websiteTypeResult);
+    }
+
+
+    /**
      * 更新申请网点码状态
      *
      * @return
@@ -135,6 +148,13 @@ class MerchantInfoController implements BaseController {
     public CommonResult<WebsiteCodeAmountResult> applyWebsiteCodeAmount(@RequestBody List<Integer> ids) {
         WebsiteCodeAmountResult websiteCodeAmountResult=merchantInfoService.applyWebsiteCodeAmount(ids);
         return CommonResult.success(websiteCodeAmountResult);
+    }
+
+
+    @RequestMapping(value = "/applyWebsiteCodePay", method = {RequestMethod.POST})
+    public CommonResult<WebsiteCodePayResult> applyWebsiteCodePay(@RequestBody WebsiteCodePayReq websiteCodePayReq) {
+        WebsiteCodePayResult websiteCodePayResult=merchantInfoService.applyWebsiteCodePay(websiteCodePayReq);
+        return CommonResult.success(websiteCodePayResult);
     }
 
     /**

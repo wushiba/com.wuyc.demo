@@ -51,3 +51,14 @@ dubbo:
     retries: 0
   consumer:
     check: false
+
+qiniu:
+  domain: qqjyvi051.hn-bkt.clouddn.com
+  bucket: yufanshop
+  access: DSM_E9p8v4nikrb0W6ovHkzxH_2uRtz8c5-nx8y6
+  secret: QFrGQnxFdOzz-iNKQmilWQGdnrzy-3ScVGYGVQG7
+  prefix: /yufanshop
+
+websiteCode:
+  dirs: F://websiteCode/
+  url: http://192.168.11.34:8088/#/merchantRegisterForm?websetCode=

@@ -10,7 +10,9 @@ import com.yfshop.admin.api.service.merchant.MerchantInfoService;
 import com.yfshop.admin.api.service.merchant.result.MerchantResult;
 import com.yfshop.admin.api.website.req.WebsiteCodeAddressReq;
 import com.yfshop.admin.api.website.req.WebsiteCodeBindReq;
+import com.yfshop.admin.api.website.req.WebsiteCodePayReq;
 import com.yfshop.admin.api.website.result.*;
+import com.yfshop.admin.task.WebsiteCodeTask;
 import com.yfshop.code.mapper.*;
 import com.yfshop.code.model.*;
 import com.yfshop.common.enums.GroupRoleEnum;
@@ -21,11 +23,14 @@ import com.yfshop.common.util.DateUtil;
 import com.yfshop.common.util.GeoUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -60,6 +65,9 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
 
     @Resource
     private RegionMapper regionMapper;
+
+    @Autowired
+    WebsiteCodeTask websiteCodeTask;
 
     @Override
     public MerchantResult getWebsiteInfo(Integer merchantId) throws ApiException {
@@ -178,12 +186,27 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
     public Integer applyWebsiteCode(Integer merchantId, Integer count, String email) throws ApiException {
         Merchant merchant = merchantMapper.selectById(merchantId);
         WebsiteCode websiteCode = new WebsiteCode();
+        websiteCode.setEmail(email);
         websiteCode.setMerchantId(merchant.getId());
         websiteCode.setMerchantName(merchant.getMerchantName());
         websiteCode.setPidPath(merchant.getPidPath());
         websiteCode.setQuantity(count);
+        if (StringUtils.isBlank(email)) {
+            websiteCode.setOrderAmount(new BigDecimal("0.35").multiply(new BigDecimal(count)));
+            websiteCode.setPostage(new BigDecimal(8));
+            int g = count * 4;
+            if (g > 1000) {
+                double amount = Math.ceil((g - 1000) / 1000f) * 2.5d;
+                websiteCode.setPostage(websiteCode.getPostage().add(new BigDecimal(String.valueOf(amount))));
+            }
+        } else {
+            websiteCode.setOrderStatus("SUCCESS");
+        }
         websiteCode.setBatchNo(cn.hutool.core.date.DateUtil.format(new Date(), "yyMMddHHmmssSSS" + RandomUtil.randomNumbers(4)));
         websiteCodeMapper.insert(websiteCode);
+        if (StringUtils.isNotBlank(email)) {
+            websiteCodeTask.buildWebSiteCode(websiteCode);
+        }
         return websiteCode.getId();
     }
 
@@ -216,7 +239,7 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
         return null;
     }
 
-    public void buildAddress(WebsiteCodeAddress websiteCodeAddress) {
+    public void buildAddress(WebsiteCodeAddress websiteCodeAddress) throws ApiException {
         if (websiteCodeAddress.getDistrictId() == null) return;
         Region district = regionMapper.selectById(websiteCodeAddress.getDistrictId());
         if (district == null) return;
@@ -246,7 +269,7 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
     }
 
     @Override
-    public WebsiteCodeAmountResult applyWebsiteCodeAmount(List<Integer> ids) {
+    public WebsiteCodeAmountResult applyWebsiteCodeAmount(List<Integer> ids) throws ApiException {
         WebsiteCodeAmountResult websiteCodeAmountResult = new WebsiteCodeAmountResult();
         websiteCodeAmountResult.setAmount(new BigDecimal(0));
         websiteCodeAmountResult.setPostage(new BigDecimal(0));
@@ -261,6 +284,33 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
         }
 
         return websiteCodeAmountResult;
+    }
+
+    @Override
+    public WebsiteCodeResult applyWebsiteCodeDetails(Integer id) throws ApiException {
+        return BeanUtil.convert(websiteCodeMapper.selectById(id), WebsiteCodeResult.class);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public WebsiteCodePayResult applyWebsiteCodePay(WebsiteCodePayReq websiteCodePayReq) throws ApiException {
+        WebsiteCodeAddress websiteCodeAddress = websiteCodeAddressMapper.selectById(websiteCodePayReq.getAddressId());
+        WebsiteCode websiteCode = new WebsiteCode();
+        websiteCode.setMobile(websiteCodeAddress.getMobile());
+        websiteCode.setContracts(websiteCodeAddress.getContracts());
+        websiteCode.setPayMethod("WxPay");
+        websiteCode.setAddress(websiteCodeAddress.getProvince() + websiteCodeAddress.getCity() + websiteCodeAddress.getDistrict() + websiteCodeAddress.getAddress());
+        websiteCode.setOrderStatus("WAIT");
+        websiteCode.setOrderNo(String.format("%06d", websiteCodeAddress.getMerchantId()) + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyMMddHHmmssSSS")));
+        int count = websiteCodeMapper.update(websiteCode, Wrappers.<WebsiteCode>lambdaQuery()
+                .in(WebsiteCode::getId, websiteCodePayReq.getIds())
+                .eq(WebsiteCode::getOrderStatus, "PENDING"));
+        Asserts.assertTrue(count > 0, 500, "没有要支付的订单！");
+        WebsiteCodeAmountResult websiteCodeAmountResult = applyWebsiteCodeAmount(websiteCodePayReq.getIds());
+        WebsiteCodePayResult websiteCodePayResult = new WebsiteCodePayResult();
+        websiteCodePayResult.setAmount(websiteCodeAmountResult.getAmount().add(websiteCodeAmountResult.getPostage()));
+        websiteCodePayResult.setOrderNo(websiteCode.getOrderNo());
+        return websiteCodePayResult;
     }
 
 }

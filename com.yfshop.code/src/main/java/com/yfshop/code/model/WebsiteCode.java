@@ -16,7 +16,7 @@ import lombok.EqualsAndHashCode;
  * </p>
  *
  * @author yoush
- * @since 2021-03-25
+ * @since 2021-03-26
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -63,6 +63,11 @@ public class WebsiteCode extends Model<WebsiteCode> {
     private String orderStatus;
 
     /**
+     * 订单号
+     */
+    private String orderNo;
+
+    /**
      * 流水单号
      */
     private String billno;
@@ -71,6 +76,11 @@ public class WebsiteCode extends Model<WebsiteCode> {
      * 交易方式: WX(微信)
      */
     private String payMethod;
+
+    /**
+     * 支付时间
+     */
+    private LocalDateTime payTime;
 
     /**
      * 快递名
@@ -116,6 +126,11 @@ public class WebsiteCode extends Model<WebsiteCode> {
      * 邮箱地址
      */
     private String email;
+
+    /**
+     * WAIT 等待 DOING 加工中 SUCCESS 已完成 FAIL 失败
+     */
+    private String fileStatus;
 
 
     @Override

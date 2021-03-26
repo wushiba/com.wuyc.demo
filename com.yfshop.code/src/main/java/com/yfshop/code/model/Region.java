@@ -14,7 +14,7 @@ import lombok.EqualsAndHashCode;
  * </p>
  *
  * @author yoush
- * @since 2021-03-22
+ * @since 2021-03-26
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -45,6 +45,11 @@ public class Region extends Model<Region> {
      * 行政区域编码
      */
     private Integer code;
+
+    /**
+     * 地区编码
+     */
+    private Integer areaCode;
 
 
     @Override

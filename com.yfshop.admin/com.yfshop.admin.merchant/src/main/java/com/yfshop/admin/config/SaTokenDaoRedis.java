@@ -3,6 +3,7 @@ package com.yfshop.admin.config;
 import cn.dev33.satoken.dao.SaTokenDao;
 import cn.dev33.satoken.session.SaSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Primary;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.serializer.JdkSerializationRedisSerializer;
@@ -18,6 +19,7 @@ import java.util.concurrent.TimeUnit;
  * @author kong
  *
  */
+@Primary
 @Component
 public class SaTokenDaoRedis implements SaTokenDao {
 
