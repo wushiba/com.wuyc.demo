@@ -42,10 +42,10 @@ public class CreateCouponReq implements Serializable {
     private String validType;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", locale = "zh", timezone = "GMT+8")
-    private LocalDateTime validStartTime;
+    private Date validStartTime;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", locale = "zh", timezone = "GMT+8")
-    private LocalDateTime validEndTime;
+    private Date validEndTime;
 
     /** 领取后有效天数 */
     private Integer validDay;
