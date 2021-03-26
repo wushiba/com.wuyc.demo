@@ -4,7 +4,6 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.google.common.collect.Maps;
 import com.yfshop.admin.api.sourcefactory.AdminSourceFactoryManageService;
 import com.yfshop.admin.api.sourcefactory.excel.SourceFactoryExcel;
 import com.yfshop.admin.api.sourcefactory.req.CreateSourceFactoryReq;
@@ -19,6 +18,8 @@ import com.yfshop.code.model.SourceFactory;
 import com.yfshop.common.exception.ApiException;
 import com.yfshop.common.exception.Asserts;
 import com.yfshop.common.util.BeanUtil;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,6 +31,7 @@ import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -93,14 +95,14 @@ public class AdminSourceFactoryManageServiceImpl implements AdminSourceFactoryMa
     public Void importSourceFactory(@NotNull ImportSourceFactoryReq req) throws ApiException {
         List<SourceFactoryExcel> excels = req.getExcels();
         // find all regions
-        Set<String> regionNames = new HashSet<>();
+        Set<RegionWrapper> regionWrappers = new HashSet<>();
         for (SourceFactoryExcel excel : excels) {
-            regionNames.add(excel.getProvince());
-            regionNames.add(excel.getCity());
-            regionNames.add(excel.getDistrict());
+            regionWrappers.add(new RegionWrapper(excel.getProvince(), 1));
+            regionWrappers.add(new RegionWrapper(excel.getCity(), 2));
+            regionWrappers.add(new RegionWrapper(excel.getDistrict(), 3));
         }
-        Map<String, Region> regionIndexMap = Maps.newConcurrentMap();
-        regionNames.parallelStream().forEach((regionName) -> regionIndexMap.put(regionName, this.findRegion(regionName)));
+        Map<String, Region> regionIndexMap = regionWrappers.parallelStream()
+                .collect(Collectors.toMap(RegionWrapper::getRegionName, rw -> this.findRegion(rw.getRegionName(), rw.getType())));
 
         // batch create
         List<CreateSourceFactoryReq> reqs = excels.stream().map(excel -> {
@@ -126,8 +128,38 @@ public class AdminSourceFactoryManageServiceImpl implements AdminSourceFactoryMa
         return BeanUtil.iPageConvert(page, SourceFactoryResult.class);
     }
 
-    private Region findRegion(String regionName) {
-        return regionMapper.selectList(Wrappers.lambdaQuery(Region.class).likeRight(Region::getName, regionName))
+    private Region findRegion(String regionName, int type) {
+        return regionMapper.selectList(Wrappers.lambdaQuery(Region.class)
+                .eq(Region::getType, type).likeRight(Region::getName, regionName))
                 .stream().findFirst().orElseThrow(() -> new ApiException(500, "未能查询" + regionName + "信息"));
+    }
+
+    @Data
+    @AllArgsConstructor
+    private static class RegionWrapper {
+        private String regionName;
+        private int type;
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
+            RegionWrapper that = (RegionWrapper) o;
+            if (type != that.type) {
+                return false;
+            }
+            return Objects.equals(regionName, that.regionName);
+        }
+
+        @Override
+        public int hashCode() {
+            int result = regionName != null ? regionName.hashCode() : 0;
+            result = 31 * result + type;
+            return result;
+        }
     }
 }

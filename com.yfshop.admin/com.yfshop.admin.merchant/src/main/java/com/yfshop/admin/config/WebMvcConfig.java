@@ -5,6 +5,8 @@ import cn.hutool.core.date.DateUtil;
 import com.yfshop.common.exception.CustomGlobalExceptionResolver;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.server.ConfigurableWebServerFactory;
 import org.springframework.boot.web.server.ErrorPage;
@@ -30,6 +32,11 @@ import java.util.Date;
  */
 @Configuration
 public class WebMvcConfig implements WebMvcConfigurer {
+    private static final Logger logger = LoggerFactory.getLogger(WebMvcConfig.class);
+
+    public WebMvcConfig() {
+        logger.info("**************配置类WebMvcConfig被实例化*******************************");
+    }
 
     @Value("${spring.profiles.active}")
     private String profile;
@@ -40,6 +47,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
      */
     @Bean
     public WebServerFactoryCustomizer<ConfigurableWebServerFactory> webServerFactoryCustomizer() {
+        logger.info("****************************创建WebServerFactoryCustomizer************************");
         return new WebServerFactoryCustomizer<ConfigurableWebServerFactory>() {
             @Override
             public void customize(ConfigurableWebServerFactory factory) {
@@ -53,6 +61,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
 
     @Bean
     public CustomGlobalExceptionResolver customGlobalExceptionResolver() {
+        logger.info("****************************创建CustomGlobalExceptionResolver************************");
         return new CustomGlobalExceptionResolver();
     }
 
@@ -63,6 +72,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
     public void addInterceptors(InterceptorRegistry registry) {
         // dev环境关闭验证
         if (!StringUtils.equals("dev", profile)) {
+            logger.info("****************************加载拦截器SaAnnotationInterceptor************************");
             registry.addInterceptor(new SaAnnotationInterceptor())
                     .addPathPatterns("/**")
                     .excludePathPatterns("");
@@ -81,6 +91,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
      */
     @Bean
     public Converter<String, Date> dateConverter() {
+        logger.info("****************************创建Converter<String, Date>************************");
         return new Converter<String, Date>() {
             @Override
             public Date convert(@Nullable String dateString) {
@@ -105,6 +116,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
      */
     @Bean
     public Converter<String, LocalDateTime> localDateTimeConverter() {
+        logger.info("****************************创建Converter<String, LocalDateTime>************************");
         return new Converter<String, LocalDateTime>() {
             @Override
             public LocalDateTime convert(@Nullable String dateString) {

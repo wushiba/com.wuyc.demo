@@ -1,12 +1,19 @@
 package com.yfshop.admin.config;
 
 import cn.dev33.satoken.config.SaTokenConfig;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 
 @Configuration
 public class MySaTokenConfig {
+    private static final Logger logger = LoggerFactory.getLogger(MySaTokenConfig.class);
+
+    public MySaTokenConfig() {
+        logger.info("**************配置类MySaTokenConfig被实例化*******************************");
+    }
 
     // 获取配置Bean (以代码的方式配置sa-token, 此配置会覆盖yml中的配置)
     @Primary
