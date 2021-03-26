@@ -7,16 +7,14 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.yfshop.admin.api.service.merchant.MerchantInfoService;
 import com.yfshop.admin.api.service.merchant.result.MerchantResult;
 import com.yfshop.admin.api.website.req.*;
-import com.yfshop.admin.api.website.result.WebsiteCodeAddressResult;
-import com.yfshop.admin.api.website.result.WebsiteCodeDetailResult;
-import com.yfshop.admin.api.website.result.WebsiteCodeResult;
-import com.yfshop.admin.api.website.result.WebsiteTypeResult;
+import com.yfshop.admin.api.website.result.*;
 import com.yfshop.common.api.CommonResult;
 import com.yfshop.common.base.BaseController;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -127,9 +125,16 @@ class MerchantInfoController implements BaseController {
      * @return
      */
     @RequestMapping(value = "/applyWebsiteCode", method = {RequestMethod.POST})
-    public CommonResult<Void> applyWebsiteCode(WebsiteCodeApplyReq websiteCodeApplyReq) {
-        merchantInfoService.applyWebsiteCode(getCurrentAdminUserId(), websiteCodeApplyReq.getCount(), websiteCodeApplyReq.getEmail());
-        return CommonResult.success(null);
+    public CommonResult<Integer> applyWebsiteCode(WebsiteCodeApplyReq websiteCodeApplyReq) {
+        Integer id=merchantInfoService.applyWebsiteCode(getCurrentAdminUserId(), websiteCodeApplyReq.getCount(), websiteCodeApplyReq.getEmail());
+        return CommonResult.success(id);
+    }
+
+
+    @RequestMapping(value = "/applyWebsiteCodeAmount", method = {RequestMethod.POST})
+    public CommonResult<WebsiteCodeAmountResult> applyWebsiteCodeAmount(@RequestBody List<Integer> ids) {
+        WebsiteCodeAmountResult websiteCodeAmountResult=merchantInfoService.applyWebsiteCodeAmount(ids);
+        return CommonResult.success(websiteCodeAmountResult);
     }
 
     /**

@@ -88,12 +88,6 @@ class Demo {
     }
 
     private static String composePic2(String qrCodeUrl, String headImage, String nickname) {
-        //优加背景图
-        //https://c9.51jujibao.com/upload/2020/02/19/202002191737519325
-        //联通背景图
-        //https://c9.51jujibao.com/upload/2020/02/19/202002191740289858
-        //安然云背景图
-        //https://c9.51jujibao.com/upload/2020/03/02/202003021439339425
         String backgroundImage = "https://c9.51jujibao.com/upload/2020/02/19/202002191737519325";
         PlugBg bg = new PlugBg();
         // 背景图片地址

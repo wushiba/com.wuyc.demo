@@ -4,10 +4,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.yfshop.admin.api.service.merchant.result.MerchantResult;
 import com.yfshop.admin.api.website.req.WebsiteCodeAddressReq;
 import com.yfshop.admin.api.website.req.WebsiteCodeBindReq;
-import com.yfshop.admin.api.website.result.WebsiteCodeAddressResult;
-import com.yfshop.admin.api.website.result.WebsiteCodeDetailResult;
-import com.yfshop.admin.api.website.result.WebsiteCodeResult;
-import com.yfshop.admin.api.website.result.WebsiteTypeResult;
+import com.yfshop.admin.api.website.result.*;
 import com.yfshop.common.exception.ApiException;
 
 import java.util.Date;
@@ -88,7 +85,7 @@ public interface MerchantInfoService {
      * @param email
      * @throws ApiException
      */
-    Void applyWebsiteCode(Integer merchantId, Integer count, String email) throws ApiException;
+    Integer applyWebsiteCode(Integer merchantId, Integer count, String email) throws ApiException;
 
     /**
      * 创建更新网点码收货地址
@@ -114,4 +111,11 @@ public interface MerchantInfoService {
      * @return
      */
     Void deleteWebsiteCodeAddress(Integer id);
+
+    /**
+     * 获取网点码价格
+     * @param ids
+     * @return
+     */
+    WebsiteCodeAmountResult applyWebsiteCodeAmount(List<Integer> ids);
 }

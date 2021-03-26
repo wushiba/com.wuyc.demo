@@ -60,6 +60,17 @@ class MerchantLoginController implements BaseController {
 
 
     /**
+     * 退出登录
+     *
+     * @return
+     */
+    @RequestMapping(value = "/logout", method = {RequestMethod.POST})
+    public CommonResult<MerchantResult> logout() {
+        StpUtil.logout();
+        return CommonResult.success(null);
+    }
+
+    /**
      * 验证码发送
      *
      * @param mobile

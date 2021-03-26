@@ -10,10 +10,7 @@ import com.yfshop.admin.api.service.merchant.MerchantInfoService;
 import com.yfshop.admin.api.service.merchant.result.MerchantResult;
 import com.yfshop.admin.api.website.req.WebsiteCodeAddressReq;
 import com.yfshop.admin.api.website.req.WebsiteCodeBindReq;
-import com.yfshop.admin.api.website.result.WebsiteCodeAddressResult;
-import com.yfshop.admin.api.website.result.WebsiteCodeDetailResult;
-import com.yfshop.admin.api.website.result.WebsiteCodeResult;
-import com.yfshop.admin.api.website.result.WebsiteTypeResult;
+import com.yfshop.admin.api.website.result.*;
 import com.yfshop.code.mapper.*;
 import com.yfshop.code.model.*;
 import com.yfshop.common.enums.GroupRoleEnum;
@@ -28,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -59,6 +57,9 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
 
     @Resource
     private WebsiteTypeMapper websiteTypeMapper;
+
+    @Resource
+    private RegionMapper regionMapper;
 
     @Override
     public MerchantResult getWebsiteInfo(Integer merchantId) throws ApiException {
@@ -128,6 +129,7 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
         websiteCodeDetail.setMobile(merchant.getMobile());
         websiteCodeDetail.setIsActivate("Y");
         websiteCodeDetailMapper.updateById(websiteCodeDetail);
+
         return null;
     }
 
@@ -173,7 +175,7 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
     }
 
     @Override
-    public Void applyWebsiteCode(Integer merchantId, Integer count, String email) throws ApiException {
+    public Integer applyWebsiteCode(Integer merchantId, Integer count, String email) throws ApiException {
         Merchant merchant = merchantMapper.selectById(merchantId);
         WebsiteCode websiteCode = new WebsiteCode();
         websiteCode.setMerchantId(merchant.getId());
@@ -182,15 +184,26 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
         websiteCode.setQuantity(count);
         websiteCode.setBatchNo(cn.hutool.core.date.DateUtil.format(new Date(), "yyMMddHHmmssSSS" + RandomUtil.randomNumbers(4)));
         websiteCodeMapper.insert(websiteCode);
-        return null;
+        return websiteCode.getId();
     }
 
     @Override
     public Void websiteCodeAddress(WebsiteCodeAddressReq websiteCodeAddressReq) throws ApiException {
         WebsiteCodeAddress websiteCodeAddress = BeanUtil.convert(websiteCodeAddressReq, WebsiteCodeAddress.class);
         if (websiteCodeAddress.getId() == null) {
+            int count = websiteCodeAddressMapper.selectCount(Wrappers.<WebsiteCodeAddress>lambdaQuery()
+                    .eq(WebsiteCodeAddress::getMerchantId, websiteCodeAddress.getMerchantId()));
+            if (count == 0) {
+                websiteCodeAddress.setIsDefault("Y");
+            }
+            buildAddress(websiteCodeAddress);
             websiteCodeAddressMapper.insert(websiteCodeAddress);
         } else {
+            if ("N".equals(websiteCodeAddress.getIsDefault())) {
+                WebsiteCodeAddress address = websiteCodeAddressMapper.selectById(websiteCodeAddress.getId());
+                Asserts.assertEquals("N", address.getIsDefault(), 500, "不允许取消默认地址");
+            }
+            buildAddress(websiteCodeAddress);
             websiteCodeAddressMapper.updateById(websiteCodeAddress);
         }
         if ("Y".equals(websiteCodeAddress.getIsDefault())) {
@@ -201,6 +214,21 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
                     .ne(WebsiteCodeAddress::getId, websiteCodeAddress.getId()));
         }
         return null;
+    }
+
+    public void buildAddress(WebsiteCodeAddress websiteCodeAddress) {
+        if (websiteCodeAddress.getDistrictId() == null) return;
+        Region district = regionMapper.selectById(websiteCodeAddress.getDistrictId());
+        if (district == null) return;
+        websiteCodeAddress.setDistrict(district.getName());
+        Region city = regionMapper.selectById(district.getPid());
+        if (city == null) return;
+        websiteCodeAddress.setCityId(city.getId());
+        websiteCodeAddress.setCity(city.getName());
+        Region province = regionMapper.selectById(city.getPid());
+        if (province == null) return;
+        websiteCodeAddress.setProvinceId(province.getId());
+        websiteCodeAddress.setProvince(province.getName());
     }
 
     @Override
@@ -215,6 +243,24 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
     public Void deleteWebsiteCodeAddress(Integer id) {
         websiteCodeAddressMapper.deleteById(id);
         return null;
+    }
+
+    @Override
+    public WebsiteCodeAmountResult applyWebsiteCodeAmount(List<Integer> ids) {
+        WebsiteCodeAmountResult websiteCodeAmountResult = new WebsiteCodeAmountResult();
+        websiteCodeAmountResult.setAmount(new BigDecimal(0));
+        websiteCodeAmountResult.setPostage(new BigDecimal(0));
+        websiteCodeAmountResult.setQuantity(0);
+        if (!CollectionUtil.isEmpty(ids)) {
+            List<WebsiteCode> websiteCodes = websiteCodeMapper.selectBatchIds(ids);
+            websiteCodes.forEach(item -> {
+                websiteCodeAmountResult.setAmount(websiteCodeAmountResult.getAmount().add(item.getOrderAmount()));
+                websiteCodeAmountResult.setPostage(websiteCodeAmountResult.getPostage().add(item.getPostage()));
+                websiteCodeAmountResult.setQuantity(websiteCodeAmountResult.getQuantity() + item.getQuantity());
+            });
+        }
+
+        return websiteCodeAmountResult;
     }
 
 }
