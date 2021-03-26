@@ -8,8 +8,8 @@ import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import java.io.Serializable;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -27,10 +27,10 @@ public class CreateDrawActivityReq implements Serializable {
     private String actTitle;
 
     @NotBlank(message = "开始时间不能为空")
-    private LocalDateTime startTime;
+    private Date startTime;
 
     @NotBlank(message = "结束时间不能为空")
-    private LocalDateTime endTime;
+    private Date endTime;
 
     @NotBlank(message = "banner图不能为空")
     private String bannerUrl;

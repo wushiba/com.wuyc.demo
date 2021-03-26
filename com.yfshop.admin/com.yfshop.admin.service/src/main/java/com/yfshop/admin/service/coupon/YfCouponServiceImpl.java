@@ -12,9 +12,11 @@ import com.yfshop.code.model.Coupon;
 import com.yfshop.common.exception.ApiException;
 import com.yfshop.common.exception.Asserts;
 import com.yfshop.common.util.BeanUtil;
+import com.yfshop.common.util.DateUtil;
 import org.apache.dubbo.config.annotation.Service;
 
 import javax.annotation.Resource;
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -66,7 +68,14 @@ public class YfCouponServiceImpl implements AdminCouponService {
     public void insertYfCoupon(CreateCouponReq couponReq) throws ApiException {
         checkCouponParams(couponReq);
         Coupon coupon = BeanUtil.convert(couponReq, Coupon.class);
+        coupon.setCreateTime(LocalDateTime.now());
+
+        if ("DATE_RANGE".equalsIgnoreCase(couponReq.getValidType())) {
+            coupon.setValidStartTime(DateUtil.dateToLocalDateTime(couponReq.getValidStartTime()));
+            coupon.setValidEndTime(DateUtil.dateToLocalDateTime(couponReq.getValidEndTime()));
+        }
         coupon.setIsDelete("N");
+        coupon.setIsEnable("N");
         couponMapper.insert(coupon);
     }
 
@@ -74,6 +83,10 @@ public class YfCouponServiceImpl implements AdminCouponService {
     public void updateYfCoupon(CreateCouponReq couponReq) throws ApiException {
         checkCouponParams(couponReq);
         Coupon coupon = BeanUtil.convert(couponReq, Coupon.class);
+        if ("DATE_RANGE".equalsIgnoreCase(couponReq.getValidType())) {
+            coupon.setValidStartTime(DateUtil.dateToLocalDateTime(couponReq.getValidStartTime()));
+            coupon.setValidEndTime(DateUtil.dateToLocalDateTime(couponReq.getValidEndTime()));
+        }
         couponMapper.updateById(coupon);
     }
 

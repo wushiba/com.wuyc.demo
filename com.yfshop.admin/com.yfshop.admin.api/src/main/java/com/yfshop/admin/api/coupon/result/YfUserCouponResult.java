@@ -1,5 +1,6 @@
 package com.yfshop.admin.api.coupon.result;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -22,8 +23,10 @@ public class YfUserCouponResult implements Serializable{
     /**  */
     private Long id;
 
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", locale = "zh", timezone = "GMT+8")
     private LocalDateTime createTime;
 
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", locale = "zh", timezone = "GMT+8")
     private LocalDateTime updateTime;
 
     /** 用户id编号 */
@@ -57,9 +60,11 @@ public class YfUserCouponResult implements Serializable{
     private String canUseItemIds;
 	
     /**  */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", locale = "zh", timezone = "GMT+8")
     private Date validStartTime;
 	
     /**  */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", locale = "zh", timezone = "GMT+8")
     private Date validEndTime;
 	
     /** 用户昵称 */

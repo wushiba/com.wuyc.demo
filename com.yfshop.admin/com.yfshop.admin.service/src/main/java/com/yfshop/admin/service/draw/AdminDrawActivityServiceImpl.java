@@ -20,6 +20,7 @@ import com.yfshop.common.exception.ApiException;
 import com.yfshop.common.exception.Asserts;
 import com.yfshop.common.service.RedisService;
 import com.yfshop.common.util.BeanUtil;
+import com.yfshop.common.util.DateUtil;
 import org.apache.dubbo.config.annotation.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -99,6 +100,8 @@ public class AdminDrawActivityServiceImpl implements AdminDrawActivityService {
         DrawActivity drawActivity = BeanUtil.convert(req, DrawActivity.class);
         drawActivity.setCreateTime(localDateTime);
         drawActivity.setUpdateTime(localDateTime);
+        drawActivity.setStartTime(DateUtil.dateToLocalDateTime(req.getStartTime()));
+        drawActivity.setEndTime(DateUtil.dateToLocalDateTime(req.getEndTime()));
         drawActivity.setIsEnable("N");
         drawActivityMapper.insert(drawActivity);
 
@@ -119,6 +122,7 @@ public class AdminDrawActivityServiceImpl implements AdminDrawActivityService {
         // 特殊省份的特殊中奖概率
         List<DrawProvinceRate> provinceRateList = new ArrayList<>();
         List<CreateDrawActivityReq.ProvinceRateReq> provinceList = req.getProvinceRateList();
+        if (CollectionUtils.isEmpty(provinceList)) return;
         provinceList.forEach(provinceRateReq -> {
             DrawProvinceRate provinceRate = BeanUtil.convert(provinceRateReq, DrawProvinceRate.class);
             provinceRate.setCreateTime(localDateTime);
@@ -148,6 +152,8 @@ public class AdminDrawActivityServiceImpl implements AdminDrawActivityService {
         // 编辑活动
         DrawActivity drawActivity = BeanUtil.convert(req, DrawActivity.class);
         drawActivity.setUpdateTime(localDateTime);
+        drawActivity.setStartTime(DateUtil.dateToLocalDateTime(req.getStartTime()));
+        drawActivity.setEndTime(DateUtil.dateToLocalDateTime(req.getEndTime()));
         drawActivityMapper.updateById(drawActivity);
 
         // 编辑奖品
@@ -161,12 +167,14 @@ public class AdminDrawActivityServiceImpl implements AdminDrawActivityService {
             prizeMap.put(prize.getPrizeLevel(), drawPrize);
         });
 
+
+        List<CreateDrawActivityReq.ProvinceRateReq> provinceList = req.getProvinceRateList();
+        if (CollectionUtils.isEmpty(provinceList)) return;
         // 特殊省份的中奖概率 先删除后新增
         drawProvinceRateMapper.delete(Wrappers.lambdaQuery(DrawProvinceRate.class)
                 .eq(DrawProvinceRate::getActId, req.getId()));
 
         List<DrawProvinceRate> provinceRateList = new ArrayList<>();
-        List<CreateDrawActivityReq.ProvinceRateReq> provinceList = req.getProvinceRateList();
         provinceList.forEach(provinceRateReq -> {
             DrawProvinceRate provinceRate = BeanUtil.convert(provinceRateReq, DrawProvinceRate.class);
             provinceRate.setUpdateTime(localDateTime);
