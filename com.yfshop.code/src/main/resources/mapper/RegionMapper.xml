@@ -4,16 +4,38 @@
 
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.yfshop.code.model.Region">
-        <id column="id" property="id" />
-        <result column="pid" property="pid" />
-        <result column="name" property="name" />
-        <result column="type" property="type" />
-        <result column="code" property="code" />
+        <id column="id" property="id"/>
+        <result column="pid" property="pid"/>
+        <result column="name" property="name"/>
+        <result column="type" property="type"/>
+        <result column="code" property="code"/>
     </resultMap>
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
         id, pid, name, type, code
     </sql>
+    <sql id="table_name">
+		yf_region
+    </sql>
+
+    <select id="queryByFuzzyRegionName" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from
+        <include refid="table_name"/>
+        <where>
+            <choose>
+                <when test="list != null and !list.empty">
+                    <foreach collection="list" index="index" item="regionName" separator="or">
+                        `name` like CONCAT(#{regionName}, '%')
+                    </foreach>
+                </when>
+                <otherwise>
+                    false
+                </otherwise>
+            </choose>
+        </where>
+    </select>
 
 </mapper>

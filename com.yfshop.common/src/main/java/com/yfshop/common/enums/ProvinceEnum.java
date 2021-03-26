@@ -1,4 +1,4 @@
-package com.yfshop.shop.enums;
+package com.yfshop.common.enums;
 
 /**
  * @author wuyc

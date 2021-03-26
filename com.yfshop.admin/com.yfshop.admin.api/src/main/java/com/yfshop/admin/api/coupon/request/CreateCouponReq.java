@@ -41,10 +41,10 @@ public class CreateCouponReq implements Serializable {
     @CandidateValue(candidateValue = {"DATE_RANGE", "TODAY", "FIX_DAY"}, message = "有效日期类型标识不正确")
     private String validType;
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", locale = "zh", timezone = "GMT+8")
+//    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", locale = "zh", timezone = "GMT+8")
     private LocalDateTime validStartTime;
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", locale = "zh", timezone = "GMT+8")
+//    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", locale = "zh", timezone = "GMT+8")
     private LocalDateTime validEndTime;
 
     /** 领取后有效天数 */

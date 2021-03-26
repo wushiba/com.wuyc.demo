@@ -1,6 +1,8 @@
 package com.yfshop.admin.config;
 
 import com.github.benmanes.caffeine.cache.Caffeine;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cache.caffeine.CaffeineCacheManager;
 import org.springframework.context.annotation.Bean;
@@ -16,9 +18,14 @@ import java.util.concurrent.TimeUnit;
 @Configuration
 @EnableCaching
 public class CacheConfig {
+    private static final Logger logger = LoggerFactory.getLogger(CacheConfig.class);
 
     private static final long AVAILABLE_TIME = 10;
     private static final long MAXIMUM_SIZE = 1000;
+
+    public CacheConfig() {
+        logger.info("**************配置类CacheConfig被实例化*******************************");
+    }
 
     @Bean
     @Profile("dev")
@@ -31,7 +38,7 @@ public class CacheConfig {
         CaffeineCacheManager caffeineCacheManager = new CaffeineCacheManager();
         caffeineCacheManager.setAllowNullValues(true);
         caffeineCacheManager.setCaffeine(caffeine);
-        System.out.println("==================创建CaffeineCacheManager==================");
+        logger.info("*************************创建CaffeineCacheManager************************");
         return caffeineCacheManager;
     }
 

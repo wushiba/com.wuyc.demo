@@ -83,10 +83,6 @@ public class YfCouponServiceImpl implements AdminCouponService {
     public void updateYfCoupon(CreateCouponReq couponReq) throws ApiException {
         checkCouponParams(couponReq);
         Coupon coupon = BeanUtil.convert(couponReq, Coupon.class);
-//        if ("DATE_RANGE".equalsIgnoreCase(couponReq.getValidType())) {
-//            coupon.setValidStartTime(DateUtil.dateToLocalDateTime(couponReq.getValidStartTime()));
-//            coupon.setValidEndTime(DateUtil.dateToLocalDateTime(couponReq.getValidEndTime()));
-//        }
         couponMapper.updateById(coupon);
     }
 

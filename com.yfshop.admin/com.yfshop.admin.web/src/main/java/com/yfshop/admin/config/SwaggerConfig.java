@@ -1,5 +1,7 @@
 package com.yfshop.admin.config;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -22,6 +24,11 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @EnableSwagger2
 @Profile(value = {"dev", "uat"})
 public class SwaggerConfig {
+    private static final Logger logger = LoggerFactory.getLogger(SwaggerConfig.class);
+
+    public SwaggerConfig() {
+        logger.info("**************配置类SwaggerConfig被实例化*******************************");
+    }
 
     @Bean
     public Docket createRestApi() {

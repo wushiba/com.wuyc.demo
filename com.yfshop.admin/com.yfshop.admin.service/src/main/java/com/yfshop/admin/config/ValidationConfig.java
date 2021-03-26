@@ -5,6 +5,8 @@ import com.yfshop.common.api.ErrorCode;
 import com.yfshop.common.api.ResultCode;
 import com.yfshop.common.exception.ApiException;
 import org.aopalliance.intercept.MethodInvocation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.aop.Pointcut;
 import org.springframework.aop.support.DefaultPointcutAdvisor;
 import org.springframework.aop.support.annotation.AnnotationMatchingPointcut;
@@ -27,6 +29,11 @@ import javax.validation.Validator;
  */
 @Configuration
 public class ValidationConfig {
+    private static final Logger logger = LoggerFactory.getLogger(ValidationConfig.class);
+
+    public ValidationConfig() {
+        logger.info("**************配置类ValidationConfig被实例化*******************************");
+    }
 
     @Role(BeanDefinition.ROLE_INFRASTRUCTURE)
     @Bean
@@ -37,6 +44,7 @@ public class ValidationConfig {
         MethodValidationInterceptor validationInterceptor = new CustomizeMethodValidationInterceptor(validator);
         DefaultPointcutAdvisor advisor = new DefaultPointcutAdvisor(pointcut, validationInterceptor);
         advisor.setOrder(1);
+        logger.info("*****************************创建DefaultPointcutAdvisor***********************************");
         return advisor;
     }
 

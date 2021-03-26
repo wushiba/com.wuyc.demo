@@ -30,6 +30,7 @@ public interface BaseController {
 
     /**
      * 获取当前登录用户的openId
+     *
      * @return
      */
     default String getCurrentAdminOpenId() {
@@ -139,4 +140,27 @@ public interface BaseController {
     default SaSession getCurrentSaSession() {
         return StpUtil.getSessionByLoginId(getCurrentAdminUserId(), false);
     }
+
+
+    /**
+     * 根据当前请求返回ip地址
+     * @param request
+     * @return  ipStr
+     */
+    default String getRequestIpStr(HttpServletRequest request) {
+        String ip = request.getHeader("x-forwarded-for");
+        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getHeader("Proxy-Client-IP");
+        }
+
+        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getHeader("WL-Proxy-Client-IP");
+        }
+
+        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getRemoteAddr();
+        }
+        return ip;
+    }
+
 }
