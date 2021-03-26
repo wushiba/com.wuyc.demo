@@ -122,25 +122,26 @@ public class AdminDrawActivityServiceImpl implements AdminDrawActivityService {
         // 特殊省份的特殊中奖概率
         List<DrawProvinceRate> provinceRateList = new ArrayList<>();
         List<CreateDrawActivityReq.ProvinceRateReq> provinceList = req.getProvinceRateList();
-        if (CollectionUtils.isEmpty(provinceList)) return;
-        provinceList.forEach(provinceRateReq -> {
-            DrawProvinceRate provinceRate = BeanUtil.convert(provinceRateReq, DrawProvinceRate.class);
-            provinceRate.setCreateTime(localDateTime);
-            provinceRate.setUpdateTime(localDateTime);
-            provinceRate.setFirstPrizeId(prizeMap.get(1).getId());
-            provinceRate.setSecondPrizeId(prizeMap.get(2).getId());
-            provinceRate.setThirdPrizeId(prizeMap.get(3).getId());
-            drawProvinceRateMapper.insert(provinceRate);
-            provinceRateList.add(provinceRate);
-        });
-
+        if (CollectionUtils.isNotEmpty(provinceList)) {
+            provinceList.forEach(provinceRateReq -> {
+                DrawProvinceRate provinceRate = BeanUtil.convert(provinceRateReq, DrawProvinceRate.class);
+                provinceRate.setCreateTime(localDateTime);
+                provinceRate.setUpdateTime(localDateTime);
+                provinceRate.setActId(drawActivity.getId());
+                provinceRate.setFirstPrizeId(prizeMap.get(1).getId());
+                provinceRate.setSecondPrizeId(prizeMap.get(2).getId());
+                provinceRate.setThirdPrizeId(prizeMap.get(3).getId());
+                drawProvinceRateMapper.insert(provinceRate);
+                provinceRateList.add(provinceRate);
+            });
+        }
         // 存入缓存，设置半年有效期有效
         redisService.set(CacheConstants.DRAW_ACTIVITY_PREFIX + drawActivity.getId(),
-                JSON.toJSONString(drawActivity), 180 * 24 * 60 * 1000);
+                JSON.toJSONString(drawActivity), 60 * 60 * 24 * 30);
         redisService.set(CacheConstants.DRAW_PRIZE_NAME_PREFIX + drawActivity.getId(),
-                JSON.toJSONString(drawPrizeList), 180 * 24 * 60 * 1000);
+                JSON.toJSONString(drawPrizeList), 60 * 60 * 24 * 30);
         redisService.set(CacheConstants.DRAW_PROVINCE_RATE_PREFIX + drawActivity.getId(),
-                JSON.toJSONString(provinceRateList), 180 * 24 * 60 * 1000);
+                JSON.toJSONString(provinceRateList), 60 * 60 * 24 * 30);
     }
 
     @Override
@@ -167,32 +168,34 @@ public class AdminDrawActivityServiceImpl implements AdminDrawActivityService {
             prizeMap.put(prize.getPrizeLevel(), drawPrize);
         });
 
-
-        List<CreateDrawActivityReq.ProvinceRateReq> provinceList = req.getProvinceRateList();
-        if (CollectionUtils.isEmpty(provinceList)) return;
-        // 特殊省份的中奖概率 先删除后新增
-        drawProvinceRateMapper.delete(Wrappers.lambdaQuery(DrawProvinceRate.class)
-                .eq(DrawProvinceRate::getActId, req.getId()));
-
+        // 编辑定制化省份中奖概率
         List<DrawProvinceRate> provinceRateList = new ArrayList<>();
-        provinceList.forEach(provinceRateReq -> {
-            DrawProvinceRate provinceRate = BeanUtil.convert(provinceRateReq, DrawProvinceRate.class);
-            provinceRate.setUpdateTime(localDateTime);
-            provinceRate.setCreateTime(localDateTime);
-            provinceRate.setFirstPrizeId(prizeMap.get(1).getId());
-            provinceRate.setSecondPrizeId(prizeMap.get(2).getId());
-            provinceRate.setThirdPrizeId(prizeMap.get(3).getId());
-            drawProvinceRateMapper.insert(provinceRate);
-            provinceRateList.add(provinceRate);
-        });
+        List<CreateDrawActivityReq.ProvinceRateReq> provinceList = req.getProvinceRateList();
+        if (CollectionUtils.isNotEmpty(provinceList)) {
+            // 特殊省份的中奖概率 先删除后新增
+            drawProvinceRateMapper.delete(Wrappers.lambdaQuery(DrawProvinceRate.class)
+                    .eq(DrawProvinceRate::getActId, req.getId()));
+
+            provinceList.forEach(provinceRateReq -> {
+                DrawProvinceRate provinceRate = BeanUtil.convert(provinceRateReq, DrawProvinceRate.class);
+                provinceRate.setUpdateTime(localDateTime);
+                provinceRate.setCreateTime(localDateTime);
+                provinceRate.setActId(drawActivity.getId());
+                provinceRate.setFirstPrizeId(prizeMap.get(1).getId());
+                provinceRate.setSecondPrizeId(prizeMap.get(2).getId());
+                provinceRate.setThirdPrizeId(prizeMap.get(3).getId());
+                drawProvinceRateMapper.insert(provinceRate);
+                provinceRateList.add(provinceRate);
+            });
+        }
 
         // 存入缓存，设置半年有效期有效
         redisService.set(CacheConstants.DRAW_ACTIVITY_PREFIX + drawActivity.getId(),
-                JSON.toJSONString(drawActivity), 180 * 24 * 60 * 1000);
+                JSON.toJSONString(drawActivity), 60 * 60 * 24 * 30);
         redisService.set(CacheConstants.DRAW_PRIZE_NAME_PREFIX + drawActivity.getId(),
-                JSON.toJSONString(drawPrizeList), 180 * 24 * 60 * 1000);
+                JSON.toJSONString(drawPrizeList), 60 * 60 * 24 * 30);
         redisService.set(CacheConstants.DRAW_PROVINCE_RATE_PREFIX + drawActivity.getId(),
-                JSON.toJSONString(provinceRateList), 180 * 24 * 60 * 1000);
+                JSON.toJSONString(provinceRateList), 60 * 60 * 24 * 30);
     }
 
     @Override
@@ -203,7 +206,7 @@ public class AdminDrawActivityServiceImpl implements AdminDrawActivityService {
         drawActivityMapper.updateById(drawActivity);
 
         redisService.set(CacheConstants.DRAW_ACTIVITY_PREFIX + drawActivity.getId(),
-                JSON.toJSONString(drawActivity), 180 * 24 * 60 * 1000);
+                JSON.toJSONString(drawActivity), 60 * 60 * 24 * 30);
     }
 
     @Override

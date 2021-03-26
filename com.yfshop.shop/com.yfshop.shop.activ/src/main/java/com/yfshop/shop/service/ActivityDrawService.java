@@ -2,8 +2,11 @@ package com.yfshop.shop.service;
 
 import com.baomidou.mybatisplus.extension.exceptions.ApiException;
 import com.yfshop.shop.request.QueryCouponReq;
+import com.yfshop.shop.request.QueryProvinceRateReq;
 import com.yfshop.shop.request.QueryUserCouponReq;
 import com.yfshop.shop.result.YfCouponResult;
+import com.yfshop.shop.result.YfDrawActivityResult;
+import com.yfshop.shop.result.YfDrawProvinceResult;
 import com.yfshop.shop.result.YfUserCouponResult;
 import java.util.List;
 
@@ -16,6 +19,8 @@ import java.util.List;
  */
 public interface ActivityDrawService {
 
+	public YfDrawActivityResult getDrawActivityDetailById(Integer id) throws ApiException;
+
 	/**
 	 * 用户抽奖
 	 * @param userId	用户id
@@ -24,6 +29,6 @@ public interface ActivityDrawService {
 	 * @return
 	 * @throws ApiException
 	 */
-	public void createUserCoupon(Integer userId, String ipStr, String actCode) throws ApiException;
+	public YfUserCouponResult userClickDraw(Integer userId, String ipStr, String actCode) throws ApiException;
 
 }

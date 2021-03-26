@@ -70,10 +70,10 @@ public class YfCouponServiceImpl implements AdminCouponService {
         Coupon coupon = BeanUtil.convert(couponReq, Coupon.class);
         coupon.setCreateTime(LocalDateTime.now());
 
-        if ("DATE_RANGE".equalsIgnoreCase(couponReq.getValidType())) {
-            coupon.setValidStartTime(DateUtil.dateToLocalDateTime(couponReq.getValidStartTime()));
-            coupon.setValidEndTime(DateUtil.dateToLocalDateTime(couponReq.getValidEndTime()));
-        }
+//        if ("DATE_RANGE".equalsIgnoreCase(couponReq.getValidType())) {
+//            coupon.setValidStartTime(DateUtil.dateToLocalDateTime(couponReq.getValidStartTime()));
+//            coupon.setValidEndTime(DateUtil.dateToLocalDateTime(couponReq.getValidEndTime()));
+//        }
         coupon.setIsDelete("N");
         coupon.setIsEnable("N");
         couponMapper.insert(coupon);
@@ -83,10 +83,6 @@ public class YfCouponServiceImpl implements AdminCouponService {
     public void updateYfCoupon(CreateCouponReq couponReq) throws ApiException {
         checkCouponParams(couponReq);
         Coupon coupon = BeanUtil.convert(couponReq, Coupon.class);
-        if ("DATE_RANGE".equalsIgnoreCase(couponReq.getValidType())) {
-            coupon.setValidStartTime(DateUtil.dateToLocalDateTime(couponReq.getValidStartTime()));
-            coupon.setValidEndTime(DateUtil.dateToLocalDateTime(couponReq.getValidEndTime()));
-        }
         couponMapper.updateById(coupon);
     }
 
