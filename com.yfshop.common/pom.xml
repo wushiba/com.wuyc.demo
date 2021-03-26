@@ -80,6 +80,18 @@
             <artifactId>javase</artifactId>
             <version>3.0.0</version>
         </dependency>
+
+
+        <!--easypoi start-->
+        <dependency>
+            <groupId>cn.afterturn</groupId>
+            <artifactId>easypoi-base</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>cn.afterturn</groupId>
+            <artifactId>easypoi-annotation</artifactId>
+        </dependency>
+        <!--easypoi end-->
     </dependencies>
 
 </project>
