@@ -5,13 +5,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.util.Assert;
-import redis.clients.jedis.Jedis;
-import redis.clients.jedis.JedisPool;
-import redis.clients.jedis.JedisPoolConfig;
+import org.springframework.data.redis.connection.RedisConnection;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.connection.ReturnType;
 
+import javax.annotation.Resource;
 import java.io.IOException;
 
 /**
@@ -19,15 +18,13 @@ import java.io.IOException;
  * Created in 2020-12-05 20:09
  */
 public class RedisIpVisitLimitCheckStrategy implements InitializingBean, DisposableBean {
-    private static final Logger logger = LoggerFactory.getLogger(RedisIpVisitLimitCheckStrategy2.class);
+    private static final Logger logger = LoggerFactory.getLogger(RedisIpVisitLimitCheckStrategy.class);
 
-    private JedisPool jedisPool;
     private String ipLimitScript;
 
-    @Value("${spring.redis.host}")
-    private String redisHost;
-    @Value("${spring.redis.port}")
-    private int redisPort;
+    @Resource
+    private RedisConnectionFactory redisConnectionFactory;
+
     /**
      * IP是否超过单位时间的访问次数限制
      *
@@ -37,17 +34,16 @@ public class RedisIpVisitLimitCheckStrategy implements InitializingBean, Disposa
      * @return true if access legal
      */
     public boolean isIpAccessLegal(String visitorIp, int durationSeconds, int limitTimes) {
-        try (Jedis jedis = jedisPool.getResource()) {
-            Object result = jedis.eval(ipLimitScript, 1, visitorIp,
-                    String.valueOf(limitTimes), String.valueOf(durationSeconds));
+        try (RedisConnection connection = redisConnectionFactory.getConnection()) {
+            Object result = connection.eval(ipLimitScript.getBytes(), ReturnType.INTEGER, 1, visitorIp.getBytes(),
+                    String.valueOf(limitTimes).getBytes(), String.valueOf(durationSeconds).getBytes());
+            System.out.println(result);
             return result != null && (Long) result > 0;
         }
     }
 
     @Override
     public void afterPropertiesSet() {
-        Assert.hasText(redisHost, "redis host must not be null");
-        Assert.isTrue(redisPort > 0, "redis port must available");
         // lua限流脚本
         ClassPathResource resource = new ClassPathResource("lua/IpAccessLimit.lua");
         try {
@@ -55,15 +51,9 @@ public class RedisIpVisitLimitCheckStrategy implements InitializingBean, Disposa
         } catch (IOException e) {
             throw new Error("local IpAccessLimit.lua error", e);
         }
-        // init jedis pool
-        jedisPool = new JedisPool(new JedisPoolConfig(), redisHost, redisPort);
     }
 
     @Override
     public void destroy() {
-        if (jedisPool != null) {
-            jedisPool.destroy();
-        }
-        logger.info(this.getClass().getName() + "#destroy() jedis pool destroyed");
     }
 }
