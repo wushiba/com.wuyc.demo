@@ -42,7 +42,7 @@ public class WxRedirectController {
             WxOAuth2AccessToken accessToken = wxService.getOAuth2Service().getAccessToken(code);
             WxOAuth2UserInfo user = wxService.getOAuth2Service().getUserInfo(accessToken, null);
             UserReq userReq = BeanUtil.convert(user, UserReq.class);
-            userReq.setOpenId(userReq.getOpenId());
+            userReq.setOpenId(user.getOpenid());
             userService.saveUser(userReq);
             stpLogic.setLoginId(user.getOpenid());
         } catch (WxErrorException e) {
