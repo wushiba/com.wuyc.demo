@@ -111,17 +111,26 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
                 .eq(WebsiteCodeDetail::getAlias, websiteReq.getWebsiteCode())
                 .eq(WebsiteCodeDetail::getIsActivate, 'N'));
         Asserts.assertNonNull(websiteCodeDetail, 500, "网点码已被绑定！");
-        Merchant merchant = merchantMapper.selectById(websiteReq.getId());
+        Merchant merchant = null;
+        if (websiteReq.getId() == null) {
+            merchant = merchantMapper.selectOne(Wrappers.<Merchant>lambdaQuery()
+                    .eq(Merchant::getMobile, websiteReq.getMobile()));
+        } else {
+            merchant = merchantMapper.selectById(websiteReq.getId());
+        }
+        Integer merchantId;
         if (merchant == null) {
             merchant = BeanUtil.convert(websiteReq, Merchant.class);
             merchant.setRoleAlias(GroupRoleEnum.WD.getCode());
             merchant.setRoleName(GroupRoleEnum.WD.getDescription());
             merchantMapper.insert(merchant);
+            merchantId = merchant.getId();
             MerchantDetail merchantDetail = BeanUtil.convert(websiteReq, MerchantDetail.class);
             merchantDetail.setMerchantId(merchant.getId());
             merchantDetail.setGeoHash(GeoUtils.toBase32(websiteReq.getLatitude(), websiteReq.getLongitude(), 12));
             merchantDetailMapper.insert(merchantDetail);
         } else {
+            merchantId = merchant.getId();
             Asserts.assertEquals(merchant.getRoleAlias(), GroupRoleEnum.WD.getCode(), 500, "只允许网点用户绑定网点码！");
             merchant = BeanUtil.convert(websiteReq, Merchant.class);
             merchant.setRoleAlias(GroupRoleEnum.WD.getCode());
@@ -155,13 +164,14 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
                 merchant.setHeadImgUrl(user.getHeadImgUrl());
             }
         }
+        merchant.setId(merchantId);
         merchantMapper.updateById(merchant);
         websiteCodeDetail.setMerchantId(merchant.getId());
         websiteCodeDetail.setMerchantName(merchant.getMerchantName());
         websiteCodeDetail.setMobile(merchant.getMobile());
         websiteCodeDetail.setIsActivate("Y");
         websiteCodeDetailMapper.updateById(websiteCodeDetail);
-        return BeanUtil.convert(merchant,MerchantResult.class);
+        return BeanUtil.convert(merchant, MerchantResult.class);
     }
 
 
@@ -204,6 +214,8 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
         }
         List<WebsiteCodeDetail> websiteCodeDetails = websiteCodeDetailMapper.selectList(Wrappers.<WebsiteCodeDetail>lambdaQuery()
                 .like(WebsiteCodeDetail::getPidPath, merchantId)
+                .or()
+                .eq(WebsiteCodeDetail::getMerchantId, merchantId)
                 .eq(WebsiteCodeDetail::getIsActivate, status)
                 .ge(dateTime != null, WebsiteCodeDetail::getCreateTime, dateTime)
                 .lt(nextDate != null, WebsiteCodeDetail::getCreateTime, nextDate)
@@ -221,6 +233,8 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
         }
         LambdaQueryWrapper<WebsiteCode> lambdaQueryWrapper = Wrappers.<WebsiteCode>lambdaQuery()
                 .like(WebsiteCode::getPidPath, merchantId)
+                .or()
+                .eq(WebsiteCode::getMerchantId, merchantId)
                 .in(CollectionUtil.isNotEmpty(allStatus), WebsiteCode::getOrderStatus, allStatus)
                 .eq(StringUtils.isNotBlank(status) && !"ALL".equals(status), WebsiteCode::getOrderStatus, status)
                 .orderByDesc(WebsiteCode::getId);
