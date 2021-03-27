@@ -81,7 +81,7 @@ class MerchantInfoController extends AbstractBaseController {
                 merchantResult = merchantInfoService.getMerchantByOpenId(getCurrentOpenId());
             }
             if (merchantResult != null) {
-                Asserts.assertEquals(merchantResult.getRoleAlias(), GroupRoleEnum.WD, 500, "网点码未激活！");
+                Asserts.assertEquals(merchantResult.getRoleAlias(), GroupRoleEnum.WD.getCode(), 500, "网点码未激活！");
             }
         } else if (result > 0) {
             merchantResult = merchantInfoService.getMerchantByWebsiteCode(websiteCode);
@@ -137,7 +137,11 @@ class MerchantInfoController extends AbstractBaseController {
             websiteReq.setId(StpUtil.getLoginIdAsInt());
         }
         websiteReq.setOpenId(getCurrentOpenId());
-        return CommonResult.success(merchantInfoService.websiteCodeBind(websiteReq));
+        MerchantResult merchantResult = merchantInfoService.websiteCodeBind(websiteReq);
+        if (merchantResult != null) {
+            StpUtil.setLoginId(merchantResult.getId());
+        }
+        return CommonResult.success(null);
     }
 
     /**

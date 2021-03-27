@@ -53,6 +53,9 @@ public class MerchantResult implements Serializable {
      */
     private String contacts;
 
+    private String headImgUrl;
+
+
     /**
      * 省
      */

@@ -44,7 +44,7 @@ public interface MerchantInfoService {
      * @param websiteReq
      * @return
      */
-    Void websiteCodeBind(WebsiteCodeBindReq websiteReq) throws ApiException;
+    MerchantResult websiteCodeBind(WebsiteCodeBindReq websiteReq) throws ApiException;
 
 
     /**

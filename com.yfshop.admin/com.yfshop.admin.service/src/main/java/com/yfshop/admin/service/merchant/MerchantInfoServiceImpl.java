@@ -84,6 +84,7 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
         MerchantResult merchantResult = BeanUtil.convert(merchant, MerchantResult.class);
         if (merchantDetail != null) {
             BeanUtil.copyProperties(merchantDetail, merchantResult);
+            merchantResult.setId(merchant.getId());
         }
         return merchantResult;
     }
@@ -104,7 +105,7 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Void websiteCodeBind(WebsiteCodeBindReq websiteReq) throws ApiException {
+    public MerchantResult websiteCodeBind(WebsiteCodeBindReq websiteReq) throws ApiException {
         buildAddress(websiteReq);
         WebsiteCodeDetail websiteCodeDetail = websiteCodeDetailMapper.selectOne(Wrappers.<WebsiteCodeDetail>lambdaQuery()
                 .eq(WebsiteCodeDetail::getAlias, websiteReq.getWebsiteCode())
@@ -121,7 +122,7 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
             merchantDetail.setGeoHash(GeoUtils.toBase32(websiteReq.getLatitude(), websiteReq.getLongitude(), 12));
             merchantDetailMapper.insert(merchantDetail);
         } else {
-            Asserts.assertEquals(merchant.getRoleAlias(), GroupRoleEnum.WD, 500, "只允许网点用户绑定网点码！");
+            Asserts.assertEquals(merchant.getRoleAlias(), GroupRoleEnum.WD.getCode(), 500, "只允许网点用户绑定网点码！");
             merchant = BeanUtil.convert(websiteReq, Merchant.class);
             merchant.setRoleAlias(GroupRoleEnum.WD.getCode());
             merchant.setRoleName(GroupRoleEnum.WD.getDescription());
@@ -160,7 +161,7 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
         websiteCodeDetail.setMobile(merchant.getMobile());
         websiteCodeDetail.setIsActivate("Y");
         websiteCodeDetailMapper.updateById(websiteCodeDetail);
-        return null;
+        return BeanUtil.convert(merchant,MerchantResult.class);
     }
 
 
@@ -243,6 +244,7 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
         websiteCode.setEmail(email);
         websiteCode.setMerchantId(merchant.getId());
         websiteCode.setMerchantName(merchant.getMerchantName());
+        websiteCode.setMobile(merchant.getMobile());
         websiteCode.setPidPath(merchant.getPidPath());
         websiteCode.setQuantity(count);
         if (StringUtils.isBlank(email)) {
@@ -401,6 +403,7 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
                     .eq(MerchantDetail::getMerchantId, merchant.getId()));
             if (merchantDetail != null) {
                 BeanUtil.copyProperties(merchantDetail, merchantResult);
+                merchantResult.setId(merchant.getId());
             }
         }
         return merchantResult;
