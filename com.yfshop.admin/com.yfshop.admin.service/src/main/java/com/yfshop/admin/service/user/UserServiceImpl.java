@@ -59,4 +59,25 @@ public class UserServiceImpl implements UserService {
         return null;
     }
 
+    @Override
+    public Integer checkSubscribe(String openId) {
+        return userMapper.selectCount(Wrappers.<User>lambdaQuery()
+                .eq(User::getOpenId, openId)
+                .eq(User::getSubscribe, 'Y'));
+    }
+
+    @Override
+    public Void saveUser(UserReq userReq) throws ApiException {
+        UserResult userResult = getUserByOpenId(userReq.getOpenId());
+        if (userResult == null) {
+            User user = BeanUtil.convert(userReq, User.class);
+            userMapper.insert(user);
+        } else {
+            User user = BeanUtil.convert(userReq, User.class);
+            user.setId(userResult.getId());
+            userMapper.updateById(user);
+        }
+        return null;
+    }
+
 }

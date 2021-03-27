@@ -33,6 +33,22 @@ spring:
   redis:
     host: 127.0.0.1
     port: 6379
+
+  mail:
+    host: smtp.126.com
+    port: 465
+    username: yousheng_hui@126.com
+    password: YTLXAVOGNLTZHUBZ
+    protocol: smtp
+    test-connection: true
+    default-encoding: UTF-8
+    properties:
+      mail.smtp.auth: true
+      mail.smtp.starttls.enable: true
+      mail.smtp.starttls.required: true
+      mail.smtp.ssl.enable: true
+      mail.display.sendmail: 雨帆健康家
+
 dubbo:
   registry:
     address: zookeeper://127.0.0.1:2181
@@ -61,4 +77,4 @@ qiniu:
 
 websiteCode:
   dirs: F://websiteCode/
-  url: http://192.168.11.34:8088/#/merchantRegisterForm?websetCode=
+  url: http://192.168.11.34:8088/#/MerchantRegisterPrep?websiteCode=

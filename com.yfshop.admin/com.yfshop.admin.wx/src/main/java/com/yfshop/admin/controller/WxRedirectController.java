@@ -3,12 +3,16 @@ package com.yfshop.admin.controller;
 import cn.dev33.satoken.stp.StpLogic;
 import cn.dev33.satoken.stp.StpUtil;
 import com.yfshop.admin.api.service.merchant.result.MerchantResult;
+import com.yfshop.admin.api.user.UserService;
+import com.yfshop.admin.api.user.req.UserReq;
 import com.yfshop.common.api.CommonResult;
+import com.yfshop.common.util.BeanUtil;
 import lombok.AllArgsConstructor;
 import me.chanjar.weixin.common.bean.WxOAuth2UserInfo;
 import me.chanjar.weixin.common.bean.oauth2.WxOAuth2AccessToken;
 import me.chanjar.weixin.common.error.WxErrorException;
 import me.chanjar.weixin.mp.api.WxMpService;
+import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -25,14 +29,19 @@ import org.springframework.web.bind.annotation.RestController;
 public class WxRedirectController {
     private final WxMpService wxService;
     public static StpLogic stpLogic = new StpLogic("wx");
+    @DubboReference(check = false)
+    UserService userService;
+
+
     @RequestMapping("/authByCode")
-    public CommonResult<MerchantResult> greetUser(@PathVariable String appid, @RequestParam String code) {
+    public CommonResult<MerchantResult> authByCode(@PathVariable String appid, @RequestParam String code) {
         if (!this.wxService.switchover(appid)) {
             throw new IllegalArgumentException(String.format("未找到对应appid=[%s]的配置，请核实！", appid));
         }
         try {
             WxOAuth2AccessToken accessToken = wxService.getOAuth2Service().getAccessToken(code);
             WxOAuth2UserInfo user = wxService.getOAuth2Service().getUserInfo(accessToken, null);
+            userService.saveUser(BeanUtil.convert(user, UserReq.class));
             stpLogic.setLoginId(user.getOpenid());
         } catch (WxErrorException e) {
             e.printStackTrace();
@@ -41,4 +50,5 @@ public class WxRedirectController {
 
         return CommonResult.success(null);
     }
+
 }

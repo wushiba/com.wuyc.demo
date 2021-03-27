@@ -18,6 +18,7 @@ import com.yfshop.code.model.*;
 import com.yfshop.common.enums.GroupRoleEnum;
 import com.yfshop.common.exception.ApiException;
 import com.yfshop.common.exception.Asserts;
+import com.yfshop.common.util.AddressUtil;
 import com.yfshop.common.util.BeanUtil;
 import com.yfshop.common.util.DateUtil;
 import com.yfshop.common.util.GeoUtils;
@@ -34,6 +35,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 用户用户服务
@@ -66,8 +68,12 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
     @Resource
     private RegionMapper regionMapper;
 
+    @Resource
+    private UserMapper userMapper;
+
     @Autowired
-    WebsiteCodeTask websiteCodeTask;
+    private WebsiteCodeTask websiteCodeTask;
+
 
     @Override
     public MerchantResult getWebsiteInfo(Integer merchantId) throws ApiException {
@@ -99,12 +105,13 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Void websiteCodeBind(WebsiteCodeBindReq websiteReq) throws ApiException {
+        buildAddress(websiteReq);
         WebsiteCodeDetail websiteCodeDetail = websiteCodeDetailMapper.selectOne(Wrappers.<WebsiteCodeDetail>lambdaQuery()
                 .eq(WebsiteCodeDetail::getAlias, websiteReq.getWebsiteCode())
                 .eq(WebsiteCodeDetail::getIsActivate, 'N'));
         Asserts.assertNonNull(websiteCodeDetail, 500, "网点码已被绑定！");
-        Merchant merchant;
-        if (websiteReq.getId() == null) {
+        Merchant merchant = merchantMapper.selectById(websiteReq.getId());
+        if (merchant == null) {
             merchant = BeanUtil.convert(websiteReq, Merchant.class);
             merchant.setRoleAlias(GroupRoleEnum.WD.getCode());
             merchant.setRoleName(GroupRoleEnum.WD.getDescription());
@@ -114,15 +121,23 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
             merchantDetail.setGeoHash(GeoUtils.toBase32(websiteReq.getLatitude(), websiteReq.getLongitude(), 12));
             merchantDetailMapper.insert(merchantDetail);
         } else {
+            Asserts.assertEquals(merchant.getRoleAlias(), GroupRoleEnum.WD, 500, "只允许网点用户绑定网点码！");
             merchant = BeanUtil.convert(websiteReq, Merchant.class);
             merchant.setRoleAlias(GroupRoleEnum.WD.getCode());
+            merchant.setRoleName(GroupRoleEnum.WD.getDescription());
             MerchantDetail merchantDetail = merchantDetailMapper.selectOne(Wrappers.<MerchantDetail>lambdaQuery()
                     .eq(MerchantDetail::getMerchantId, websiteReq.getId()));
-            Integer merchantDetailId = merchantDetail.getId();
-            merchantDetail = BeanUtil.convert(websiteReq, MerchantDetail.class);
-            merchantDetail.setMerchantId(merchant.getId());
-            merchantDetail.setId(merchantDetailId);
-            merchantDetailMapper.updateById(merchantDetail);
+            if (merchantDetail != null) {
+                Integer merchantDetailId = merchantDetail.getId();
+                merchantDetail = BeanUtil.convert(websiteReq, MerchantDetail.class);
+                merchantDetail.setMerchantId(merchant.getId());
+                merchantDetail.setId(merchantDetailId);
+                merchantDetailMapper.updateById(merchantDetail);
+            } else {
+                merchantDetail = BeanUtil.convert(websiteReq, MerchantDetail.class);
+                merchantDetail.setMerchantId(merchant.getId());
+                merchantDetailMapper.insert(merchantDetail);
+            }
         }
         Merchant merchantPid = merchantMapper.selectById(websiteCodeDetail.getPid());
         if (merchantPid != null) {
@@ -132,13 +147,52 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
         } else {
             merchant.setPidPath(merchant.getId() + ".");
         }
+        if (StringUtils.isNotBlank(websiteReq.getOpenId())) {
+            User user = userMapper.selectOne(Wrappers.<User>lambdaQuery()
+                    .eq(User::getOpenId, websiteReq.getOpenId()));
+            if (user != null) {
+                merchant.setHeadImgUrl(user.getHeadImgUrl());
+            }
+        }
         merchantMapper.updateById(merchant);
         websiteCodeDetail.setMerchantId(merchant.getId());
+        websiteCodeDetail.setMerchantName(merchant.getMerchantName());
         websiteCodeDetail.setMobile(merchant.getMobile());
         websiteCodeDetail.setIsActivate("Y");
         websiteCodeDetailMapper.updateById(websiteCodeDetail);
-
         return null;
+    }
+
+
+    public void buildAddress(WebsiteCodeBindReq websiteCodeBindReq) {
+        if (StringUtils.isNotBlank(websiteCodeBindReq.getAddress())) {
+            List<Map<String, String>> addressList = AddressUtil.addressResolution(websiteCodeBindReq.getAddress());
+            if (!CollectionUtil.isEmpty(addressList)) {
+                Map<String, String> maps = addressList.get(0);
+                websiteCodeBindReq.setProvince(maps.get("province"));
+                Region province = regionMapper.selectOne(Wrappers.<Region>lambdaQuery()
+                        .eq(Region::getName, maps.get("province")));
+                if (province != null) {
+                    websiteCodeBindReq.setProvinceId(province.getId());
+                    Region city = regionMapper.selectOne(Wrappers.<Region>lambdaQuery()
+                            .eq(Region::getName, maps.get("city"))
+                            .eq(Region::getPid, province.getId()));
+                    if (city != null) {
+                        websiteCodeBindReq.setCityId(city.getId());
+                        Region county = regionMapper.selectOne(Wrappers.<Region>lambdaQuery()
+                                .eq(Region::getName, maps.get("county"))
+                                .eq(Region::getPid, city.getId()));
+                        if (county != null) {
+                            websiteCodeBindReq.setDistrictId(county.getId());
+                        }
+                    }
+                }
+                websiteCodeBindReq.setCity(maps.get("city"));
+                websiteCodeBindReq.setDistrict(maps.get("county"));
+                websiteCodeBindReq.setAddress(maps.get("town"));
+            }
+        }
+
     }
 
     @Override
@@ -310,7 +364,46 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
         WebsiteCodePayResult websiteCodePayResult = new WebsiteCodePayResult();
         websiteCodePayResult.setAmount(websiteCodeAmountResult.getAmount().add(websiteCodeAmountResult.getPostage()));
         websiteCodePayResult.setOrderNo(websiteCode.getOrderNo());
+
+        websiteCodeTask.doWorkWebsiteCodeFile(websiteCode.getOrderNo());
         return websiteCodePayResult;
+    }
+
+    @Override
+    public Integer checkWebsiteCode(String websiteCode) throws ApiException {
+        return websiteCodeDetailMapper.selectCount(Wrappers.<WebsiteCodeDetail>lambdaQuery()
+                .eq(WebsiteCodeDetail::getAlias, websiteCode)
+                .eq(WebsiteCodeDetail::getIsActivate, "Y"));
+    }
+
+    @Override
+    public MerchantResult getMerchantByWebsiteCode(String websiteCode) throws ApiException {
+        WebsiteCodeDetail websiteCodeDetail = websiteCodeDetailMapper.selectOne(Wrappers.<WebsiteCodeDetail>lambdaQuery()
+                .eq(WebsiteCodeDetail::getAlias, websiteCode));
+        if (websiteCodeDetail != null) {
+            try {
+                return getWebsiteInfo(websiteCodeDetail.getMerchantId());
+            } catch (Exception e) {
+
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public MerchantResult getMerchantByOpenId(String openId) throws ApiException {
+        MerchantResult merchantResult = null;
+        Merchant merchant = merchantMapper.selectOne(Wrappers.<Merchant>lambdaQuery()
+                .eq(Merchant::getOpenId, openId));
+        if (merchant != null) {
+            merchantResult = BeanUtil.convert(merchant, MerchantResult.class);
+            MerchantDetail merchantDetail = merchantDetailMapper.selectOne(Wrappers.<MerchantDetail>lambdaQuery()
+                    .eq(MerchantDetail::getMerchantId, merchant.getId()));
+            if (merchantDetail != null) {
+                BeanUtil.copyProperties(merchantDetail, merchantResult);
+            }
+        }
+        return merchantResult;
     }
 
 }

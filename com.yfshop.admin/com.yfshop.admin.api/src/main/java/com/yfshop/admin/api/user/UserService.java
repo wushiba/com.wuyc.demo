@@ -17,4 +17,8 @@ public interface UserService {
     Void subscribe(UserReq userReq) throws ApiException;
 
     Void unsubscribe(UserReq userReq) throws ApiException;
+
+    Integer checkSubscribe(String openId);
+
+    Void saveUser(UserReq convert) throws ApiException;
 }

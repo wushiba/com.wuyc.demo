@@ -79,6 +79,8 @@ public class MerchantResult implements Serializable {
      */
     private String address;
 
+    private String subAddress;
+
     private String websiteTypeName;
 
     /**
