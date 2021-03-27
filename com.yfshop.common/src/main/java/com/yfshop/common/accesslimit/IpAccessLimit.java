@@ -15,7 +15,7 @@ import java.lang.annotation.Target;
  */
 @Inherited
 @Documented
-@Target({ElementType.FIELD, ElementType.TYPE, ElementType.METHOD})
+@Target({ElementType.TYPE, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface IpAccessLimit {
 
