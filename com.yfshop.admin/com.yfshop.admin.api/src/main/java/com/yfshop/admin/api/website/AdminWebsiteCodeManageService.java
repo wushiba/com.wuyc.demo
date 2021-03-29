@@ -1,6 +1,9 @@
 package com.yfshop.admin.api.website;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.yfshop.admin.api.website.req.WebsiteCodeQueryDetailsReq;
 import com.yfshop.admin.api.website.req.WebsiteCodeQueryReq;
+import com.yfshop.admin.api.website.result.WebsiteCodeDetailResult;
 import com.yfshop.admin.api.website.result.WebsiteCodeResult;
 import com.yfshop.admin.api.website.result.WebsiteTypeResult;
 import com.yfshop.common.exception.ApiException;
@@ -19,6 +22,14 @@ public interface AdminWebsiteCodeManageService {
      *
      * @return
      */
-    List<WebsiteCodeResult> queryWebsiteCodeList(WebsiteCodeQueryReq websiteCodeQueryReq);
+    IPage<WebsiteCodeResult> queryWebsiteCodeList(WebsiteCodeQueryReq websiteCodeQueryReq);
+
+
+    /**
+     * 获取商户码详情
+     * @param websiteCodeQueryDetailsReq
+     * @return
+     */
+    IPage<WebsiteCodeDetailResult> queryWebsiteCodeDetailsList(WebsiteCodeQueryDetailsReq websiteCodeQueryDetailsReq);
 
 }

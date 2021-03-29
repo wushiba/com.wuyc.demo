@@ -3,10 +3,42 @@
 <mapper namespace="com.yfshop.admin.dao.WebsiteCodeDao">
 
     <select id="queryWebsiteCodeList" resultType="com.yfshop.admin.api.website.result.WebsiteCodeResult">
-        select w.*,m.mobile,m.role_name
+        select w.*,m.mobile as merchant_mobile,m.role_name
         from yf_website_code w left join yf_merchant m on m.id = w.merchant_id
         where 1=1
-        and (w.id=merchant_id=#{merchantId} or w.pid_path like concat(#{merchantId},'%') )
+        and (w.merchant_id=#{req.merchantId} or w.pid_path like concat('%',#{req.merchantId},'%') )
+        <if test="req.startTime!=null">
+            and w.create_time &gt;= #{req.startTime}
+        </if>
+        <if test="req.endTime!=null">
+            and w.create_time &lt; #{req.endTime}
+        </if>
+        <if test="req.batchNo!=null and req.batchNo!=''">
+            and w.batch_no = #{req.batchNo}
+        </if>
+        <if test="req.merchantName!=null and req.merchantName!=''">
+            and w.merchant_name = #{req.merchantName}
+        </if>
+        <if test="req.orderStatus!=null and req.orderStatus!=''">
+            and w.order_status = #{req.orderStatus}
+        </if>
+        <if test="req.expressNo!=null and req.expressNo!=''">
+            and w.express_no = #{req.expressNo}
+        </if>
+        <if test="req.roleName!=null and req.roleName!=''">
+            and m.role_name = #{req.roleName}
+        </if>
+        <if test="req.mobile!=null and req.mobile!=''">
+            and m.mobile = #{req.mobile}
+        </if>
+        order by w.id desc
+    </select>
+
+    <select id="queryWebsiteCodeCount" resultType="java.lang.Integer">
+        select count(1)
+        from yf_website_code w left join yf_merchant m on m.id = w.merchant_id
+        where 1=1
+        and (w.merchant_id=#{merchantId} or w.pid_path like concat('%',#{merchantId},'%') )
         <if test="startTime!=null and startTime!=''">
             and w.create_time &gt;= #{startTime}
         </if>

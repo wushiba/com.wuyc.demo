@@ -9,7 +9,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
  * </p>
  *
  * @author yoush
- * @since 2021-03-24
+ * @since 2021-03-29
  */
 public interface WebsiteCodeDetailManager extends IService<WebsiteCodeDetail> {
 

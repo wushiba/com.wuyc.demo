@@ -29,7 +29,7 @@ public class Generator {
     //作者
     private static String authorName="yoush";
     //要生成的表名
-    private static String[] tables= {"yf_merchant"};
+    private static String[] tables= {"yf_website_code_detail"};
     private static String prefix="yf_";
 
     //数据库配置四要素
@@ -156,7 +156,7 @@ public class Generator {
         fileOutList.add(new FileOutConfig("/templates/mapper.xml.ftl") {
             @Override
             public String outputFile(TableInfo tableInfo) {
-                return baseProjectPath + "/src/main/resources/"+"mapper/" + tableInfo.getEntityName() + "Mapper.xml";
+                return baseProjectPath + "/src/main/resources/"+basePackage+".mapper/" + tableInfo.getEntityName() + "Mapper.xml";
             }
         });
         abc.setFileOutConfigList(fileOutList);

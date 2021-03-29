@@ -42,6 +42,8 @@ public class WebsiteCodeResult implements Serializable {
 
     private String merchantMobile;
 
+    private String roleName;
+
     /**
      * 商户pid_path
      */
