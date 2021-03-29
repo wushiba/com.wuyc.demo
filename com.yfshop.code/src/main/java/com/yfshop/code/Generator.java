@@ -156,7 +156,7 @@ public class Generator {
         fileOutList.add(new FileOutConfig("/templates/mapper.xml.ftl") {
             @Override
             public String outputFile(TableInfo tableInfo) {
-                return baseProjectPath + "/src/main/resources/"+basePackage+".mapper/" + tableInfo.getEntityName() + "Mapper.xml";
+                return baseProjectPath + "/src/main/resources/"+"mapper/" + tableInfo.getEntityName() + "Mapper.xml";
             }
         });
         abc.setFileOutConfigList(fileOutList);

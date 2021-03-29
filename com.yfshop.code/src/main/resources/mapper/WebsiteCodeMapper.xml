@@ -13,8 +13,10 @@
         <result column="batch_no" property="batchNo" />
         <result column="quantity" property="quantity" />
         <result column="order_status" property="orderStatus" />
+        <result column="order_no" property="orderNo" />
         <result column="billno" property="billno" />
         <result column="pay_method" property="payMethod" />
+        <result column="pay_time" property="payTime" />
         <result column="expree_name" property="expreeName" />
         <result column="order_amount" property="orderAmount" />
         <result column="postage" property="postage" />
@@ -24,11 +26,12 @@
         <result column="contracts" property="contracts" />
         <result column="file_url" property="fileUrl" />
         <result column="email" property="email" />
+        <result column="file_status" property="fileStatus" />
     </resultMap>
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        id, create_time, update_time, merchant_id, merchant_name, pid_path, batch_no, quantity, order_status, billno, pay_method, expree_name, order_amount, postage, express_no, address, mobile, contracts, file_url, email
+        id, create_time, update_time, merchant_id, merchant_name, pid_path, batch_no, quantity, order_status, order_no, billno, pay_method, pay_time, expree_name, order_amount, postage, express_no, address, mobile, contracts, file_url, email, file_status
     </sql>
 
 </mapper>
