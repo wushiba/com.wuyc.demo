@@ -216,9 +216,10 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
             nextDate = DateUtil.plusDays(dateTime, 1);
         }
         List<WebsiteCodeDetail> websiteCodeDetails = websiteCodeDetailMapper.selectList(Wrappers.<WebsiteCodeDetail>lambdaQuery()
-                .like(WebsiteCodeDetail::getPidPath, merchantId)
-                .or()
-                .eq(WebsiteCodeDetail::getMerchantId, merchantId)
+                .and(itemWrapper -> itemWrapper
+                        .eq(WebsiteCodeDetail::getMerchantId, merchantId)
+                        .or()
+                        .like(WebsiteCodeDetail::getPidPath, merchantId))
                 .eq(WebsiteCodeDetail::getIsActivate, status)
                 .ge(dateTime != null, WebsiteCodeDetail::getCreateTime, dateTime)
                 .lt(nextDate != null, WebsiteCodeDetail::getCreateTime, nextDate)
@@ -235,9 +236,10 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
             allStatus.add("SUCCESS");
         }
         LambdaQueryWrapper<WebsiteCode> lambdaQueryWrapper = Wrappers.<WebsiteCode>lambdaQuery()
-                .like(WebsiteCode::getPidPath, merchantId)
-                .or()
-                .eq(WebsiteCode::getMerchantId, merchantId)
+                .and(itemWrapper -> itemWrapper
+                        .eq(WebsiteCode::getMerchantId, merchantId)
+                        .or()
+                        .like(WebsiteCode::getPidPath, merchantId))
                 .in(CollectionUtil.isNotEmpty(allStatus), WebsiteCode::getOrderStatus, allStatus)
                 .eq(StringUtils.isNotBlank(status) && !"ALL".equals(status), WebsiteCode::getOrderStatus, status)
                 .orderByDesc(WebsiteCode::getId);

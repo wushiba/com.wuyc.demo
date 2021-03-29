@@ -1,4 +1,4 @@
-package com.yfshop.code.mapper.custom;
+package com.yfshop.admin.dao;
 
 import com.yfshop.code.model.Region;
 import org.apache.ibatis.annotations.Param;
@@ -13,7 +13,7 @@ import java.util.List;
  * @author yoush
  * @since 2021-03-26
  */
-public interface CustomRegionMapper {
+public interface RegionDao {
     // 根据名称模糊查询
     List<Region> queryByFuzzyRegionName(@Param("list") List<String> fuzzyRegionNames);
 }

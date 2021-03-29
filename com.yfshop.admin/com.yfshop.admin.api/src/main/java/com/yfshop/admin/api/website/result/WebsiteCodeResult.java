@@ -40,6 +40,8 @@ public class WebsiteCodeResult implements Serializable {
      */
     private String merchantName;
 
+    private String merchantMobile;
+
     /**
      * 商户pid_path
      */
@@ -81,7 +83,7 @@ public class WebsiteCodeResult implements Serializable {
     /**
      * 快递名
      */
-    private String expreeName;
+    private String expressName;
 
     /**
      * 订单金额

@@ -15,6 +15,7 @@ import com.yfshop.admin.config.WxStpLogic;
 import com.yfshop.common.api.CommonResult;
 import com.yfshop.common.enums.GroupRoleEnum;
 import com.yfshop.common.exception.Asserts;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -86,9 +87,23 @@ class MerchantInfoController extends AbstractBaseController {
         } else if (result > 0) {
             merchantResult = merchantInfoService.getMerchantByWebsiteCode(websiteCode);
             if (merchantResult != null) {
-                StpUtil.setLoginId(merchantResult.getId());
-                //跳转商户管理
-                result = 1;
+                if (StpUtil.isLogin() && merchantResult.getId().equals(getCurrentAdminUserId())) {
+                    StpUtil.setLoginId(merchantResult.getId());
+                    //跳转商户管理
+                    result = 1;
+                } else {
+                    String openId = merchantResult.getOpenId();
+                    if (StringUtils.isNotBlank(openId) && openId.equals(getCurrentOpenId())) {
+                        StpUtil.setLoginId(merchantResult.getId());
+                        result = 1;
+                    } else {
+                        result = 2;
+                        UserResult userResult = userService.getUserByOpenId(getCurrentOpenId());
+                        if (userResult != null) {
+                            userLogic.setLoginId(userResult.getId());
+                        }
+                    }
+                }
             } else {
                 //跳转兑换支付界面
                 result = 2;

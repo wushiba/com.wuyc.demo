@@ -1,4 +1,4 @@
-package com.yfshop.code.query;
+package com.yfshop.admin.dto.query;
 
 import lombok.Data;
 

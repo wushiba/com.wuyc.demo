@@ -85,7 +85,7 @@ public class WebsiteCode extends Model<WebsiteCode> {
     /**
      * 快递名
      */
-    private String expreeName;
+    private String expressName;
 
     /**
      * 订单金额

@@ -2,9 +2,8 @@ package com.yfshop.admin.service.website;
 
 import com.yfshop.admin.api.website.AdminWebsiteTypeManageService;
 import com.yfshop.admin.api.website.result.WebsiteTypeResult;
-import com.yfshop.code.mapper.MerchantDetailMapper;
 import com.yfshop.code.mapper.WebsiteTypeMapper;
-import com.yfshop.code.mapper.custom.CustomMerchantDetailMapper;
+import com.yfshop.admin.dao.MerchantDetailDao;
 import com.yfshop.code.model.WebsiteType;
 import com.yfshop.common.exception.ApiException;
 import com.yfshop.common.util.BeanUtil;
@@ -30,9 +29,9 @@ public class AdminWebsiteTypeManageServiceImpl implements AdminWebsiteTypeManage
     @Resource
     private WebsiteTypeMapper websiteTypeMapper;
     @Resource
-    private MerchantDetailMapper merchantDetailMapper;
+    private com.yfshop.code.mapper.MerchantDetailMapper merchantDetailMapper;
     @Resource
-    private CustomMerchantDetailMapper customMerchantDetailMapper;
+    private MerchantDetailDao customMerchantDetailMapper;
 
     @Transactional(rollbackFor = Exception.class)
     @Override

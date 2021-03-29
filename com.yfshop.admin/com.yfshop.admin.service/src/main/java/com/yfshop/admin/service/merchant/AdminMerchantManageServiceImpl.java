@@ -10,14 +10,13 @@ import com.yfshop.admin.api.service.merchant.req.CreateMerchantReq;
 import com.yfshop.admin.api.service.merchant.req.QueryMerchantReq;
 import com.yfshop.admin.api.service.merchant.req.UpdateMerchantReq;
 import com.yfshop.admin.api.service.merchant.result.MerchantResult;
+import com.yfshop.admin.dto.query.QueryMerchantDetail;
 import com.yfshop.code.mapper.MerchantDetailMapper;
-import com.yfshop.code.mapper.MerchantMapper;
 import com.yfshop.code.mapper.RegionMapper;
-import com.yfshop.code.mapper.custom.CustomMerchantMapper;
+import com.yfshop.admin.dao.MerchantDao;
 import com.yfshop.code.model.Merchant;
 import com.yfshop.code.model.MerchantDetail;
 import com.yfshop.code.model.Region;
-import com.yfshop.code.query.QueryMerchantDetail;
 import com.yfshop.common.enums.GroupRoleEnum;
 import com.yfshop.common.exception.ApiException;
 import com.yfshop.common.exception.Asserts;
@@ -47,11 +46,11 @@ public class AdminMerchantManageServiceImpl implements AdminMerchantManageServic
     @Resource
     private RegionMapper regionMapper;
     @Resource
-    private MerchantMapper merchantMapper;
+    private com.yfshop.code.mapper.MerchantMapper merchantMapper;
     @Resource
     private MerchantDetailMapper merchantDetailMapper;
     @Resource
-    private CustomMerchantMapper customMerchantMapper;
+    private MerchantDao customMerchantMapper;
 
     @Transactional(rollbackFor = Exception.class)
     @Override

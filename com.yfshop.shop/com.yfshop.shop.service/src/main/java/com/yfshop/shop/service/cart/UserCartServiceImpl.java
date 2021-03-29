@@ -6,7 +6,7 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.yfshop.code.mapper.ItemMapper;
 import com.yfshop.code.mapper.ItemSkuMapper;
 import com.yfshop.code.mapper.UserCartMapper;
-import com.yfshop.code.mapper.custom.CustomUserCartMapper;
+import com.yfshop.admin.dao.CustomUserCartMapper;
 import com.yfshop.code.model.Item;
 import com.yfshop.code.model.ItemSku;
 import com.yfshop.code.model.UserCart;

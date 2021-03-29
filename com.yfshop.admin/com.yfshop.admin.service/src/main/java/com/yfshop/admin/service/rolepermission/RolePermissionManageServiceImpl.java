@@ -8,11 +8,9 @@ import com.yfshop.admin.api.rolepermission.request.CreatePermissionReq;
 import com.yfshop.admin.api.rolepermission.result.RoleResult;
 import com.yfshop.code.manager.RlRolePermissionManager;
 import com.yfshop.code.mapper.MerchantMapper;
-import com.yfshop.code.mapper.PermissionMapper;
 import com.yfshop.code.mapper.RlRolePermissionMapper;
-import com.yfshop.code.mapper.RoleMapper;
-import com.yfshop.code.mapper.custom.CustomPermissionMapper;
-import com.yfshop.code.mapper.custom.CustomRoleMapper;
+import com.yfshop.admin.dao.PermissionDao;
+import com.yfshop.admin.dao.RoleDao;
 import com.yfshop.code.model.Merchant;
 import com.yfshop.code.model.Permission;
 import com.yfshop.code.model.RlRolePermission;
@@ -47,17 +45,17 @@ import java.util.stream.Collectors;
 public class RolePermissionManageServiceImpl implements RolePermissionManageService {
 
     @Resource
-    private RoleMapper roleMapper;
+    private com.yfshop.code.mapper.RoleMapper roleMapper;
     @Resource
-    private CustomRoleMapper customRoleMapper;
+    private RoleDao customRoleMapper;
     @Resource
     private RlRolePermissionMapper rolePermissionMapper;
     @Resource
     private RlRolePermissionManager rolePermissionManager;
     @Resource
-    private PermissionMapper permissionMapper;
+    private com.yfshop.code.mapper.PermissionMapper permissionMapper;
     @Resource
-    private CustomPermissionMapper customPermissionMapper;
+    private PermissionDao customPermissionMapper;
     @Resource
     private MerchantMapper merchantMapper;
 

@@ -1,4 +1,4 @@
-package com.yfshop.code.mapper.custom;
+package com.yfshop.admin.dao;
 
 import org.apache.ibatis.annotations.Param;
 
@@ -10,6 +10,6 @@ import org.apache.ibatis.annotations.Param;
  * @author yoush
  * @since 2021-03-22
  */
-public interface CustomUserAddressMapper {
+public interface UserAddressDao {
     int disableDefaultAddress(@Param("userId") Integer userId);
 }

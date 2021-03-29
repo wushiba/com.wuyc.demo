@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yfshop.admin.dao.WebsiteCodeDao">
+
+    <select id="queryWebsiteCodeList" resultType="com.yfshop.admin.api.website.result.WebsiteCodeResult">
+        select w.*,m.mobile,m.role_name
+        from yf_website_code w left join yf_merchant m on m.id = w.merchant_id
+        where 1=1
+        and (w.id=merchant_id=#{merchantId} or w.pid_path like concat(#{merchantId},'%') )
+        <if test="startTime!=null and startTime!=''">
+            and w.create_time &gt;= #{startTime}
+        </if>
+        <if test="endTime!=null and endTime!=''">
+            and w.create_time &lt; #{endTime}
+        </if>
+        <if test="batchNo!=null and batchNo!=''">
+            and w.batch_no = #{batchNo}
+        </if>
+        <if test="merchantName!=null and merchantName!=''">
+            and w.merchant_name = #{merchantName}
+        </if>
+        <if test="orderStatus!=null and orderStatus!=''">
+            and w.order_status = #{orderStatus}
+        </if>
+        <if test="expressNo!=null and expressNo!=''">
+            and w.express_no = #{expressNo}
+        </if>
+        <if test="roleName!=null and roleName!=''">
+            and m.role_name = #{roleName}
+        </if>
+        <if test="mobile!=null and mobile!=''">
+            and m.mobile = #{mobile}
+        </if>
+    </select>
+</mapper>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.yfshop.code.mapper.custom.CustomMerchantMapper">
+<mapper namespace="com.yfshop.admin.dao.MerchantDao">
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
@@ -11,7 +11,7 @@
         select * from yf_merchant
     </select>
 
-    <select id="pageQueryMerchantInfo" resultType="com.yfshop.code.result.MerchantInfo">
+    <select id="pageQueryMerchantInfo" resultType="com.yfshop.admin.dto.result.MerchantInfo">
         select a.*, b.website_type_id, b.website_type_name, b.is_refrigerator, b.longitude, b.latitude, b.geo_hash, b.head_image
         from yf_merchant a inner join yf_merchant_detail on a.id = b.merchant_id
         <include refid="query_sql"/>

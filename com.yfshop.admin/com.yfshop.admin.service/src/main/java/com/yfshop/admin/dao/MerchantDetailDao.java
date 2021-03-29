@@ -1,4 +1,4 @@
-package com.yfshop.code.mapper.custom;
+package com.yfshop.admin.dao;
 
 import java.util.List;
 import java.util.Map;
@@ -11,6 +11,6 @@ import java.util.Map;
  * @author yoush
  * @since 2021-03-22
  */
-public interface CustomMerchantDetailMapper {
+public interface MerchantDetailDao {
     List<Map<String, Object>> countGroupByWebsiteType();
 }

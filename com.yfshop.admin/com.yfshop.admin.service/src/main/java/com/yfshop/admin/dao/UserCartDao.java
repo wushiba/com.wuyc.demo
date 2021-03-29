@@ -1,4 +1,4 @@
-package com.yfshop.code.mapper.custom;
+package com.yfshop.admin.dao;
 
 import org.apache.ibatis.annotations.Param;
 
@@ -10,7 +10,7 @@ import org.apache.ibatis.annotations.Param;
  * @author yoush
  * @since 2021-03-22
  */
-public interface CustomUserCartMapper {
+public interface UserCartDao {
 
     int addCartNum(@Param("userId") Integer userId, @Param("skuId") Integer skuId, @Param("num") int num);
 

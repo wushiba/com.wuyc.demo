@@ -1,4 +1,4 @@
-package com.yfshop.code.result;
+package com.yfshop.admin.dto.result;
 
 import lombok.Data;
 

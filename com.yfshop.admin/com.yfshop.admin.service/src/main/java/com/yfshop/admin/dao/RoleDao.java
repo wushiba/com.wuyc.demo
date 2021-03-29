@@ -1,4 +1,4 @@
-package com.yfshop.code.mapper.custom;
+package com.yfshop.admin.dao;
 
 import com.yfshop.code.model.Role;
 import org.apache.ibatis.annotations.Param;
@@ -13,7 +13,7 @@ import java.util.List;
  * @author yoush
  * @since 2021-03-22
  */
-public interface CustomRoleMapper {
+public interface RoleDao {
 
     Role findByAlias(@Param("alias") String alias);
 

@@ -4,7 +4,7 @@ import cn.hutool.core.collection.CollectionUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.yfshop.code.mapper.RegionMapper;
 import com.yfshop.code.mapper.UserAddressMapper;
-import com.yfshop.code.mapper.custom.CustomUserAddressMapper;
+import com.yfshop.admin.dao.CustomUserAddressMapper;
 import com.yfshop.code.model.Region;
 import com.yfshop.code.model.UserAddress;
 import com.yfshop.common.exception.ApiException;
