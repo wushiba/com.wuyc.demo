@@ -1,6 +1,5 @@
 package com.yfshop.shop;
 
-import com.yfshop.shop.service.address.UserAddressService;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.validation.ValidationAutoConfiguration;

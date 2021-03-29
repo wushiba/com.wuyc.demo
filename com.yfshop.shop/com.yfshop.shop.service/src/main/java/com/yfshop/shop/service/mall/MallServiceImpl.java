@@ -31,7 +31,6 @@ import com.yfshop.shop.service.mall.result.ItemSpecNameResult;
 import com.yfshop.shop.service.mall.result.ItemSpecValueResult;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
@@ -44,7 +43,6 @@ import java.util.stream.Collectors;
  * Created in 2021-03-29 10:39
  */
 @DubboService
-@Validated
 public class MallServiceImpl implements MallService {
 
     @Resource
