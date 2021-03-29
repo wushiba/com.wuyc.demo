@@ -53,6 +53,9 @@ public class MerchantResult implements Serializable {
      */
     private String contacts;
 
+    private String headImgUrl;
+
+
     /**
      * 省
      */
@@ -78,6 +81,8 @@ public class MerchantResult implements Serializable {
      * 详细地址
      */
     private String address;
+
+    private String subAddress;
 
     private String websiteTypeName;
 

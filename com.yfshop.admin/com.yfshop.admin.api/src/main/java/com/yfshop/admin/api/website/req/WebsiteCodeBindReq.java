@@ -80,6 +80,8 @@ public class WebsiteCodeBindReq implements Serializable {
      */
     private String address;
 
+    private String subAddress;
+
     private String websiteTypeName;
 
     /**

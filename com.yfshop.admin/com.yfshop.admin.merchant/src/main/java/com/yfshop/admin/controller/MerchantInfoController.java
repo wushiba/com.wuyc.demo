@@ -6,11 +6,15 @@ import cn.dev33.satoken.stp.StpUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.yfshop.admin.api.service.merchant.MerchantInfoService;
 import com.yfshop.admin.api.service.merchant.result.MerchantResult;
+import com.yfshop.admin.api.user.UserService;
+import com.yfshop.admin.api.user.result.UserResult;
 import com.yfshop.admin.api.website.req.*;
 import com.yfshop.admin.api.website.result.*;
+import com.yfshop.admin.config.UserStpLogic;
+import com.yfshop.admin.config.WxStpLogic;
 import com.yfshop.common.api.CommonResult;
-import com.yfshop.common.base.BaseController;
-import io.swagger.models.auth.In;
+import com.yfshop.common.enums.GroupRoleEnum;
+import com.yfshop.common.exception.Asserts;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,12 +29,28 @@ import java.util.List;
 @Validated
 @RestController
 @RequestMapping("merchant/info")
-class MerchantInfoController implements BaseController {
+class MerchantInfoController extends AbstractBaseController {
     private static final Logger logger = LoggerFactory.getLogger(MerchantInfoController.class);
 
     @DubboReference(check = false)
     private MerchantInfoService merchantInfoService;
-    public static StpLogic stpLogic = new StpLogic("wx");
+
+    @DubboReference(check = false)
+    private UserService userService;
+
+    public static StpLogic wxLogic = new WxStpLogic("wx");
+    public static StpLogic userLogic = new UserStpLogic("user");
+
+
+    /**
+     * @return
+     */
+    @RequestMapping(value = "/checkSubscribe", method = {RequestMethod.POST})
+    public CommonResult<Integer> checkSubscribe() {
+        Integer result = userService.checkSubscribe(getCurrentOpenId());
+        return CommonResult.success(result);
+    }
+
 
     /**
      * 获取网点用户信息
@@ -44,6 +64,42 @@ class MerchantInfoController implements BaseController {
         return CommonResult.success(merchantResult);
     }
 
+
+    /**
+     * 校验网点码逻辑
+     *
+     * @return
+     */
+    @RequestMapping(value = "/checkWebsiteCode", method = {RequestMethod.POST})
+    public CommonResult<Integer> checkWebsiteCode(String websiteCode) {
+        Integer result = merchantInfoService.checkWebsiteCode(websiteCode);
+        MerchantResult merchantResult;
+        if (result == 0) {
+            if (StpUtil.isLogin()) {
+                merchantResult = merchantInfoService.getWebsiteInfo(getCurrentAdminUserId());
+            } else {
+                merchantResult = merchantInfoService.getMerchantByOpenId(getCurrentOpenId());
+            }
+            if (merchantResult != null) {
+                Asserts.assertEquals(merchantResult.getRoleAlias(), GroupRoleEnum.WD.getCode(), 500, "网点码未激活！");
+            }
+        } else if (result > 0) {
+            merchantResult = merchantInfoService.getMerchantByWebsiteCode(websiteCode);
+            if (merchantResult != null) {
+                StpUtil.setLoginId(merchantResult.getId());
+                //跳转商户管理
+                result = 1;
+            } else {
+                //跳转兑换支付界面
+                result = 2;
+                UserResult userResult = userService.getUserByOpenId(getCurrentOpenId());
+                if (userResult != null) {
+                    userLogic.setLoginId(userResult.getId());
+                }
+            }
+        }
+        return CommonResult.success(result);
+    }
 
     /**
      * 获取网点码
@@ -80,8 +136,12 @@ class MerchantInfoController implements BaseController {
         if (StpUtil.isLogin()) {
             websiteReq.setId(StpUtil.getLoginIdAsInt());
         }
-        websiteReq.setOpenId(stpLogic.getLoginIdAsString());
-        return CommonResult.success(merchantInfoService.websiteCodeBind(websiteReq));
+        websiteReq.setOpenId(getCurrentOpenId());
+        MerchantResult merchantResult = merchantInfoService.websiteCodeBind(websiteReq);
+        if (merchantResult != null) {
+            StpUtil.setLoginId(merchantResult.getId());
+        }
+        return CommonResult.success(null);
     }
 
     /**
@@ -139,21 +199,21 @@ class MerchantInfoController implements BaseController {
      */
     @RequestMapping(value = "/applyWebsiteCode", method = {RequestMethod.POST})
     public CommonResult<Integer> applyWebsiteCode(WebsiteCodeApplyReq websiteCodeApplyReq) {
-        Integer id=merchantInfoService.applyWebsiteCode(getCurrentAdminUserId(), websiteCodeApplyReq.getCount(), websiteCodeApplyReq.getEmail());
+        Integer id = merchantInfoService.applyWebsiteCode(getCurrentAdminUserId(), websiteCodeApplyReq.getCount(), websiteCodeApplyReq.getEmail());
         return CommonResult.success(id);
     }
 
 
     @RequestMapping(value = "/applyWebsiteCodeAmount", method = {RequestMethod.POST})
     public CommonResult<WebsiteCodeAmountResult> applyWebsiteCodeAmount(@RequestBody List<Integer> ids) {
-        WebsiteCodeAmountResult websiteCodeAmountResult=merchantInfoService.applyWebsiteCodeAmount(ids);
+        WebsiteCodeAmountResult websiteCodeAmountResult = merchantInfoService.applyWebsiteCodeAmount(ids);
         return CommonResult.success(websiteCodeAmountResult);
     }
 
 
     @RequestMapping(value = "/applyWebsiteCodePay", method = {RequestMethod.POST})
     public CommonResult<WebsiteCodePayResult> applyWebsiteCodePay(@RequestBody WebsiteCodePayReq websiteCodePayReq) {
-        WebsiteCodePayResult websiteCodePayResult=merchantInfoService.applyWebsiteCodePay(websiteCodePayReq);
+        WebsiteCodePayResult websiteCodePayResult = merchantInfoService.applyWebsiteCodePay(websiteCodePayReq);
         return CommonResult.success(websiteCodePayResult);
     }
 

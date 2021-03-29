@@ -33,8 +33,8 @@ public interface BaseController {
      *
      * @return
      */
-    default String getCurrentAdminOpenId() {
-        return StpUtil.getLoginIdAsString();
+    default String getCurrentOpenId() {
+        return null;
     }
 
     /**
@@ -43,7 +43,7 @@ public interface BaseController {
      * @return the user id
      */
     default Integer getCurrentUserId() {
-        return StpUtil.getLoginIdAsInt();
+        return null;
     }
 
     /**
@@ -144,8 +144,9 @@ public interface BaseController {
 
     /**
      * 根据当前请求返回ip地址
+     *
      * @param request
-     * @return  ipStr
+     * @return ipStr
      */
     default String getRequestIpStr(HttpServletRequest request) {
         String ip = request.getHeader("x-forwarded-for");

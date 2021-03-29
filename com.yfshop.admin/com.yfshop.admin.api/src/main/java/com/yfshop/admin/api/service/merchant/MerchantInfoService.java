@@ -44,7 +44,7 @@ public interface MerchantInfoService {
      * @param websiteReq
      * @return
      */
-    Void websiteCodeBind(WebsiteCodeBindReq websiteReq) throws ApiException;
+    MerchantResult websiteCodeBind(WebsiteCodeBindReq websiteReq) throws ApiException;
 
 
     /**
@@ -108,6 +108,7 @@ public interface MerchantInfoService {
 
     /**
      * 删除网点码收货地址
+     *
      * @param id
      * @return
      */
@@ -115,6 +116,7 @@ public interface MerchantInfoService {
 
     /**
      * 获取网点码价格
+     *
      * @param ids
      * @return
      */
@@ -122,6 +124,7 @@ public interface MerchantInfoService {
 
     /**
      * 获取网点码订单详情
+     *
      * @param id
      * @return
      */
@@ -129,8 +132,21 @@ public interface MerchantInfoService {
 
     /**
      * 网点码支付
+     *
      * @param websiteCodePayReq
      * @return
      */
     WebsiteCodePayResult applyWebsiteCodePay(WebsiteCodePayReq websiteCodePayReq) throws ApiException;
+
+    Integer checkWebsiteCode(String websiteCode) throws ApiException;
+
+    /**
+     * 获取网点信息
+     *
+     * @param websiteCode
+     * @return
+     */
+    MerchantResult getMerchantByWebsiteCode(String websiteCode) throws ApiException;
+
+    MerchantResult getMerchantByOpenId(String openId) throws ApiException;
 }

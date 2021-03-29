@@ -15,7 +15,7 @@ import lombok.EqualsAndHashCode;
  * </p>
  *
  * @author yoush
- * @since 2021-03-23
+ * @since 2021-03-27
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -76,6 +76,11 @@ public class Merchant extends Model<Merchant> {
     private String contacts;
 
     /**
+     * 头像
+     */
+    private String headImgUrl;
+
+    /**
      * 省
      */
     private String province;
@@ -97,9 +102,14 @@ public class Merchant extends Model<Merchant> {
     private Integer districtId;
 
     /**
-     * 详细地址
+     * 街道地址
      */
     private String address;
+
+    /**
+     * 门牌号
+     */
+    private String subAddress;
 
     /**
      * 是否可用: Y(可用), N(禁用)

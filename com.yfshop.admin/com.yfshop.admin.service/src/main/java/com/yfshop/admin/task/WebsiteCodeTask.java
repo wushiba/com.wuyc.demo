@@ -1,5 +1,6 @@
 package com.yfshop.admin.task;
 
+import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.CharsetUtil;
 import cn.hutool.core.util.ZipUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -24,11 +25,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import javax.mail.MessagingException;
+import javax.mail.internet.MimeMessage;
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDate;
@@ -64,6 +70,11 @@ public class WebsiteCodeTask {
     QiniuUploader qiniuUploader;
     @Autowired
     QiniuConfig qiniuConfig;
+    @Autowired
+    private JavaMailSender mailSender;
+
+    @Value("${spring.mail.username}")
+    private String from;
 
     private static final Logger logger = LoggerFactory.getLogger(WebsiteCodeTask.class);
 
@@ -73,6 +84,14 @@ public class WebsiteCodeTask {
         websiteCodeFile(websiteCode);
     }
 
+    @Async
+    public void doWorkWebsiteCodeFile(String orderNo) {
+        List<WebsiteCode> websiteCodeList = websiteCodeMapper.selectList(Wrappers.<WebsiteCode>lambdaQuery()
+                .eq(WebsiteCode::getOrderNo, orderNo));
+        for (WebsiteCode websiteCode:websiteCodeList) {
+            websiteCodeFile(websiteCode);
+        }
+    }
 
     @SneakyThrows
     private void websiteCodeFile(WebsiteCode websiteCode) {
@@ -100,9 +119,9 @@ public class WebsiteCodeTask {
                 Response response = qiniuUploader.getUploadManager().put(fileZip, fileZip.getName(), qiniuUploader.getAuth().uploadToken(qiniuConfig.getBucket()));
                 if (response.isOK()) {
                     websiteCode.setFileStatus("SUCCESS");
-                    websiteCode.setFileUrl(websiteCode.getBatchNo() + ".zip");
+                    websiteCode.setFileUrl(response.url() + websiteCode.getBatchNo() + ".zip");
                     if (StringUtils.isNotBlank(websiteCode.getEmail())) {
-                        logger.info("发送邮件");
+                        sendAttachmentsMail(websiteCode.getEmail(), String.format("%s雨帆健康家网点码文件", websiteCode.getBatchNo()), String.format("%s雨帆健康家网点码文件，请及时下载！", websiteCode.getBatchNo()), fileZip.getPath());
                     }
                 }
             }
@@ -160,7 +179,7 @@ public class WebsiteCodeTask {
         qrCode.setWidth(540);
         qrCode.setQrCode(true);
         qrCode.setQrCodeMargin(0);
-        qrCode.setUrl(websiteCodeUrl+websiteCode);
+        qrCode.setUrl(websiteCodeUrl + websiteCode);
         qrCode.setIndex(2);
         images.add(qrCode);
         ArrayList<Text> texts = new ArrayList<>();
@@ -183,4 +202,23 @@ public class WebsiteCodeTask {
         }
         return null;
     }
+
+    private void sendAttachmentsMail(String to, String subject, String content, String filePath, String... cc) throws MessagingException {
+        MimeMessage message = mailSender.createMimeMessage();
+
+        MimeMessageHelper helper = new MimeMessageHelper(message, true);
+        helper.setFrom(from);
+        helper.setTo(to);
+        helper.setSubject(subject);
+        helper.setText(content, true);
+        if (ArrayUtil.isNotEmpty(cc)) {
+            helper.setCc(cc);
+        }
+        FileSystemResource file = new FileSystemResource(new File(filePath));
+        String fileName = filePath.substring(filePath.lastIndexOf(File.separator));
+        helper.addAttachment(fileName, file);
+
+        mailSender.send(message);
+    }
+
 }
