@@ -11,6 +11,8 @@ import com.yfshop.code.mapper.MerchantMapper;
 import com.yfshop.code.mapper.PermissionMapper;
 import com.yfshop.code.mapper.RlRolePermissionMapper;
 import com.yfshop.code.mapper.RoleMapper;
+import com.yfshop.code.mapper.custom.CustomPermissionMapper;
+import com.yfshop.code.mapper.custom.CustomRoleMapper;
 import com.yfshop.code.model.Merchant;
 import com.yfshop.code.model.Permission;
 import com.yfshop.code.model.RlRolePermission;
@@ -47,11 +49,15 @@ public class RolePermissionManageServiceImpl implements RolePermissionManageServ
     @Resource
     private RoleMapper roleMapper;
     @Resource
+    private CustomRoleMapper customRoleMapper;
+    @Resource
     private RlRolePermissionMapper rolePermissionMapper;
     @Resource
     private RlRolePermissionManager rolePermissionManager;
     @Resource
     private PermissionMapper permissionMapper;
+    @Resource
+    private CustomPermissionMapper customPermissionMapper;
     @Resource
     private MerchantMapper merchantMapper;
 
@@ -77,9 +83,9 @@ public class RolePermissionManageServiceImpl implements RolePermissionManageServ
     @Transactional(rollbackFor = Exception.class)
     @Override
     public Void associateRolePermission(@NotNull AssociateRolePermissionReq req) throws ApiException {
-        Role role = roleMapper.findByAlias(req.getRole());
+        Role role = customRoleMapper.findByAlias(req.getRole());
         Asserts.assertNonNull(role, 500, "角色不存在");
-        List<Permission> permissions = permissionMapper.findByAliases(req.getPermissions());
+        List<Permission> permissions = customPermissionMapper.findByAliases(req.getPermissions());
         Asserts.assertTrue(permissions.size() == req.getPermissions().size(), 500, "权限不存在");
         // delete old role permission relationship
         rolePermissionMapper.delete(Wrappers.lambdaQuery(RlRolePermission.class).eq(RlRolePermission::getRoleAlias, req.getRole()));

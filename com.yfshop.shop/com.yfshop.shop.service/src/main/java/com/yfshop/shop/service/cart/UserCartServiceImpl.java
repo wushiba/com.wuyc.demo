@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.yfshop.code.mapper.ItemMapper;
 import com.yfshop.code.mapper.ItemSkuMapper;
 import com.yfshop.code.mapper.UserCartMapper;
+import com.yfshop.code.mapper.custom.CustomUserCartMapper;
 import com.yfshop.code.model.Item;
 import com.yfshop.code.model.ItemSku;
 import com.yfshop.code.model.UserCart;
@@ -45,6 +46,8 @@ public class UserCartServiceImpl implements UserCartService {
     @Resource
     private UserCartMapper cartMapper;
     @Resource
+    private CustomUserCartMapper customUserCartMapper;
+    @Resource
     private ItemSkuMapper skuMapper;
     @Resource
     private ItemMapper itemMapper;
@@ -79,7 +82,7 @@ public class UserCartServiceImpl implements UserCartService {
         Asserts.assertTrue("N".equals(item.getIsDelete())
                 && "Y".equalsIgnoreCase(item.getIsEnable()), 500, "商品已下架");
         // 修改购物车中商品的数量
-        int rows = cartMapper.addCartNum(userId, skuId, num);
+        int rows = customUserCartMapper.addCartNum(userId, skuId, num);
         if (rows <= 0) {
             // 新建购物车项
             UserCart userCart = new UserCart();
@@ -114,7 +117,7 @@ public class UserCartServiceImpl implements UserCartService {
                     .eq(UserCart::getUserId, userId).eq(UserCart::getSkuId, skuId));
         } else {
             // 增加数量
-            int rows = cartMapper.updateCartNum(userId, skuId, num);
+            int rows = customUserCartMapper.updateCartNum(userId, skuId, num);
             if (rows <= 0) {
                 // 新建购物车项
                 UserCart userCart = new UserCart();

@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollectionUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.yfshop.code.mapper.RegionMapper;
 import com.yfshop.code.mapper.UserAddressMapper;
+import com.yfshop.code.mapper.custom.CustomUserAddressMapper;
 import com.yfshop.code.model.Region;
 import com.yfshop.code.model.UserAddress;
 import com.yfshop.common.exception.ApiException;
@@ -32,6 +33,8 @@ public class UserAddressServiceImpl implements UserAddressService {
 
     @Resource
     private UserAddressMapper userAddressMapper;
+    @Resource
+    private CustomUserAddressMapper customUserAddressMapper;
     @Resource
     private RegionMapper regionMapper;
 
@@ -131,7 +134,7 @@ public class UserAddressServiceImpl implements UserAddressService {
         UserAddress existUserAddress = userAddressMapper.selectById(userAddressId);
         Asserts.assertNonNull(existUserAddress, 500, "地址信息不存在");
         Asserts.assertTrue(existUserAddress.getUserId().equals(userId), 500, "非法操作");
-        userAddressMapper.disableDefaultAddress(userId);
+        customUserAddressMapper.disableDefaultAddress(userId);
         UserAddress bean = new UserAddress();
         bean.setId(userAddressId);
         bean.setIsDefault("Y");

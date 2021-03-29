@@ -4,6 +4,7 @@ import com.yfshop.admin.api.website.AdminWebsiteTypeManageService;
 import com.yfshop.admin.api.website.result.WebsiteTypeResult;
 import com.yfshop.code.mapper.MerchantDetailMapper;
 import com.yfshop.code.mapper.WebsiteTypeMapper;
+import com.yfshop.code.mapper.custom.CustomMerchantDetailMapper;
 import com.yfshop.code.model.WebsiteType;
 import com.yfshop.common.exception.ApiException;
 import com.yfshop.common.util.BeanUtil;
@@ -30,6 +31,8 @@ public class AdminWebsiteTypeManageServiceImpl implements AdminWebsiteTypeManage
     private WebsiteTypeMapper websiteTypeMapper;
     @Resource
     private MerchantDetailMapper merchantDetailMapper;
+    @Resource
+    private CustomMerchantDetailMapper customMerchantDetailMapper;
 
     @Transactional(rollbackFor = Exception.class)
     @Override
@@ -52,7 +55,7 @@ public class AdminWebsiteTypeManageServiceImpl implements AdminWebsiteTypeManage
                 .stream().map((w) -> BeanUtil.convert(w, WebsiteTypeResult.class))
                 .collect(Collectors.toList());
         // 统计各个类型网点数量
-        Map<String, Object> indexMap = merchantDetailMapper.countGroupByWebsiteType().stream()
+        Map<String, Object> indexMap = customMerchantDetailMapper.countGroupByWebsiteType().stream()
                 .collect(Collectors.toMap(map -> map.get("typeName").toString(), map -> map.get("num")));
         for (WebsiteTypeResult websiteType : websiteTypes) {
             Integer count = Integer.valueOf(indexMap.getOrDefault(websiteType.getTypeName(), "0").toString());
