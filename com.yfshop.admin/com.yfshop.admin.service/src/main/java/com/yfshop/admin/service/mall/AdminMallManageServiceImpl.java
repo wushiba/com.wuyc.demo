@@ -237,7 +237,7 @@ public class AdminMallManageServiceImpl implements AdminMallManageService {
     }
 
     @Override
-    public Object findItemDetailAndSkuList(Integer itemId) {
+    public ItemResult findItemDetailAndSkuList(Integer itemId) {
         Item item = itemMapper.selectById(itemId);
         if (item == null) {
             return null;

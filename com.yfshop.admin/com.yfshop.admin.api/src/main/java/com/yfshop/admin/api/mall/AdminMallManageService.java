@@ -142,7 +142,7 @@ public interface AdminMallManageService {
      * @param itemId the item id
      * @return the item details
      */
-    Object findItemDetailAndSkuList(Integer itemId);
+    ItemResult findItemDetailAndSkuList(Integer itemId);
 
     /**
      * 创建商品的基本信息

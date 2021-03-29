@@ -317,7 +317,7 @@ public class AdminMallManageController implements BaseController {
     @ResponseBody
     @SaCheckLogin
     @SaCheckRole(value = "sys")
-    public CommonResult<Object> findItemSpecAndSkuList(@NotNull(message = "商品id不能为空") Integer itemId) {
+    public CommonResult<ItemResult> findItemSpecAndSkuList(@NotNull(message = "商品id不能为空") Integer itemId) {
         return CommonResult.success(adminMallManageService.findItemDetailAndSkuList(itemId));
     }
 
