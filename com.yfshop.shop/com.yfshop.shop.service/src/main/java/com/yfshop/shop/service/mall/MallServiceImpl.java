@@ -1,5 +1,6 @@
 package com.yfshop.shop.service.mall;
 
+import cn.hutool.core.collection.CollectionUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.yfshop.code.mapper.BannerMapper;
 import com.yfshop.code.mapper.ItemCategoryMapper;
@@ -64,7 +65,7 @@ public class MallServiceImpl implements MallService {
 
     @Cacheable(cacheManager = CacheConstants.CACHE_MANAGE_NAME,
             cacheNames = CacheConstants.MALL_CATEGORY_CACHE_NAME,
-            key = CacheConstants.MALL_CATEGORY_CACHE_KEY_PREFIX)
+            key = "'" + CacheConstants.MALL_CATEGORY_CACHE_KEY_PREFIX + "' + #root.methodName")
     @Override
     public List<ItemCategoryResult> queryCategories() {
         List<ItemCategory> categories = itemCategoryMapper.selectList(Wrappers.lambdaQuery(ItemCategory.class)
@@ -127,7 +128,7 @@ public class MallServiceImpl implements MallService {
         // spec name value
         List<ItemSpecName> itemSpecNames = specNameMapper.selectList(Wrappers.lambdaQuery(ItemSpecName.class)
                 .eq(ItemSpecName::getItemId, req.getItemId()).orderByAsc(ItemSpecName::getSort));
-        if (itemSpecNames != null) {
+        if (CollectionUtil.isNotEmpty(itemSpecNames)) {
             List<ItemSpecNameResult> itemSpecNameResults = BeanUtil.convertList(itemSpecNames, ItemSpecNameResult.class);
             // spec values
             List<Integer> specNameIds = itemSpecNames.stream().map(ItemSpecName::getId).collect(Collectors.toList());

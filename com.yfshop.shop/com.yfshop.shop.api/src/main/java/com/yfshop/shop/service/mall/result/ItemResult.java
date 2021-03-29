@@ -1,5 +1,6 @@
 package com.yfshop.shop.service.mall.result;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -21,6 +22,7 @@ public class ItemResult implements Serializable {
 
     private Integer id;
 
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", locale = "zh", timezone = "GMT+8")
     private LocalDateTime createTime;
 
     /**

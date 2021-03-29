@@ -43,7 +43,7 @@ public interface CacheConstants {
 
     /** 商品分类信息 */
     String MALL_CATEGORY_CACHE_NAME = "MallCategoryCacheName";
-    String MALL_CATEGORY_CACHE_KEY_PREFIX = "mall_categories";
+    String MALL_CATEGORY_CACHE_KEY_PREFIX = "mall_categories_";
 
     /** 分类下商品列表 */
     String MALL_CATEGORY_ITEMS_CACHE_NAME = "MallCategoryItemsCacheName";
