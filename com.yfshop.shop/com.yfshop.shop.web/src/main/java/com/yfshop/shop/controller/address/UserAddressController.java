@@ -35,16 +35,20 @@ public class UserAddressController implements BaseController {
     @DubboReference(check = false)
     private UserAddressService userAddressService;
 
-    @ApiOperation(value = "添加或修改用户收货地址", httpMethod = "GET")
-    @RequestMapping(value = "/addOrUpdateUserAddress", method = {RequestMethod.POST})
+    @ApiOperation(value = "添加用户收货地址", httpMethod = "GET")
+    @RequestMapping(value = "/addUserAddress", method = {RequestMethod.POST})
     @ResponseBody
     @SaCheckLogin
-    public CommonResult<Void> addOrUpdateUserAddress(@NotNull(message = "创建分类信息不能为空") UpdateUserAddressReq req) {
-        if (req.getUserAddressId() == null) {
-            return CommonResult.success(userAddressService.addUserAddress(1, (CreateUserAddressReq) req));
-        } else {
-            return CommonResult.success(userAddressService.updateUserAddress(1, req));
-        }
+    public CommonResult<Void> addUserAddress(@NotNull(message = "地址信息不能为空") CreateUserAddressReq req) {
+        return CommonResult.success(userAddressService.addUserAddress(getCurrentUserId(), req));
+    }
+
+    @ApiOperation(value = "修改用户收货地址", httpMethod = "GET")
+    @RequestMapping(value = "/updateUserAddress", method = {RequestMethod.POST})
+    @ResponseBody
+    @SaCheckLogin
+    public CommonResult<Void> updateUserAddress(@NotNull(message = "地址信息不能为空") UpdateUserAddressReq req) {
+        return CommonResult.success(userAddressService.updateUserAddress(getCurrentUserId(), req));
     }
 
     @ApiOperation(value = "查询用户收货地址列表", httpMethod = "GET")
