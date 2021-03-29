@@ -2,6 +2,8 @@ package com.yfshop.admin.service.merchant;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.RandomUtil;
+import cn.hutool.crypto.SecureUtil;
+import cn.hutool.crypto.digest.MD5;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -123,6 +125,7 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
             merchant = BeanUtil.convert(websiteReq, Merchant.class);
             merchant.setRoleAlias(GroupRoleEnum.WD.getCode());
             merchant.setRoleName(GroupRoleEnum.WD.getDescription());
+            merchant.setPassword(SecureUtil.md5(SecureUtil.md5("123456")));
             merchantMapper.insert(merchant);
             merchantId = merchant.getId();
             MerchantDetail merchantDetail = BeanUtil.convert(websiteReq, MerchantDetail.class);

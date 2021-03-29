@@ -14,7 +14,11 @@ public enum GroupRoleEnum {
 
     FGS("fgs", "分公司"),
 
+    SQ("sq", "省区"),
+
     JXS("jxs", "经销商"),
+
+    FXS("fxs", "分销商"),
 
     YWY("ywy", "业务员"),
 

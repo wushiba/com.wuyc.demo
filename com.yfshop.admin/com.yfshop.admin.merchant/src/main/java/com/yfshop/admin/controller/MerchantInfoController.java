@@ -252,4 +252,11 @@ class MerchantInfoController extends AbstractBaseController {
         merchantInfoService.deleteWebsiteCodeAddress(id);
         return CommonResult.success(null);
     }
+
+
+    @RequestMapping(value = "/getWebsiteCodeQrcode", method = {RequestMethod.GET})
+    public CommonResult<Void> getWebsiteCodeQrcode(String qrcode) {
+
+        return CommonResult.success(null);
+    }
 }
