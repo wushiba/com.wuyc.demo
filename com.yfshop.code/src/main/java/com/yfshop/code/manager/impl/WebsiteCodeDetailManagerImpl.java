@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
  * </p>
  *
  * @author yoush
- * @since 2021-03-29
+ * @since 2021-03-30
  */
 @Service
 public class WebsiteCodeDetailManagerImpl extends ServiceImpl<WebsiteCodeDetailMapper, WebsiteCodeDetail> implements WebsiteCodeDetailManager {

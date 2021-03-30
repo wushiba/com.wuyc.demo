@@ -9,7 +9,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  * </p>
  *
  * @author yoush
- * @since 2021-03-29
+ * @since 2021-03-30
  */
 public interface WebsiteCodeDetailMapper extends BaseMapper<WebsiteCodeDetail> {
 

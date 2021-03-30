@@ -105,7 +105,7 @@ public class WebsiteCodeTask {
             }
             if (!fileZip.exists()) {
                 List<WebsiteCodeDetail> websiteCodeDetails = websiteCodeDetailMapper.selectList(Wrappers.<WebsiteCodeDetail>lambdaQuery()
-                        .eq(WebsiteCodeDetail::getBatchNo, websiteCode.getBatchNo()));
+                        .eq(WebsiteCodeDetail::getId, websiteCode.getId()));
                 int sum = websiteCodeDetails.size();
                 int successCount = (int) websiteCodeDetails.stream().map(item -> buildWebsiteCodeFile(dirs, item.getAlias())).filter(Objects::nonNull).count();
                 int failCount = sum - successCount;
@@ -146,7 +146,7 @@ public class WebsiteCodeTask {
         List<WebsiteCodeDetail> list = new ArrayList<>();
         for (int i = 0; i < websiteCode.getQuantity(); i++) {
             WebsiteCodeDetail websiteCodeDetail = new WebsiteCodeDetail();
-            websiteCodeDetail.setBatchNo(websiteCode.getBatchNo());
+            websiteCodeDetail.setBatchId(websiteCode.getId());
             websiteCodeDetail.setAlias(String.format("%s%05d", code, i + count));
             websiteCodeDetail.setIsActivate("N");
             websiteCodeDetail.setPid(websiteCode.getMerchantId());

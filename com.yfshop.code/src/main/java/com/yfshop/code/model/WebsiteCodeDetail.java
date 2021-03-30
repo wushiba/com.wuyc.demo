@@ -15,7 +15,7 @@ import lombok.EqualsAndHashCode;
  * </p>
  *
  * @author yoush
- * @since 2021-03-29
+ * @since 2021-03-30
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -30,6 +30,11 @@ public class WebsiteCodeDetail extends Model<WebsiteCodeDetail> {
     private LocalDateTime createTime;
 
     private LocalDateTime updateTime;
+
+    /**
+     * 批次id
+     */
+    private Integer batchId;
 
     /**
      * 商户码 3位地区码+6位pid+6位年月日+5位序号
@@ -65,11 +70,6 @@ public class WebsiteCodeDetail extends Model<WebsiteCodeDetail> {
      * 上级路径
      */
     private String pidPath;
-
-    /**
-     * 批次号
-     */
-    private String batchNo;
 
 
     @Override

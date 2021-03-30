@@ -3,6 +3,7 @@ package com.yfshop.admin.api.website;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.yfshop.admin.api.website.req.WebsiteCodeQueryDetailsReq;
 import com.yfshop.admin.api.website.req.WebsiteCodeQueryReq;
+import com.yfshop.admin.api.website.result.WebsiteCodeDetailExport;
 import com.yfshop.admin.api.website.result.WebsiteCodeDetailResult;
 import com.yfshop.admin.api.website.result.WebsiteCodeResult;
 import com.yfshop.admin.api.website.result.WebsiteTypeResult;
@@ -32,4 +33,5 @@ public interface AdminWebsiteCodeManageService {
      */
     IPage<WebsiteCodeDetailResult> queryWebsiteCodeDetailsList(WebsiteCodeQueryDetailsReq websiteCodeQueryDetailsReq);
 
+    List<WebsiteCodeDetailExport> exportWebsiteCodeDetails(WebsiteCodeQueryDetailsReq websiteCodeQueryDetailsReq);
 }

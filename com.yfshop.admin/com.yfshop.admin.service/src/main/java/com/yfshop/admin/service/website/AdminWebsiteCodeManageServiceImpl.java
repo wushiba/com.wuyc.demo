@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.yfshop.admin.api.website.AdminWebsiteCodeManageService;
 import com.yfshop.admin.api.website.req.WebsiteCodeQueryDetailsReq;
 import com.yfshop.admin.api.website.req.WebsiteCodeQueryReq;
+import com.yfshop.admin.api.website.result.WebsiteCodeDetailExport;
 import com.yfshop.admin.api.website.result.WebsiteCodeDetailResult;
 import com.yfshop.admin.api.website.result.WebsiteCodeResult;
 import com.yfshop.admin.dao.WebsiteCodeDao;
@@ -44,7 +45,7 @@ public class AdminWebsiteCodeManageServiceImpl implements AdminWebsiteCodeManage
                         .or()
                         .like(WebsiteCodeDetail::getPidPath, req.getMerchantId()))
                 .eq(StringUtils.isNotBlank(req.getAlias()), WebsiteCodeDetail::getAlias, req.getAlias())
-                .eq(StringUtils.isNotBlank(req.getBatchNo()), WebsiteCodeDetail::getBatchNo, req.getBatchNo())
+                .eq(req.getBatchId() != null, WebsiteCodeDetail::getBatchId, req.getBatchId())
                 .eq(StringUtils.isNotBlank(req.getIsActivate()), WebsiteCodeDetail::getIsActivate, req.getIsActivate())
                 .eq(StringUtils.isNotBlank(req.getMobile()), WebsiteCodeDetail::getMobile, req.getMobile())
                 .eq(StringUtils.isNotBlank(req.getMerchantName()), WebsiteCodeDetail::getMerchantName, req.getMerchantName());
@@ -53,5 +54,21 @@ public class AdminWebsiteCodeManageServiceImpl implements AdminWebsiteCodeManage
                 wrappers);
         websiteCodeDetailIPage.setTotal(websiteCodeDetailMapper.selectCount(wrappers));
         return BeanUtil.iPageConvert(websiteCodeDetailIPage, WebsiteCodeDetailResult.class);
+    }
+
+    @Override
+    public List<WebsiteCodeDetailExport> exportWebsiteCodeDetails(WebsiteCodeQueryDetailsReq req) {
+        LambdaQueryWrapper<WebsiteCodeDetail> wrappers = Wrappers.<WebsiteCodeDetail>lambdaQuery()
+                .and(wrapper -> wrapper
+                        .eq(WebsiteCodeDetail::getPid, req.getMerchantId())
+                        .or()
+                        .like(WebsiteCodeDetail::getPidPath, req.getMerchantId()))
+                .eq(StringUtils.isNotBlank(req.getAlias()), WebsiteCodeDetail::getAlias, req.getAlias())
+                .eq(req.getBatchId() != null, WebsiteCodeDetail::getBatchId, req.getBatchId())
+                .eq(StringUtils.isNotBlank(req.getIsActivate()), WebsiteCodeDetail::getIsActivate, req.getIsActivate())
+                .eq(StringUtils.isNotBlank(req.getMobile()), WebsiteCodeDetail::getMobile, req.getMobile())
+                .eq(StringUtils.isNotBlank(req.getMerchantName()), WebsiteCodeDetail::getMerchantName, req.getMerchantName());
+        List<WebsiteCodeDetail> websiteCodeDetails = websiteCodeDetailMapper.selectList(wrappers);
+        return BeanUtil.convertList(websiteCodeDetails, WebsiteCodeDetailExport.class);
     }
 }
