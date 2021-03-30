@@ -1,9 +1,9 @@
 package com.yfshop.common.accesslimit;
 
 import cn.hutool.core.io.IoUtil;
+import com.yfshop.common.exception.Asserts;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.redis.connection.RedisConnection;
@@ -17,7 +17,7 @@ import java.io.IOException;
  * @author Xulg
  * Created in 2020-12-05 20:09
  */
-public class RedisIpVisitLimitCheckStrategy implements InitializingBean, DisposableBean {
+public class RedisIpVisitLimitCheckStrategy implements InitializingBean {
     private static final Logger logger = LoggerFactory.getLogger(RedisIpVisitLimitCheckStrategy.class);
 
     private String ipLimitScript;
@@ -35,10 +35,9 @@ public class RedisIpVisitLimitCheckStrategy implements InitializingBean, Disposa
      */
     public boolean isIpAccessLegal(String visitorIp, int durationSeconds, int limitTimes) {
         try (RedisConnection connection = redisConnectionFactory.getConnection()) {
-            Object result = connection.eval(ipLimitScript.getBytes(), ReturnType.INTEGER, 1, visitorIp.getBytes(),
+            Long result = connection.eval(ipLimitScript.getBytes(), ReturnType.INTEGER, 1, visitorIp.getBytes(),
                     String.valueOf(limitTimes).getBytes(), String.valueOf(durationSeconds).getBytes());
-            System.out.println(result);
-            return result != null && (Long) result > 0;
+            return result != null && result > 0;
         }
     }
 
@@ -51,9 +50,7 @@ public class RedisIpVisitLimitCheckStrategy implements InitializingBean, Disposa
         } catch (IOException e) {
             throw new Error("local IpAccessLimit.lua error", e);
         }
+        Asserts.assertNonNull(redisConnectionFactory, 500, "redisConnectionFactory must not be null");
     }
 
-    @Override
-    public void destroy() {
-    }
 }

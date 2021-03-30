@@ -68,7 +68,7 @@ public class UpdateMerchantReq implements Serializable {
 
     @ApiModelProperty(value = "是否有光明冰箱", allowableValues = "Y|N", required = false)
     //@NotBlank(message = "是否有光明冰箱不能为空")
-    //@CandidateValue(candidateValue = {"Y", "N"}, message = "是否有光明冰箱只能是Y|N")
+    @CandidateValue(candidateValue = {"Y", "N"}, message = "是否有光明冰箱只能是Y|N")
     private String isRefrigerator;
 
     @ApiModelProperty(value = "门头照", required = false)
