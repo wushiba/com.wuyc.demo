@@ -6,7 +6,6 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.yfshop.code.mapper.ItemMapper;
 import com.yfshop.code.mapper.ItemSkuMapper;
 import com.yfshop.code.mapper.UserCartMapper;
-import com.yfshop.admin.dao.CustomUserCartMapper;
 import com.yfshop.code.model.Item;
 import com.yfshop.code.model.ItemSku;
 import com.yfshop.code.model.UserCart;
@@ -14,6 +13,7 @@ import com.yfshop.common.constants.CacheConstants;
 import com.yfshop.common.exception.ApiException;
 import com.yfshop.common.exception.Asserts;
 import com.yfshop.common.util.BeanUtil;
+import com.yfshop.shop.dao.UserCartDao;
 import com.yfshop.shop.service.cart.result.UserCartResult;
 import com.yfshop.shop.service.cart.result.UserCartSummary;
 import com.yfshop.shop.service.coupon.result.YfUserCouponResult;
@@ -46,7 +46,7 @@ public class UserCartServiceImpl implements UserCartService {
     @Resource
     private UserCartMapper cartMapper;
     @Resource
-    private CustomUserCartMapper customUserCartMapper;
+    private UserCartDao customUserCartMapper;
     @Resource
     private ItemSkuMapper skuMapper;
     @Resource

@@ -202,6 +202,7 @@ public class AdminServiceApplicationTests {
             SaveItemSkuReq req = new SaveItemSkuReq();
             req.setSpecInfo(generateItemSkuReq);
             req.setCandidateSkus(itemCandidateSkuList);
+
             adminMallManageService.saveItemSku(req);
         } catch (Exception e) {
             e.printStackTrace();

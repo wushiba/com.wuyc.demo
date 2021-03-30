@@ -2,11 +2,14 @@ package com.yfshop.admin.controller.sourcefactory;
 
 import cn.dev33.satoken.annotation.SaCheckLogin;
 import cn.dev33.satoken.annotation.SaCheckRole;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.yfshop.admin.api.sourcefactory.AdminSourceFactoryManageService;
 import com.yfshop.admin.api.sourcefactory.excel.SourceFactoryExcel;
 import com.yfshop.admin.api.sourcefactory.req.CreateSourceFactoryReq;
 import com.yfshop.admin.api.sourcefactory.req.ImportSourceFactoryReq;
+import com.yfshop.admin.api.sourcefactory.req.QuerySourceFactoriesReq;
 import com.yfshop.admin.api.sourcefactory.req.UpdateSourceFactoryReq;
+import com.yfshop.admin.api.sourcefactory.result.SourceFactoryResult;
 import com.yfshop.common.api.CommonResult;
 import com.yfshop.common.base.BaseController;
 import com.yfshop.common.exception.Asserts;
@@ -24,6 +27,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
@@ -45,7 +49,7 @@ public class AdminSourceFactoryManageController implements BaseController {
     @ResponseBody
     @SaCheckLogin
     @SaCheckRole(value = "sys")
-    public CommonResult<Void> createSourceFactory(@NotNull(message = "创建工厂信息不能为空") CreateSourceFactoryReq req) {
+    public CommonResult<Void> createSourceFactory(@Valid @NotNull(message = "创建工厂信息不能为空") CreateSourceFactoryReq req) {
         return CommonResult.success(adminSourceFactoryManageService.createSourceFactory(req));
     }
 
@@ -54,7 +58,7 @@ public class AdminSourceFactoryManageController implements BaseController {
     @ResponseBody
     @SaCheckLogin
     @SaCheckRole(value = "sys")
-    public CommonResult<Void> updateSourceFactory(@NotNull(message = "编辑工厂信息不能为空") UpdateSourceFactoryReq req) {
+    public CommonResult<Void> updateSourceFactory(@Valid @NotNull(message = "编辑工厂信息不能为空") UpdateSourceFactoryReq req) {
         return CommonResult.success(adminSourceFactoryManageService.updateSourceFactory(req));
     }
 
@@ -70,6 +74,20 @@ public class AdminSourceFactoryManageController implements BaseController {
         Asserts.assertCollectionNotEmpty(excels, 500, "未能解析出Excel内容");
         ImportSourceFactoryReq req = ImportSourceFactoryReq.builder().excels(excels).build();
         return CommonResult.success(adminSourceFactoryManageService.importSourceFactory(req));
+    }
+
+    @ApiOperation(value = "分页查询工厂", httpMethod = "GET")
+    @ApiImplicitParams(value = {
+            @ApiImplicitParam(paramType = "query", name = "pageIndex", value = "页码", required = false),
+            @ApiImplicitParam(paramType = "query", name = "pageSize", value = "每页显示个数", required = false),
+            @ApiImplicitParam(paramType = "query", name = "factoryName", value = "工厂名称", required = false),
+    })
+    @RequestMapping(value = "/pageQuerySourceFactories", method = {RequestMethod.GET, RequestMethod.POST})
+    @ResponseBody
+    @SaCheckLogin
+    @SaCheckRole(value = "sys")
+    public CommonResult<IPage<SourceFactoryResult>> pageQuerySourceFactories(QuerySourceFactoriesReq req) {
+        return CommonResult.success(adminSourceFactoryManageService.pageQuerySourceFactories(req));
     }
 
 }

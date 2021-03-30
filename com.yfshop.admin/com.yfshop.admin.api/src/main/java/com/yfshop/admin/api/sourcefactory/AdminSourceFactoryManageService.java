@@ -8,6 +8,7 @@ import com.yfshop.admin.api.sourcefactory.req.UpdateSourceFactoryReq;
 import com.yfshop.admin.api.sourcefactory.result.SourceFactoryResult;
 import com.yfshop.common.exception.ApiException;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
 /**
@@ -23,7 +24,7 @@ public interface AdminSourceFactoryManageService {
      * @return void
      * @throws ApiException e
      */
-    Void createSourceFactory(@NotNull CreateSourceFactoryReq req) throws ApiException;
+    Void createSourceFactory(@Valid @NotNull CreateSourceFactoryReq req) throws ApiException;
 
     /**
      * 编辑源码工厂
@@ -32,7 +33,7 @@ public interface AdminSourceFactoryManageService {
      * @return void
      * @throws ApiException e
      */
-    Void updateSourceFactory(@NotNull UpdateSourceFactoryReq req) throws ApiException;
+    Void updateSourceFactory(@Valid @NotNull UpdateSourceFactoryReq req) throws ApiException;
 
     /**
      * 导入工厂数据
@@ -41,7 +42,7 @@ public interface AdminSourceFactoryManageService {
      * @return void
      * @throws ApiException e
      */
-    Void importSourceFactory(@NotNull ImportSourceFactoryReq req) throws ApiException;
+    Void importSourceFactory(@Valid @NotNull ImportSourceFactoryReq req) throws ApiException;
 
     /**
      * 分页查询工厂列表

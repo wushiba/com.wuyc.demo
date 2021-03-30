@@ -38,6 +38,7 @@ import java.util.stream.Collectors;
  * Created in 2021-03-24 10:35
  */
 @Controller
+@RequestMapping("user/cart")
 @Validated
 public class UserCartController implements BaseController {
 

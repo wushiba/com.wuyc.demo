@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
 /**
@@ -39,7 +40,7 @@ public class AdminMerchantManageController implements BaseController {
     @ResponseBody
     @SaCheckLogin
     @SaCheckRole(value = "sys")
-    public CommonResult<Void> createMerchant(@NotNull(message = "创建商户信息不能为空") CreateMerchantReq req) {
+    public CommonResult<Void> createMerchant(@Valid @NotNull(message = "创建商户信息不能为空") CreateMerchantReq req) {
         return CommonResult.success(adminMerchantManageService.createMerchant(req));
     }
 
@@ -48,7 +49,7 @@ public class AdminMerchantManageController implements BaseController {
     @ResponseBody
     @SaCheckLogin
     @SaCheckRole(value = "sys")
-    public CommonResult<Void> updateMerchant(@NotNull(message = "编辑商户信息不能为空") UpdateMerchantReq req) {
+    public CommonResult<Void> updateMerchant(@Valid @NotNull(message = "编辑商户信息不能为空") UpdateMerchantReq req) {
         return CommonResult.success(adminMerchantManageService.updateMerchant(req));
     }
 

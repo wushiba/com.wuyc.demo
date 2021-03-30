@@ -36,6 +36,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.List;
@@ -63,7 +64,7 @@ public class AdminMallManageController implements BaseController {
     @ResponseBody
     @SaCheckLogin
     @SaCheckRole(value = "sys")
-    public CommonResult<Void> createCategory(@NotNull(message = "创建分类信息不能为空") CreateItemCategoryReq req) {
+    public CommonResult<Void> createCategory(@Valid @NotNull(message = "创建分类信息不能为空") CreateItemCategoryReq req) {
         return CommonResult.success(adminMallManageService.createCategory(req));
     }
 
@@ -102,7 +103,7 @@ public class AdminMallManageController implements BaseController {
     @ResponseBody
     @SaCheckLogin
     @SaCheckRole(value = "sys")
-    public CommonResult<Void> editCategory(@NotNull(message = "编辑的分类信息不能为空") UpdateItemCategoryReq req) {
+    public CommonResult<Void> editCategory(@Valid @NotNull(message = "编辑的分类信息不能为空") UpdateItemCategoryReq req) {
         return CommonResult.success(adminMallManageService.editCategory(req));
     }
 
@@ -188,7 +189,7 @@ public class AdminMallManageController implements BaseController {
         return CommonResult.success(adminMallManageService.editBanner(req));
     }
 
-    @ApiOperation(value = "创建首页banner", httpMethod = "GET")
+    @ApiOperation(value = "创建轮播banner", httpMethod = "GET")
     @ApiImplicitParams(value = {
             @ApiImplicitParam(paramType = "query", name = "bannerName", value = "banner名称", required = true),
             @ApiImplicitParam(paramType = "query", name = "imageUrl", value = "banner图片地址", required = true),
@@ -275,7 +276,7 @@ public class AdminMallManageController implements BaseController {
     @ResponseBody
     @SaCheckLogin
     @SaCheckRole(value = "sys")
-    public CommonResult<Void> createItem(@NotNull @RequestBody ItemCreateReq req) {
+    public CommonResult<Void> createItem(@Valid @NotNull @RequestBody ItemCreateReq req) {
         return CommonResult.success(adminMallManageService.createItem(req));
     }
 
@@ -284,7 +285,7 @@ public class AdminMallManageController implements BaseController {
     @ResponseBody
     @SaCheckLogin
     @SaCheckRole(value = "sys")
-    public CommonResult<Void> editItem(@NotNull @RequestBody ItemUpdateReq req) {
+    public CommonResult<Void> editItem(@Valid @NotNull @RequestBody ItemUpdateReq req) {
         return CommonResult.success(adminMallManageService.editItem(req));
     }
 
@@ -326,7 +327,7 @@ public class AdminMallManageController implements BaseController {
     @ResponseBody
     @SaCheckLogin
     @SaCheckRole(value = "sys")
-    public CommonResult<List<ItemSkuResult>> previewItemSku(@NotNull @RequestBody GenerateItemSkuReq req) {
+    public CommonResult<List<ItemSkuResult>> previewItemSku(@Valid @NotNull @RequestBody GenerateItemSkuReq req) {
         return CommonResult.success(adminMallManageService.previewItemSku(req));
     }
 
@@ -335,7 +336,7 @@ public class AdminMallManageController implements BaseController {
     @ResponseBody
     @SaCheckLogin
     @SaCheckRole(value = "sys")
-    public CommonResult<Void> saveItemSku(@NotNull @RequestBody SaveItemSkuReq req) {
+    public CommonResult<Void> saveItemSku(@Valid @NotNull @RequestBody SaveItemSkuReq req) {
         return CommonResult.success(adminMallManageService.saveItemSku(req));
     }
 

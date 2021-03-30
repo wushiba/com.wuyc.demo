@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.Arrays;
@@ -29,6 +30,7 @@ import java.util.stream.Collectors;
  * Created in 2021-03-23 20:02
  */
 @Controller
+@RequestMapping("user/address")
 @Validated
 public class UserAddressController implements BaseController {
 
@@ -39,7 +41,7 @@ public class UserAddressController implements BaseController {
     @RequestMapping(value = "/addUserAddress", method = {RequestMethod.POST})
     @ResponseBody
     @SaCheckLogin
-    public CommonResult<Void> addUserAddress(@NotNull(message = "地址信息不能为空") CreateUserAddressReq req) {
+    public CommonResult<Void> addUserAddress(@Valid @NotNull(message = "地址信息不能为空") CreateUserAddressReq req) {
         return CommonResult.success(userAddressService.addUserAddress(getCurrentUserId(), req));
     }
 
@@ -47,7 +49,7 @@ public class UserAddressController implements BaseController {
     @RequestMapping(value = "/updateUserAddress", method = {RequestMethod.POST})
     @ResponseBody
     @SaCheckLogin
-    public CommonResult<Void> updateUserAddress(@NotNull(message = "地址信息不能为空") UpdateUserAddressReq req) {
+    public CommonResult<Void> updateUserAddress(@Valid @NotNull(message = "地址信息不能为空") UpdateUserAddressReq req) {
         return CommonResult.success(userAddressService.updateUserAddress(getCurrentUserId(), req));
     }
 
