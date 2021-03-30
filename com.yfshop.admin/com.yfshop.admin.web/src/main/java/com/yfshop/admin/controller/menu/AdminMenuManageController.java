@@ -32,6 +32,6 @@ public class AdminMenuManageController implements BaseController {
     @ResponseBody
     @SaCheckLogin
     public CommonResult<List<MenuResult>> queryMerchantMenus() {
-        return CommonResult.success(adminMenuManageService.queryMerchantMenus(getCurrentAdminUserId().intValue()));
+        return CommonResult.success(adminMenuManageService.queryMerchantMenus(getCurrentAdminUserId()));
     }
 }
