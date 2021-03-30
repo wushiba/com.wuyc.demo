@@ -90,7 +90,7 @@ public class AdminMallManageServiceImpl implements AdminMallManageService {
         banner.setId(req.getBannerId());
         banner.setUpdateTime(LocalDateTime.now());
         banner.setBannerName(req.getBannerName());
-        banner.setPositions(req.getPositions());
+        //banner.setPositions(req.getPositions());
         banner.setImageUrl(req.getImageUrl());
         banner.setJumpUrl(req.getJumpUrl());
         banner.setSort(req.getSort());
@@ -339,6 +339,7 @@ public class AdminMallManageServiceImpl implements AdminMallManageService {
 
         // 创建商品
         Item item = new Item();
+        item.setId(req.getItemId());
         item.setCreateTime(LocalDateTime.now());
         item.setUpdateTime(LocalDateTime.now());
         item.setCategoryId(req.getCategoryId());

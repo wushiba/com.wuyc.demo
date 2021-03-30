@@ -188,7 +188,7 @@ public class AdminMallManageController implements BaseController {
         return CommonResult.success(adminMallManageService.editBanner(req));
     }
 
-    @ApiOperation(value = "创建首页banner", httpMethod = "GET")
+    @ApiOperation(value = "创建轮播banner", httpMethod = "GET")
     @ApiImplicitParams(value = {
             @ApiImplicitParam(paramType = "query", name = "bannerName", value = "banner名称", required = true),
             @ApiImplicitParam(paramType = "query", name = "imageUrl", value = "banner图片地址", required = true),
