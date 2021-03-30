@@ -5,6 +5,7 @@ import com.yfshop.shop.service.address.request.CreateUserAddressReq;
 import com.yfshop.shop.service.address.request.UpdateUserAddressReq;
 import com.yfshop.shop.service.address.result.UserAddressResult;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
@@ -32,7 +33,7 @@ public interface UserAddressService {
      * @return void
      * @throws ApiException e
      */
-    Void addUserAddress(@NotNull(message = "用户ID不能为空") Integer userId, @NotNull CreateUserAddressReq req) throws ApiException;
+    Void addUserAddress(@NotNull(message = "用户ID不能为空") Integer userId, @Valid @NotNull CreateUserAddressReq req) throws ApiException;
 
     /**
      * 编辑用户收货地址
@@ -42,7 +43,7 @@ public interface UserAddressService {
      * @return void
      * @throws ApiException e
      */
-    Void updateUserAddress(@NotNull(message = "用户ID不能为空") Integer userId, @NotNull UpdateUserAddressReq req) throws ApiException;
+    Void updateUserAddress(@NotNull(message = "用户ID不能为空") Integer userId, @Valid @NotNull UpdateUserAddressReq req) throws ApiException;
 
     /**
      * 删除用户的地址

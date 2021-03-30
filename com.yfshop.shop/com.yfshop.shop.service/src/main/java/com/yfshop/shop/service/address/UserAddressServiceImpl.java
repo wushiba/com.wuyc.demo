@@ -4,9 +4,11 @@ import cn.hutool.core.collection.CollectionUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.yfshop.code.mapper.RegionMapper;
 import com.yfshop.code.mapper.UserAddressMapper;
-
+import com.yfshop.code.mapper.UserMapper;
 import com.yfshop.code.model.Region;
+import com.yfshop.code.model.User;
 import com.yfshop.code.model.UserAddress;
+import com.yfshop.common.constants.CacheConstants;
 import com.yfshop.common.exception.ApiException;
 import com.yfshop.common.exception.Asserts;
 import com.yfshop.common.util.BeanUtil;
@@ -15,10 +17,13 @@ import com.yfshop.shop.service.address.request.CreateUserAddressReq;
 import com.yfshop.shop.service.address.request.UpdateUserAddressReq;
 import com.yfshop.shop.service.address.result.UserAddressResult;
 import org.apache.dubbo.config.annotation.DubboService;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -33,12 +38,17 @@ import java.util.List;
 public class UserAddressServiceImpl implements UserAddressService {
 
     @Resource
+    private UserMapper userMapper;
+    @Resource
     private UserAddressMapper userAddressMapper;
     @Resource
     private UserAddressDao customUserAddressMapper;
     @Resource
     private RegionMapper regionMapper;
 
+    @Cacheable(cacheManager = CacheConstants.CACHE_MANAGE_NAME,
+            cacheNames = CacheConstants.MALL_USER_ADDRESS_CACHE_NAME,
+            key = "'" + CacheConstants.MALL_USER_ADDRESS_CACHE_KEY_PREFIX + "' + #root.args[0]")
     @Override
     public List<UserAddressResult> queryUserAddresses(Integer userId) {
         if (userId == null) {
@@ -52,9 +62,13 @@ public class UserAddressServiceImpl implements UserAddressService {
         return BeanUtil.convertList(userAddresses, UserAddressResult.class);
     }
 
+    @CacheEvict(cacheManager = CacheConstants.CACHE_MANAGE_NAME,
+            cacheNames = CacheConstants.MALL_USER_ADDRESS_CACHE_NAME,
+            key = "'" + CacheConstants.MALL_USER_ADDRESS_CACHE_KEY_PREFIX + "' + #root.args[0]")
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public Void addUserAddress(@NotNull(message = "用户ID不能为空") Integer userId, @NotNull CreateUserAddressReq req) throws ApiException {
+    public Void addUserAddress(@NotNull(message = "用户ID不能为空") Integer userId, @Valid @NotNull CreateUserAddressReq req) throws ApiException {
+        assertUserExist(userId);
         Region province = regionMapper.selectById(req.getProvinceId());
         Asserts.assertNonNull(province, 500, "省份信息不存在");
         Region city = regionMapper.selectById(req.getCityId());
@@ -80,9 +94,13 @@ public class UserAddressServiceImpl implements UserAddressService {
         return null;
     }
 
+    @CacheEvict(cacheManager = CacheConstants.CACHE_MANAGE_NAME,
+            cacheNames = CacheConstants.MALL_USER_ADDRESS_CACHE_NAME,
+            key = "'" + CacheConstants.MALL_USER_ADDRESS_CACHE_KEY_PREFIX + "' + #root.args[0]")
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public Void updateUserAddress(@NotNull(message = "用户ID不能为空") Integer userId, @NotNull UpdateUserAddressReq req) throws ApiException {
+    public Void updateUserAddress(@NotNull(message = "用户ID不能为空") Integer userId, @Valid @NotNull UpdateUserAddressReq req) throws ApiException {
+        assertUserExist(userId);
         UserAddress existUserAddress = userAddressMapper.selectById(req.getUserAddressId());
         Asserts.assertNonNull(existUserAddress, 500, "地址信息不存在");
         Asserts.assertTrue(existUserAddress.getUserId().equals(userId), 500, "非法操作");
@@ -111,9 +129,13 @@ public class UserAddressServiceImpl implements UserAddressService {
         return null;
     }
 
+    @CacheEvict(cacheManager = CacheConstants.CACHE_MANAGE_NAME,
+            cacheNames = CacheConstants.MALL_USER_ADDRESS_CACHE_NAME,
+            key = "'" + CacheConstants.MALL_USER_ADDRESS_CACHE_KEY_PREFIX + "' + #root.args[0]")
     @Transactional(rollbackFor = Exception.class)
     @Override
     public Void deleteUserAddress(@NotNull(message = "用户ID不能为空") Integer userId, List<Integer> userAddressIds) throws ApiException {
+        assertUserExist(userId);
         if (CollectionUtil.isEmpty(userAddressIds)) {
             return null;
         }
@@ -128,10 +150,14 @@ public class UserAddressServiceImpl implements UserAddressService {
         return null;
     }
 
+    @CacheEvict(cacheManager = CacheConstants.CACHE_MANAGE_NAME,
+            cacheNames = CacheConstants.MALL_USER_ADDRESS_CACHE_NAME,
+            key = "'" + CacheConstants.MALL_USER_ADDRESS_CACHE_KEY_PREFIX + "' + #root.args[0]")
     @Transactional(rollbackFor = Exception.class)
     @Override
     public Void configDefaultUserAddress(@NotNull(message = "用户ID不能为空") Integer userId,
                                          @NotNull(message = "地址ID不能为空") Integer userAddressId) throws ApiException {
+        assertUserExist(userId);
         UserAddress existUserAddress = userAddressMapper.selectById(userAddressId);
         Asserts.assertNonNull(existUserAddress, 500, "地址信息不存在");
         Asserts.assertTrue(existUserAddress.getUserId().equals(userId), 500, "非法操作");
@@ -143,4 +169,10 @@ public class UserAddressServiceImpl implements UserAddressService {
         return null;
     }
 
+    @SuppressWarnings("UnusedReturnValue")
+    private User assertUserExist(Integer userId) {
+        User user = userMapper.selectById(userId);
+        Asserts.assertNonNull(user, 500, "用户不存在");
+        return user;
+    }
 }

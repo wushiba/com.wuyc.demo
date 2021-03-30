@@ -3,6 +3,7 @@ package com.yfshop.common.base;
 import cn.dev33.satoken.session.SaSession;
 import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.extra.servlet.ServletUtil;
+import cn.hutool.extra.spring.SpringUtil;
 import com.yfshop.common.api.ResultCode;
 import com.yfshop.common.exception.ApiException;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -43,6 +44,9 @@ public interface BaseController {
      * @return the user id
      */
     default Integer getCurrentUserId() {
+        if ("dev".equalsIgnoreCase(SpringUtil.getActiveProfile())) {
+            return 1;
+        }
         return null;
     }
 
