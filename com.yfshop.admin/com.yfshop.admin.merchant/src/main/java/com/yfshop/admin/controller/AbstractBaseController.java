@@ -1,6 +1,5 @@
 package com.yfshop.admin.controller;
 
-import com.yfshop.admin.config.SaTokenDaoRedis;
 import com.yfshop.common.base.BaseController;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
