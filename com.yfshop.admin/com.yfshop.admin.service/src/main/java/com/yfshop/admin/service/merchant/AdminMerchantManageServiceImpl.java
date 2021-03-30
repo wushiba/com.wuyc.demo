@@ -5,11 +5,11 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.yfshop.admin.api.service.merchant.AdminMerchantManageService;
-import com.yfshop.admin.api.service.merchant.req.CreateMerchantReq;
-import com.yfshop.admin.api.service.merchant.req.QueryMerchantReq;
-import com.yfshop.admin.api.service.merchant.req.UpdateMerchantReq;
-import com.yfshop.admin.api.service.merchant.result.MerchantResult;
+import com.yfshop.admin.api.merchant.AdminMerchantManageService;
+import com.yfshop.admin.api.merchant.request.CreateMerchantReq;
+import com.yfshop.admin.api.merchant.request.QueryMerchantReq;
+import com.yfshop.admin.api.merchant.request.UpdateMerchantReq;
+import com.yfshop.admin.api.merchant.result.MerchantResult;
 import com.yfshop.admin.dao.MerchantDao;
 import com.yfshop.admin.dto.query.QueryMerchantDetail;
 import com.yfshop.code.mapper.MerchantDetailMapper;
@@ -166,7 +166,6 @@ public class AdminMerchantManageServiceImpl implements AdminMerchantManageServic
 
     @Override
     public IPage<MerchantResult> pageQueryMerchants(QueryMerchantReq req) {
-        QueryMerchantDetail query = BeanUtil.convert(req, QueryMerchantDetail.class);
         QueryMerchantDetail query = new QueryMerchantDetail();
         query.setStartCreateTime(req.getStartCreateTime());
         query.setEndCreateTime(req.getEndCreateTime());
@@ -205,7 +204,6 @@ public class AdminMerchantManageServiceImpl implements AdminMerchantManageServic
     }
 
     private String generatePidPath(Integer pid) {
-        if (pid == null) {
         if (pid == null || pid == 0) {
             return null;
         }

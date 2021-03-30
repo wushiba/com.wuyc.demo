@@ -7,6 +7,7 @@ import cn.dev33.satoken.exception.SaTokenException;
 import com.alibaba.fastjson.JSON;
 import com.yfshop.common.api.CommonResult;
 import com.yfshop.common.api.ErrorCode;
+import com.yfshop.common.api.IErrorCode;
 import com.yfshop.common.api.ResultCode;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -43,6 +44,7 @@ import java.lang.reflect.Method;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -145,7 +147,9 @@ public class CustomGlobalExceptionResolver implements HandlerExceptionResolver, 
     private CodeAndMessage fetchErrorInfoByProfile(Throwable t) {
         // 开发环境和预发环境直接返回错误信息
         if ("dev".equalsIgnoreCase(profile) || "uat".equalsIgnoreCase(profile)) {
-            int code = t instanceof ApiException ? ((ApiException) t).getErrorCode().getCode() : 500;
+            int code = t instanceof ApiException ?
+                    Optional.ofNullable(((ApiException) t).getErrorCode()).map(IErrorCode::getCode).orElse(500)
+                    : 500;
             return new CodeAndMessage(code, t.getMessage());
         } else {
             return this.fetchErrorCodeAndMessageByException(t);
