@@ -4,12 +4,13 @@ import cn.hutool.core.collection.CollectionUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.yfshop.code.mapper.RegionMapper;
 import com.yfshop.code.mapper.UserAddressMapper;
-import com.yfshop.admin.dao.CustomUserAddressMapper;
+
 import com.yfshop.code.model.Region;
 import com.yfshop.code.model.UserAddress;
 import com.yfshop.common.exception.ApiException;
 import com.yfshop.common.exception.Asserts;
 import com.yfshop.common.util.BeanUtil;
+import com.yfshop.shop.dao.UserAddressDao;
 import com.yfshop.shop.service.address.request.CreateUserAddressReq;
 import com.yfshop.shop.service.address.request.UpdateUserAddressReq;
 import com.yfshop.shop.service.address.result.UserAddressResult;
@@ -34,7 +35,7 @@ public class UserAddressServiceImpl implements UserAddressService {
     @Resource
     private UserAddressMapper userAddressMapper;
     @Resource
-    private CustomUserAddressMapper customUserAddressMapper;
+    private UserAddressDao customUserAddressMapper;
     @Resource
     private RegionMapper regionMapper;
 

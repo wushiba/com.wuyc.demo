@@ -17,7 +17,7 @@ import java.util.concurrent.TimeUnit;
 @EnableCaching
 public class CacheConfig {
 
-    private static final long AVAILABLE_TIME = 10;
+    private static final long AVAILABLE_TIME = 2;
     private static final long MAXIMUM_SIZE = 1000;
 
     @Bean
