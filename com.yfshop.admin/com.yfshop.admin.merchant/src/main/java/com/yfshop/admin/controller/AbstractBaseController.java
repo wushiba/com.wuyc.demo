@@ -1,5 +1,6 @@
 package com.yfshop.admin.controller;
 
+import cn.dev33.satoken.dao.SaTokenDaoRedisJackson;
 import com.yfshop.common.base.BaseController;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,7 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 public abstract class AbstractBaseController implements BaseController {
 
     @Autowired
-    SaTokenDaoRedis saTokenDaoRedis;
+    SaTokenDaoRedisJackson saTokenDaoRedis;
 
     @Override
     public String getCurrentOpenId() {
