@@ -5,12 +5,10 @@ import cn.afterturn.easypoi.excel.entity.ExportParams;
 import cn.hutool.core.io.IoUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.yfshop.admin.api.website.AdminWebsiteCodeManageService;
-import com.yfshop.admin.api.website.req.WebsiteCodeQueryDetailsReq;
-import com.yfshop.admin.api.website.req.WebsiteCodeQueryExpressReq;
-import com.yfshop.admin.api.website.req.WebsiteCodeQueryReq;
+import com.yfshop.admin.api.website.request.WebsiteCodeQueryDetailsReq;
+import com.yfshop.admin.api.website.request.WebsiteCodeExpressReq;
+import com.yfshop.admin.api.website.request.WebsiteCodeQueryReq;
 import com.yfshop.admin.api.website.result.WebsiteCodeDetailExport;
-import com.yfshop.admin.api.website.result.WebsiteCodeResult;
-import com.yfshop.admin.api.website.result.WebsiteTypeResult;
 import com.yfshop.common.api.CommonResult;
 import com.yfshop.common.base.BaseController;
 import io.swagger.annotations.ApiOperation;
@@ -25,7 +23,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 import java.net.URLEncoder;
 import java.util.List;
 
@@ -58,13 +55,20 @@ public class AdminWebsiteManageController implements BaseController {
         return CommonResult.success(adminWebsiteCodeManageService.queryWebsiteCodeList(websiteCodeQueryReq));
     }
 
-//    @ApiOperation(value = "更新网点码更新物流", httpMethod = "POST")
-//    @RequestMapping(value = "/updateWebsiteCodeExpress", method = {RequestMethod.GET, RequestMethod.POST})
-//    @ResponseBody
-//    public CommonResult<IPage> updateWebsiteCodeExpress(WebsiteCodeQueryExpressReq websiteCodeQueryDetailsReq) {
-//        websiteCodeQueryDetailsReq.setMerchantId(getCurrentAdminUserId());
-//        return CommonResult.success(adminWebsiteCodeManageService.queryWebsiteCodeDetailsList(websiteCodeQueryDetailsReq));
-//    }
+
+    @ApiOperation(value = "获取网点码文件", httpMethod = "POST")
+    @RequestMapping(value = "/getWebsiteCodeUrl", method = {RequestMethod.GET, RequestMethod.POST})
+    @ResponseBody
+    public CommonResult<String> getWebsiteCodeUrl(Integer id) {
+        return CommonResult.success(adminWebsiteCodeManageService.getWebsiteCodeUrl(id));
+    }
+
+    @ApiOperation(value = "更新网点码更新物流", httpMethod = "POST")
+    @RequestMapping(value = "/updateWebsiteCodeExpress", method = {RequestMethod.GET, RequestMethod.POST})
+    @ResponseBody
+    public CommonResult<Void> updateWebsiteCodeExpress(WebsiteCodeExpressReq websiteCodeQueryExpressReq) {
+        return CommonResult.success(adminWebsiteCodeManageService.updateWebsiteCodeExpress(websiteCodeQueryExpressReq));
+    }
 
 
     @SneakyThrows

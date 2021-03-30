@@ -3,16 +3,15 @@ package com.yfshop.admin.service.merchant;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.crypto.SecureUtil;
-import cn.hutool.crypto.digest.MD5;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.yfshop.admin.api.service.merchant.MerchantInfoService;
-import com.yfshop.admin.api.service.merchant.result.MerchantResult;
-import com.yfshop.admin.api.website.req.WebsiteCodeAddressReq;
-import com.yfshop.admin.api.website.req.WebsiteCodeBindReq;
-import com.yfshop.admin.api.website.req.WebsiteCodePayReq;
+import com.yfshop.admin.api.merchant.MerchantInfoService;
+import com.yfshop.admin.api.merchant.result.MerchantResult;
+import com.yfshop.admin.api.website.request.WebsiteCodeAddressReq;
+import com.yfshop.admin.api.website.request.WebsiteCodeBindReq;
+import com.yfshop.admin.api.website.request.WebsiteCodePayReq;
 import com.yfshop.admin.api.website.result.*;
 import com.yfshop.admin.task.WebsiteCodeTask;
 import com.yfshop.code.mapper.*;
@@ -135,7 +134,9 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
         } else {
             merchantId = merchant.getId();
             Asserts.assertEquals(merchant.getRoleAlias(), GroupRoleEnum.WD.getCode(), 500, "只允许网点用户绑定网点码！");
+            Asserts.assertEquals(merchant.getMobile(), websiteReq.getMobile(), 500, "手机号不允许被修改！");
             merchant = BeanUtil.convert(websiteReq, Merchant.class);
+            merchant.setOpenId(null);//不更新openId
             merchant.setRoleAlias(GroupRoleEnum.WD.getCode());
             merchant.setRoleName(GroupRoleEnum.WD.getDescription());
             MerchantDetail merchantDetail = merchantDetailMapper.selectOne(Wrappers.<MerchantDetail>lambdaQuery()
@@ -170,6 +171,7 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
         merchant.setId(merchantId);
         merchantMapper.updateById(merchant);
         websiteCodeDetail.setMerchantId(merchant.getId());
+        websiteCodeDetail.setActivityTime(LocalDateTime.now());
         websiteCodeDetail.setMerchantName(merchant.getMerchantName());
         websiteCodeDetail.setMobile(merchant.getMobile());
         websiteCodeDetail.setIsActivate("Y");

@@ -11,6 +11,7 @@ public class UserStpLogic extends StpLogic {
         super(loginKey);
         saTokenConfig = BeanUtil.convert(super.getConfig(), SaTokenConfig.class);
         saTokenConfig.setCookieDomain("shop");
+        saTokenConfig.setTokenName("shop");
     }
 
     @Override

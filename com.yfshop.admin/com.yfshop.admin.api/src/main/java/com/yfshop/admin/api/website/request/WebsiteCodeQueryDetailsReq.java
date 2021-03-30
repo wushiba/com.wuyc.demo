@@ -1,4 +1,4 @@
-package com.yfshop.admin.api.website.req;
+package com.yfshop.admin.api.website.request;
 
 import lombok.Data;
 

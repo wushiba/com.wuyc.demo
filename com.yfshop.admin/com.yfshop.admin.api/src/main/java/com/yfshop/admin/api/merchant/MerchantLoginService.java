@@ -1,6 +1,6 @@
-package com.yfshop.admin.api.service.merchant;
+package com.yfshop.admin.api.merchant;
 
-import com.yfshop.admin.api.service.merchant.result.MerchantResult;
+import com.yfshop.admin.api.merchant.result.MerchantResult;
 import com.yfshop.common.exception.ApiException;
 
 public interface MerchantLoginService {

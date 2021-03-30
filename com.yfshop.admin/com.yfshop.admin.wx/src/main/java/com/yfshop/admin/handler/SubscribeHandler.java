@@ -2,7 +2,7 @@ package com.yfshop.admin.handler;
 
 
 import com.yfshop.admin.api.user.UserService;
-import com.yfshop.admin.api.user.req.UserReq;
+import com.yfshop.admin.api.user.request.UserReq;
 import com.yfshop.admin.builder.TextBuilder;
 import com.yfshop.common.util.BeanUtil;
 import me.chanjar.weixin.common.error.WxErrorException;

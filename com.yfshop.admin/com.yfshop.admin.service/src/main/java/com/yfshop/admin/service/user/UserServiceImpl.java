@@ -2,7 +2,7 @@ package com.yfshop.admin.service.user;
 
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.yfshop.admin.api.user.UserService;
-import com.yfshop.admin.api.user.req.UserReq;
+import com.yfshop.admin.api.user.request.UserReq;
 import com.yfshop.admin.api.user.result.UserResult;
 import com.yfshop.code.mapper.UserMapper;
 import com.yfshop.code.model.User;

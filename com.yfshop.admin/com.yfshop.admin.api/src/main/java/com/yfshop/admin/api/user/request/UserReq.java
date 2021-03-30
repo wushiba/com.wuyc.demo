@@ -1,4 +1,4 @@
-package com.yfshop.admin.api.user.req;
+package com.yfshop.admin.api.user.request;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;

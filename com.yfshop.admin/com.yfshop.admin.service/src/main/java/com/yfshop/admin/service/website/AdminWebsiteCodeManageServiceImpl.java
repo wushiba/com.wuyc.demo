@@ -5,17 +5,23 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.yfshop.admin.api.website.AdminWebsiteCodeManageService;
-import com.yfshop.admin.api.website.req.WebsiteCodeQueryDetailsReq;
-import com.yfshop.admin.api.website.req.WebsiteCodeQueryReq;
+import com.yfshop.admin.api.website.request.WebsiteCodeQueryDetailsReq;
+import com.yfshop.admin.api.website.request.WebsiteCodeExpressReq;
+import com.yfshop.admin.api.website.request.WebsiteCodeQueryReq;
 import com.yfshop.admin.api.website.result.WebsiteCodeDetailExport;
 import com.yfshop.admin.api.website.result.WebsiteCodeDetailResult;
 import com.yfshop.admin.api.website.result.WebsiteCodeResult;
 import com.yfshop.admin.dao.WebsiteCodeDao;
+import com.yfshop.admin.tool.poster.kernal.qiniu.QiniuDownloader;
 import com.yfshop.code.mapper.WebsiteCodeDetailMapper;
+import com.yfshop.code.mapper.WebsiteCodeMapper;
+import com.yfshop.code.model.WebsiteCode;
 import com.yfshop.code.model.WebsiteCodeDetail;
+import com.yfshop.common.exception.ApiException;
 import com.yfshop.common.util.BeanUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboService;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -26,10 +32,14 @@ public class AdminWebsiteCodeManageServiceImpl implements AdminWebsiteCodeManage
     @Resource
     private WebsiteCodeDao websiteCodeDao;
     @Resource
+    private WebsiteCodeMapper websiteCodeMapper;
+    @Resource
     private WebsiteCodeDetailMapper websiteCodeDetailMapper;
+    @Autowired
+    private QiniuDownloader qiniuDownloader;
 
     @Override
-    public IPage<WebsiteCodeResult> queryWebsiteCodeList(WebsiteCodeQueryReq req) {
+    public IPage<WebsiteCodeResult> queryWebsiteCodeList(WebsiteCodeQueryReq req) throws ApiException {
         IPage page = new Page<WebsiteCodeQueryReq>(req.getPageIndex(), req.getPageSize());
         List<WebsiteCodeResult> list = websiteCodeDao.queryWebsiteCodeList(page, req);
         page.setTotal(websiteCodeDao.queryWebsiteCodeCount(req));
@@ -38,7 +48,7 @@ public class AdminWebsiteCodeManageServiceImpl implements AdminWebsiteCodeManage
     }
 
     @Override
-    public IPage<WebsiteCodeDetailResult> queryWebsiteCodeDetailsList(WebsiteCodeQueryDetailsReq req) {
+    public IPage<WebsiteCodeDetailResult> queryWebsiteCodeDetailsList(WebsiteCodeQueryDetailsReq req) throws ApiException {
         LambdaQueryWrapper<WebsiteCodeDetail> wrappers = Wrappers.<WebsiteCodeDetail>lambdaQuery()
                 .and(wrapper -> wrapper
                         .eq(WebsiteCodeDetail::getPid, req.getMerchantId())
@@ -57,7 +67,7 @@ public class AdminWebsiteCodeManageServiceImpl implements AdminWebsiteCodeManage
     }
 
     @Override
-    public List<WebsiteCodeDetailExport> exportWebsiteCodeDetails(WebsiteCodeQueryDetailsReq req) {
+    public List<WebsiteCodeDetailExport> exportWebsiteCodeDetails(WebsiteCodeQueryDetailsReq req) throws ApiException {
         LambdaQueryWrapper<WebsiteCodeDetail> wrappers = Wrappers.<WebsiteCodeDetail>lambdaQuery()
                 .and(wrapper -> wrapper
                         .eq(WebsiteCodeDetail::getPid, req.getMerchantId())
@@ -70,5 +80,22 @@ public class AdminWebsiteCodeManageServiceImpl implements AdminWebsiteCodeManage
                 .eq(StringUtils.isNotBlank(req.getMerchantName()), WebsiteCodeDetail::getMerchantName, req.getMerchantName());
         List<WebsiteCodeDetail> websiteCodeDetails = websiteCodeDetailMapper.selectList(wrappers);
         return BeanUtil.convertList(websiteCodeDetails, WebsiteCodeDetailExport.class);
+    }
+
+    @Override
+    public Void updateWebsiteCodeExpress(WebsiteCodeExpressReq websiteCodeExpressReq) throws ApiException {
+        WebsiteCode websiteCode = BeanUtil.convert(websiteCodeExpressReq, WebsiteCode.class);
+        websiteCode.setOrderStatus("DELIVERY");
+        websiteCodeMapper.updateById(websiteCode);
+        return null;
+    }
+
+    @Override
+    public String getWebsiteCodeUrl(Integer id) {
+        WebsiteCode websiteCode = websiteCodeMapper.selectById(id);
+        if (StringUtils.isNotBlank(websiteCode.getFileUrl())) {
+            return qiniuDownloader.privateDownloadUrl(websiteCode.getFileUrl(), 60);
+        }
+        return null;
     }
 }

@@ -33,6 +33,7 @@ public class WebsiteCodeDetailResult implements Serializable {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", locale = "zh", timezone = "GMT+8")
     private LocalDateTime updateTime;
 
+
     /**
      * 批次id
      */
@@ -47,6 +48,9 @@ public class WebsiteCodeDetailResult implements Serializable {
      * 是否激活, Y|N
      */
     private String isActivate;
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", locale = "zh", timezone = "GMT+8")
+    private LocalDateTime activateTime;
 
     /**
      * 商户id

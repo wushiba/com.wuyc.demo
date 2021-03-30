@@ -1,10 +1,12 @@
 package com.yfshop.admin.controller;
 
+import cn.dev33.satoken.dao.SaTokenDaoRedis;
 import com.yfshop.common.api.CommonResult;
 import lombok.AllArgsConstructor;
 import me.chanjar.weixin.common.bean.WxJsapiSignature;
 import me.chanjar.weixin.common.error.WxErrorException;
 import me.chanjar.weixin.mp.api.WxMpService;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URLDecoder;
@@ -22,9 +24,9 @@ public class WxJsapiController {
     private final WxMpService wxService;
 
     @PostMapping("/getJsapiTicket")
-    public CommonResult getJsapiTicket(@PathVariable String appid,String url) throws WxErrorException {
+    public CommonResult getJsapiTicket(@PathVariable String appid, String url) throws WxErrorException {
         final WxJsapiSignature jsapiSignature = this.wxService.switchoverTo(appid).createJsapiSignature(URLDecoder.decode(url));
-        System.out.println(this.wxService.getJsapiTicket(true));
+        System.out.println(this.wxService.getJsapiTicket(false));
         return CommonResult.success(jsapiSignature);
     }
 }

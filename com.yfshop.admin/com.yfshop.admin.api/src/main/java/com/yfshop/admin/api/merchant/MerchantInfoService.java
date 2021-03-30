@@ -1,10 +1,10 @@
-package com.yfshop.admin.api.service.merchant;
+package com.yfshop.admin.api.merchant;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.yfshop.admin.api.service.merchant.result.MerchantResult;
-import com.yfshop.admin.api.website.req.WebsiteCodeAddressReq;
-import com.yfshop.admin.api.website.req.WebsiteCodeBindReq;
-import com.yfshop.admin.api.website.req.WebsiteCodePayReq;
+import com.yfshop.admin.api.merchant.result.MerchantResult;
+import com.yfshop.admin.api.website.request.WebsiteCodeAddressReq;
+import com.yfshop.admin.api.website.request.WebsiteCodeBindReq;
+import com.yfshop.admin.api.website.request.WebsiteCodePayReq;
 import com.yfshop.admin.api.website.result.*;
 import com.yfshop.common.exception.ApiException;
 

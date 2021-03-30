@@ -88,7 +88,7 @@ public class WebsiteCodeTask {
     public void doWorkWebsiteCodeFile(String orderNo) {
         List<WebsiteCode> websiteCodeList = websiteCodeMapper.selectList(Wrappers.<WebsiteCode>lambdaQuery()
                 .eq(WebsiteCode::getOrderNo, orderNo));
-        for (WebsiteCode websiteCode:websiteCodeList) {
+        for (WebsiteCode websiteCode : websiteCodeList) {
             buildWebSiteCode(websiteCode);
         }
     }
@@ -105,12 +105,12 @@ public class WebsiteCodeTask {
             }
             if (!fileZip.exists()) {
                 List<WebsiteCodeDetail> websiteCodeDetails = websiteCodeDetailMapper.selectList(Wrappers.<WebsiteCodeDetail>lambdaQuery()
-                        .eq(WebsiteCodeDetail::getId, websiteCode.getId()));
+                        .eq(WebsiteCodeDetail::getBatchId, websiteCode.getId()));
                 int sum = websiteCodeDetails.size();
                 int successCount = (int) websiteCodeDetails.stream().map(item -> buildWebsiteCodeFile(dirs, item.getAlias())).filter(Objects::nonNull).count();
                 int failCount = sum - successCount;
                 logger.info("{},成功合成{},失败合成{}", websiteCode.getBatchNo(), successCount, failCount);
-                if (failCount == 0) {
+                if (failCount == 0 && sum > 0) {
                     ZipUtil.zip(dirs, CharsetUtil.CHARSET_UTF_8);
                 }
             }

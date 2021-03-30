@@ -2,7 +2,7 @@ package com.yfshop.admin.controller;
 
 
 import com.yfshop.admin.api.website.WebsiteBillService;
-import com.yfshop.admin.api.website.req.WebsiteCodeReq;
+import com.yfshop.admin.api.website.request.WebsiteCodeReq;
 import com.yfshop.admin.api.website.result.WebsiteBillDayResult;
 import com.yfshop.common.api.CommonResult;
 import com.yfshop.common.base.BaseController;

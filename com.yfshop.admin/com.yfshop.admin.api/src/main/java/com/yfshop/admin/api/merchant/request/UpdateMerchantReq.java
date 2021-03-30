@@ -1,6 +1,7 @@
-package com.yfshop.admin.api.service.merchant.req;
+package com.yfshop.admin.api.merchant.request;
 
 import com.yfshop.common.enums.GroupRoleEnum;
+import com.yfshop.common.validate.annotation.CandidateValue;
 import com.yfshop.common.validate.annotation.CheckEnum;
 import com.yfshop.common.validate.annotation.Mobile;
 import io.swagger.annotations.ApiModel;
@@ -17,12 +18,16 @@ import java.io.Serializable;
  */
 @ApiModel
 @Data
-public class CreateMerchantReq implements Serializable {
+public class UpdateMerchantReq implements Serializable {
     private static final long serialVersionUID = 1712420945806506096L;
+
+    @ApiModelProperty(value = "商户ID", required = true)
+    @NotNull(message = "商户ID不能为空")
+    private Integer merchantId;
 
     @ApiModelProperty(value = "商户类型", required = true)
     @NotBlank(message = "商户类型不能为空")
-    @CheckEnum(value = GroupRoleEnum.class, whitelist = {"zb", "fgs", "jxs", "ywy", "cxy"}, message = "不支持的商户类型")
+    @CheckEnum(value = GroupRoleEnum.class, whitelist = {"zb", "fgs", "jxs", "ywy", "cxy", "wd"}, message = "不支持的商户类型")
     private String roleAlias;
 
     @ApiModelProperty(value = "商户名称", required = true)
@@ -58,6 +63,14 @@ public class CreateMerchantReq implements Serializable {
     @NotBlank(message = "详细地址不能为空")
     private String address;
 
-    @ApiModelProperty(value = "上级商户ID", required = true)
+    @ApiModelProperty(value = "上级商户ID", required = false)
     private Integer pid;
+
+    @ApiModelProperty(value = "是否有光明冰箱", allowableValues = "Y|N", required = false)
+    //@NotBlank(message = "是否有光明冰箱不能为空")
+    @CandidateValue(candidateValue = {"Y", "N"}, message = "是否有光明冰箱只能是Y|N")
+    private String isRefrigerator;
+
+    @ApiModelProperty(value = "门头照", required = false)
+    private String headImage;
 }

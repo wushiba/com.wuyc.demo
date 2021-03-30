@@ -47,6 +47,11 @@ public class WebsiteCodeDetail extends Model<WebsiteCodeDetail> {
     private String isActivate;
 
     /**
+     * 激活时间
+     */
+    private LocalDateTime activityTime;
+
+    /**
      * 商户id
      */
     private Integer merchantId;

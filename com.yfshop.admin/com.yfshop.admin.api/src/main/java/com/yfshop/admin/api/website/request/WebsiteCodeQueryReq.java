@@ -1,13 +1,10 @@
-package com.yfshop.admin.api.website.req;
+package com.yfshop.admin.api.website.request;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.core.metadata.OrderItem;
 import com.yfshop.common.util.DateUtil;
 import lombok.Data;
 
 import java.io.Serializable;
 import java.util.Date;
-import java.util.List;
 
 @Data
 public class WebsiteCodeQueryReq implements Serializable {

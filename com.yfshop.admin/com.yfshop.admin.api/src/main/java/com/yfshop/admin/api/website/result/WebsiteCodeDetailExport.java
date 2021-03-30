@@ -26,6 +26,9 @@ public class WebsiteCodeDetailExport implements Serializable {
     private static final long serialVersionUID = 1L;
 
 
+    @Excel(name = "激活时间", format = "yyyy-MM-dd HH:mm:ss",width=40)
+    private LocalDateTime activateTime;
+
     /**
      * 商户码 3位地区码+6位pid+6位年月日+5位序号
      */

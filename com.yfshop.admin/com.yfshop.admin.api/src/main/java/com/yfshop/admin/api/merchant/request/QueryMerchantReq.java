@@ -1,4 +1,4 @@
-package com.yfshop.admin.api.service.merchant.req;
+package com.yfshop.admin.api.merchant.request;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;

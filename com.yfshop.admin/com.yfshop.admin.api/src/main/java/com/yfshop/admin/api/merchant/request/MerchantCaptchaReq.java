@@ -1,4 +1,4 @@
-package com.yfshop.admin.api.service.merchant.req;
+package com.yfshop.admin.api.merchant.request;
 
 import com.yfshop.common.validate.annotation.Mobile;
 import lombok.Data;

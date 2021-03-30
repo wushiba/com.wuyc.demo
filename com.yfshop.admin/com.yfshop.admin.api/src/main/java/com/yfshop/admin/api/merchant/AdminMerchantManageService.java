@@ -1,10 +1,10 @@
-package com.yfshop.admin.api.service.merchant;
+package com.yfshop.admin.api.merchant;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.yfshop.admin.api.service.merchant.req.CreateMerchantReq;
-import com.yfshop.admin.api.service.merchant.req.QueryMerchantReq;
-import com.yfshop.admin.api.service.merchant.req.UpdateMerchantReq;
-import com.yfshop.admin.api.service.merchant.result.MerchantResult;
+import com.yfshop.admin.api.merchant.request.CreateMerchantReq;
+import com.yfshop.admin.api.merchant.request.QueryMerchantReq;
+import com.yfshop.admin.api.merchant.request.UpdateMerchantReq;
+import com.yfshop.admin.api.merchant.result.MerchantResult;
 import com.yfshop.common.exception.ApiException;
 
 import javax.validation.constraints.NotNull;

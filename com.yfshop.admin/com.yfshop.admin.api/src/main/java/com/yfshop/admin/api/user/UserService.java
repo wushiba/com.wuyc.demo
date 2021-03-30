@@ -1,6 +1,6 @@
 package com.yfshop.admin.api.user;
 
-import com.yfshop.admin.api.user.req.UserReq;
+import com.yfshop.admin.api.user.request.UserReq;
 import com.yfshop.admin.api.user.result.UserResult;
 import com.yfshop.common.exception.ApiException;
 

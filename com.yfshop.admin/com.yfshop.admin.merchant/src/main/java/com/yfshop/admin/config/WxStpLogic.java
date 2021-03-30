@@ -11,6 +11,7 @@ public class WxStpLogic extends StpLogic {
         super(loginKey);
         saTokenConfig = BeanUtil.convert(super.getConfig(), SaTokenConfig.class);
         saTokenConfig.setCookieDomain("yfOpen");
+        saTokenConfig.setTokenName("yfOpen");
     }
 
     @Override

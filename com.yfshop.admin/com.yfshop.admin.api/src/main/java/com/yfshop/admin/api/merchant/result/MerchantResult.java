@@ -1,4 +1,4 @@
-package com.yfshop.admin.api.service.merchant.result;
+package com.yfshop.admin.api.merchant.result;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;

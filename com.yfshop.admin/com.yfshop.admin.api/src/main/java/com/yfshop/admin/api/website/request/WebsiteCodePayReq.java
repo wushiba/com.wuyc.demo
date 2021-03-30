@@ -1,10 +1,9 @@
-package com.yfshop.admin.api.website.req;
+package com.yfshop.admin.api.website.request;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import java.io.Serializable;
-import java.util.Date;
 import java.util.List;
 
 @Data

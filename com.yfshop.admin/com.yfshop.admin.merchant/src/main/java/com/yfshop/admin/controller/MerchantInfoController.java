@@ -4,11 +4,11 @@ import cn.dev33.satoken.annotation.SaCheckLogin;
 import cn.dev33.satoken.stp.StpLogic;
 import cn.dev33.satoken.stp.StpUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.yfshop.admin.api.service.merchant.MerchantInfoService;
-import com.yfshop.admin.api.service.merchant.result.MerchantResult;
+import com.yfshop.admin.api.merchant.MerchantInfoService;
+import com.yfshop.admin.api.merchant.result.MerchantResult;
 import com.yfshop.admin.api.user.UserService;
 import com.yfshop.admin.api.user.result.UserResult;
-import com.yfshop.admin.api.website.req.*;
+import com.yfshop.admin.api.website.request.*;
 import com.yfshop.admin.api.website.result.*;
 import com.yfshop.admin.config.UserStpLogic;
 import com.yfshop.admin.config.WxStpLogic;
@@ -86,27 +86,21 @@ class MerchantInfoController extends AbstractBaseController {
             }
         } else if (result > 0) {
             merchantResult = merchantInfoService.getMerchantByWebsiteCode(websiteCode);
+            result = 2;
             if (merchantResult != null) {
-                if (StpUtil.isLogin() && merchantResult.getId().equals(getCurrentAdminUserId())) {
-                    StpUtil.setLoginId(merchantResult.getId());
+                if (StringUtils.isNotBlank(merchantResult.getOpenId())) {
+                    if (merchantResult.getOpenId().equals(getCurrentOpenId())) {
+                        //跳转商户管理
+                        result = 1;
+                    }
+                } else if (StpUtil.isLogin() && merchantResult.getId().equals(getCurrentAdminUserId())) {
                     //跳转商户管理
                     result = 1;
-                } else {
-                    String openId = merchantResult.getOpenId();
-                    if (StringUtils.isNotBlank(openId) && openId.equals(getCurrentOpenId())) {
-                        StpUtil.setLoginId(merchantResult.getId());
-                        result = 1;
-                    } else {
-                        result = 2;
-                        UserResult userResult = userService.getUserByOpenId(getCurrentOpenId());
-                        if (userResult != null) {
-                            userLogic.setLoginId(userResult.getId());
-                        }
-                    }
                 }
+            }
+            if (result == 1) {
+                StpUtil.setLoginId(merchantResult.getId());
             } else {
-                //跳转兑换支付界面
-                result = 2;
                 UserResult userResult = userService.getUserByOpenId(getCurrentOpenId());
                 if (userResult != null) {
                     userLogic.setLoginId(userResult.getId());

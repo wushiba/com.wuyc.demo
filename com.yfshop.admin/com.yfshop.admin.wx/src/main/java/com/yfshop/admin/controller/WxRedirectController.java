@@ -1,10 +1,9 @@
 package com.yfshop.admin.controller;
 
 import cn.dev33.satoken.stp.StpLogic;
-import cn.dev33.satoken.stp.StpUtil;
-import com.yfshop.admin.api.service.merchant.result.MerchantResult;
+import com.yfshop.admin.api.merchant.result.MerchantResult;
 import com.yfshop.admin.api.user.UserService;
-import com.yfshop.admin.api.user.req.UserReq;
+import com.yfshop.admin.api.user.request.UserReq;
 import com.yfshop.common.api.CommonResult;
 import com.yfshop.common.util.BeanUtil;
 import lombok.AllArgsConstructor;
@@ -13,8 +12,6 @@ import me.chanjar.weixin.common.bean.oauth2.WxOAuth2AccessToken;
 import me.chanjar.weixin.common.error.WxErrorException;
 import me.chanjar.weixin.mp.api.WxMpService;
 import org.apache.dubbo.config.annotation.DubboReference;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;

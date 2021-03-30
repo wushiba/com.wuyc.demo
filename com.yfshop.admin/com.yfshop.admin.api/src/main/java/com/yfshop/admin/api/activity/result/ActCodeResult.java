@@ -1,19 +1,16 @@
-package com.yfshop.code.model;
+package com.yfshop.admin.api.activity.result;
 
-import com.baomidou.mybatisplus.annotation.TableName;
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.extension.activerecord.Model;
-import com.baomidou.mybatisplus.annotation.TableId;
-
-import java.time.LocalDateTime;
-import java.io.Serializable;
-
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.io.Serializable;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+
 /**
  * <p>
- * 活动码批次记录
+ * 商户批次码详情
  * </p>
  *
  * @author yoush
@@ -21,16 +18,15 @@ import lombok.EqualsAndHashCode;
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
-@TableName("yf_act_code_batch")
-public class ActCodeBatch extends Model<ActCodeBatch> {
+public class ActCodeResult implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @TableId(value = "id", type = IdType.AUTO)
-    private Integer id;
 
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", locale = "zh", timezone = "GMT+8")
     private LocalDateTime createTime;
 
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", locale = "zh", timezone = "GMT+8")
     private LocalDateTime updateTime;
 
     /**
@@ -49,12 +45,14 @@ public class ActCodeBatch extends Model<ActCodeBatch> {
     private Integer actId;
 
     /**
+     * 活动名
+     */
+    private String actName;
+
+    /**
      * 文件地址
      */
     private String fileUrl;
-
-
-    private String fileMd5;
 
     /**
      * 是否下载
@@ -67,9 +65,5 @@ public class ActCodeBatch extends Model<ActCodeBatch> {
     private String isSend;
 
 
-    @Override
-    protected Serializable pkVal() {
-        return this.id;
-    }
 
 }
