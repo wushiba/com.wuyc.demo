@@ -1,5 +1,8 @@
 package com.yfshop.common.service;
 
+import org.springframework.data.geo.GeoResults;
+import org.springframework.data.redis.connection.RedisGeoCommands;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -140,6 +143,11 @@ public interface RedisService {
     Long sRemove(String key, Object... values);
 
     /**
+     * 删除zSet结构中的属性
+     */
+    Long zRemove(String key, Object... values);
+
+    /**
      * 获取List结构中的属性
      */
     List<Object> lRange(String key, long start, long end);
@@ -178,4 +186,25 @@ public interface RedisService {
      * 从List结构中移除属性
      */
     Long lRemove(String key, long count, Object value);
+
+    /**
+     * 添加地理位置
+     * @param key           key
+     * @param longitude     经度
+     * @param latitude      纬度
+     * @param value         具体的值
+     */
+    void geoAdd(String key, Double longitude, Double latitude, Object value);
+
+    /**
+     * 查询当前位置半径内的数据
+     * @param key           key
+     * @param longitude     经度
+     * @param latitude      纬度
+     * @param distance      当前位置方圆多远
+     * @param unit          当前位置方圆多远的单位值
+     * @return  GeoResults<RedisGeoCommands.GeoLocation<Object>>
+     */
+    GeoResults<RedisGeoCommands.GeoLocation<Object>> findNearDataList(String key, Double longitude, Double latitude, Integer distance, RedisGeoCommands.DistanceUnit unit);
+
 }

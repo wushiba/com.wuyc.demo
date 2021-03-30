@@ -15,6 +15,7 @@ import com.yfshop.common.service.RedisService;
 import com.yfshop.common.util.BeanUtil;
 import com.yfshop.shop.result.*;
 import com.yfshop.shop.service.ActivityActCodeBatchService;
+import com.yfshop.shop.service.ActivityCouponService;
 import com.yfshop.shop.service.ActivityDrawService;
 import com.yfshop.shop.service.ActivityUserService;
 import org.slf4j.Logger;
@@ -61,6 +62,9 @@ public class ActivityDrawServiceImpl implements ActivityDrawService {
 
     @Resource
     private ActivityActCodeBatchService activityActCodeBatchService;
+
+    @Resource
+    private ActivityCouponService activityCouponService;
 
     @Override
     public YfDrawActivityResult getDrawActivityDetailById(Integer id) throws ApiException {
@@ -121,9 +125,10 @@ public class ActivityDrawServiceImpl implements ActivityDrawService {
 
         // 判断省份抽奖规则有没有走定制化, 找不到根据活动奖品概率去发奖品, 根据大盒小盒,去抽奖
         DrawProvinceRate provinceRate = this.getProvinceRateByActIdAndProvince(actCodeBatchDetail.getActId(), provinceId);
+        Integer couponId = null;
         if (provinceRate == null) {
             if (BoxSpecValEnum.BIG.getCode().equalsIgnoreCase(actCodeBatchDetail.getBoxSpecVal())) {
-                startDraw(firstPrize.getWinRate(), secondPrize.getWinRate());
+                Integer integer = startDraw(firstPrize.getWinRate(), secondPrize.getWinRate());
             } else {
                 startDraw(firstPrize.getWinRate(), secondPrize.getSmallBoxRate());
             }
@@ -134,6 +139,8 @@ public class ActivityDrawServiceImpl implements ActivityDrawService {
                 startDraw(provinceRate.getFirstWinRate(), provinceRate.getSecondSmallBoxWinRate());
             }
         }
+
+        activityCouponService.createUserCoupon(userId, firstPrize.getCouponId());
         return null;
     }
 
