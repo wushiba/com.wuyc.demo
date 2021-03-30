@@ -7,6 +7,7 @@ import com.yfshop.admin.api.service.merchant.req.UpdateMerchantReq;
 import com.yfshop.admin.api.service.merchant.result.MerchantResult;
 import com.yfshop.common.exception.ApiException;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
 /**
@@ -22,7 +23,7 @@ public interface AdminMerchantManageService {
      * @return void
      * @throws ApiException e
      */
-    Void createMerchant(@NotNull CreateMerchantReq req) throws ApiException;
+    Void createMerchant(@Valid @NotNull CreateMerchantReq req) throws ApiException;
 
     /**
      * 编辑商户
@@ -31,7 +32,7 @@ public interface AdminMerchantManageService {
      * @return void
      * @throws ApiException e
      */
-    Void updateMerchant(@NotNull UpdateMerchantReq req) throws ApiException;
+    Void updateMerchant(@Valid @NotNull UpdateMerchantReq req) throws ApiException;
 
     /**
      * 分页查询商户列表

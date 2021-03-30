@@ -10,10 +10,10 @@ import com.yfshop.admin.api.service.merchant.req.CreateMerchantReq;
 import com.yfshop.admin.api.service.merchant.req.QueryMerchantReq;
 import com.yfshop.admin.api.service.merchant.req.UpdateMerchantReq;
 import com.yfshop.admin.api.service.merchant.result.MerchantResult;
+import com.yfshop.admin.dao.MerchantDao;
 import com.yfshop.admin.dto.query.QueryMerchantDetail;
 import com.yfshop.code.mapper.MerchantDetailMapper;
 import com.yfshop.code.mapper.RegionMapper;
-import com.yfshop.admin.dao.MerchantDao;
 import com.yfshop.code.model.Merchant;
 import com.yfshop.code.model.MerchantDetail;
 import com.yfshop.code.model.Region;
@@ -165,7 +165,20 @@ public class AdminMerchantManageServiceImpl implements AdminMerchantManageServic
 
     @Override
     public IPage<MerchantResult> pageQueryMerchants(QueryMerchantReq req) {
-        QueryMerchantDetail query = BeanUtil.convert(req, QueryMerchantDetail.class);
+        QueryMerchantDetail query = new QueryMerchantDetail();
+        query.setStartCreateTime(req.getStartCreateTime());
+        query.setEndCreateTime(req.getEndCreateTime());
+        query.setMerchantId(req.getMerchantId());
+        query.setMerchantName(StringUtils.isBlank(req.getMerchantName()) ? null : req.getMerchantName());
+        query.setProvinceId(req.getProvinceId());
+        query.setCityId(req.getCityId());
+        query.setDistrictId(req.getDistrictId());
+        query.setRoleAlias(StringUtils.isBlank(req.getRoleAlias()) ? null : req.getRoleAlias());
+        query.setMobile(StringUtils.isBlank(req.getMobile()) ? null : req.getMobile());
+        query.setContacts(StringUtils.isBlank(req.getContacts()) ? null : req.getContacts());
+        query.setPMerchantName(StringUtils.isBlank(req.getPMerchantName()) ? null : req.getPMerchantName());
+        query.setIsEnable(StringUtils.isBlank(req.getIsEnable()) ? null : req.getIsEnable());
+        query.setIsRefrigerator(StringUtils.isBlank(req.getIsRefrigerator()) ? null : req.getIsRefrigerator());
         int count = customMerchantMapper.countMerchantInfo(query);
         if (count <= 0) {
             return BeanUtil.emptyPageData(req.getPageIndex(), req.getPageSize());
@@ -190,7 +203,7 @@ public class AdminMerchantManageServiceImpl implements AdminMerchantManageServic
     }
 
     private String generatePidPath(Integer pid) {
-        if (pid == null) {
+        if (pid == null || pid == 0) {
             return null;
         }
         LinkedList<Integer> path = new LinkedList<>();
