@@ -1,5 +1,7 @@
 package com.yfshop.common.constants;
 
+import org.springframework.data.redis.connection.RedisGeoCommands;
+
 /**
  * 缓存常量类
  *
@@ -56,4 +58,13 @@ public interface CacheConstants {
     /** 用户收货地址 */
     String MALL_USER_ADDRESS_CACHE_NAME = "MallUserAddressCacheName";
     String MALL_USER_ADDRESS_CACHE_KEY_PREFIX = "mall_user_address_";
+
+    /** 商户信息 */
+    String MERCHANT_GRO_DATA = "merchant_geo_data";
+    String MERCHANT_INFO_DATA = "merchant_info_data";
+
+    /** 用户商户距离 */
+    Integer USER_MERCHANT_DISTANCE = 10;
+    RedisGeoCommands.DistanceUnit USER_MERCHANT_DISTANCE_UNIT = RedisGeoCommands.DistanceUnit.METERS;
+
 }

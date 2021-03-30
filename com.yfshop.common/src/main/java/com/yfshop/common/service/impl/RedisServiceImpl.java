@@ -1,7 +1,11 @@
 package com.yfshop.common.service.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.yfshop.common.service.RedisService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.geo.*;
+import org.springframework.data.redis.connection.RedisGeoCommands;
+import org.springframework.data.redis.core.GeoOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 
 import java.util.List;
@@ -151,6 +155,11 @@ public class RedisServiceImpl implements RedisService {
     }
 
     @Override
+    public Long zRemove(String key, Object... values) {
+        return redisTemplate.opsForZSet().remove(key, values);
+    }
+
+    @Override
     public List<Object> lRange(String key, long start, long end) {
         return redisTemplate.opsForList().range(key, start, end);
     }
@@ -193,4 +202,37 @@ public class RedisServiceImpl implements RedisService {
     public Long lRemove(String key, long count, Object value) {
         return redisTemplate.opsForList().remove(key, count, value);
     }
+
+    /***
+     * 将位置信息添加到redis
+     * @param key           key
+     * @param longitude     经度
+     * @param latitude      纬度
+     * @param value         具体的值
+     */
+    @Override
+    public void geoAdd(String key, Double longitude, Double latitude, Object value) {
+        redisTemplate.opsForGeo().add(key, new Point(longitude, latitude), JSON.toJSONString(value));
+    }
+
+    /**
+     * 查询当前位置半径内的数据
+     * @param key           key
+     * @param longitude     经度
+     * @param latitude      纬度
+     * @param distance      当前位置方圆多远
+     * @param unit          当前位置方圆多远的单位值
+     * @return  GeoResults<RedisGeoCommands.GeoLocation<Object>>
+     */
+    @Override
+    public GeoResults<RedisGeoCommands.GeoLocation<Object>> findNearDataList(String key, Double longitude, Double latitude,
+                                                                             Integer distance, RedisGeoCommands.DistanceUnit unit) {
+        Circle circle = new Circle(new Point(longitude, latitude), new Distance(distance, unit));
+        RedisGeoCommands.GeoRadiusCommandArgs args = RedisGeoCommands.GeoRadiusCommandArgs.newGeoRadiusArgs()
+                .includeCoordinates().includeDistance().sortAscending().limit(100);
+
+
+        return redisTemplate.opsForGeo().radius(key, circle, args);
+    }
+
 }
