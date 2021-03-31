@@ -8,11 +8,12 @@ public interface FrontMerchantService {
 
     /**
      * 根据当前位置查询附近门店
+     * @param districtId    区id
      * @param longitude     经度
      * @param latitude      纬度
      * @return
      * @throws ApiException
      */
-    List<MerchantResult> findNearMerchantList(Double longitude, Double latitude) throws ApiException;
+    List<MerchantResult> findNearMerchantList(Integer districtId, Double longitude, Double latitude) throws ApiException;
 
 }

@@ -15,6 +15,7 @@
         <result column="coupon_price" property="couponPrice" />
         <result column="freight" property="freight" />
         <result column="pay_price" property="payPrice" />
+        <result column="is_pay" property="isPay" />
         <result column="bill_no" property="billNo" />
         <result column="pay_time" property="payTime" />
         <result column="cancel_time" property="cancelTime" />
@@ -24,7 +25,7 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        id, create_time, update_time, user_id, user_coupon_id, item_count, child_order_count, order_price, coupon_price, freight, pay_price, bill_no, pay_time, cancel_time, pay_entry_count, remark
+        id, create_time, update_time, user_id, user_coupon_id, item_count, child_order_count, order_price, coupon_price, freight, pay_price, is_pay, bill_no, pay_time, cancel_time, pay_entry_count, remark
     </sql>
 
 </mapper>
