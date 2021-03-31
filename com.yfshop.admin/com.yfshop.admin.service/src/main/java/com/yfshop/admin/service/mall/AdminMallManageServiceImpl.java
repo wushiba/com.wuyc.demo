@@ -262,25 +262,13 @@ public class AdminMallManageServiceImpl implements AdminMallManageService {
         }
 
         // delete item
-        Item entity = new Item();
-        entity.setId(itemId);
-        entity.setIsDelete("Y");
-        int rows = itemMapper.updateById(entity);
+        int rows = itemMapper.deleteById(itemId);
         Asserts.assertTrue(rows > 0, 500, "删除失败");
 
-        // disable all sku
+        // delete all sku
         LambdaQueryWrapper<ItemSku> queryWrapper = Wrappers.lambdaQuery(ItemSku.class)
                 .eq(ItemSku::getItemId, itemId);
-        List<ItemSku> skuList = skuMapper.selectList(queryWrapper);
-        if (CollectionUtil.isNotEmpty(skuList)) {
-            List<ItemSku> beans = skuList.stream().map(itemSku -> {
-                ItemSku bean = new ItemSku();
-                bean.setId(itemSku.getId());
-                bean.setIsEnable("N");
-                return bean;
-            }).collect(Collectors.toList());
-            skuManager.updateBatchById(beans);
-        }
+        skuMapper.delete(queryWrapper);
 
         // delete item content
         itemContentMapper.delete(Wrappers.lambdaQuery(ItemContent.class).eq(ItemContent::getItemId, itemId));

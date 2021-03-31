@@ -49,6 +49,11 @@ public class UserCart extends Model<UserCart> {
     private Integer num;
 
     /**
+     * sku名称
+     */
+    private String skuTitle;
+
+    /**
      * 封面图
      */
     private String skuCover;

@@ -64,7 +64,16 @@ public class UserCartServiceImpl implements UserCartService {
         // 查询用户所有的购物车列表
         List<UserCart> userCarts = cartMapper.selectList(Wrappers.lambdaQuery(UserCart.class)
                 .eq(UserCart::getUserId, userId));
-        return BeanUtil.convertList(userCarts, UserCartResult.class);
+        // 查询sku信息
+        Map<Integer, ItemSku> skuIndexMap = skuMapper.selectBatchIds(userCarts.stream().map(UserCart::getSkuId)
+                .collect(Collectors.toList())).stream().collect(Collectors.toMap(ItemSku::getId, s -> s));
+        List<UserCartResult> userCartResults = BeanUtil.convertList(userCarts, UserCartResult.class);
+        for (UserCartResult userCartResult : userCartResults) {
+            ItemSku itemSku = skuIndexMap.get(userCartResult.getSkuId());
+            // 是否有效
+            userCartResult.setIsAvailable(itemSku != null && "Y".equals(itemSku.getIsEnable()) ? "Y" : "N");
+        }
+        return userCartResults;
     }
 
     @CacheEvict(cacheNames = CacheConstants.USER_CART_CACHE_NAME,
@@ -86,6 +95,10 @@ public class UserCartServiceImpl implements UserCartService {
         if (rows <= 0) {
             // 新建购物车项
             UserCart userCart = new UserCart();
+            userCart.setSkuTitle(sku.getSkuTitle());
+            userCart.setSkuCover(sku.getSkuCover());
+            userCart.setSpecValueIdPath(sku.getSpecValueIdPath());
+            userCart.setSpecNameValueJson(sku.getSpecNameValueJson());
             userCart.setCreateTime(LocalDateTime.now());
             userCart.setUpdateTime(LocalDateTime.now());
             userCart.setUserId(userId);
@@ -121,6 +134,10 @@ public class UserCartServiceImpl implements UserCartService {
             if (rows <= 0) {
                 // 新建购物车项
                 UserCart userCart = new UserCart();
+                userCart.setSkuTitle(sku.getSkuTitle());
+                userCart.setSkuCover(sku.getSkuCover());
+                userCart.setSpecValueIdPath(sku.getSpecValueIdPath());
+                userCart.setSpecNameValueJson(sku.getSpecNameValueJson());
                 userCart.setCreateTime(LocalDateTime.now());
                 userCart.setUpdateTime(LocalDateTime.now());
                 userCart.setUserId(userId);
