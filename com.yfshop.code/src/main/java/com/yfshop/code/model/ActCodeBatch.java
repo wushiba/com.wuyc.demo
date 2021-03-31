@@ -4,10 +4,8 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.extension.activerecord.Model;
 import com.baomidou.mybatisplus.annotation.TableId;
-
 import java.time.LocalDateTime;
 import java.io.Serializable;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -17,7 +15,7 @@ import lombok.EqualsAndHashCode;
  * </p>
  *
  * @author yoush
- * @since 2021-03-22
+ * @since 2021-03-30
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -53,8 +51,15 @@ public class ActCodeBatch extends Model<ActCodeBatch> {
      */
     private String fileUrl;
 
-
+    /**
+     * 上传溯源码文件md5
+     */
     private String fileMd5;
+
+    /**
+     * WAIT等待 DOING 生成中 SUCCESS 成功 FAIL 失败
+     */
+    private String fileStatus;
 
     /**
      * 是否下载

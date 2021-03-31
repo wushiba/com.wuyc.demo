@@ -29,7 +29,7 @@ public class Generator {
     //作者
     private static String authorName="yoush";
     //要生成的表名
-    private static String[] tables= {"yf_website_code_detail"};
+    private static String[] tables= {"yf_user_cart"};
     private static String prefix="yf_";
 
     //数据库配置四要素
@@ -109,8 +109,8 @@ public class Generator {
                         // .setSuperServiceClass("com.baomidou.demo.TestService")
                         // 自定义 service 实现类父类 默认ServiceImpl
                         // .setSuperServiceImplClass("com.baomidou.demo.TestServiceImpl")
-                        // 自定义 controller 父类
-                        //.setSuperControllerClass("com.kichun."+packageName+".controller.AbstractController")
+                        // 自定义 com.yfshop.open.controller 父类
+                        //.setSuperControllerClass("com.kichun."+packageName+".com.yfshop.open.controller.AbstractController")
                         // 【实体】是否生成字段常量（默认 false）
                         // public static final String ID = "test_id";
                         // .setEntityColumnConstant(true)
@@ -131,7 +131,7 @@ public class Generator {
         gen.setPackageInfo(new PackageConfig()
                 //.setModuleName("User")
                 .setParent(basePackage)// 自定义包路径
-                .setController("controller")// 这里是控制器包名，默认 web
+                .setController("com.yfshop.open.controller")// 这里是控制器包名，默认 web
                 .setEntity("model")
                 .setMapper("mapper")
                 .setService("manager")

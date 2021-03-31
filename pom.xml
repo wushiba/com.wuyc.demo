@@ -13,6 +13,7 @@
     <modules>
         <module>com.yfshop.admin</module>
         <module>com.yfshop.shop</module>
+        <module>com.yfshop.open</module>
         <module>com.yfshop.code</module>
         <module>com.yfshop.common</module>
     </modules>

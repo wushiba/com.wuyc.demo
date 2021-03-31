@@ -20,4 +20,9 @@
         </if>
         order by b.id desc
     </select>
+
+    <select id="sumActCodeByBeforeId" resultType="java.lang.Integer">
+        select sum(b.quantity)
+        from yf_act_code_batch b  where b.create_time &gt;= #{statDate) and b.id &lt; #{id}
+    </select>
 </mapper>

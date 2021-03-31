@@ -97,6 +97,10 @@
             <artifactId>reflections</artifactId>
         </dependency>
         <!--好用的反射工具 end-->
+        <dependency>
+            <groupId>cn.dev33</groupId>
+            <artifactId>sa-token-spring-boot-starter</artifactId>
+        </dependency>
 
         <!--<dependency>
             <groupId>cn.dev33</groupId>

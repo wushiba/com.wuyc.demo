@@ -20,7 +20,7 @@ dubbo:
     retries: 0
     check: false
   scan:
-    base-packages: com.yfshop.admin.controlle
+    base-packages: com.yfshop.admin.controller
 
 spring:
     redis:

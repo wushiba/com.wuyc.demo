@@ -35,7 +35,7 @@ public class SwaggerConfig {
         return new Docket(DocumentationType.SWAGGER_2)
                 .apiInfo(apiInfo())
                 .select()
-                .apis(RequestHandlerSelectors.basePackage("com.yfshop.admin.controller"))
+                .apis(RequestHandlerSelectors.basePackage("com.yfshop.admin.com.yfshop.open.controller"))
                 .paths(PathSelectors.any())
                 .build();
     }

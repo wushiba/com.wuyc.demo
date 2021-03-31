@@ -12,7 +12,7 @@ dubbo:
   application:
     name: yfshop-shop-web
   scan:
-    base-packages: com.yfshop.shop.controller
+    base-packages: com.yfshop.shop.com.yfshop.open.controller
   consumer:
     timeout: 30000
     retries: 0

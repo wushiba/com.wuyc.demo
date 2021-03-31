@@ -16,7 +16,7 @@ import lombok.EqualsAndHashCode;
  * </p>
  *
  * @author yoush
- * @since 2021-03-23
+ * @since 2021-03-31
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -88,6 +88,8 @@ public class OrderDetail extends Model<OrderDetail> {
      * 订单状态 DZF(待支付), 待发货(DFH), 待收货(DSH), 已完成(YWC)
      */
     private String orderStatus;
+
+    private String itemTitle;
 
     /**
      * 商品sku的specValueIdpath

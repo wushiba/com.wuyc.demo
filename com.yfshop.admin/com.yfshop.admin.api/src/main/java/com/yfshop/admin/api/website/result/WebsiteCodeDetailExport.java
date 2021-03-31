@@ -9,6 +9,7 @@ import lombok.EqualsAndHashCode;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.Date;
 
 /**
  * <p>
@@ -27,7 +28,7 @@ public class WebsiteCodeDetailExport implements Serializable {
 
 
     @Excel(name = "激活时间", format = "yyyy-MM-dd HH:mm:ss",width=40)
-    private LocalDateTime activateTime;
+    private Date activateTime;
 
     /**
      * 商户码 3位地区码+6位pid+6位年月日+5位序号
@@ -38,7 +39,7 @@ public class WebsiteCodeDetailExport implements Serializable {
     /**
      * 是否激活, Y|N
      */
-    @Excel(name = "结算状态", replace = {"Y_已激活", "N_未激活"})
+    @Excel(name = "激活状态", replace = {"已激活_Y", "未激活_N"})
     private String isActivate;
 
     /**

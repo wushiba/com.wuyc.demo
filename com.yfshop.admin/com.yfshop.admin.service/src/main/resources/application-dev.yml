@@ -78,3 +78,7 @@ qiniu:
 websiteCode:
   dirs: F://websiteCode/
   url: http://192.168.11.34:8088/#/MerchantRegisterPrep?websiteCode=
+
+actCode:
+  dirs: F://actCode/
+  url: http://192.168.11.34:8088/#/Activity?actCode=

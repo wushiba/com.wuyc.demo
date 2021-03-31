@@ -40,8 +40,8 @@
         select count(1)
         from yf_website_code w left join yf_merchant m on m.id = w.merchant_id
         where 1=1
-        <if test="req.merchantId!=null">
-            and (w.merchant_id=#{req.merchantId} or w.pid_path like concat('%',#{req.merchantId},'%') )
+        <if test="merchantId!=null">
+            and (w.merchant_id=#{merchantId} or w.pid_path like concat('%',#{merchantId},'%') )
         </if>
         <if test="startTime!=null and startTime!=''">
             and w.create_time &gt;= #{startTime}
@@ -67,5 +67,11 @@
         <if test="mobile!=null and mobile!=''">
             and m.mobile = #{mobile}
         </if>
+    </select>
+
+    <select id="sumWebsiteCodeByBeforeId" resultType="java.lang.Integer">
+        select sum(c.quantity)
+        from yf_website_code c
+        where c.create_time &gt;= #{statDate) and c.id &lt; #{id}
     </select>
 </mapper>

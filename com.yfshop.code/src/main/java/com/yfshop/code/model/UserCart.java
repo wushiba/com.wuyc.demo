@@ -15,7 +15,7 @@ import lombok.EqualsAndHashCode;
  * </p>
  *
  * @author yoush
- * @since 2021-03-22
+ * @since 2021-03-31
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -47,6 +47,21 @@ public class UserCart extends Model<UserCart> {
      * 数量
      */
     private Integer num;
+
+    /**
+     * 封面图
+     */
+    private String skuCover;
+
+    /**
+     * 规格id字符串(1,2,3,4,5)
+     */
+    private String specValueIdPath;
+
+    /**
+     * 规格名称和值的json串({"尺码":"38","颜色":"黑色"})
+     */
+    private String specNameValueJson;
 
 
     @Override

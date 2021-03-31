@@ -5,6 +5,7 @@ import cn.hutool.core.util.CharsetUtil;
 import cn.hutool.core.util.ZipUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.qiniu.http.Response;
+import com.yfshop.admin.dao.WebsiteCodeDao;
 import com.yfshop.admin.tool.poster.drawable.Image;
 import com.yfshop.admin.tool.poster.drawable.Poster;
 import com.yfshop.admin.tool.poster.drawable.Text;
@@ -19,6 +20,7 @@ import com.yfshop.code.model.Merchant;
 import com.yfshop.code.model.Region;
 import com.yfshop.code.model.WebsiteCode;
 import com.yfshop.code.model.WebsiteCodeDetail;
+import com.yfshop.common.util.DateUtil;
 import lombok.SneakyThrows;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -40,6 +42,7 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.zip.ZipFile;
@@ -65,11 +68,12 @@ public class WebsiteCodeTask {
     private RegionMapper regionMapper;
     @Resource
     private MerchantMapper merchantMapper;
-
+    @Resource
+    private WebsiteCodeDao websiteCodeDao;
     @Autowired
-    QiniuUploader qiniuUploader;
+    private QiniuUploader qiniuUploader;
     @Autowired
-    QiniuConfig qiniuConfig;
+    private QiniuConfig qiniuConfig;
     @Autowired
     private JavaMailSender mailSender;
 
@@ -120,8 +124,11 @@ public class WebsiteCodeTask {
                 if (response.isOK()) {
                     websiteCode.setFileStatus("SUCCESS");
                     websiteCode.setFileUrl(response.url() + websiteCode.getBatchNo() + ".zip");
+                    String msg = "您好：\n" +
+                            "此邮件内含光明网点码，请妥善保管。\n" +
+                            "                                                                     雨帆";
                     if (StringUtils.isNotBlank(websiteCode.getEmail())) {
-                        sendAttachmentsMail(websiteCode.getEmail(), String.format("%s雨帆健康家网点码文件", websiteCode.getBatchNo()), String.format("%s雨帆健康家网点码文件，请及时下载！", websiteCode.getBatchNo()), fileZip.getPath());
+                        sendAttachmentsMail(websiteCode.getEmail(), "光明网点码", msg, fileZip.getPath());
                     }
                 }
             }
@@ -132,17 +139,16 @@ public class WebsiteCodeTask {
     //商户码 3位地区码+6位pid+6位年月日+5位序号
     @Async
     public void buildWebSiteCode(WebsiteCode websiteCode) {
-        int count = websiteCodeDetailMapper.selectCount(Wrappers.<WebsiteCodeDetail>lambdaQuery()
-                .eq(WebsiteCodeDetail::getPid, websiteCode.getMerchantId())
-                .ge(WebsiteCodeDetail::getCreateTime, LocalDate.now()));
+        Date date = DateUtil.getDate(DateUtil.localDateTimeToDate(websiteCode.getCreateTime()));
+        int count = websiteCodeDao.sumWebsiteCodeByBeforeId(websiteCode.getId(), date);
         if (count > 99999) {
             logger.info("{},超出当日限量了", websiteCode.getBatchNo());
             return;
         }
+        String dateTime = cn.hutool.core.date.DateUtil.format(date, "yyMMdd");
         Merchant merchant = merchantMapper.selectById(websiteCode.getMerchantId());
         Region region = regionMapper.selectById(merchant.getCityId());
-        String code = String.format("%03d%06d%s", region == null ? 0 : region.getAreaCode(), websiteCode.getMerchantId(),
-                LocalDate.now().format(DateTimeFormatter.ofPattern("yyMMdd")));
+        String code = String.format("%03d%06d%s", region == null ? 0 : region.getAreaCode(), websiteCode.getMerchantId(), dateTime);
         List<WebsiteCodeDetail> list = new ArrayList<>();
         for (int i = 0; i < websiteCode.getQuantity(); i++) {
             WebsiteCodeDetail websiteCodeDetail = new WebsiteCodeDetail();
@@ -205,7 +211,6 @@ public class WebsiteCodeTask {
 
     private void sendAttachmentsMail(String to, String subject, String content, String filePath, String... cc) throws MessagingException {
         MimeMessage message = mailSender.createMimeMessage();
-
         MimeMessageHelper helper = new MimeMessageHelper(message, true);
         helper.setFrom(from);
         helper.setTo(to);

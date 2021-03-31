@@ -1,7 +1,6 @@
 package com.yfshop.admin.config;
 
 import cn.dev33.satoken.config.SaTokenConfig;
-import cn.dev33.satoken.dao.SaTokenDaoRedis;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;

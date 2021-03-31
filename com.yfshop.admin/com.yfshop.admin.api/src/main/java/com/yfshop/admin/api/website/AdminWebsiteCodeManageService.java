@@ -51,8 +51,9 @@ public interface AdminWebsiteCodeManageService {
 
     /**
      * 获取网点码下载文件
+     *
      * @param id
      * @return
      */
-    String getWebsiteCodeUrl(Integer id);
+    String getWebsiteCodeUrl(Integer id) throws ApiException;
 }

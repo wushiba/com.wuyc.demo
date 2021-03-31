@@ -43,7 +43,7 @@ public class AdminWebsiteManageController implements BaseController {
     @RequestMapping(value = "/queryWebsiteCode", method = {RequestMethod.GET, RequestMethod.POST})
     @ResponseBody
     public CommonResult<IPage> queryWebsiteCode(WebsiteCodeQueryReq websiteCodeQueryReq) {
-        websiteCodeQueryReq.setMerchantId(getCurrentAdminUserId());
+        //websiteCodeQueryReq.setMerchantId(getCurrentAdminUserId());
         return CommonResult.success(adminWebsiteCodeManageService.queryWebsiteCodeList(websiteCodeQueryReq));
     }
 
@@ -55,6 +55,13 @@ public class AdminWebsiteManageController implements BaseController {
         return CommonResult.success(adminWebsiteCodeManageService.queryWebsiteCodeList(websiteCodeQueryReq));
     }
 
+
+    @ApiOperation(value = "查询网点码详情", httpMethod = "POST")
+    @RequestMapping(value = "/queryWebsiteCodeDetails", method = {RequestMethod.GET, RequestMethod.POST})
+    @ResponseBody
+    public CommonResult<IPage> queryWebsiteCodeDetailsList(WebsiteCodeQueryDetailsReq websiteCodeQueryDetailsReq) {
+        return CommonResult.success(adminWebsiteCodeManageService.queryWebsiteCodeDetailsList(websiteCodeQueryDetailsReq));
+    }
 
     @ApiOperation(value = "获取网点码文件", httpMethod = "POST")
     @RequestMapping(value = "/getWebsiteCodeUrl", method = {RequestMethod.GET, RequestMethod.POST})

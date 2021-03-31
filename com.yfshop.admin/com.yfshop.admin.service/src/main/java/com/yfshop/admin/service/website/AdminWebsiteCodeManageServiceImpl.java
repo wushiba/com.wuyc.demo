@@ -15,15 +15,19 @@ import com.yfshop.admin.dao.WebsiteCodeDao;
 import com.yfshop.admin.tool.poster.kernal.qiniu.QiniuDownloader;
 import com.yfshop.code.mapper.WebsiteCodeDetailMapper;
 import com.yfshop.code.mapper.WebsiteCodeMapper;
+import com.yfshop.code.model.Item;
 import com.yfshop.code.model.WebsiteCode;
 import com.yfshop.code.model.WebsiteCodeDetail;
 import com.yfshop.common.exception.ApiException;
+import com.yfshop.common.exception.Asserts;
 import com.yfshop.common.util.BeanUtil;
+import com.yfshop.common.util.DateUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.List;
 
 @DubboService
@@ -50,7 +54,7 @@ public class AdminWebsiteCodeManageServiceImpl implements AdminWebsiteCodeManage
     @Override
     public IPage<WebsiteCodeDetailResult> queryWebsiteCodeDetailsList(WebsiteCodeQueryDetailsReq req) throws ApiException {
         LambdaQueryWrapper<WebsiteCodeDetail> wrappers = Wrappers.<WebsiteCodeDetail>lambdaQuery()
-                .and(wrapper -> wrapper
+                .and(req.getMerchantId() != null, wrapper -> wrapper
                         .eq(WebsiteCodeDetail::getPid, req.getMerchantId())
                         .or()
                         .like(WebsiteCodeDetail::getPidPath, req.getMerchantId()))
@@ -79,7 +83,13 @@ public class AdminWebsiteCodeManageServiceImpl implements AdminWebsiteCodeManage
                 .eq(StringUtils.isNotBlank(req.getMobile()), WebsiteCodeDetail::getMobile, req.getMobile())
                 .eq(StringUtils.isNotBlank(req.getMerchantName()), WebsiteCodeDetail::getMerchantName, req.getMerchantName());
         List<WebsiteCodeDetail> websiteCodeDetails = websiteCodeDetailMapper.selectList(wrappers);
-        return BeanUtil.convertList(websiteCodeDetails, WebsiteCodeDetailExport.class);
+        List<WebsiteCodeDetailExport> websiteCodeDetailExportList = new ArrayList<>();
+        websiteCodeDetails.forEach(item -> {
+            WebsiteCodeDetailExport websiteCodeDetailExport = BeanUtil.convert(item, WebsiteCodeDetailExport.class);
+            websiteCodeDetailExport.setActivateTime(DateUtil.localDateTimeToDate(item.getActivityTime()));
+            websiteCodeDetailExportList.add(websiteCodeDetailExport);
+        });
+        return websiteCodeDetailExportList;
     }
 
     @Override
@@ -91,11 +101,9 @@ public class AdminWebsiteCodeManageServiceImpl implements AdminWebsiteCodeManage
     }
 
     @Override
-    public String getWebsiteCodeUrl(Integer id) {
+    public String getWebsiteCodeUrl(Integer id) throws ApiException {
         WebsiteCode websiteCode = websiteCodeMapper.selectById(id);
-        if (StringUtils.isNotBlank(websiteCode.getFileUrl())) {
-            return qiniuDownloader.privateDownloadUrl(websiteCode.getFileUrl(), 60);
-        }
-        return null;
+        Asserts.assertStringNotBlank(websiteCode.getFileUrl(), 500, "文件不存在！");
+        return qiniuDownloader.privateDownloadUrl(websiteCode.getFileUrl(), 60);
     }
 }

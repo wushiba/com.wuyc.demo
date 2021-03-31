@@ -7,9 +7,12 @@ import com.yfshop.admin.api.website.request.WebsiteCodeQueryReq;
 import com.yfshop.admin.api.website.result.WebsiteCodeResult;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.Date;
 import java.util.List;
 
 public interface ActCodeDao {
 
     List<ActCodeResult> queryActCodeList(IPage iPage, @Param("req") ActCodeQueryReq req);
+
+    Integer sumActCodeByBeforeId(Integer id, Date statDate);
 }

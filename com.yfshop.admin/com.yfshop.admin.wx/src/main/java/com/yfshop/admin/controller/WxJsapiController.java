@@ -1,18 +1,19 @@
 package com.yfshop.admin.controller;
 
-import cn.dev33.satoken.dao.SaTokenDaoRedis;
 import com.yfshop.common.api.CommonResult;
 import lombok.AllArgsConstructor;
 import me.chanjar.weixin.common.bean.WxJsapiSignature;
 import me.chanjar.weixin.common.error.WxErrorException;
 import me.chanjar.weixin.mp.api.WxMpService;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.net.URLDecoder;
 
 /**
- * jsapi 演示接口的 controller.
+ * jsapi 演示接口的 com.yfshop.open.controller.
  *
  * @author <a href="https://github.com/binarywang">Binary Wang</a>
  * @date 2020-04-25

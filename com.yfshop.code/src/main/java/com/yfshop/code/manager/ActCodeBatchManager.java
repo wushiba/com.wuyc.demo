@@ -9,7 +9,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
  * </p>
  *
  * @author yoush
- * @since 2021-03-22
+ * @since 2021-03-30
  */
 public interface ActCodeBatchManager extends IService<ActCodeBatch> {
 

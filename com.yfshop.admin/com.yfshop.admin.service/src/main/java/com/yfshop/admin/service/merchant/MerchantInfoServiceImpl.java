@@ -279,7 +279,7 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
         } else {
             websiteCode.setOrderStatus("SUCCESS");
         }
-        websiteCode.setBatchNo(cn.hutool.core.date.DateUtil.format(new Date(), "yyMMddHHmmssSSS" + RandomUtil.randomNumbers(4)));
+        websiteCode.setBatchNo(cn.hutool.core.date.DateUtil.format(new Date(), "yyMMddHHmmssSSS") + RandomUtil.randomNumbers(4));
         websiteCodeMapper.insert(websiteCode);
         if (StringUtils.isNotBlank(email)) {
             websiteCodeTask.buildWebSiteCode(websiteCode);

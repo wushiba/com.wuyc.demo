@@ -9,7 +9,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  * </p>
  *
  * @author yoush
- * @since 2021-03-22
+ * @since 2021-03-30
  */
 public interface ActCodeBatchMapper extends BaseMapper<ActCodeBatch> {
 

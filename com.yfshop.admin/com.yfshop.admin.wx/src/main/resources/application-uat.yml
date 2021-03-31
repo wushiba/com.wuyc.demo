@@ -16,7 +16,7 @@ dubbo:
     retries: 0
     check: false
   scan:
-    base-packages: com.yfshop.admin.controller
+    base-packages: com.yfshop.admin.com.yfshop.open.controller
 wx:
   mp:
     useRedis: true

@@ -1,0 +1,46 @@
+---
+server:
+  port: 10000
+logging:
+  level:
+    com.yfshop.admin.service.dao: debug
+spring:
+  datasource:
+    connectionProperties: druid.stat.mergeSql=true;druid.stat.slowSqlMillis=5000
+    minIdle: 3
+    validationQuery: select 'x'
+    initialSize: 1
+    maxWait: 60000
+    filters: stat,wall,slf4j
+    poolPreparedStatements: true
+    type: com.alibaba.druid.pool.DruidDataSource
+    url: jdbc:mysql://${MYSQL_HOST:192.168.11.197}:${MYSQL_PORT:3306}/${MYSQL_DB:db_online_jf}?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
+    username: ${MYSQL-USER:root}
+    password: ${MYSQL-PWD:root}
+    maxPoolPreparedStatementPerConnectionSize: 20
+    testOnBorrow: false
+    testWhileIdle: true
+    minEvictableIdleTimeMillis: 30000
+    timeBetweenEvictionRunsMillis: 60000
+    testOnReturn: false
+    driverClassName: com.mysql.cj.jdbc.Driver
+    maxActive: 20
+  
+dubbo:
+  registry:
+    address: zookeeper://${ZOOKEEPER_HOST:192.168.11.197}:${ZOOKEEPER_PORT:2181}
+  metadataReport:
+    address: zookeeper://${ZOOKEEPER_HOST:192.168.11.197}:${ZOOKEEPER_PORT:2181}
+  configcenter:
+    address: zookeeper://${ZOOKEEPER_HOST:192.168.11.197}:${ZOOKEEPER_PORT:2181}
+  protocol:
+    port: 20981
+    name: dubbo
+  scan:
+    base-packages: com.yfshop.open
+  provider:
+    dynamic: true
+    timeout: 30000
+    retries: 0
+  consumer:
+    check: false
