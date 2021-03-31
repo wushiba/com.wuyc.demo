@@ -100,6 +100,15 @@ public interface AdminMallManageService {
     List<ItemCategoryResult> queryCategory(Boolean isEnable);
 
     /**
+     * 修改分类排序序号
+     *
+     * @param categoryId the category id
+     * @param sort       the sort
+     * @return void
+     */
+    Void modifyCategorySort(@NotNull(message = "分类ID不能为空") Integer categoryId, @NotNull(message = "序号不能为空") Integer sort);
+
+    /**
      * 分页条件查询商品
      *
      * @param req the req
@@ -189,5 +198,4 @@ public interface AdminMallManageService {
      * @throws ApiException e
      */
     Void saveItemSku(@Valid @NotNull SaveItemSkuReq req) throws ApiException;
-
 }

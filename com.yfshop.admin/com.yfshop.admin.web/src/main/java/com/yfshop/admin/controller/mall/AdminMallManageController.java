@@ -77,9 +77,7 @@ public class AdminMallManageController implements BaseController {
     @SaCheckLogin
     @SaCheckRole(value = "sys")
     public CommonResult<List<ItemCategoryResult>> queryCategory(String isEnable) {
-        return CommonResult.success(adminMallManageService.queryCategory(
-                StringUtils.isBlank(isEnable) ? null : "Y".equalsIgnoreCase(isEnable))
-        );
+        return CommonResult.success(adminMallManageService.queryCategory(StringUtils.isBlank(isEnable) ? null : "Y".equalsIgnoreCase(isEnable)));
     }
 
     @ApiOperation(value = "删除分类", httpMethod = "GET")
@@ -105,6 +103,20 @@ public class AdminMallManageController implements BaseController {
     @SaCheckRole(value = "sys")
     public CommonResult<Void> editCategory(@Valid @NotNull(message = "编辑的分类信息不能为空") UpdateItemCategoryReq req) {
         return CommonResult.success(adminMallManageService.editCategory(req));
+    }
+
+    @ApiOperation(value = "修改分类的排序", httpMethod = "GET")
+    @ApiImplicitParams(value = {
+            @ApiImplicitParam(paramType = "query", name = "categoryId", value = "分类id", required = true),
+            @ApiImplicitParam(paramType = "query", name = "sort", value = "排序序号", required = true)
+    })
+    @RequestMapping(value = "/modifyCategorySort", method = {RequestMethod.POST})
+    @ResponseBody
+    @SaCheckLogin
+    @SaCheckRole(value = "sys")
+    public CommonResult<Void> modifyCategorySort(@NotNull(message = "分类ID不能为空") Integer categoryId,
+                                                 @NotNull(message = "序号不能为空") Integer sort) {
+        return CommonResult.success(adminMallManageService.modifyCategorySort(categoryId, sort));
     }
 
     @ApiOperation(value = "创建首页banner", httpMethod = "GET")

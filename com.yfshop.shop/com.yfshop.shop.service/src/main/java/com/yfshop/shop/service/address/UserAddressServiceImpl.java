@@ -135,10 +135,10 @@ public class UserAddressServiceImpl implements UserAddressService {
     @Transactional(rollbackFor = Exception.class)
     @Override
     public Void deleteUserAddress(@NotNull(message = "用户ID不能为空") Integer userId, List<Integer> userAddressIds) throws ApiException {
-        assertUserExist(userId);
         if (CollectionUtil.isEmpty(userAddressIds)) {
             return null;
         }
+        assertUserExist(userId);
         List<UserAddress> userAddresses = userAddressMapper.selectBatchIds(userAddressIds);
         if (CollectionUtil.isEmpty(userAddresses)) {
             return null;
