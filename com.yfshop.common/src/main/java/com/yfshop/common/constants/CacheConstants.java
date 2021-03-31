@@ -65,6 +65,6 @@ public interface CacheConstants {
 
     /** 用户商户距离 */
     Integer USER_MERCHANT_DISTANCE = 10;
-    RedisGeoCommands.DistanceUnit USER_MERCHANT_DISTANCE_UNIT = RedisGeoCommands.DistanceUnit.METERS;
+    RedisGeoCommands.DistanceUnit USER_MERCHANT_DISTANCE_UNIT = RedisGeoCommands.DistanceUnit.KILOMETERS;
 
 }

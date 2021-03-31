@@ -230,7 +230,7 @@ public class UserCartServiceImpl implements UserCartService {
         // 计算运费
         BigDecimal totalFreight = calcTotalFreight();
 
-        // TODO: 2021/3/24 优惠信息
+        // TODO: 2021/3/24 优惠信息  购物车不需要优惠券信息
 
         // 封装数据
         UserCartSummary cartSummary = new UserCartSummary();

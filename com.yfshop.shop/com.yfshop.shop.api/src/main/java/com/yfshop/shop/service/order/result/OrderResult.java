@@ -1,31 +1,16 @@
-package com.yfshop.code.model;
+package com.yfshop.shop.service.order.result;
 
-import java.math.BigDecimal;
-import com.baomidou.mybatisplus.annotation.TableName;
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.extension.activerecord.Model;
-import com.baomidou.mybatisplus.annotation.TableId;
-import java.time.LocalDateTime;
-import java.io.Serializable;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
+import java.io.Serializable;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.List;
 
-/**
- * <p>
- * 
- * </p>
- *
- * @author yoush
- * @since 2021-03-23
- */
 @Data
-@EqualsAndHashCode(callSuper = false)
-@TableName("yf_order")
-public class Order extends Model<Order> {
+public class OrderResult implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @TableId(value = "id", type = IdType.AUTO)
     private Long id;
 
     private LocalDateTime createTime;
@@ -96,10 +81,8 @@ public class Order extends Model<Order> {
      */
     private String remark;
 
+    private List<OrderDetailResult> childList;
 
-    @Override
-    protected Serializable pkVal() {
-        return this.id;
-    }
+    private OrderAddressResult orderAddressResult;
 
 }

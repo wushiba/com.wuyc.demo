@@ -16,7 +16,7 @@ import java.util.Date;
  * @Copyright:Copyright 
  */
 @Data
-public class YfCouponResult implements Serializable{
+public class YfCouponResult implements Serializable {
 
 	private static final long serialVersionUID = -1L;
 	

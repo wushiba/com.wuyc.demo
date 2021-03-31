@@ -25,9 +25,15 @@ public class FrontOrderController implements BaseController {
     @RequestMapping(value = "/findNearMerchantList", method = {RequestMethod.GET, RequestMethod.POST})
     @ResponseBody
     @SaCheckLogin
-    public CommonResult<List<MerchantResult>> findNearMerchantList(Double longitude, Double latitude) {
-        return CommonResult.success(frontMerchantService.findNearMerchantList(longitude, latitude));
+    public CommonResult<List<MerchantResult>> findNearMerchantList(Integer districtId, Double longitude, Double latitude) {
+        return CommonResult.success(frontMerchantService.findNearMerchantList(districtId, longitude, latitude));
     }
 
+    @RequestMapping(value = "/order/submit", method = {RequestMethod.GET, RequestMethod.POST})
+    @ResponseBody
+    @SaCheckLogin
+    public CommonResult<List<MerchantResult>> submitOrder(Integer districtId, Double longitude, Double latitude) {
+        return CommonResult.success(frontMerchantService.findNearMerchantList(districtId, longitude, latitude));
+    }
 
 }

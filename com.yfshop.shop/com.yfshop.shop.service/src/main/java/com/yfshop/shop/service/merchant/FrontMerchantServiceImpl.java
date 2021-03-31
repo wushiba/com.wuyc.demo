@@ -43,13 +43,14 @@ public class FrontMerchantServiceImpl implements FrontMerchantService {
 
     /**
      * 根据当前位置查询附近门店
+     * @param districtId    区id
      * @param longitude     经度
      * @param latitude      纬度
      * @return
      * @throws ApiException
      */
     @Override
-    public List<MerchantResult> findNearMerchantList(Double longitude, Double latitude) throws ApiException {
+    public List<MerchantResult> findNearMerchantList(Integer districtId, Double longitude, Double latitude) throws ApiException {
         List<MerchantResult> merchantResultList = initWdMerchantList();
         if (CollectionUtils.isEmpty(merchantResultList)) {
             return null;
@@ -111,10 +112,9 @@ public class FrontMerchantServiceImpl implements FrontMerchantService {
         redisService.set(CacheConstants.MERCHANT_INFO_DATA, JSON.toJSONString(merchantResultList));
 
         // 更新缓存中的商户经纬度，先删除后更新
-        Long aLong = redisService.zRemove(CacheConstants.MERCHANT_GRO_DATA);
-        logger.info("======zSetRemoveSize=" + aLong);
-
         detailList.forEach(merchantDetail -> {
+            Long aLong = redisService.zRemove(CacheConstants.MERCHANT_GRO_DATA, merchantDetail.getMerchantId() + "");
+            logger.info("======merchantId=" + merchantDetail.getMerchantId() + "zSetRemoveSize=" + aLong);
             redisService.geoAdd(CacheConstants.MERCHANT_GRO_DATA, merchantDetail.getLongitude(), merchantDetail.getLatitude(), merchantDetail.getMerchantId());
         });
         return merchantResultList;
