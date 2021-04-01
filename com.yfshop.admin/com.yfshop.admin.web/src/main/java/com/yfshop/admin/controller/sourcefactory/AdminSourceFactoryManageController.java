@@ -30,6 +30,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author Xulg
@@ -90,4 +91,32 @@ public class AdminSourceFactoryManageController implements BaseController {
         return CommonResult.success(adminSourceFactoryManageService.pageQuerySourceFactories(req));
     }
 
+    @ApiOperation(value = "导出工厂", httpMethod = "GET")
+    @ApiImplicitParams(value = {
+            @ApiImplicitParam(paramType = "query", name = "factoryName", value = "工厂名称", required = false),
+    })
+    @RequestMapping(value = "/downloadSourceFactory", method = {RequestMethod.GET, RequestMethod.POST})
+    @ResponseBody
+    @SaCheckLogin
+    @SaCheckRole(value = "sys")
+    public void downloadSourceFactory(QuerySourceFactoriesReq req) {
+        req.setPageSize(Integer.MAX_VALUE);
+        IPage<SourceFactoryResult> page = adminSourceFactoryManageService.pageQuerySourceFactories(req);
+        List<SourceFactoryExcel> data = page.getRecords().stream()
+                .map(sf -> {
+                    SourceFactoryExcel excel = new SourceFactoryExcel();
+                    excel.setFactoryName(sf.getFactoryName());
+                    excel.setContacts(sf.getContacts());
+                    excel.setMobile(sf.getMobile());
+                    excel.setEmail(sf.getEmail());
+                    excel.setProvince(sf.getProvince());
+                    excel.setCity(sf.getCity());
+                    excel.setDistrict(sf.getDistrict());
+                    excel.setAddress(sf.getAddress());
+                    excel.setIsEnable(sf.getIsEnable());
+                    return excel;
+                }).collect(Collectors.toList());
+        ExcelUtils.exportExcel(data, "工厂信息", "工厂信息",
+                SourceFactoryExcel.class, "工厂信息.xls", getCurrentResponse());
+    }
 }
