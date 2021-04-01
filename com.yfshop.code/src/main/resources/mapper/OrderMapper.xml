@@ -8,7 +8,7 @@
         <result column="create_time" property="createTime" />
         <result column="update_time" property="updateTime" />
         <result column="user_id" property="userId" />
-        <result column="user_coupon_id" property="userCouponId" />
+        <result column="receive_way" property="receiveWay" />
         <result column="item_count" property="itemCount" />
         <result column="child_order_count" property="childOrderCount" />
         <result column="order_price" property="orderPrice" />
@@ -18,6 +18,7 @@
         <result column="is_pay" property="isPay" />
         <result column="bill_no" property="billNo" />
         <result column="pay_time" property="payTime" />
+        <result column="is_cancel" property="isCancel" />
         <result column="cancel_time" property="cancelTime" />
         <result column="pay_entry_count" property="payEntryCount" />
         <result column="remark" property="remark" />
@@ -25,7 +26,7 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        id, create_time, update_time, user_id, user_coupon_id, item_count, child_order_count, order_price, coupon_price, freight, pay_price, is_pay, bill_no, pay_time, cancel_time, pay_entry_count, remark
+        id, create_time, update_time, user_id, receive_way, item_count, child_order_count, order_price, coupon_price, freight, pay_price, is_pay, bill_no, pay_time, is_cancel, cancel_time, pay_entry_count, remark
     </sql>
 
 </mapper>

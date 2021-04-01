@@ -26,7 +26,7 @@ public class OrderDetail extends Model<OrderDetail> {
     private static final long serialVersionUID = 1L;
 
     @TableId(value = "id", type = IdType.AUTO)
-    private Integer id;
+    private Long id;
 
     private LocalDateTime createTime;
 
@@ -54,6 +54,8 @@ public class OrderDetail extends Model<OrderDetail> {
      */
     private String receiveWay;
 
+    private String isPay;
+
     /**
      * 商品id
      */
@@ -79,10 +81,22 @@ public class OrderDetail extends Model<OrderDetail> {
      */
     private Integer itemCount;
 
-    /**
-     * 子订单运费
-     */
+    /** 子订单运费 */
     private BigDecimal freight;
+
+    /** 优惠金额 */
+    private BigDecimal couponPrice;
+
+    /** 订单总金额 */
+    private BigDecimal orderPrice;
+
+    /** 支付金额 */
+    private BigDecimal payPrice;
+
+    /**
+     * 优惠金额
+     */
+    private Long userCouponId;
 
     /**
      * 订单状态 DZF(待支付), 待发货(DFH), 待收货(DSH), 已完成(YWC)

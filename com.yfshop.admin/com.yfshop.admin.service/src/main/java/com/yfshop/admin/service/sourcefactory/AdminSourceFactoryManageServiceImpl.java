@@ -26,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.HashSet;
@@ -50,7 +51,7 @@ public class AdminSourceFactoryManageServiceImpl implements AdminSourceFactoryMa
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public Void createSourceFactory(@NotNull CreateSourceFactoryReq req) throws ApiException {
+    public Void createSourceFactory(@Valid @NotNull CreateSourceFactoryReq req) throws ApiException {
         Region province = regionMapper.selectById(req.getProvinceId());
         Asserts.assertNonNull(province, 500, "省份信息不存在");
         Region city = regionMapper.selectById(req.getCityId());
@@ -70,7 +71,7 @@ public class AdminSourceFactoryManageServiceImpl implements AdminSourceFactoryMa
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public Void updateSourceFactory(@NotNull UpdateSourceFactoryReq req) throws ApiException {
+    public Void updateSourceFactory(@Valid @NotNull UpdateSourceFactoryReq req) throws ApiException {
         SourceFactory existSourceFactory = sourceFactoryMapper.selectById(req.getSourceFactoryId());
         Asserts.assertNonNull(existSourceFactory, 500, "编辑工厂不存在");
         Region province = regionMapper.selectById(req.getProvinceId());
@@ -82,6 +83,7 @@ public class AdminSourceFactoryManageServiceImpl implements AdminSourceFactoryMa
 
         SourceFactory bean = new SourceFactory();
         BeanUtil.copyProperties(req, bean);
+        bean.setId(req.getSourceFactoryId());
         bean.setProvince(province.getName());
         bean.setCity(city.getName());
         bean.setDistrict(district.getName());
@@ -92,7 +94,7 @@ public class AdminSourceFactoryManageServiceImpl implements AdminSourceFactoryMa
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public Void importSourceFactory(@NotNull ImportSourceFactoryReq req) throws ApiException {
+    public Void importSourceFactory(@Valid @NotNull ImportSourceFactoryReq req) throws ApiException {
         List<SourceFactoryExcel> excels = req.getExcels();
         // find all regions
         Set<RegionWrapper> regionWrappers = new HashSet<>();

@@ -1,7 +1,8 @@
 package com.yfshop.shop.service.order.service;
 
 import com.yfshop.common.exception.ApiException;
-import com.yfshop.shop.service.order.result.OrderResult;
+import com.yfshop.shop.service.order.result.YfUserOrderDetailResult;
+import com.yfshop.shop.service.order.result.YfUserOrderListResult;
 import java.util.List;
 
 /**
@@ -20,7 +21,7 @@ public interface FrontUserOrderService {
 	 * @return
 	 * @Description:
 	 */
-	public List<OrderResult> findUserOrderList(Integer userId, String useStatus) throws ApiException;
+	public List<YfUserOrderListResult> findUserOrderList(Integer userId, String useStatus) throws ApiException;
 
 	/**
 	 * 用户订单详情
@@ -29,22 +30,56 @@ public interface FrontUserOrderService {
 	 * @return
 	 * @Description:
 	 */
-	public List<OrderResult> getUserOrderDetail(Integer userId, Integer orderId) throws ApiException;
+	public YfUserOrderDetailResult getUserOrderDetail(Integer userId, Integer orderId, Integer orderDetailId) throws ApiException;
 
 	/**
 	 * 用户取消订单
-	 * @param userId
-	 * @param orderId
+	 * @param userId	用户id
+	 * @param orderId	订单id
 	 * @throws ApiException
 	 */
 	public void cancelOrder(Integer userId, Integer orderId) throws ApiException;
 
 	/**
 	 * 用户确认订单
-	 * @param userId
-	 * @param orderId
+	 * @param userId			用户id
+	 * @param orderDetailId		订单详情id
 	 * @throws ApiException
 	 */
-	public void confirmOrder(Integer userId, Integer orderId) throws ApiException;
+	public void confirmOrder(Integer userId, Integer orderDetailId) throws ApiException;
+
+	/**
+	 * 商品单个立即购买
+	 * @param userId		用户id
+	 * @param skuId			skuId
+	 * @param num			购买数量
+	 * @param userCouponId	用户优惠券id
+	 * @param addressId		用户地址id
+	 * @return
+	 * @throws ApiException
+	 */
+	Void submitOrderBySkuId(Integer userId, Integer skuId, Integer num, Long userCouponId, Long addressId) throws ApiException;
+
+	/**
+	 * 商品购物车下单购买
+	 * @param userId		用户id
+	 * @param cartIds		购物车id
+	 * @param userCouponId	用户优惠券id
+	 * @param addressId		用户地址id
+	 * @return
+	 * @throws ApiException
+	 */
+	Void submitOrderByCart(Integer userId, String cartIds, Long userCouponId, Long addressId) throws ApiException;
+
+	/**
+	 * 优惠券购买商品
+	 * @param userId		用户id
+	 * @param userCouponIds	用户优惠券ids
+	 * @param userMobile	用户手机号
+	 * @param websiteCode	商户网点码
+	 * @return
+	 * @throws ApiException
+	 */
+	Void submitOrderByUserCouponId(Integer userId, String userCouponIds, String userMobile, String websiteCode) throws ApiException;
 
 }

@@ -130,4 +130,6 @@ public class MerchantInfo implements Serializable {
      * 门头照
      */
     private String headImage;
+
+    private String pRoleAlias;
 }

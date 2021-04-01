@@ -14,7 +14,6 @@ import com.yfshop.admin.dao.MerchantDao;
 import com.yfshop.admin.dto.query.QueryMerchantDetail;
 import com.yfshop.code.mapper.MerchantDetailMapper;
 import com.yfshop.code.mapper.RegionMapper;
-import com.yfshop.admin.dao.MerchantDao;
 import com.yfshop.code.model.Merchant;
 import com.yfshop.code.model.MerchantDetail;
 import com.yfshop.code.model.Region;
@@ -55,13 +54,17 @@ public class AdminMerchantManageServiceImpl implements AdminMerchantManageServic
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public Void createMerchant(CreateMerchantReq req) throws ApiException {
+    public Void createMerchant(Integer merchantId, CreateMerchantReq req) throws ApiException {
         Region province = regionMapper.selectById(req.getProvinceId());
         Asserts.assertNonNull(province, 500, "省份信息不存在");
         Region city = regionMapper.selectById(req.getCityId());
         Asserts.assertNonNull(city, 500, "市信息不存在");
         Region district = regionMapper.selectById(req.getDistrictId());
         Asserts.assertNonNull(district, 500, "区信息不存在");
+        Merchant currentLoginMerchant = merchantMapper.selectById(merchantId);
+        Asserts.assertNonNull(currentLoginMerchant, 500, "当前登录商户不存在");
+        Asserts.assertTrue("Y".equalsIgnoreCase(currentLoginMerchant.getIsEnable()), 500, "当前登录商户已被禁用");
+        Asserts.assertTrue("N".equalsIgnoreCase(currentLoginMerchant.getIsDelete()), 500, "当前登录商户已被删除");
 
         // check the pid if necessary
         Merchant pm = null;
@@ -91,8 +94,8 @@ public class AdminMerchantManageServiceImpl implements AdminMerchantManageServic
         merchant.setAddress(req.getAddress());
         merchant.setIsEnable("Y");
         merchant.setIsDelete("N");
-        merchant.setPid(pm == null ? 0 : pm.getId());
-        merchant.setPMerchantName(pm == null ? null : pm.getMerchantName());
+        merchant.setPid(pm == null ? merchantId : pm.getId());
+        merchant.setPMerchantName(pm == null ? currentLoginMerchant.getMerchantName() : pm.getMerchantName());
         merchant.setPidPath(this.generatePidPath(req.getPid()));
         merchantMapper.insert(merchant);
         return null;
@@ -100,7 +103,7 @@ public class AdminMerchantManageServiceImpl implements AdminMerchantManageServic
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public Void updateMerchant(UpdateMerchantReq req) throws ApiException {
+    public Void updateMerchant(Integer merchantId, UpdateMerchantReq req) throws ApiException {
         Merchant existMerchant = merchantMapper.selectById(req.getMerchantId());
         Asserts.assertNonNull(existMerchant, 500, "编辑的商户不存在");
         Region province = regionMapper.selectById(req.getProvinceId());
@@ -109,6 +112,10 @@ public class AdminMerchantManageServiceImpl implements AdminMerchantManageServic
         Asserts.assertNonNull(city, 500, "市信息不存在");
         Region district = regionMapper.selectById(req.getDistrictId());
         Asserts.assertNonNull(district, 500, "区信息不存在");
+        Merchant currentLoginMerchant = merchantMapper.selectById(merchantId);
+        Asserts.assertNonNull(currentLoginMerchant, 500, "当前登录商户不存在");
+        Asserts.assertTrue("Y".equalsIgnoreCase(currentLoginMerchant.getIsEnable()), 500, "当前登录商户已被禁用");
+        Asserts.assertTrue("N".equalsIgnoreCase(currentLoginMerchant.getIsDelete()), 500, "当前登录商户已被删除");
 
         // check the pid if necessary
         Merchant pm = null;
@@ -124,6 +131,7 @@ public class AdminMerchantManageServiceImpl implements AdminMerchantManageServic
             // update detail
             MerchantDetail bean = new MerchantDetail();
             bean.setIsRefrigerator(req.getIsRefrigerator());
+            bean.setHeadImage(req.getHeadImage());
             LambdaQueryWrapper<MerchantDetail> queryWrapper = Wrappers.lambdaQuery(MerchantDetail.class)
                     .eq(MerchantDetail::getMerchantId, req.getMerchantId());
             Asserts.assertTrue(merchantDetailMapper.update(bean, queryWrapper) > 0,
@@ -131,7 +139,6 @@ public class AdminMerchantManageServiceImpl implements AdminMerchantManageServic
         }
 
         // update
-        MD5 md5 = MD5.create();
         Merchant merchant = new Merchant();
         merchant.setId(req.getMerchantId());
         merchant.setUpdateTime(LocalDateTime.now());
@@ -139,7 +146,10 @@ public class AdminMerchantManageServiceImpl implements AdminMerchantManageServic
         merchant.setRoleName(GroupRoleEnum.getByCode(req.getRoleAlias()).getDescription());
         merchant.setMerchantName(req.getMerchantName());
         merchant.setMobile(req.getMobile());
-        merchant.setPassword(md5.digestHex(md5.digestHex(req.getPassword())));
+        if (StringUtils.isNotBlank(req.getPassword())) {
+            MD5 md5 = MD5.create();
+            merchant.setPassword(md5.digestHex(md5.digestHex(req.getPassword())));
+        }
         merchant.setContacts(req.getContacts());
         merchant.setProvince(province.getName());
         merchant.setCity(city.getName());
@@ -148,8 +158,8 @@ public class AdminMerchantManageServiceImpl implements AdminMerchantManageServic
         merchant.setCityId(req.getCityId());
         merchant.setDistrictId(req.getDistrictId());
         merchant.setAddress(req.getAddress());
-        merchant.setPid(pm == null ? 0 : pm.getId());
-        merchant.setPMerchantName(pm == null ? null : pm.getMerchantName());
+        merchant.setPid(pm == null ? merchantId : pm.getId());
+        merchant.setPMerchantName(pm == null ? currentLoginMerchant.getMerchantName() : pm.getMerchantName());
         merchant.setPidPath(this.generatePidPath(req.getPid()));
         int rows = merchantMapper.updateById(merchant);
         Asserts.assertTrue(rows > 0, 500, "编辑商户信息失败");
@@ -203,6 +213,18 @@ public class AdminMerchantManageServiceImpl implements AdminMerchantManageServic
         return null;
     }
 
+    @Override
+    public IPage<MerchantResult> pageQueryMerchantsByPidAndRoleAlias(Integer merchantId, String roleAlias, String merchantName,
+                                                                     Integer pageIndex, Integer pageSize) {
+        if (merchantId == null || StringUtils.isBlank(roleAlias)) {
+            return BeanUtil.emptyPageData(pageIndex, pageSize);
+        }
+        Page<Merchant> page = merchantMapper.selectPage(new Page<>(pageIndex, pageSize),
+                Wrappers.lambdaQuery(Merchant.class).eq(Merchant::getPid, merchantId).eq(Merchant::getRoleAlias, roleAlias)
+                        .like(StringUtils.isNotBlank(merchantName), Merchant::getMerchantName, merchantName));
+        return BeanUtil.iPageConvert(page, MerchantResult.class);
+    }
+
     private String generatePidPath(Integer pid) {
         if (pid == null || pid == 0) {
             return null;
@@ -210,7 +232,7 @@ public class AdminMerchantManageServiceImpl implements AdminMerchantManageServic
         LinkedList<Integer> path = new LinkedList<>();
         path.addFirst(pid);
         Merchant parent = this.getParent(pid);
-        while (parent.getPid() != 0) {
+        while (parent.getPid() != null && parent.getPid() != 0) {
             path.addFirst(parent.getId());
             parent = this.getParent(parent.getPid());
         }

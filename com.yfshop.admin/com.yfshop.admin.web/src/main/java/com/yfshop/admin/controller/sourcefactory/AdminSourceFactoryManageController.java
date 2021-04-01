@@ -30,6 +30,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author Xulg
@@ -65,12 +66,12 @@ public class AdminSourceFactoryManageController implements BaseController {
 
     @ApiOperation(value = "导入工厂数据Excel文件", httpMethod = "GET")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "excelFile", value = "excel文件"),
+            @ApiImplicitParam(name = "file", value = "excel文件"),
     })
     @RequestMapping(value = "/importSourceFactory", method = {RequestMethod.POST, RequestMethod.GET})
     @ResponseBody
-    public CommonResult<Void> importSourceFactory(@NotNull(message = "导入文件不能为空") MultipartFile excelFile) {
-        List<SourceFactoryExcel> excels = ExcelUtils.importExcel(excelFile, 1, 1, SourceFactoryExcel.class);
+    public CommonResult<Void> importSourceFactory(@NotNull(message = "导入文件不能为空") MultipartFile file) {
+        List<SourceFactoryExcel> excels = ExcelUtils.importExcel(file, 1, 1, SourceFactoryExcel.class);
         Asserts.assertCollectionNotEmpty(excels, 500, "未能解析出Excel内容");
         ImportSourceFactoryReq req = ImportSourceFactoryReq.builder().excels(excels).build();
         return CommonResult.success(adminSourceFactoryManageService.importSourceFactory(req));
@@ -90,4 +91,32 @@ public class AdminSourceFactoryManageController implements BaseController {
         return CommonResult.success(adminSourceFactoryManageService.pageQuerySourceFactories(req));
     }
 
+    @ApiOperation(value = "导出工厂", httpMethod = "GET")
+    @ApiImplicitParams(value = {
+            @ApiImplicitParam(paramType = "query", name = "factoryName", value = "工厂名称", required = false),
+    })
+    @RequestMapping(value = "/downloadSourceFactory", method = {RequestMethod.GET, RequestMethod.POST})
+    @ResponseBody
+    @SaCheckLogin
+    @SaCheckRole(value = "sys")
+    public void downloadSourceFactory(QuerySourceFactoriesReq req) {
+        req.setPageSize(Integer.MAX_VALUE);
+        IPage<SourceFactoryResult> page = adminSourceFactoryManageService.pageQuerySourceFactories(req);
+        List<SourceFactoryExcel> data = page.getRecords().stream()
+                .map(sf -> {
+                    SourceFactoryExcel excel = new SourceFactoryExcel();
+                    excel.setFactoryName(sf.getFactoryName());
+                    excel.setContacts(sf.getContacts());
+                    excel.setMobile(sf.getMobile());
+                    excel.setEmail(sf.getEmail());
+                    excel.setProvince(sf.getProvince());
+                    excel.setCity(sf.getCity());
+                    excel.setDistrict(sf.getDistrict());
+                    excel.setAddress(sf.getAddress());
+                    excel.setIsEnable(sf.getIsEnable());
+                    return excel;
+                }).collect(Collectors.toList());
+        ExcelUtils.exportExcel(data, "工厂信息", "工厂信息",
+                SourceFactoryExcel.class, "工厂信息.xls", getCurrentResponse());
+    }
 }
