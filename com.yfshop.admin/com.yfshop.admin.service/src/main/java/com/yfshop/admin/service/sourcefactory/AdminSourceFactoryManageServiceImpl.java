@@ -22,6 +22,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboService;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
@@ -65,7 +66,11 @@ public class AdminSourceFactoryManageServiceImpl implements AdminSourceFactoryMa
         bean.setDistrict(district.getName());
         bean.setCreateTime(LocalDateTime.now());
         bean.setUpdateTime(LocalDateTime.now());
-        sourceFactoryMapper.insert(bean);
+        try {
+            sourceFactoryMapper.insert(bean);
+        } catch (DuplicateKeyException e) {
+            throw new ApiException(500, "重复的手机号" + req.getMobile());
+        }
         return null;
     }
 
@@ -88,7 +93,11 @@ public class AdminSourceFactoryManageServiceImpl implements AdminSourceFactoryMa
         bean.setCity(city.getName());
         bean.setDistrict(district.getName());
         bean.setUpdateTime(LocalDateTime.now());
-        sourceFactoryMapper.updateById(bean);
+        try {
+            sourceFactoryMapper.updateById(bean);
+        } catch (DuplicateKeyException e) {
+            throw new ApiException(500, "重复的手机号" + req.getMobile());
+        }
         return null;
     }
 
