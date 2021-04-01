@@ -9,6 +9,8 @@ import java.util.List;
 @Data
 @EqualsAndHashCode(callSuper = false)
 public class WebsiteCodePayReq implements Serializable {
-    List<Integer> ids;
-    Integer addressId;
+    private String userId;
+    private String openId;
+    private List<Integer> ids;
+    private Integer addressId;
 }

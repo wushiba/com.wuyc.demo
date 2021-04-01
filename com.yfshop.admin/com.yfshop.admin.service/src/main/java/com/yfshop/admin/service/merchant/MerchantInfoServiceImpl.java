@@ -7,12 +7,17 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.github.binarywang.wxpay.bean.notify.WxPayOrderNotifyResult;
+import com.github.binarywang.wxpay.bean.order.WxPayMpOrderResult;
+import com.github.binarywang.wxpay.bean.request.BaseWxPayRequest;
+import com.github.binarywang.wxpay.bean.request.WxPayUnifiedOrderRequest;
 import com.yfshop.admin.api.merchant.MerchantInfoService;
 import com.yfshop.admin.api.merchant.result.MerchantResult;
 import com.yfshop.admin.api.website.request.WebsiteCodeAddressReq;
 import com.yfshop.admin.api.website.request.WebsiteCodeBindReq;
 import com.yfshop.admin.api.website.request.WebsiteCodePayReq;
 import com.yfshop.admin.api.website.result.*;
+import com.yfshop.admin.api.wx.MpPayService;
 import com.yfshop.admin.task.WebsiteCodeTask;
 import com.yfshop.code.mapper.*;
 import com.yfshop.code.model.*;
@@ -23,7 +28,10 @@ import com.yfshop.common.util.AddressUtil;
 import com.yfshop.common.util.BeanUtil;
 import com.yfshop.common.util.DateUtil;
 import com.yfshop.common.util.GeoUtils;
+import lombok.SneakyThrows;
+import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
@@ -74,6 +82,9 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
 
     @Autowired
     private WebsiteCodeTask websiteCodeTask;
+
+    @DubboReference
+    private MpPayService mpPayService;
 
 
     @Override
@@ -359,7 +370,6 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
                 websiteCodeAmountResult.setQuantity(websiteCodeAmountResult.getQuantity() + item.getQuantity());
             });
         }
-
         return websiteCodeAmountResult;
     }
 
@@ -368,28 +378,41 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
         return BeanUtil.convert(websiteCodeMapper.selectById(id), WebsiteCodeResult.class);
     }
 
+    @SneakyThrows
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public WebsiteCodePayResult applyWebsiteCodePay(WebsiteCodePayReq websiteCodePayReq) throws ApiException {
+    public WxPayMpOrderResult applyWebsiteCodePay(WebsiteCodePayReq websiteCodePayReq) throws ApiException {
         WebsiteCodeAddress websiteCodeAddress = websiteCodeAddressMapper.selectById(websiteCodePayReq.getAddressId());
         WebsiteCode websiteCode = new WebsiteCode();
         websiteCode.setMobile(websiteCodeAddress.getMobile());
         websiteCode.setContracts(websiteCodeAddress.getContracts());
-        websiteCode.setPayMethod("WxPay");
+        //websiteCode.setPayMethod("WxPay");
         websiteCode.setAddress(websiteCodeAddress.getProvince() + websiteCodeAddress.getCity() + websiteCodeAddress.getDistrict() + websiteCodeAddress.getAddress());
-        websiteCode.setOrderStatus("WAIT");
+        //websiteCode.setOrderStatus("WAIT");
         websiteCode.setOrderNo(String.format("%06d", websiteCodeAddress.getMerchantId()) + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyMMddHHmmssSSS")));
         int count = websiteCodeMapper.update(websiteCode, Wrappers.<WebsiteCode>lambdaQuery()
                 .in(WebsiteCode::getId, websiteCodePayReq.getIds())
                 .eq(WebsiteCode::getOrderStatus, "PENDING"));
         Asserts.assertTrue(count > 0, 500, "没有要支付的订单！");
         WebsiteCodeAmountResult websiteCodeAmountResult = applyWebsiteCodeAmount(websiteCodePayReq.getIds());
-        WebsiteCodePayResult websiteCodePayResult = new WebsiteCodePayResult();
-        websiteCodePayResult.setAmount(websiteCodeAmountResult.getAmount().add(websiteCodeAmountResult.getPostage()));
-        websiteCodePayResult.setOrderNo(websiteCode.getOrderNo());
+        String fee = websiteCodeAmountResult.getAmount().add(websiteCodeAmountResult.getPostage()).toPlainString();
+//        WebsiteCodePayResult websiteCodePayResult = new WebsiteCodePayResult();
+//        websiteCodePayResult.setAmount(websiteCodeAmountResult.getAmount().add(websiteCodeAmountResult.getPostage()));
+//        websiteCodePayResult.setOrderNo(websiteCode.getOrderNo());
+        //websiteCodeTask.doWorkWebsiteCodeFile(websiteCode.getOrderNo());
 
-        websiteCodeTask.doWorkWebsiteCodeFile(websiteCode.getOrderNo());
-        return websiteCodePayResult;
+        WxPayUnifiedOrderRequest wxPayUnifiedOrderRequest = new WxPayUnifiedOrderRequest();
+        WxPayUnifiedOrderRequest orderRequest = new WxPayUnifiedOrderRequest();
+        orderRequest.setBody("网点码申请");
+        orderRequest.setOutTradeNo(websiteCode.getOrderNo());
+        orderRequest.setNotifyUrl("http://wx.luckylottery.cloud/pay/notify/order/websiteCodePay");
+        orderRequest.setTotalFee(BaseWxPayRequest.yuanToFen(fee));//元转成分
+        orderRequest.setOpenid(websiteCodePayReq.getOpenId());
+        orderRequest.setSpbillCreateIp(websiteCodePayReq.getUserId());
+        orderRequest.setTimeStart(DateFormatUtils.format(new Date(), "yyyyMMddHHmmss"));
+        orderRequest.setTimeExpire(DateFormatUtils.format(new Date(System.currentTimeMillis() + (1000 * 60 * 15)), "yyyyMMddHHmmss"));
+
+        return mpPayService.createPayOrder(wxPayUnifiedOrderRequest);
     }
 
     @Override
@@ -428,6 +451,19 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
             }
         }
         return merchantResult;
+    }
+
+    @Override
+    public void websitePayOrderNotify(WxPayOrderNotifyResult notifyResult) {
+        WebsiteCode websiteCode = new WebsiteCode();
+        websiteCode.setPayMethod("WxPay");
+        websiteCode.setBillno(notifyResult.getTransactionId());
+        int count = websiteCodeMapper.update(websiteCode, Wrappers.<WebsiteCode>lambdaQuery()
+                .eq(WebsiteCode::getOrderNo, notifyResult.getOutTradeNo())
+                .eq(WebsiteCode::getOrderStatus, "PENDING"));
+        if (count > 0) {
+            websiteCodeTask.doWorkWebsiteCodeFile(notifyResult.getOutTradeNo());
+        }
     }
 
 }

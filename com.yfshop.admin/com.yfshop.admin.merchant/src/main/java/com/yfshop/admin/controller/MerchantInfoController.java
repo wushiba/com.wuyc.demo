@@ -4,7 +4,8 @@ import cn.dev33.satoken.annotation.SaCheckLogin;
 import cn.dev33.satoken.stp.StpLogic;
 import cn.dev33.satoken.stp.StpUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.yfshop.admin.api.merchant.MerchantInfoService;
+import com.github.binarywang.wxpay.bean.order.WxPayMpOrderResult;
+import com.yfshop.admin.api.merchant.*;
 import com.yfshop.admin.api.merchant.result.MerchantResult;
 import com.yfshop.admin.api.user.UserService;
 import com.yfshop.admin.api.user.result.UserResult;
@@ -221,9 +222,13 @@ class MerchantInfoController extends AbstractBaseController {
 
 
     @RequestMapping(value = "/applyWebsiteCodePay", method = {RequestMethod.POST})
-    public CommonResult<WebsiteCodePayResult> applyWebsiteCodePay(@RequestBody WebsiteCodePayReq websiteCodePayReq) {
-        WebsiteCodePayResult websiteCodePayResult = merchantInfoService.applyWebsiteCodePay(websiteCodePayReq);
-        return CommonResult.success(websiteCodePayResult);
+    public CommonResult<WxPayMpOrderResult> applyWebsiteCodePay(@RequestBody WebsiteCodePayReq websiteCodePayReq) {
+        String openId = getCurrentOpenId();
+        Asserts.assertNonNull(openId, 500, "需要微信授权");
+        websiteCodePayReq.setOpenId(getCurrentOpenId());
+        websiteCodePayReq.setUserId(getRequestIpStr());
+        WxPayMpOrderResult wxPayMpOrderResult = merchantInfoService.applyWebsiteCodePay(websiteCodePayReq);
+        return CommonResult.success(wxPayMpOrderResult);
     }
 
     /**

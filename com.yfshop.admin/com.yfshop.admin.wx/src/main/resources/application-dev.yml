@@ -17,8 +17,8 @@ dubbo:
     check: false
   scan:
     base-packages: com.yfshop.admin
-    
-    
+
+
 spring:
   # redis配置
   redis:
@@ -61,10 +61,10 @@ wx:
         token: yufanshop # 接口配置里的Token值
         aesKey: 111 # 接口配置里的EncodingAESKey
   pay:
-    appId: #微信公众号或者小程序等的appid
-    mchId: #微信支付商户号
-    mchKey: #微信支付商户密钥
+    appId: wxf4797fe8b12cdf62
+    mchId: 1607782065
+    mchKey: F1887D3F9E6EE7A32FE5E76F4AB80D63
     subAppId: #服务商模式下的子商户公众账号ID
     subMchId: #服务商模式下的子商户号
-    keyPath: # p12证书的位置，可以指定绝对路径，也可以指定类路径（以classpath:开头）
+    keyPath: classpath:/static/apiclient_cert.p12
 

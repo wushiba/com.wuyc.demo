@@ -1,6 +1,8 @@
 package com.yfshop.admin.api.merchant;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.github.binarywang.wxpay.bean.notify.WxPayOrderNotifyResult;
+import com.github.binarywang.wxpay.bean.order.WxPayMpOrderResult;
 import com.yfshop.admin.api.merchant.result.MerchantResult;
 import com.yfshop.admin.api.website.request.WebsiteCodeAddressReq;
 import com.yfshop.admin.api.website.request.WebsiteCodeBindReq;
@@ -23,6 +25,15 @@ public interface MerchantInfoService {
 
 
     /**
+     * 判定商户码
+     *
+     * @param websiteReq
+     * @return
+     */
+    MerchantResult websiteCodeBind(WebsiteCodeBindReq websiteReq) throws ApiException;
+
+
+    /**
      * 获取网点商户码信息
      *
      * @param merchantId
@@ -37,15 +48,6 @@ public interface MerchantInfoService {
      * @return
      */
     List<WebsiteTypeResult> getWebsiteType() throws ApiException;
-
-    /**
-     * 判定商户码
-     *
-     * @param websiteReq
-     * @return
-     */
-    MerchantResult websiteCodeBind(WebsiteCodeBindReq websiteReq) throws ApiException;
-
 
     /**
      * 我申请的网点码
@@ -136,8 +138,14 @@ public interface MerchantInfoService {
      * @param websiteCodePayReq
      * @return
      */
-    WebsiteCodePayResult applyWebsiteCodePay(WebsiteCodePayReq websiteCodePayReq) throws ApiException;
+    WxPayMpOrderResult applyWebsiteCodePay(WebsiteCodePayReq websiteCodePayReq) throws ApiException;
 
+    /**
+     * 校验网点码跳转
+     * @param websiteCode
+     * @return
+     * @throws ApiException
+     */
     Integer checkWebsiteCode(String websiteCode) throws ApiException;
 
     /**
@@ -148,5 +156,17 @@ public interface MerchantInfoService {
      */
     MerchantResult getMerchantByWebsiteCode(String websiteCode) throws ApiException;
 
+    /**
+     * 获取网点码
+     * @param openId
+     * @return
+     * @throws ApiException
+     */
     MerchantResult getMerchantByOpenId(String openId) throws ApiException;
+
+    /**
+     * 网点码支付回调
+     * @param notifyResult
+     */
+    void websitePayOrderNotify(WxPayOrderNotifyResult notifyResult);
 }

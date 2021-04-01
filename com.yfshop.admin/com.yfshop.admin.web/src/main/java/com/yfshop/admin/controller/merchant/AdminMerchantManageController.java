@@ -3,7 +3,7 @@ package com.yfshop.admin.controller.merchant;
 import cn.dev33.satoken.annotation.SaCheckLogin;
 import cn.dev33.satoken.annotation.SaCheckRole;
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.yfshop.admin.api.merchant.AdminMerchantManageService;
+import com.yfshop.admin.api.merchant.*;
 import com.yfshop.admin.api.merchant.request.CreateMerchantReq;
 import com.yfshop.admin.api.merchant.request.QueryMerchantReq;
 import com.yfshop.admin.api.merchant.request.UpdateMerchantReq;
