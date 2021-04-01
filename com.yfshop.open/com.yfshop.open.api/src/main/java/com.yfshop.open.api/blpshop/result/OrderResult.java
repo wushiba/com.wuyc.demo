@@ -2,12 +2,13 @@ package com.yfshop.open.api.blpshop.result;
 
 import lombok.Data;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
 @Data
-public class OrderResult {
+public class OrderResult implements Serializable {
     private String code;
     private String message;
     private Integer numTotalOrder;

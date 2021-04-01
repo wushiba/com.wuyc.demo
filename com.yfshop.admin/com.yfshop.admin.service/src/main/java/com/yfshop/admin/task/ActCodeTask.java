@@ -90,7 +90,7 @@ public class ActCodeTask {
         Response response = qiniuUploader.getUploadManager().put(filePath, actCodeBatch.getBatchNo() + ".txt", qiniuUploader.getAuth().uploadToken(qiniuConfig.getBucket()));
         if (response.isOK()) {
             actCodeBatch.setFileStatus("SUCCESS");
-            actCodeBatch.setFileUrl(response.url() + actCodeBatch.getBatchNo() + ".txt");
+            actCodeBatch.setFileUrl("http://"+qiniuConfig.getDomain() + actCodeBatch.getBatchNo() + ".txt");
         }
         actCodeBatchManager.updateById(actCodeBatch);
     }

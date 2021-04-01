@@ -4,26 +4,24 @@ import java.math.BigDecimal;
 
 import com.google.common.collect.Lists;
 
-import java.util.Date;
-
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.yfshop.code.mapper.*;
-import com.yfshop.code.model.Order;
-import com.yfshop.code.model.OrderAddress;
-import com.yfshop.code.model.OrderDetail;
-import com.yfshop.code.model.RlItemHotpot;
+import com.yfshop.code.model.*;
+import com.yfshop.common.exception.ApiException;
 import com.yfshop.common.util.DateUtil;
-import com.yfshop.open.api.blpshop.request.OrderReq;
-import com.yfshop.open.api.blpshop.result.OrderResult;
+import com.yfshop.open.api.blpshop.request.*;
+import com.yfshop.open.api.blpshop.result.*;
 import com.yfshop.open.api.blpshop.service.OrderService;
+import io.swagger.models.auth.In;
 import org.apache.dubbo.config.annotation.DubboService;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -39,6 +37,10 @@ public class OrderServiceImpl implements OrderService {
     private RlItemHotpotMapper rlItemHotpotMapper;
     @Resource
     private OrderAddressMapper orderAddressMapper;
+    @Resource
+    private ItemSkuMapper itemSkuMapper;
+    @Resource
+    private ItemMapper itemMapper;
 
     @Override
     public OrderResult getOrder(OrderReq orderReq) {
@@ -91,20 +93,18 @@ public class OrderServiceImpl implements OrderService {
             order.setPayType("JH_WXWeb");
             order.setShouldPayType("担保交易");
             for (OrderDetail detail : value) {
-                OrderResult.GoodInfo goodInfo=new OrderResult.GoodInfo();
-                goodInfo.setProductId(key+"");
-                goodInfo.setSubOrderNo(detail.getId()+"");
-                goodInfo.setTradeGoodsNo(detail.getSkuId()+"");
-                goodInfo.setPlatGoodsId(detail.getItemId()+"");
-                goodInfo.setPlatSkuId(detail.getSkuId()+"");
-                goodInfo.setOutItemId(detail.getItemId()+"");
-                goodInfo.setOutSkuId(detail.getSkuId()+"");
-                goodInfo.setTradeGoodsName(detail.getItemCount());
-                goodInfo.setTradeGoodsSpec("");
-                goodInfo.setGoodsCount(0);
-                goodInfo.setPrice(new BigDecimal("0"));
-
-
+                OrderResult.GoodInfo goodInfo = new OrderResult.GoodInfo();
+                goodInfo.setProductId(key + "");
+                goodInfo.setSubOrderNo(detail.getId() + "");
+                goodInfo.setTradeGoodsNo(detail.getSkuId() + "");
+                goodInfo.setPlatGoodsId(detail.getItemId() + "");
+                goodInfo.setPlatSkuId(detail.getSkuId() + "");
+                goodInfo.setOutItemId(detail.getItemId() + "");
+                goodInfo.setOutSkuId(detail.getSkuId() + "");
+                goodInfo.setTradeGoodsName(detail.getItemTitle());
+                goodInfo.setTradeGoodsSpec(detail.getSpecNameValueJson());
+                goodInfo.setGoodsCount(detail.getItemCount());
+                goodInfo.setPrice(detail.getItemPrice());
             }
             order.setGoodInfos(goodInfos);
             orderList.add(order);
@@ -114,5 +114,108 @@ public class OrderServiceImpl implements OrderService {
         orderResult.setOrders(orderList);
         orderResult.setNumTotalOrder(orderDetailMapper.selectCount(lambdaQueryWrapper));
         return orderResult;
+    }
+
+    @Override
+    public SendResult send(SendReq sendReq) throws ApiException {
+        List<Long> subPlatOrderNo = Arrays.stream(sendReq.getSubPlatOrderNo().split("|")).map(a -> Long.parseLong(a)).collect(Collectors.toList());
+        OrderDetail orderDetail = new OrderDetail();
+        orderDetail.setOrderStatus("DSH");
+        orderDetail.setOrderId(Long.parseLong(sendReq.getPlatOrderNo()));
+        orderDetail.setExpressCompany(sendReq.getLogisticName());
+        orderDetail.setExpressNo(sendReq.getLogisticNo());
+        orderDetailMapper.update(orderDetail, Wrappers.<OrderDetail>lambdaQuery()
+                .eq(OrderDetail::getOrderId, Long.parseLong(sendReq.getPlatOrderNo()))
+                .in(OrderDetail::getId, subPlatOrderNo));
+        SendResult sendResult = new SendResult();
+        sendResult.setCode("10000");
+        sendResult.setMessage("Success");
+        sendResult.setSubMessage("发货成功");
+        return sendResult;
+    }
+
+    @Override
+    public CheckRefundStatusResult checkRefundStatus(CheckRefundStatusReq checkRefundStatusReq) throws ApiException {
+        CheckRefundStatusResult checkRefundStatusResult = new CheckRefundStatusResult();
+        checkRefundStatusResult.setCode("10000");
+        checkRefundStatusResult.setMessage("SUCCESS");
+        checkRefundStatusResult.setSubMessage("没有退款");
+        checkRefundStatusResult.setRefundStatus("JH_07");
+        checkRefundStatusResult.setRefundStatusDescription("退款成功");
+
+        return checkRefundStatusResult;
+    }
+
+    @Override
+    public DownloadProductResult downloadProduct(DownloadProductReq downloadProductReq) throws ApiException {
+        DownloadProductResult downloadProductResult = new DownloadProductResult();
+        List<RlItemHotpot> list = rlItemHotpotMapper.selectList(Wrappers.emptyWrapper());
+        List<Integer> skuIds = new ArrayList<>();
+        list.stream().forEach(item -> {
+            skuIds.add(item.getSkuId());
+        });
+        IPage<ItemSku> ipage = itemSkuMapper.selectPage(new Page<>(downloadProductReq.getPageIndex(), downloadProductReq.getPageSize()), Wrappers.emptyWrapper());
+        downloadProductResult.setCode("10000");
+        downloadProductResult.setMessage("SUCCESS");
+        List<DownloadProductResult.Goods> goodsList = new ArrayList<>();
+        Map<Integer, List<ItemSku>> skuMap = ipage.getRecords().stream().collect(Collectors.groupingBy(ItemSku::getItemId));
+        List<Integer> items = new ArrayList<>();
+        skuMap.forEach((key, value) -> {
+            items.add(key);
+        });
+        List<Item> itemList = itemMapper.selectBatchIds(items);
+        Map<Integer, Item> itemMap = itemList.stream().collect(Collectors.toMap(Item::getId, Function.identity()));
+        skuMap.forEach((key, value) -> {
+            Item item = itemMap.get(key);
+            DownloadProductResult.Goods goods = new DownloadProductResult.Goods();
+            goods.setPlatProductId(item.getId() + "");
+            goods.setName(item.getItemTitle());
+            goods.setOuterId(item.getId() + "");
+            goods.setPrice(item.getItemPrice());
+            goods.setNum(item.getItemStock());
+            goods.setPictureUrl(item.getItemCover());
+            List<DownloadProductResult.Sku> skus = new ArrayList<>();
+            for (ItemSku sku : value) {
+                DownloadProductResult.Sku s = new DownloadProductResult.Sku();
+                s.setSkuId(sku.getId() + "");
+                s.setSkuOuterId(sku.getId() + "");
+                s.setSkuPrice(sku.getSkuSalePrice());
+                s.setSkuQuantity(sku.getSkuStock());
+                s.setSkuName(sku.getSkuTitle());
+                s.setSkuProperty(sku.getSpecNameValueJson());
+                s.setSkuPictureUrl(sku.getSkuCover());
+                skus.add(s);
+            }
+            goods.setSkus(skus);
+            goodsList.add(goods);
+
+        });
+        downloadProductResult.setGoodsList(goodsList);
+        downloadProductResult.setTotalCount(skuIds.size());
+        return downloadProductResult;
+    }
+
+    @Override
+    public SyncStockResult syncStock(SyncStockReq syncStockReq) throws ApiException {
+        ItemSku itemSku = new ItemSku();
+        itemSku.setItemId(Integer.valueOf(syncStockReq.getSkuId()));
+        itemSku.setSkuStock(syncStockReq.getQuantity());
+        itemSkuMapper.updateById(itemSku);
+        SyncStockResult syncStockResult = new SyncStockResult();
+        syncStockResult.setCode("10000");
+        syncStockResult.setMessage("SUCCESS");
+        syncStockResult.setQuantity(syncStockReq.getQuantity() + "");
+        return syncStockResult;
+    }
+
+    @Override
+    public RefundResult getRefund(RefundReq refundReq) throws ApiException {
+        RefundResult refundResult = new RefundResult();
+        refundResult.setRefunds(new ArrayList<>());
+        refundResult.setMessage("SUCCESS");
+        refundResult.setCode("10000");
+        refundResult.setIsSuccess(true);
+        refundResult.setTotalCount(0);
+        return refundResult;
     }
 }

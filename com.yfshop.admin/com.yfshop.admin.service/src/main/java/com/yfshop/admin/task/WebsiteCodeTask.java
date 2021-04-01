@@ -123,7 +123,7 @@ public class WebsiteCodeTask {
                 Response response = qiniuUploader.getUploadManager().put(fileZip, fileZip.getName(), qiniuUploader.getAuth().uploadToken(qiniuConfig.getBucket()));
                 if (response.isOK()) {
                     websiteCode.setFileStatus("SUCCESS");
-                    websiteCode.setFileUrl(response.url() + websiteCode.getBatchNo() + ".zip");
+                    websiteCode.setFileUrl("http://"+qiniuConfig.getDomain() + websiteCode.getBatchNo() + ".zip");
                     String msg = "您好：\n" +
                             "此邮件内含光明网点码，请妥善保管。\n" +
                             "                                                                     雨帆";

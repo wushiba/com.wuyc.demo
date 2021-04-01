@@ -2,10 +2,11 @@ package com.yfshop.open.api.blpshop.request;
 
 import lombok.Data;
 
+import java.io.Serializable;
 import java.util.Date;
 
 @Data
-public class OrderReq {
+public class OrderReq implements Serializable {
     /**
      * 订单交易状态(等待买家付款=JH_01，等待卖家发货=JH_02，
      * 等待买家确认收货=JH_03，交易成功=JH_04，
