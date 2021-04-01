@@ -19,7 +19,7 @@
     </select>
 
     <select id="countMerchantInfo" resultType="java.lang.Integer">
-        select count(*) from yf_merchant a left join yf_merchant_detail b on a.id = b.merchant_id
+        select count(*) from yf_merchant a left join yf_merchant_detail b on a.id = b.merchant_id left join yf_merchant c on a.pid = c.id
         <include refid="query_sql"/>
     </select>
 
