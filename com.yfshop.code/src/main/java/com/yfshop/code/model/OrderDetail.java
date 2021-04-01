@@ -96,7 +96,7 @@ public class OrderDetail extends Model<OrderDetail> {
     /**
      * 优惠金额
      */
-    private Integer userCouponId;
+    private Long userCouponId;
 
     /**
      * 订单状态 DZF(待支付), 待发货(DFH), 待收货(DSH), 已完成(YWC)

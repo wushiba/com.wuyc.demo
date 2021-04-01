@@ -48,4 +48,38 @@ public interface FrontUserOrderService {
 	 */
 	public void confirmOrder(Integer userId, Integer orderDetailId) throws ApiException;
 
+	/**
+	 * 商品单个立即购买
+	 * @param userId		用户id
+	 * @param skuId			skuId
+	 * @param num			购买数量
+	 * @param userCouponId	用户优惠券id
+	 * @param addressId		用户地址id
+	 * @return
+	 * @throws ApiException
+	 */
+	Void submitOrderBySkuId(Integer userId, Integer skuId, Integer num, Long userCouponId, Long addressId) throws ApiException;
+
+	/**
+	 * 商品购物车下单购买
+	 * @param userId		用户id
+	 * @param cartIds		购物车id
+	 * @param userCouponId	用户优惠券id
+	 * @param addressId		用户地址id
+	 * @return
+	 * @throws ApiException
+	 */
+	Void submitOrderByCart(Integer userId, String cartIds, Long userCouponId, Long addressId) throws ApiException;
+
+	/**
+	 * 优惠券购买商品
+	 * @param userId		用户id
+	 * @param userCouponIds	用户优惠券ids
+	 * @param userMobile	用户手机号
+	 * @param websiteCode	商户网点码
+	 * @return
+	 * @throws ApiException
+	 */
+	Void submitOrderByUserCouponId(Integer userId, String userCouponIds, String userMobile, String websiteCode) throws ApiException;
+
 }
