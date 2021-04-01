@@ -1,5 +1,6 @@
 package com.yfshop.admin.api.merchant.result;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -29,6 +30,11 @@ public class MerchantResult implements Serializable {
      * 上级名称，有编辑上级名称的时候同步到进来
      */
     private String pMerchantName;
+
+    /**
+     * 上级的角色标识
+     */
+    private String pRoleAlias;
 
     /**
      * pid_path
@@ -112,6 +118,7 @@ public class MerchantResult implements Serializable {
      */
     private String headImage;
 
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", locale = "zh", timezone = "GMT+8")
     private LocalDateTime createTime;
     private String isEnable;
     private String isDelete;

@@ -131,6 +131,7 @@ public class AdminMerchantManageServiceImpl implements AdminMerchantManageServic
             // update detail
             MerchantDetail bean = new MerchantDetail();
             bean.setIsRefrigerator(req.getIsRefrigerator());
+            bean.setHeadImage(req.getHeadImage());
             LambdaQueryWrapper<MerchantDetail> queryWrapper = Wrappers.lambdaQuery(MerchantDetail.class)
                     .eq(MerchantDetail::getMerchantId, req.getMerchantId());
             Asserts.assertTrue(merchantDetailMapper.update(bean, queryWrapper) > 0,

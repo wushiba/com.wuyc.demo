@@ -12,8 +12,8 @@
     </select>
 
     <select id="pageQueryMerchantInfo" resultType="com.yfshop.admin.dto.result.MerchantInfo">
-        select a.*, b.website_type_id, b.website_type_name, b.is_refrigerator, b.longitude, b.latitude, b.geo_hash, b.head_image
-        from yf_merchant a left join yf_merchant_detail b on a.id = b.merchant_id
+        select a.*, b.website_type_id, b.website_type_name, b.is_refrigerator, b.longitude, b.latitude, b.geo_hash, b.head_image, c.role_alias as pRoleAlias
+        from yf_merchant a left join yf_merchant_detail b on a.id = b.merchant_id left join yf_merchant c on a.pid = c.id
         <include refid="query_sql"/>
         order by a.id desc limit #{startIndex}, #{pageSize}
     </select>
