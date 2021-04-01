@@ -9,6 +9,7 @@ import com.yfshop.common.exception.ApiException;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import java.util.List;
 
 /**
  * @author Xulg
@@ -19,20 +20,22 @@ public interface AdminMerchantManageService {
     /**
      * 创建商户
      *
-     * @param req the req
+     * @param merchantId the merchant id
+     * @param req        the req
      * @return void
      * @throws ApiException e
      */
-    Void createMerchant(@Valid @NotNull CreateMerchantReq req) throws ApiException;
+    Void createMerchant(@NotNull Integer merchantId, @Valid @NotNull CreateMerchantReq req) throws ApiException;
 
     /**
      * 编辑商户
      *
-     * @param req the req
+     * @param merchantId the merchant id
+     * @param req        the req
      * @return void
      * @throws ApiException e
      */
-    Void updateMerchant(@Valid @NotNull UpdateMerchantReq req) throws ApiException;
+    Void updateMerchant(@NotNull Integer merchantId, @Valid @NotNull UpdateMerchantReq req) throws ApiException;
 
     /**
      * 分页查询商户列表
@@ -51,4 +54,17 @@ public interface AdminMerchantManageService {
      * @throws ApiException e
      */
     Void updateMerchantIsEnable(@NotNull(message = "商户ID不能为空") Integer merchantId, boolean isEnable) throws ApiException;
+
+    /**
+     * 根据角色标识查询商户列表
+     *
+     * @param merchantId   the merchant id
+     * @param roleAlias    the role alias
+     * @param merchantName the merchant name
+     * @param pageIndex    the page index
+     * @param pageSize     the page size
+     * @return the merchant list
+     */
+    IPage<MerchantResult> pageQueryMerchantsByPidAndRoleAlias(Integer merchantId, String roleAlias, String merchantName,
+                                                              Integer pageIndex, Integer pageSize);
 }

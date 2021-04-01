@@ -18,6 +18,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.validation.Valid;
@@ -41,7 +42,7 @@ public class AdminMerchantManageController implements BaseController {
     @SaCheckLogin
     @SaCheckRole(value = "sys")
     public CommonResult<Void> createMerchant(@Valid @NotNull(message = "创建商户信息不能为空") CreateMerchantReq req) {
-        return CommonResult.success(adminMerchantManageService.createMerchant(req));
+        return CommonResult.success(adminMerchantManageService.createMerchant(getCurrentAdminUserId(), req));
     }
 
     @ApiOperation(value = "编辑商户", httpMethod = "GET")
@@ -50,7 +51,7 @@ public class AdminMerchantManageController implements BaseController {
     @SaCheckLogin
     @SaCheckRole(value = "sys")
     public CommonResult<Void> updateMerchant(@Valid @NotNull(message = "编辑商户信息不能为空") UpdateMerchantReq req) {
-        return CommonResult.success(adminMerchantManageService.updateMerchant(req));
+        return CommonResult.success(adminMerchantManageService.updateMerchant(getCurrentAdminUserId(), req));
     }
 
     @ApiOperation(value = "分页查询商户列表", httpMethod = "GET")
@@ -84,6 +85,24 @@ public class AdminMerchantManageController implements BaseController {
     @SaCheckRole(value = "sys")
     public CommonResult<Void> enableMerchant(@NotNull(message = "商户ID不能为空") Integer merchantId) {
         return CommonResult.success(adminMerchantManageService.updateMerchantIsEnable(merchantId, true));
+    }
+
+    @ApiOperation(value = "根据pid和角色分页查询商户", httpMethod = "GET")
+    @ApiImplicitParams(value = {
+            @ApiImplicitParam(paramType = "query", name = "pageIndex", value = "页码", required = false),
+            @ApiImplicitParam(paramType = "query", name = "pageSize", value = "每页显示个数", required = false),
+            @ApiImplicitParam(paramType = "query", name = "roleAlias", value = "角色", required = false),
+            @ApiImplicitParam(paramType = "query", name = "merchantName", value = "商户名称", required = false),
+    })
+    @RequestMapping(value = "/pageQueryMerchantsByPidAndRoleAlias", method = {RequestMethod.GET, RequestMethod.POST})
+    @ResponseBody
+    @SaCheckLogin
+    @SaCheckRole(value = "sys")
+    public CommonResult<IPage<MerchantResult>> pageQueryMerchantsByPidAndRoleAlias(@RequestParam(name = "pageIndex", required = false, defaultValue = "1") Integer pageIndex,
+                                                                                   @RequestParam(name = "pageSize", required = false, defaultValue = "10") Integer pageSize,
+                                                                                   String roleAlias, String merchantName) {
+        return CommonResult.success(adminMerchantManageService.pageQueryMerchantsByPidAndRoleAlias(
+                getCurrentAdminUserId(), roleAlias, merchantName, pageIndex, pageSize));
     }
 
 }
