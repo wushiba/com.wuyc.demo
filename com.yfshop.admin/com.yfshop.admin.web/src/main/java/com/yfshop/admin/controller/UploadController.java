@@ -30,7 +30,7 @@ public class UploadController {
     @SaCheckLogin
     public CommonResult<String> createUploadToken() {
         QiNiuYunHelper helper = QiNiuYunHelper.builder().accessKey("DSM_E9p8v4nikrb0W6ovHkzxH_2uRtz8c5-nx8y6")
-                .secretKey("QFrGQnxFdOzz-iNKQmilWQGdnrzy-3ScVGYGVQG7").bucketName("yufanshop").build();
+                .secretKey("QFrGQnxFdOzz-iNKQmilWQGdnrzy-3ScVGYGVQG7").bucketName("yufanopen").build();
         return CommonResult.success(helper.createUploadToken());
     }
 

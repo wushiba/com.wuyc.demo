@@ -26,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.HashSet;
@@ -70,7 +71,7 @@ public class AdminSourceFactoryManageServiceImpl implements AdminSourceFactoryMa
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public Void updateSourceFactory(@NotNull UpdateSourceFactoryReq req) throws ApiException {
+    public Void updateSourceFactory(@Valid @NotNull UpdateSourceFactoryReq req) throws ApiException {
         SourceFactory existSourceFactory = sourceFactoryMapper.selectById(req.getSourceFactoryId());
         Asserts.assertNonNull(existSourceFactory, 500, "编辑工厂不存在");
         Region province = regionMapper.selectById(req.getProvinceId());
