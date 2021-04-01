@@ -83,6 +83,7 @@ public class AdminSourceFactoryManageServiceImpl implements AdminSourceFactoryMa
 
         SourceFactory bean = new SourceFactory();
         BeanUtil.copyProperties(req, bean);
+        bean.setId(req.getSourceFactoryId());
         bean.setProvince(province.getName());
         bean.setCity(city.getName());
         bean.setDistrict(district.getName());
