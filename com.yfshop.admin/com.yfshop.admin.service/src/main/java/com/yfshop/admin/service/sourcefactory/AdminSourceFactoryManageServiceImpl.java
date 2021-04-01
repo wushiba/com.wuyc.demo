@@ -51,7 +51,7 @@ public class AdminSourceFactoryManageServiceImpl implements AdminSourceFactoryMa
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public Void createSourceFactory(@NotNull CreateSourceFactoryReq req) throws ApiException {
+    public Void createSourceFactory(@Valid @NotNull CreateSourceFactoryReq req) throws ApiException {
         Region province = regionMapper.selectById(req.getProvinceId());
         Asserts.assertNonNull(province, 500, "省份信息不存在");
         Region city = regionMapper.selectById(req.getCityId());
@@ -93,7 +93,7 @@ public class AdminSourceFactoryManageServiceImpl implements AdminSourceFactoryMa
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public Void importSourceFactory(@NotNull ImportSourceFactoryReq req) throws ApiException {
+    public Void importSourceFactory(@Valid @NotNull ImportSourceFactoryReq req) throws ApiException {
         List<SourceFactoryExcel> excels = req.getExcels();
         // find all regions
         Set<RegionWrapper> regionWrappers = new HashSet<>();
