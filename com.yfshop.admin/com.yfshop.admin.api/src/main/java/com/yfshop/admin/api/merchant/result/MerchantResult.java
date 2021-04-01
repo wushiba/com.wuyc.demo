@@ -4,6 +4,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 
 /**
  * <p>
@@ -111,4 +112,5 @@ public class MerchantResult implements Serializable {
      */
     private String headImage;
 
+    private LocalDateTime createTime;
 }
