@@ -139,7 +139,6 @@ public class AdminMerchantManageServiceImpl implements AdminMerchantManageServic
         }
 
         // update
-        MD5 md5 = MD5.create();
         Merchant merchant = new Merchant();
         merchant.setId(req.getMerchantId());
         merchant.setUpdateTime(LocalDateTime.now());
@@ -147,7 +146,10 @@ public class AdminMerchantManageServiceImpl implements AdminMerchantManageServic
         merchant.setRoleName(GroupRoleEnum.getByCode(req.getRoleAlias()).getDescription());
         merchant.setMerchantName(req.getMerchantName());
         merchant.setMobile(req.getMobile());
-        merchant.setPassword(md5.digestHex(md5.digestHex(req.getPassword())));
+        if (StringUtils.isNotBlank(req.getPassword())) {
+            MD5 md5 = MD5.create();
+            merchant.setPassword(md5.digestHex(md5.digestHex(req.getPassword())));
+        }
         merchant.setContacts(req.getContacts());
         merchant.setProvince(province.getName());
         merchant.setCity(city.getName());

@@ -4,12 +4,15 @@ import cn.dev33.satoken.annotation.SaCheckLogin;
 import cn.dev33.satoken.annotation.SaCheckRole;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.yfshop.admin.api.merchant.AdminMerchantManageService;
+import com.yfshop.admin.api.merchant.MerchantExcel;
 import com.yfshop.admin.api.merchant.request.CreateMerchantReq;
 import com.yfshop.admin.api.merchant.request.QueryMerchantReq;
 import com.yfshop.admin.api.merchant.request.UpdateMerchantReq;
 import com.yfshop.admin.api.merchant.result.MerchantResult;
 import com.yfshop.common.api.CommonResult;
 import com.yfshop.common.base.BaseController;
+import com.yfshop.common.util.BeanUtil;
+import com.yfshop.common.util.ExcelUtils;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
@@ -23,6 +26,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author Xulg
@@ -61,6 +66,20 @@ public class AdminMerchantManageController implements BaseController {
     @SaCheckRole(value = "sys")
     public CommonResult<IPage<MerchantResult>> pageQueryMerchants(QueryMerchantReq req) {
         return CommonResult.success(adminMerchantManageService.pageQueryMerchants(req));
+    }
+
+    @ApiOperation(value = "条件导出商户列表", httpMethod = "GET")
+    @RequestMapping(value = "/downloadMerchants", method = {RequestMethod.GET, RequestMethod.POST})
+    @ResponseBody
+    @SaCheckLogin
+    @SaCheckRole(value = "sys")
+    public void downloadMerchants(QueryMerchantReq req) {
+        req.setPageSize(Integer.MAX_VALUE);
+        IPage<MerchantResult> page = adminMerchantManageService.pageQueryMerchants(req);
+        List<MerchantExcel> data = page.getRecords().stream().map(m -> BeanUtil.convert(m, MerchantExcel.class))
+                .collect(Collectors.toList());
+        ExcelUtils.exportExcel(data, "商户信息", "商户信息",
+                MerchantExcel.class, "商户信息.xls", getCurrentResponse());
     }
 
     @ApiOperation(value = "禁用商户", httpMethod = "GET")
