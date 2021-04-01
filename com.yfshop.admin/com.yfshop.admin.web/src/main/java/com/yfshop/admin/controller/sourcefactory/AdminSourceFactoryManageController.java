@@ -66,12 +66,12 @@ public class AdminSourceFactoryManageController implements BaseController {
 
     @ApiOperation(value = "导入工厂数据Excel文件", httpMethod = "GET")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "excelFile", value = "excel文件"),
+            @ApiImplicitParam(name = "file", value = "excel文件"),
     })
     @RequestMapping(value = "/importSourceFactory", method = {RequestMethod.POST, RequestMethod.GET})
     @ResponseBody
-    public CommonResult<Void> importSourceFactory(@NotNull(message = "导入文件不能为空") MultipartFile excelFile) {
-        List<SourceFactoryExcel> excels = ExcelUtils.importExcel(excelFile, 1, 1, SourceFactoryExcel.class);
+    public CommonResult<Void> importSourceFactory(@NotNull(message = "导入文件不能为空") MultipartFile file) {
+        List<SourceFactoryExcel> excels = ExcelUtils.importExcel(file, 1, 1, SourceFactoryExcel.class);
         Asserts.assertCollectionNotEmpty(excels, 500, "未能解析出Excel内容");
         ImportSourceFactoryReq req = ImportSourceFactoryReq.builder().excels(excels).build();
         return CommonResult.success(adminSourceFactoryManageService.importSourceFactory(req));
