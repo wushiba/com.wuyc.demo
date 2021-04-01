@@ -113,4 +113,6 @@ public class MerchantResult implements Serializable {
     private String headImage;
 
     private LocalDateTime createTime;
+    private String isEnable;
+    private String isDelete;
 }
