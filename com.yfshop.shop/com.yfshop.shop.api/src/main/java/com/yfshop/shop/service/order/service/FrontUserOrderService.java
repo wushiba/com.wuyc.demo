@@ -1,7 +1,8 @@
 package com.yfshop.shop.service.order.service;
 
 import com.yfshop.common.exception.ApiException;
-import com.yfshop.shop.service.order.result.OrderResult;
+import com.yfshop.shop.service.order.result.YfUserOrderDetailResult;
+import com.yfshop.shop.service.order.result.YfUserOrderListResult;
 import java.util.List;
 
 /**
@@ -20,7 +21,7 @@ public interface FrontUserOrderService {
 	 * @return
 	 * @Description:
 	 */
-	public List<OrderResult> findUserOrderList(Integer userId, String useStatus) throws ApiException;
+	public List<YfUserOrderListResult> findUserOrderList(Integer userId, String useStatus) throws ApiException;
 
 	/**
 	 * 用户订单详情
@@ -29,22 +30,22 @@ public interface FrontUserOrderService {
 	 * @return
 	 * @Description:
 	 */
-	public List<OrderResult> getUserOrderDetail(Integer userId, Integer orderId) throws ApiException;
+	public YfUserOrderDetailResult getUserOrderDetail(Integer userId, Integer orderId, Integer orderDetailId) throws ApiException;
 
 	/**
 	 * 用户取消订单
-	 * @param userId
-	 * @param orderId
+	 * @param userId	用户id
+	 * @param orderId	订单id
 	 * @throws ApiException
 	 */
 	public void cancelOrder(Integer userId, Integer orderId) throws ApiException;
 
 	/**
 	 * 用户确认订单
-	 * @param userId
-	 * @param orderId
+	 * @param userId			用户id
+	 * @param orderDetailId		订单详情id
 	 * @throws ApiException
 	 */
-	public void confirmOrder(Integer userId, Integer orderId) throws ApiException;
+	public void confirmOrder(Integer userId, Integer orderDetailId) throws ApiException;
 
 }

@@ -12,12 +12,17 @@
         <result column="merchant_id" property="merchantId" />
         <result column="pid_path" property="pidPath" />
         <result column="receive_way" property="receiveWay" />
+        <result column="is_pay" property="isPay" />
         <result column="item_id" property="itemId" />
         <result column="sku_id" property="skuId" />
         <result column="item_cover" property="itemCover" />
         <result column="item_price" property="itemPrice" />
         <result column="item_count" property="itemCount" />
         <result column="freight" property="freight" />
+        <result column="coupon_price" property="couponPrice" />
+        <result column="order_price" property="orderPrice" />
+        <result column="pay_price" property="payPrice" />
+        <result column="user_coupon_id" property="userCouponId" />
         <result column="order_status" property="orderStatus" />
         <result column="spec_value_id_path" property="specValueIdPath" />
         <result column="spec_name_value_json" property="specNameValueJson" />
@@ -30,7 +35,8 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        id, create_time, update_time, user_id, order_id, merchant_id, pid_path, receive_way, item_id, sku_id, item_cover, item_price, item_count, freight, order_status, spec_value_id_path, spec_name_value_json, spec_value_str, confirm_time, ship_time, express_company, express_no
+        id, create_time, update_time, user_id, order_id, merchant_id, pid_path, receive_way, is_pay, item_id, sku_id, item_cover, item_price, item_count, freight,
+        coupon_price, order_price, pay_price, user_coupon_id, order_status, spec_value_id_path, spec_name_value_json, spec_value_str, confirm_time, ship_time, express_company, express_no
     </sql>
 
 </mapper>

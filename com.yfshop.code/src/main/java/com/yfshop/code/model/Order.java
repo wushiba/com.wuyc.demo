@@ -37,7 +37,7 @@ public class Order extends Model<Order> {
      */
     private Integer userId;
 
-    private Integer userCouponId;
+    private String receiveWay;
 
     /**
      * 商品总数量
@@ -80,6 +80,9 @@ public class Order extends Model<Order> {
      * 支付时间
      */
     private LocalDateTime payTime;
+
+    /** 是否取消 */
+    private String isCancel;
 
     /**
      * 订单取消时间
