@@ -23,6 +23,6 @@ public interface FrontMerchantService {
      * @return
      * @throws ApiException
      */
-    WebsiteCodeDetailResult getWebsiteCodeDetailByWebsiteCode(String websiteCode) throws ApiException;
+    MerchantResult getMerchantByWebsiteCode(String websiteCode) throws ApiException;
 
 }

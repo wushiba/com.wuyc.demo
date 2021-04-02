@@ -24,6 +24,7 @@ import org.springframework.data.geo.GeoResult;
 import org.springframework.data.geo.GeoResults;
 import org.springframework.data.geo.Point;
 import org.springframework.data.redis.connection.RedisGeoCommands;
+
 import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
@@ -49,9 +50,10 @@ public class FrontMerchantServiceImpl implements FrontMerchantService {
 
     /**
      * 根据当前位置查询附近门店
-     * @param districtId    区id
-     * @param longitude     经度
-     * @param latitude      纬度
+     *
+     * @param districtId 区id
+     * @param longitude  经度
+     * @param latitude   纬度
      * @return
      * @throws ApiException
      */
@@ -83,26 +85,28 @@ public class FrontMerchantServiceImpl implements FrontMerchantService {
 
     /**
      * 根据网点码查询商户信息
-     * @param websiteCode   网点码
-     * @return
+     * @param websiteCode 网点码
+     * @return MerchantResult
      * @throws ApiException
      */
     @Override
-    public WebsiteCodeDetailResult getWebsiteCodeDetailByWebsiteCode(String websiteCode) throws ApiException {
+    public MerchantResult getMerchantByWebsiteCode(String websiteCode) throws ApiException {
         Asserts.assertStringNotBlank(websiteCode, 500, "网点码不可以为空");
 
-        Object websiteCodeObject = redisService.get(CacheConstants.MERCHANT_WEBSITE_CODE);
-        if (websiteCodeObject != null) {
-            return JSON.parseObject(websiteCodeObject.toString(), WebsiteCodeDetailResult.class);
-        }
         WebsiteCodeDetail websiteCodeDetail = websiteCodeDetailMapper.selectOne(Wrappers.lambdaQuery(WebsiteCodeDetail.class)
                 .eq(WebsiteCodeDetail::getAlias, websiteCode));
-
         Asserts.assertNonNull(websiteCodeDetail, 500, "请扫描正确的网点码");
 
-        WebsiteCodeDetailResult websiteCodeDetailResult = BeanUtil.convert(websiteCodeDetail, WebsiteCodeDetailResult.class);
-        redisService.set(CacheConstants.MERCHANT_WEBSITE_CODE, JSON.toJSONString(websiteCodeDetailResult), 60 * 60 * 24);
-        return websiteCodeDetailResult;
+
+        Object merchantObject = redisService.get(CacheConstants.MERCHANT_INFO_DATA);
+        if (merchantObject != null) {
+            return JSON.parseObject(merchantObject.toString(), MerchantResult.class);
+        }
+
+        Merchant merchant = merchantMapper.selectOne(Wrappers.lambdaQuery(Merchant.class)
+                .eq(Merchant::getId, websiteCodeDetail.getMerchantId()));
+        redisService.set(CacheConstants.MERCHANT_INFO_DATA, JSON.toJSONString(websiteCodeDetail), 60 * 60 * 24);
+        return BeanUtil.convert(merchant, MerchantResult.class);
     }
 
 

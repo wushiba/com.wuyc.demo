@@ -61,6 +61,8 @@ public interface CacheConstants {
 
     /** 商户地理位置缓存 */
     String MERCHANT_GRO_DATA = "merchant_geo_data";
+    /** 商户id信息缓存 */
+    String MERCHANT_INFO_DATA = "merchant_info_id_";
     /** 商户列表信息缓存 */
     String MERCHANT_LIST_INFO_DATA = "merchant_list_info_data";
     /** 商户网点码缓存 */
@@ -72,7 +74,5 @@ public interface CacheConstants {
 
     /** 优惠券-优惠券单个缓存 */
     String COUPON_INFO_DATA = "coupon_data_id_";
-
-
 
 }
