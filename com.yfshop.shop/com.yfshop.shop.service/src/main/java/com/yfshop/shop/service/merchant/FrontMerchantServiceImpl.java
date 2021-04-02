@@ -6,12 +6,15 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.yfshop.code.mapper.*;
 import com.yfshop.code.model.Merchant;
 import com.yfshop.code.model.MerchantDetail;
+import com.yfshop.code.model.WebsiteCodeDetail;
 import com.yfshop.common.constants.CacheConstants;
 import com.yfshop.common.enums.GroupRoleEnum;
 import com.yfshop.common.exception.ApiException;
+import com.yfshop.common.exception.Asserts;
 import com.yfshop.common.service.RedisService;
 import com.yfshop.common.util.BeanUtil;
 import com.yfshop.shop.service.merchant.result.MerchantResult;
+import com.yfshop.shop.service.merchant.result.WebsiteCodeDetailResult;
 import com.yfshop.shop.service.merchant.service.FrontMerchantService;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.slf4j.Logger;
@@ -33,13 +36,16 @@ public class FrontMerchantServiceImpl implements FrontMerchantService {
     private static final Logger logger = LoggerFactory.getLogger(FrontMerchantServiceImpl.class);
 
     @Resource
+    private RedisService redisService;
+
+    @Resource
     private MerchantMapper merchantMapper;
 
     @Resource
     private MerchantDetailMapper merchantDetailMapper;
 
     @Resource
-    private RedisService redisService;
+    private WebsiteCodeDetailMapper websiteCodeDetailMapper;
 
     /**
      * 根据当前位置查询附近门店
@@ -76,10 +82,37 @@ public class FrontMerchantServiceImpl implements FrontMerchantService {
     }
 
     /**
+     * 根据网点码查询商户信息
+     * @param websiteCode   网点码
+     * @return
+     * @throws ApiException
+     */
+    @Override
+    public WebsiteCodeDetailResult getWebsiteCodeDetailByWebsiteCode(String websiteCode) throws ApiException {
+        Asserts.assertStringNotBlank(websiteCode, 500, "网点码不可以为空");
+
+        Object websiteCodeObject = redisService.get(CacheConstants.MERCHANT_WEBSITE_CODE);
+        if (websiteCodeObject != null) {
+            return JSON.parseObject(websiteCodeObject.toString(), WebsiteCodeDetailResult.class);
+        }
+        WebsiteCodeDetail websiteCodeDetail = websiteCodeDetailMapper.selectOne(Wrappers.lambdaQuery(WebsiteCodeDetail.class)
+                .eq(WebsiteCodeDetail::getAlias, websiteCode));
+
+        Asserts.assertNonNull(websiteCodeDetail, 500, "请扫描正确的网点码");
+
+        WebsiteCodeDetailResult websiteCodeDetailResult = BeanUtil.convert(websiteCodeDetail, WebsiteCodeDetailResult.class);
+        redisService.set(CacheConstants.MERCHANT_WEBSITE_CODE, JSON.toJSONString(websiteCodeDetailResult), 60 * 60 * 24);
+        return websiteCodeDetailResult;
+    }
+
+
+    //-------------------------------------------------------- privete-method-----------------------------------------------------------------//
+
+    /**
      * 初始化网点
      */
     private List<MerchantResult> initWdMerchantList() {
-        Object merchantListObject = redisService.get(CacheConstants.MERCHANT_INFO_DATA);
+        Object merchantListObject = redisService.get(CacheConstants.MERCHANT_LIST_INFO_DATA);
         if (merchantListObject != null) {
             return JSON.parseArray(merchantListObject.toString(), MerchantResult.class);
         }
@@ -109,7 +142,7 @@ public class FrontMerchantServiceImpl implements FrontMerchantService {
         });
 
         // 将商户信息存入redis
-        redisService.set(CacheConstants.MERCHANT_INFO_DATA, JSON.toJSONString(merchantResultList));
+        redisService.set(CacheConstants.MERCHANT_LIST_INFO_DATA, JSON.toJSONString(merchantResultList), 60 * 60 * 24);
 
         // 更新缓存中的商户经纬度，先删除后更新
         detailList.forEach(merchantDetail -> {

@@ -46,6 +46,9 @@ public class YfUserCouponResult implements Serializable{
 	
     /** 领取场景: DRAW(抽奖), SHOP(商城) */
     private String couponResource;
+
+    /** 抽奖活动id */
+    private Integer drawActivityId;
 	
     /** 优惠券面值，必须是整数 */
     private Integer couponPrice;
