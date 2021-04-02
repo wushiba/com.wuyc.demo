@@ -401,18 +401,18 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
 //        websiteCodePayResult.setOrderNo(websiteCode.getOrderNo());
         //websiteCodeTask.doWorkWebsiteCodeFile(websiteCode.getOrderNo());
 
-        WxPayUnifiedOrderRequest wxPayUnifiedOrderRequest = new WxPayUnifiedOrderRequest();
         WxPayUnifiedOrderRequest orderRequest = new WxPayUnifiedOrderRequest();
         orderRequest.setBody("网点码申请");
         orderRequest.setOutTradeNo(websiteCode.getOrderNo());
         orderRequest.setNotifyUrl("http://wx.luckylottery.cloud/pay/notify/order/websiteCodePay");
         orderRequest.setTotalFee(BaseWxPayRequest.yuanToFen(fee));//元转成分
         orderRequest.setOpenid(websiteCodePayReq.getOpenId());
+        orderRequest.setTradeType("JSAPI");
         orderRequest.setSpbillCreateIp(websiteCodePayReq.getUserId());
         orderRequest.setTimeStart(DateFormatUtils.format(new Date(), "yyyyMMddHHmmss"));
         orderRequest.setTimeExpire(DateFormatUtils.format(new Date(System.currentTimeMillis() + (1000 * 60 * 15)), "yyyyMMddHHmmss"));
 
-        return mpPayService.createPayOrder(wxPayUnifiedOrderRequest);
+        return mpPayService.createPayOrder(orderRequest);
     }
 
     @Override

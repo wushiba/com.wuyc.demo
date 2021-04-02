@@ -7,7 +7,6 @@ import com.github.binarywang.wxpay.service.WxPayService;
 import com.yfshop.admin.api.wx.MpPayNotifyService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import lombok.AllArgsConstructor;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;

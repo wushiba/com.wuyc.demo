@@ -1,5 +1,6 @@
 package com.yfshop.admin.controller;
 
+import com.yfshop.admin.config.WxMpProperties;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j;
 import lombok.extern.slf4j.Slf4j;
@@ -26,26 +27,27 @@ import me.chanjar.weixin.mp.bean.message.WxMpXmlOutMessage;
 @Slf4j
 @AllArgsConstructor
 @RestController
-@RequestMapping("/wx/portal/{appid}")
+@RequestMapping("/wx/portal")
 public class WxPortalController {
+    private final WxMpProperties wxMpProperties;
     private final WxMpService wxService;
     private final WxMpMessageRouter messageRouter;
 
     @GetMapping(produces = "text/plain;charset=utf-8")
-    public String authGet(@PathVariable String appid,
-                          @RequestParam(name = "signature", required = false) String signature,
+    public String authGet(@RequestParam(name = "signature", required = false) String signature,
                           @RequestParam(name = "timestamp", required = false) String timestamp,
                           @RequestParam(name = "nonce", required = false) String nonce,
                           @RequestParam(name = "echostr", required = false) String echostr) {
 
         log.info("\n接收到来自微信服务器的认证消息：[{}, {}, {}, {}]", signature,
             timestamp, nonce, echostr);
+        String appId = wxMpProperties.getConfigs().get(0).getAppId();
         if (StringUtils.isAnyBlank(signature, timestamp, nonce, echostr)) {
             throw new IllegalArgumentException("请求参数非法，请核实!");
         }
 
-        if (!this.wxService.switchover(appid)) {
-            throw new IllegalArgumentException(String.format("未找到对应appid=[%s]的配置，请核实！", appid));
+        if (!this.wxService.switchover(appId)) {
+            throw new IllegalArgumentException(String.format("未找到对应appid=[%s]的配置，请核实！", appId));
         }
 
         if (wxService.checkSignature(timestamp, nonce, signature)) {
@@ -56,7 +58,7 @@ public class WxPortalController {
     }
 
     @PostMapping(produces = "application/xml; charset=UTF-8")
-    public String post(@PathVariable String appid,
+    public String post(
                        @RequestBody String requestBody,
                        @RequestParam("signature") String signature,
                        @RequestParam("timestamp") String timestamp,
@@ -67,9 +69,9 @@ public class WxPortalController {
         log.info("\n接收微信请求：[openid=[{}], [signature=[{}], encType=[{}], msgSignature=[{}],"
                 + " timestamp=[{}], nonce=[{}], requestBody=[\n{}\n] ",
             openid, signature, encType, msgSignature, timestamp, nonce, requestBody);
-
-        if (!this.wxService.switchover(appid)) {
-            throw new IllegalArgumentException(String.format("未找到对应appid=[%s]的配置，请核实！", appid));
+        String appId = wxMpProperties.getConfigs().get(0).getAppId();
+        if (!this.wxService.switchover(appId)) {
+            throw new IllegalArgumentException(String.format("未找到对应appid=[%s]的配置，请核实！", appId));
         }
 
         if (!wxService.checkSignature(timestamp, nonce, signature)) {
