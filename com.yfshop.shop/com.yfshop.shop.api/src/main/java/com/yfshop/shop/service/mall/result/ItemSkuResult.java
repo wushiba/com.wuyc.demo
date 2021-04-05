@@ -78,6 +78,11 @@ public class ItemSkuResult implements Serializable {
     private String specNameValueJson;
 
     /**
+     * 规格id和值id的json串({"123":"131","321":"432"})
+     */
+    private String specNameIdValueIdJson;
+
+    /**
      * 是否启用该商品(Y|N)
      */
     private String isEnable;

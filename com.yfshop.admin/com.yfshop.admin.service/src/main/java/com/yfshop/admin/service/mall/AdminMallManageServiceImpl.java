@@ -563,6 +563,8 @@ public class AdminMallManageServiceImpl implements AdminMallManageService {
             //List<JSONObject> specNameValueJsonList = new ArrayList<>(cartesianProduct.size());
             // {\"颜色\":\"黑色\"}
             JSONObject specNameValueJson = new JSONObject(cartesianProduct.size());
+            // {\"规格id\":\"规格值id\"}
+            JSONObject specNameIdValueIdJson = new JSONObject(cartesianProduct.size());
             for (String specIdValue : cartesianProduct) {
                 String[] nameAndValueIndex = StringUtils.split(specIdValue, "-");
                 // 规格名称
@@ -597,6 +599,7 @@ public class AdminMallManageServiceImpl implements AdminMallManageService {
             itemSku.setSkuCover(item.getItemCover());
             itemSku.setSpecValueIdPath(StringUtils.join(specValueIds, ","));
             itemSku.setSpecNameValueJson(JSON.toJSONString(specNameValueJson));
+            itemSku.setSpecNameIdValueIdJson(JSON.toJSONString(specNameIdValueIdJson));
             itemSku.setIsEnable("N");
             itemSku.setSort(i + 1);
             itemSkuList.add(itemSku);
@@ -735,6 +738,8 @@ public class AdminMallManageServiceImpl implements AdminMallManageService {
             //List<JSONObject> specNameValueJsonList = new ArrayList<>(cartesianProduct.size());
             // {\"颜色\":\"黑色\"}
             JSONObject specNameValueJson = new JSONObject(cartesianProduct.size());
+            // {\"规格id\":\"规格值id\"}
+            JSONObject specNameIdValueIdJson = new JSONObject(cartesianProduct.size());
             for (String specIdValue : cartesianProduct) {
                 String[] nameAndValueIndex = StringUtils.split(specIdValue, "-");
                 // 规格名称
@@ -748,6 +753,7 @@ public class AdminMallManageServiceImpl implements AdminMallManageService {
                     String key = itemSpecValue.getItemId() + specNameIdAndNameIndexMap
                             .get(itemSpecValue.getSpecId()) + itemSpecValue.getSpecValue();
                     if (key.equals(itemId + specName + specValue)) {
+                        specNameIdValueIdJson.put(itemSpecValue.getSpecId().toString(), itemSpecValue.getId());
                         specValueIds.add(itemSpecValue.getId());
                         break;
                     }
@@ -767,6 +773,7 @@ public class AdminMallManageServiceImpl implements AdminMallManageService {
             itemSku.setSkuCover(item.getItemCover());
             itemSku.setSpecValueIdPath(StringUtils.join(specValueIds, ","));
             itemSku.setSpecNameValueJson(JSON.toJSONString(specNameValueJson));
+            itemSku.setSpecNameIdValueIdJson(JSON.toJSONString(specNameIdValueIdJson));
             itemSku.setIsEnable("N");
             itemSku.setSort(i + 1);
             itemSkuList.add(itemSku);
