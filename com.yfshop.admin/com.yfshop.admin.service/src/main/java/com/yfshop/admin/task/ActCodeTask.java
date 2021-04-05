@@ -32,6 +32,7 @@ import javax.annotation.Resource;
 import java.io.BufferedReader;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -93,17 +94,20 @@ public class ActCodeTask {
         int count = actCodeDao.sumActCodeByBeforeId(actCodeBatch.getId(), date);
         logger.info("开始合成溯源码");
         for (String code : sourceCodes) {
+            LocalDateTime now = LocalDateTime.now();
             ActCodeBatchDetail actCodeBatchDetail = new ActCodeBatchDetail();
             actCodeBatchDetail.setActCode(String.format("%04d%s%08d", actCodeBatch.getActId(), dateTime, ++count));
             actCodeBatchDetail.setCipherCode(aes.encryptHex(actCodeBatchDetail.getActCode()));
             actCodeBatchDetail.setTraceNo(code);
             actCodeBatchDetail.setActId(actCodeBatch.getActId());
             actCodeBatchDetail.setBatchId(actCodeBatch.getId());
+            actCodeBatchDetail.setCreateTime(now);
+            actCodeBatchDetail.setUpdateTime(now);
             actCodeBatchDetails.add(actCodeBatchDetail);
             codeFile.add(String.format("%s,%s%s", code, actCodeCodeUrl, actCodeBatchDetail.getCipherCode()));
         }
         logger.info("溯源码合成结束");
-        actCodeBatchDetailManager.saveBatch(actCodeBatchDetails,1000);
+        actCodeBatchDetailManager.saveBatch(actCodeBatchDetails, 1000);
         String filePath = actCodeCodeTargetDir + actCodeBatch.getBatchNo() + ".txt";
         FileUtil.appendUtf8Lines(codeFile, filePath);
         logger.info("批从号{},{}个溯源码,生成完毕", actCodeBatch.getBatchNo(), actCodeBatch.getQuantity());
