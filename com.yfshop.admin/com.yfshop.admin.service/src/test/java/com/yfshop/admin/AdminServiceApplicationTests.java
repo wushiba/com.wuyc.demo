@@ -183,6 +183,11 @@ public class AdminServiceApplicationTests {
             itemSpecNameAndValue2.setSort(1);
             itemSpecNameAndValues.add(itemSpecNameAndValue1);
             itemSpecNameAndValues.add(itemSpecNameAndValue2);
+            ItemSpecNameAndValue itemSpecNameAndValue3 = new ItemSpecNameAndValue();
+            itemSpecNameAndValue3.setSpecName("适用人群");
+            itemSpecNameAndValue3.setSpecValues(Lists.newArrayList("男人", "女人", "老人"));
+            itemSpecNameAndValue3.setSort(1);
+            itemSpecNameAndValues.add(itemSpecNameAndValue3);
 
             GenerateItemSkuReq generateItemSkuReq = new GenerateItemSkuReq();
             generateItemSkuReq.setItemId(item.getId());
@@ -209,4 +214,113 @@ public class AdminServiceApplicationTests {
         }
     }
 
+    @Test
+    public void aVoid() {
+        if (true) {
+            try {
+                List<ItemSpecNameAndValue> itemSpecNameAndValues = new ArrayList<>();
+                ItemSpecNameAndValue itemSpecNameAndValue1 = new ItemSpecNameAndValue();
+                itemSpecNameAndValue1.setSpecName("颜色");
+                itemSpecNameAndValue1.setSpecValues(Lists.newArrayList("红", "白", "黑"));
+                itemSpecNameAndValue1.setSort(2);
+                ItemSpecNameAndValue itemSpecNameAndValue2 = new ItemSpecNameAndValue();
+                itemSpecNameAndValue2.setSpecName("尺寸");
+                itemSpecNameAndValue2.setSpecValues(Lists.newArrayList("大", "中", "小"));
+                itemSpecNameAndValue2.setSort(3);
+                ItemSpecNameAndValue itemSpecNameAndValue3 = new ItemSpecNameAndValue();
+                itemSpecNameAndValue3.setSpecName("适用人群");
+                itemSpecNameAndValue3.setSpecValues(Lists.newArrayList("男人", "女人", "老人"));
+                itemSpecNameAndValue3.setSort(1);
+                itemSpecNameAndValues.add(itemSpecNameAndValue1);
+                itemSpecNameAndValues.add(itemSpecNameAndValue2);
+                itemSpecNameAndValues.add(itemSpecNameAndValue3);
+
+                Item item = new Item();
+                item.setCreateTime(LocalDateTime.now());
+                item.setUpdateTime(LocalDateTime.now());
+                item.setCategoryId(1);
+                item.setReceiveWay(ReceiveWayEnum.ALL.getCode());
+                item.setItemTitle("title");
+                item.setItemSubTitle("subTitle");
+                item.setItemPrice(BigDecimal.ONE);
+                item.setItemMarketPrice(BigDecimal.ONE);
+                item.setFreight(BigDecimal.ZERO);
+                item.setItemStock(1);
+                item.setItemCover("111");
+                item.setIsEnable("Y");
+                item.setIsDelete("N");
+                item.setSpecNum(2);
+                item.setSort(1);
+                itemMapper.insert(item);
+
+                GenerateItemSkuReq req = new GenerateItemSkuReq();
+                req.setItemId(item.getId());
+                req.setSpecNameAndValues(itemSpecNameAndValues);
+                List<ItemSkuResult> itemSkuResults = adminMallManageService.previewItemSku(req);
+                System.out.println(JSON.toJSONString(itemSkuResults, true));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        try {
+            Item item = new Item();
+            item.setCreateTime(LocalDateTime.now());
+            item.setUpdateTime(LocalDateTime.now());
+            item.setCategoryId(2);
+            item.setReceiveWay(ReceiveWayEnum.ALL.getCode());
+            item.setItemTitle("title2");
+            item.setItemSubTitle("subTitle2");
+            item.setItemPrice(BigDecimal.ONE);
+            item.setItemMarketPrice(BigDecimal.ONE);
+            item.setFreight(BigDecimal.ZERO);
+            item.setItemStock(1);
+            item.setItemCover("222");
+            item.setIsEnable("Y");
+            item.setIsDelete("N");
+            item.setSpecNum(2);
+            item.setSort(1);
+            itemMapper.insert(item);
+
+            List<ItemSpecNameAndValue> itemSpecNameAndValues = new ArrayList<>();
+            ItemSpecNameAndValue itemSpecNameAndValue1 = new ItemSpecNameAndValue();
+            itemSpecNameAndValue1.setSpecName("颜色");
+            itemSpecNameAndValue1.setSpecValues(Lists.newArrayList("红", "黑"));
+            itemSpecNameAndValue1.setSort(2);
+            ItemSpecNameAndValue itemSpecNameAndValue2 = new ItemSpecNameAndValue();
+            itemSpecNameAndValue2.setSpecName("尺寸");
+            itemSpecNameAndValue2.setSpecValues(Lists.newArrayList("大", "中", "小"));
+            itemSpecNameAndValue2.setSort(3);
+            itemSpecNameAndValues.add(itemSpecNameAndValue1);
+            itemSpecNameAndValues.add(itemSpecNameAndValue2);
+            ItemSpecNameAndValue itemSpecNameAndValue3 = new ItemSpecNameAndValue();
+            itemSpecNameAndValue3.setSpecName("适用人群");
+            itemSpecNameAndValue3.setSpecValues(Lists.newArrayList("男人", "女人", "老人"));
+            itemSpecNameAndValue3.setSort(1);
+            itemSpecNameAndValues.add(itemSpecNameAndValue3);
+
+            GenerateItemSkuReq generateItemSkuReq = new GenerateItemSkuReq();
+            generateItemSkuReq.setItemId(item.getId());
+            generateItemSkuReq.setSpecNameAndValues(itemSpecNameAndValues);
+
+            List<ItemCandidateSku> itemCandidateSkuList = new ArrayList<>();
+
+            ItemCandidateSku itemCandidateSku = new ItemCandidateSku();
+            itemCandidateSku.setItemId(item.getId());
+            itemCandidateSku.setSpecNameValueJson("{\"适用人群\":\"老人\",\"颜色\":\"黑\",\"尺寸\":\"小\"}");
+            itemCandidateSku.setIsEnable("Y");
+            itemCandidateSku.setStock(2);
+            itemCandidateSku.setPrice(BigDecimal.ONE);
+            itemCandidateSku.setMarketPrice(BigDecimal.TEN);
+            itemCandidateSkuList.add(itemCandidateSku);
+
+            SaveItemSkuReq req = new SaveItemSkuReq();
+            req.setSpecInfo(generateItemSkuReq);
+            req.setCandidateSkus(itemCandidateSkuList);
+
+            adminMallManageService.saveItemSku(req);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }
