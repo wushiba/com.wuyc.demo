@@ -11,7 +11,9 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class RedisConfig extends BaseRedisConfig {
     private static final Logger logger = LoggerFactory.getLogger(RedisConfig.class);
+
     public RedisConfig() {
         logger.info("**************配置类RedisConfig被实例化*******************************");
     }
+
 }

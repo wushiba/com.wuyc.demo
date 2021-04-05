@@ -26,9 +26,9 @@ public interface BaseController {
      * @return the id
      */
     default Integer getCurrentAdminUserId() {
-        if ("dev".equalsIgnoreCase(SpringUtil.getActiveProfile())) {
-            return 100;
-        }
+//        if ("dev".equalsIgnoreCase(SpringUtil.getActiveProfile())) {
+//            return 100;
+//        }
         return StpUtil.getLoginIdAsInt();
     }
 
@@ -152,21 +152,26 @@ public interface BaseController {
     /**
      * 根据当前请求返回ip地址
      *
-     * @param request
      * @return ipStr
      */
-    default String getRequestIpStr(HttpServletRequest request) {
-        String ip = request.getHeader("x-forwarded-for");
-        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
-            ip = request.getHeader("Proxy-Client-IP");
-        }
+    default String getRequestIpStr() {
+        String ip = "0.0.0.0";
+        try {
+            HttpServletRequest request = getCurrentRequest();
+            ip = request.getHeader("x-forwarded-for");
+            if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+                ip = request.getHeader("Proxy-Client-IP");
+            }
 
-        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
-            ip = request.getHeader("WL-Proxy-Client-IP");
-        }
+            if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+                ip = request.getHeader("WL-Proxy-Client-IP");
+            }
 
-        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
-            ip = request.getRemoteAddr();
+            if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+                ip = request.getRemoteAddr();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         return ip;
     }

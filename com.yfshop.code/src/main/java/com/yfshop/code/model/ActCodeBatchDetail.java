@@ -15,7 +15,7 @@ import lombok.EqualsAndHashCode;
  * </p>
  *
  * @author yoush
- * @since 2021-03-22
+ * @since 2021-04-02
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -47,7 +47,7 @@ public class ActCodeBatchDetail extends Model<ActCodeBatchDetail> {
     private String traceNo;
 
     /**
-     * 活动id(优惠券活动)
+     * 活动id(抽奖活动)
      */
     private Integer actId;
 
@@ -55,9 +55,6 @@ public class ActCodeBatchDetail extends Model<ActCodeBatchDetail> {
      * 批次id
      */
     private Integer batchId;
-
-    /** 盒子规格值： big(大盒子) | small(小盒) */
-    private String boxSpecVal;
 
 
     @Override

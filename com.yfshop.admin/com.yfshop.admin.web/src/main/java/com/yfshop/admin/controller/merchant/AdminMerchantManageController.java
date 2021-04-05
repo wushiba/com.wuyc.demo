@@ -3,7 +3,7 @@ package com.yfshop.admin.controller.merchant;
 import cn.dev33.satoken.annotation.SaCheckLogin;
 import cn.dev33.satoken.annotation.SaCheckRole;
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.yfshop.admin.api.merchant.AdminMerchantManageService;
+import com.yfshop.admin.api.merchant.*;
 import com.yfshop.admin.api.merchant.MerchantExcel;
 import com.yfshop.admin.api.merchant.request.CreateMerchantReq;
 import com.yfshop.admin.api.merchant.request.QueryMerchantReq;
@@ -47,6 +47,7 @@ public class AdminMerchantManageController implements BaseController {
     @SaCheckLogin
     @SaCheckRole(value = "sys")
     public CommonResult<Void> createMerchant(@Valid @NotNull(message = "创建商户信息不能为空") CreateMerchantReq req) {
+   
         return CommonResult.success(adminMerchantManageService.createMerchant(getCurrentAdminUserId(), req));
     }
 

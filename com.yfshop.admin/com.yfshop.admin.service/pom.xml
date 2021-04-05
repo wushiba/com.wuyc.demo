@@ -90,23 +90,6 @@
             <artifactId>com.yfshop.code</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>com.aliyun.mns</groupId>
-            <artifactId>aliyun-sdk-mns</artifactId>
-            <exclusions>
-                <exclusion>
-                    <artifactId>httpclient</artifactId>
-                    <groupId>org.apache.httpcomponents</groupId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-
-        <!--httpclient依赖 start-->
-        <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpclient</artifactId>
-        </dependency>
-        <!--httpclient依赖 end-->
 
         <!--fast-json相关 start-->
         <dependency>
@@ -114,12 +97,6 @@
             <artifactId>fastjson</artifactId>
         </dependency>
         <!--fast-json相关 end-->
-        <!--好用的反射工具 start-->
-        <dependency>
-            <groupId>org.reflections</groupId>
-            <artifactId>reflections</artifactId>
-        </dependency>
-        <!--好用的反射工具 end-->
 
         <dependency>
             <groupId>com.github.ben-manes.caffeine</groupId>

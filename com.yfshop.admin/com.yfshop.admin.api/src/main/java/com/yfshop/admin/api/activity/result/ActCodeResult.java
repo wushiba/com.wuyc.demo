@@ -22,6 +22,7 @@ public class ActCodeResult implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    private Integer id;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", locale = "zh", timezone = "GMT+8")
     private LocalDateTime createTime;
@@ -47,12 +48,15 @@ public class ActCodeResult implements Serializable {
     /**
      * 活动名
      */
-    private String actName;
+    private String actTitle;
 
     /**
      * 文件地址
      */
     private String fileUrl;
+
+
+    private String fileStatus;
 
     /**
      * 是否下载
@@ -63,7 +67,6 @@ public class ActCodeResult implements Serializable {
      * 是否发送
      */
     private String isSend;
-
 
 
 }

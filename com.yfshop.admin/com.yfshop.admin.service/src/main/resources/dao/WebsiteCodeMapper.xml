@@ -70,8 +70,8 @@
     </select>
 
     <select id="sumWebsiteCodeByBeforeId" resultType="java.lang.Integer">
-        select sum(c.quantity)
+        select IFNULL(sum(c.quantity),0)
         from yf_website_code c
-        where c.create_time &gt;= #{statDate) and c.id &lt; #{id}
+        where c.create_time &gt;= #{startDate} and c.id &lt; #{id}
     </select>
 </mapper>

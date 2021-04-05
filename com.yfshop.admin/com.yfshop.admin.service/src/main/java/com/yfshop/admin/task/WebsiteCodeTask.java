@@ -54,8 +54,8 @@ import java.util.zip.ZipFile;
 @EnableAsync
 public class WebsiteCodeTask {
 
-    @Value("${websiteCode.dirs}")
-    private String websiteCodeDirs;
+    @Value("${websiteCode.dir}")
+    private String websiteCodeDir;
     @Value("${websiteCode.url}")
     private String websiteCodeUrl;
     @Resource
@@ -102,8 +102,8 @@ public class WebsiteCodeTask {
         if (websiteCode.getFileStatus() == null || "WAIT".equals(websiteCode.getFileStatus()) || "FAIL".equals(websiteCode.getFileStatus())) {
             websiteCode.setFileStatus("DOING");
             websiteCodeMapper.updateById(websiteCode);
-            File dirs = new File(websiteCodeDirs + "/" + websiteCode.getMerchantId() + "/" + websiteCode.getBatchNo());
-            File fileZip = new File(websiteCodeDirs + "/" + websiteCode.getMerchantId() + "/" + websiteCode.getBatchNo() + ".zip");
+            File dirs = new File(websiteCodeDir + "/" + websiteCode.getMerchantId() + "/" + websiteCode.getBatchNo());
+            File fileZip = new File(websiteCodeDir + "/" + websiteCode.getMerchantId() + "/" + websiteCode.getBatchNo() + ".zip");
             if (!dirs.isDirectory()) {
                 dirs.mkdirs();
             }
@@ -123,7 +123,7 @@ public class WebsiteCodeTask {
                 Response response = qiniuUploader.getUploadManager().put(fileZip, fileZip.getName(), qiniuUploader.getAuth().uploadToken(qiniuConfig.getBucket()));
                 if (response.isOK()) {
                     websiteCode.setFileStatus("SUCCESS");
-                    websiteCode.setFileUrl("http://"+qiniuConfig.getDomain() + websiteCode.getBatchNo() + ".zip");
+                    websiteCode.setFileUrl("http://" + qiniuConfig.getDomain() +"/"+ websiteCode.getBatchNo() + ".zip");
                     String msg = "您好：\n" +
                             "此邮件内含光明网点码，请妥善保管。\n" +
                             "                                                                     雨帆";
@@ -153,7 +153,7 @@ public class WebsiteCodeTask {
         for (int i = 0; i < websiteCode.getQuantity(); i++) {
             WebsiteCodeDetail websiteCodeDetail = new WebsiteCodeDetail();
             websiteCodeDetail.setBatchId(websiteCode.getId());
-            websiteCodeDetail.setAlias(String.format("%s%05d", code, i + count));
+            websiteCodeDetail.setAlias(String.format("%s%05d", code, ++count));
             websiteCodeDetail.setIsActivate("N");
             websiteCodeDetail.setPid(websiteCode.getMerchantId());
             websiteCodeDetail.setPidPath(websiteCode.getPidPath());
@@ -219,10 +219,9 @@ public class WebsiteCodeTask {
         if (ArrayUtil.isNotEmpty(cc)) {
             helper.setCc(cc);
         }
-        FileSystemResource file = new FileSystemResource(new File(filePath));
-        String fileName = filePath.substring(filePath.lastIndexOf(File.separator));
-        helper.addAttachment(fileName, file);
-
+        File file = new File(filePath);
+        FileSystemResource fileResource = new FileSystemResource(file);
+        helper.addAttachment(file.getName(), fileResource);
         mailSender.send(message);
     }
 

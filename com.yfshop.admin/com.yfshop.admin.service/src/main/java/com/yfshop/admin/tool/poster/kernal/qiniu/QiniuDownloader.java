@@ -25,6 +25,6 @@ public class QiniuDownloader {
 
     public String privateDownloadUrl(String baseUrl, long expires) {
 
-        return auth.privateDownloadUrl(baseUrl,expires);
+        return auth.privateDownloadUrl(baseUrl,expires)+"&attname=";
     }
 }

@@ -59,12 +59,20 @@ public interface CacheConstants {
     String MALL_USER_ADDRESS_CACHE_NAME = "MallUserAddressCacheName";
     String MALL_USER_ADDRESS_CACHE_KEY_PREFIX = "mall_user_address_";
 
-    /** 商户信息 */
+    /** 商户地理位置缓存 */
     String MERCHANT_GRO_DATA = "merchant_geo_data";
-    String MERCHANT_INFO_DATA = "merchant_info_data";
+    /** 商户id信息缓存 */
+    String MERCHANT_INFO_DATA = "merchant_info_id_";
+    /** 商户列表信息缓存 */
+    String MERCHANT_LIST_INFO_DATA = "merchant_list_info_data";
+    /** 商户网点码缓存 */
+    String MERCHANT_WEBSITE_CODE = "merchant_website_code_";
 
     /** 用户商户距离 */
     Integer USER_MERCHANT_DISTANCE = 10;
     RedisGeoCommands.DistanceUnit USER_MERCHANT_DISTANCE_UNIT = RedisGeoCommands.DistanceUnit.KILOMETERS;
+
+    /** 优惠券-优惠券单个缓存 */
+    String COUPON_INFO_DATA = "coupon_data_id_";
 
 }

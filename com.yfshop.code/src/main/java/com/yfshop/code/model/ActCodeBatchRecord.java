@@ -39,7 +39,7 @@ public class ActCodeBatchRecord extends Model<ActCodeBatchRecord> {
     /**
      * 商户id
      */
-    private Integer merchatId;
+    private Integer merchantId;
 
     /**
      * EMAIL,DOWNLOAD
