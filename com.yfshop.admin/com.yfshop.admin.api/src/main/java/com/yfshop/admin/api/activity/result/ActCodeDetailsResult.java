@@ -5,12 +5,11 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import java.io.Serializable;
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 /**
  * <p>
- * 商户批次码详情
+ * 活动码详情
  * </p>
  *
  * @author yoush
@@ -18,11 +17,10 @@ import java.time.LocalDateTime;
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class ActCodeResult implements Serializable {
+public class ActCodeDetailsResult implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private Integer id;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", locale = "zh", timezone = "GMT+8")
     private LocalDateTime createTime;
@@ -31,42 +29,14 @@ public class ActCodeResult implements Serializable {
     private LocalDateTime updateTime;
 
     /**
-     * 批次号 年月日+id编号
+     * 活动码
      */
-    private String batchNo;
+    private String actCode;
 
     /**
-     * 活动码数量
+     * 溯源码
      */
-    private Integer quantity;
-
-    /**
-     * 活动id
-     */
-    private Integer actId;
-
-    /**
-     * 活动名
-     */
-    private String actTitle;
-
-    /**
-     * 文件地址
-     */
-    private String fileUrl;
-
-
-    private String fileStatus;
-
-    /**
-     * 是否下载
-     */
-    private String isDownload;
-
-    /**
-     * 是否发送
-     */
-    private String isSend;
+    private String traceNo;
 
 
 }

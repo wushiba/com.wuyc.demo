@@ -1,34 +1,22 @@
-package com.yfshop.code.model;
+package com.yfshop.admin.api.activity.result;
 
-import com.baomidou.mybatisplus.annotation.TableName;
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.extension.activerecord.Model;
-import com.baomidou.mybatisplus.annotation.TableId;
-import java.time.LocalDateTime;
-import java.io.Serializable;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-/**
- * <p>
- * 活动码下载记录
- * </p>
- *
- * @author yoush
- * @since 2021-03-22
- */
+import java.io.Serializable;
+import java.time.LocalDateTime;
+
 @Data
 @EqualsAndHashCode(callSuper = false)
-@TableName("yf_act_code_batch_record")
-public class ActCodeBatchRecord extends Model<ActCodeBatchRecord> {
-
+public class ActCodeBatchRecordResult implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    @TableId(value = "id", type = IdType.AUTO)
-    private Integer id;
 
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", locale = "zh", timezone = "GMT+8")
     private LocalDateTime createTime;
 
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", locale = "zh", timezone = "GMT+8")
     private LocalDateTime updateTime;
 
     /**
@@ -72,9 +60,5 @@ public class ActCodeBatchRecord extends Model<ActCodeBatchRecord> {
     private String mobile;
 
 
-    @Override
-    protected Serializable pkVal() {
-        return this.id;
-    }
 
 }

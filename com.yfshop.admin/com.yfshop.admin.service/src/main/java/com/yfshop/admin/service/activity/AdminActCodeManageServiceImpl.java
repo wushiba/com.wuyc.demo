@@ -1,25 +1,33 @@
 package com.yfshop.admin.service.activity;
 
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.RandomUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.yfshop.admin.api.activity.request.ActCodeQueryDetailsReq;
 import com.yfshop.admin.api.activity.request.ActCodeQueryReq;
+import com.yfshop.admin.api.activity.result.ActCodeBatchRecordResult;
+import com.yfshop.admin.api.activity.result.ActCodeDetailsResult;
 import com.yfshop.admin.api.activity.result.ActCodeResult;
 import com.yfshop.admin.api.activity.service.AdminActCodeManageService;
 import com.yfshop.admin.dao.ActCodeDao;
 import com.yfshop.admin.task.ActCodeTask;
 import com.yfshop.admin.tool.poster.kernal.qiniu.QiniuDownloader;
+import com.yfshop.code.mapper.ActCodeBatchDetailMapper;
 import com.yfshop.code.mapper.ActCodeBatchMapper;
 import com.yfshop.code.mapper.ActCodeBatchRecordMapper;
 import com.yfshop.code.mapper.SourceFactoryMapper;
 import com.yfshop.code.model.ActCodeBatch;
+import com.yfshop.code.model.ActCodeBatchDetail;
 import com.yfshop.code.model.ActCodeBatchRecord;
 import com.yfshop.code.model.SourceFactory;
 import com.yfshop.common.exception.ApiException;
 import com.yfshop.common.exception.Asserts;
+import com.yfshop.common.util.BeanUtil;
 import lombok.SneakyThrows;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboService;
@@ -28,11 +36,13 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import java.io.File;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -42,10 +52,14 @@ import java.util.List;
  */
 @DubboService
 public class AdminActCodeManageServiceImpl implements AdminActCodeManageService {
-    @Value("${actCode.dirs}")
+    @Value("${actCode.targetDir}")
     private String actCodeCodeDirs;
+
     @Resource
     private ActCodeBatchMapper actCodeBatchMapper;
+
+    @Resource
+    private ActCodeBatchDetailMapper actCodeBatchDetailMapper;
 
     @Resource
     private ActCodeBatchRecordMapper actCodeBatchRecordMapper;
@@ -55,6 +69,7 @@ public class AdminActCodeManageServiceImpl implements AdminActCodeManageService 
 
     @Resource
     private ActCodeDao actCodeDao;
+
 
     @Autowired
     private QiniuDownloader qiniuDownloader;
@@ -82,13 +97,28 @@ public class AdminActCodeManageServiceImpl implements AdminActCodeManageService 
     @Override
     public Void actCodeImport(Integer actId, String md5, List<String> sourceCodes) throws ApiException {
         Asserts.assertTrue(sourceCodes.size() < 99999999, 500, "溯源码超出当次的最大数量99999999");
+        checkFile(md5);
         ActCodeBatch actCodeBatch = new ActCodeBatch();
         actCodeBatch.setBatchNo(DateUtil.format(new Date(), "yyMMddHHmmssSSS") + RandomUtil.randomNumbers(4));
         actCodeBatch.setActId(actId);
         actCodeBatch.setFileMd5(md5);
         actCodeBatch.setQuantity(sourceCodes.size());
+        actCodeBatch.setCreateTime(LocalDateTime.now());
         actCodeBatchMapper.insert(actCodeBatch);
         actCodeTask.buildActCode(actCodeBatch, sourceCodes);
+        return null;
+    }
+
+    @Override
+    public Void actCodeImport(Integer actId, String md5, String fileUrl) throws ApiException {
+        checkFile(md5);
+        ActCodeBatch actCodeBatch = new ActCodeBatch();
+        actCodeBatch.setBatchNo(DateUtil.format(new Date(), "yyMMddHHmmssSSS") + RandomUtil.randomNumbers(4));
+        actCodeBatch.setActId(actId);
+        actCodeBatch.setFileMd5(md5);
+        actCodeBatch.setCreateTime(LocalDateTime.now());
+        actCodeBatchMapper.insert(actCodeBatch);
+        actCodeTask.downLoadFile(actCodeBatch, md5,fileUrl);
         return null;
     }
 
@@ -101,15 +131,16 @@ public class AdminActCodeManageServiceImpl implements AdminActCodeManageService 
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public String actCodeUrl(Integer merchantId, Integer id) {
         ActCodeBatch actCodeBatch = actCodeBatchMapper.selectById(id);
-        Asserts.assertEquals(actCodeBatch.getIsDownload(), 'N', 500, "溯源码文件已被下载过！");
+        Asserts.assertEquals(actCodeBatch.getIsDownload(), "N", 500, "溯源码文件已被下载过！");
         Asserts.assertStringNotBlank(actCodeBatch.getFileUrl(), 500, "文件不存在！");
         actCodeBatch.setIsDownload("Y");
         actCodeBatchMapper.updateById(actCodeBatch);
         ActCodeBatchRecord actCodeBatchRecord = new ActCodeBatchRecord();
-        actCodeBatchRecord.setBatchId(actCodeBatchRecord.getBatchId());
-        actCodeBatchRecord.setMerchatId(merchantId);
+        actCodeBatchRecord.setBatchId(actCodeBatch.getId());
+        actCodeBatchRecord.setMerchantId(merchantId);
         actCodeBatchRecord.setType("DOWNLOAD");
         actCodeBatchRecordMapper.insert(actCodeBatchRecord);
         return qiniuDownloader.privateDownloadUrl(actCodeBatch.getFileUrl(), 60);
@@ -117,9 +148,10 @@ public class AdminActCodeManageServiceImpl implements AdminActCodeManageService 
 
     @SneakyThrows
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public Void sendEmailActCode(Integer merchantId, Integer id, Integer factoryId) {
         ActCodeBatch actCodeBatch = actCodeBatchMapper.selectById(id);
-        Asserts.assertEquals(actCodeBatch.getIsSend(), 'N', 500, "溯源码文件已被发送过！");
+        Asserts.assertEquals(actCodeBatch.getIsSend(), "N", 500, "溯源码文件已被发送过！");
         Asserts.assertStringNotBlank(actCodeBatch.getFileUrl(), 500, "文件不存在！");
         SourceFactory sourceFactory = sourceFactoryMapper.selectById(factoryId);
         String filePath = actCodeCodeDirs + actCodeBatch.getBatchNo() + ".txt";
@@ -130,8 +162,8 @@ public class AdminActCodeManageServiceImpl implements AdminActCodeManageService 
         actCodeBatch.setIsSend("Y");
         actCodeBatchMapper.updateById(actCodeBatch);
         ActCodeBatchRecord actCodeBatchRecord = new ActCodeBatchRecord();
-        actCodeBatchRecord.setBatchId(actCodeBatchRecord.getBatchId());
-        actCodeBatchRecord.setMerchatId(merchantId);
+        actCodeBatchRecord.setBatchId(actCodeBatch.getId());
+        actCodeBatchRecord.setMerchantId(merchantId);
         actCodeBatchRecord.setEmail(sourceFactory.getEmail());
         actCodeBatchRecord.setFactoryName(sourceFactory.getFactoryName());
         actCodeBatchRecord.setAddress(sourceFactory.getAddress());
@@ -140,6 +172,23 @@ public class AdminActCodeManageServiceImpl implements AdminActCodeManageService 
         actCodeBatchRecord.setType("EMAIL");
         actCodeBatchRecordMapper.insert(actCodeBatchRecord);
         return null;
+    }
+
+    @Override
+    public IPage<ActCodeDetailsResult> queryActCodeDetails(ActCodeQueryDetailsReq actCodeQueryReq) {
+        LambdaQueryWrapper<ActCodeBatchDetail> lambdaQueryWrapper = Wrappers.<ActCodeBatchDetail>lambdaQuery()
+                .eq(ActCodeBatchDetail::getBatchId, actCodeQueryReq.getBatchId())
+                .eq(StringUtils.isNotBlank(actCodeQueryReq.getActCode()), ActCodeBatchDetail::getActCode, actCodeQueryReq.getActCode())
+                .eq(StringUtils.isNotBlank(actCodeQueryReq.getTraceNo()), ActCodeBatchDetail::getTraceNo, actCodeQueryReq.getTraceNo());
+        IPage<ActCodeBatchDetail> iPage = actCodeBatchDetailMapper.selectPage(new Page<>(actCodeQueryReq.getPageIndex(), actCodeQueryReq.getPageSize()), lambdaQueryWrapper);
+        iPage.setTotal(actCodeBatchDetailMapper.selectCount(lambdaQueryWrapper));
+        return BeanUtil.iPageConvert(iPage, ActCodeDetailsResult.class);
+    }
+
+    @Override
+    public List<ActCodeBatchRecordResult> queryActCodeDownloadRecord(Integer batchId) {
+        List<ActCodeBatchRecord> actCodeBatchRecords = actCodeBatchRecordMapper.selectList(Wrappers.<ActCodeBatchRecord>lambdaQuery().eq(ActCodeBatchRecord::getBatchId, batchId));
+        return BeanUtil.convertList(actCodeBatchRecords, ActCodeBatchRecordResult.class);
     }
 
     private void sendAttachmentsMail(String to, String subject, String content, String filePath, String... cc) throws MessagingException {
@@ -152,9 +201,9 @@ public class AdminActCodeManageServiceImpl implements AdminActCodeManageService 
         if (ArrayUtil.isNotEmpty(cc)) {
             helper.setCc(cc);
         }
-        FileSystemResource file = new FileSystemResource(new File(filePath));
-        String fileName = filePath.substring(filePath.lastIndexOf(File.separator));
-        helper.addAttachment(fileName, file);
+        File file = new File(filePath);
+        FileSystemResource fileResource = new FileSystemResource(file);
+        helper.addAttachment(file.getName(), fileResource);
 
         mailSender.send(message);
     }

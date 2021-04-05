@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
  */
 @Api("微信支付")
 @RestController
-@RequestMapping("/pay")
+@RequestMapping("/wx/pay")
 public class WxPayController {
   @Autowired
   private WxPayService wxService;

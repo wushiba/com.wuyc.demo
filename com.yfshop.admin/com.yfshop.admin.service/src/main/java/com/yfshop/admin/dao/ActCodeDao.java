@@ -14,5 +14,5 @@ public interface ActCodeDao {
 
     List<ActCodeResult> queryActCodeList(IPage iPage, @Param("req") ActCodeQueryReq req);
 
-    Integer sumActCodeByBeforeId(Integer id, Date statDate);
+    int sumActCodeByBeforeId(@Param("id")Integer id,@Param("startDate") Date startDate);
 }

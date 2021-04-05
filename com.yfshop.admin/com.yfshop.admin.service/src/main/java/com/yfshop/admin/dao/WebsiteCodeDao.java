@@ -14,5 +14,5 @@ public interface WebsiteCodeDao {
 
     int queryWebsiteCodeCount(WebsiteCodeQueryReq req);
 
-    int sumWebsiteCodeByBeforeId(Integer id,Date statDate);
+    int sumWebsiteCodeByBeforeId(@Param("id") Integer id,@Param("startDate") Date startDate);
 }

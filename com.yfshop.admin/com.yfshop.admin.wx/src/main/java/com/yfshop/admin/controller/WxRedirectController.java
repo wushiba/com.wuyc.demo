@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @AllArgsConstructor
 @RestController
-@RequestMapping("/wx/redirect/{appid}")
+@RequestMapping("/wx/redirect")
 public class WxRedirectController {
     private final WxMpProperties wxMpProperties;
     private final WxMpService wxService;

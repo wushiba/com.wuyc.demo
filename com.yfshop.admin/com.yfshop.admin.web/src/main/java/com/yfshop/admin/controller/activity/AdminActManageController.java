@@ -3,7 +3,10 @@ package com.yfshop.admin.controller.activity;
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.crypto.SecureUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.yfshop.admin.api.activity.request.ActCodeImportReq;
+import com.yfshop.admin.api.activity.request.ActCodeQueryDetailsReq;
 import com.yfshop.admin.api.activity.request.ActCodeQueryReq;
+import com.yfshop.admin.api.activity.result.ActCodeBatchRecordResult;
 import com.yfshop.admin.api.activity.service.AdminActCodeManageService;
 import com.yfshop.common.api.CommonResult;
 import com.yfshop.common.base.BaseController;
@@ -44,6 +47,7 @@ public class AdminActManageController implements BaseController {
     }
 
 
+    @CrossOrigin
     @SneakyThrows
     @ApiOperation(value = "导入溯源码文件", httpMethod = "POST")
     @RequestMapping(value = "/actCodeImport", method = {RequestMethod.GET, RequestMethod.POST})
@@ -66,18 +70,44 @@ public class AdminActManageController implements BaseController {
     }
 
 
+    @CrossOrigin
+    @SneakyThrows
+    @ApiOperation(value = "导入溯源码文件", httpMethod = "POST")
+    @RequestMapping(value = "/actCodeImportUrl", method = {RequestMethod.GET, RequestMethod.POST})
+    @ResponseBody
+    public CommonResult<Void> actCodeImportUrl(ActCodeImportReq importReq) {
+
+        return CommonResult.success(adminActCodeManageService.actCodeImport(importReq.getActId(), importReq.getMd5(), importReq.getUrl()));
+    }
+
+
     @ApiOperation(value = "获取网点码文件", httpMethod = "POST")
     @RequestMapping(value = "/actCodeUrl", method = {RequestMethod.GET, RequestMethod.POST})
     @ResponseBody
     public CommonResult<String> actCodeUrl(Integer id) {
-        return CommonResult.success(adminActCodeManageService.actCodeUrl(getCurrentAdminUserId(),id));
+        return CommonResult.success(adminActCodeManageService.actCodeUrl(getCurrentAdminUserId(), id));
     }
 
     @ApiOperation(value = "发送网点码文件", httpMethod = "POST")
     @RequestMapping(value = "/sendEmailActCode", method = {RequestMethod.GET, RequestMethod.POST})
     @ResponseBody
-    public CommonResult<Void> sendEmailActCode(Integer id,Integer factoryId) {
-        return CommonResult.success(adminActCodeManageService.sendEmailActCode(getCurrentAdminUserId(),id,factoryId));
+    public CommonResult<Void> sendEmailActCode(Integer id, Integer factoryId) {
+        return CommonResult.success(adminActCodeManageService.sendEmailActCode(getCurrentAdminUserId(), id, factoryId));
+    }
+
+
+    @ApiOperation(value = "查询活动码", httpMethod = "POST")
+    @RequestMapping(value = "/queryActCodeDetails", method = {RequestMethod.GET, RequestMethod.POST})
+    @ResponseBody
+    public CommonResult<IPage> queryActCodeDetails(ActCodeQueryDetailsReq actCodeQueryReq) {
+        return CommonResult.success(adminActCodeManageService.queryActCodeDetails(actCodeQueryReq));
+    }
+
+    @ApiOperation(value = "查询活动码记录", httpMethod = "POST")
+    @RequestMapping(value = "/queryActCodeDownloadRecord", method = {RequestMethod.GET, RequestMethod.POST})
+    @ResponseBody
+    public CommonResult<List<ActCodeBatchRecordResult>> queryActCodeDownloadRecord(Integer batchId) {
+        return CommonResult.success(adminActCodeManageService.queryActCodeDownloadRecord(batchId));
     }
 
 

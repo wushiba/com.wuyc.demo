@@ -224,7 +224,7 @@ class MerchantInfoController extends AbstractBaseController {
     @RequestMapping(value = "/applyWebsiteCodePay", method = {RequestMethod.POST})
     public CommonResult<WxPayMpOrderResult> applyWebsiteCodePay(@RequestBody WebsiteCodePayReq websiteCodePayReq) {
         String openId = getCurrentOpenId();
-        Asserts.assertNonNull(openId, 500, "需要微信授权");
+        //Asserts.assertNonNull(openId, 500, "需要微信授权");
         websiteCodePayReq.setOpenId(getCurrentOpenId());
         websiteCodePayReq.setUserId(getRequestIpStr());
         WxPayMpOrderResult wxPayMpOrderResult = merchantInfoService.applyWebsiteCodePay(websiteCodePayReq);

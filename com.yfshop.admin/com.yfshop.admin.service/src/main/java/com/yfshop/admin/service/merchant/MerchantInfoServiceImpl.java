@@ -405,8 +405,9 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
         orderRequest.setBody("网点码申请");
         orderRequest.setOutTradeNo(websiteCode.getOrderNo());
         orderRequest.setNotifyUrl("http://wx.luckylottery.cloud/pay/notify/order/websiteCodePay");
-        orderRequest.setTotalFee(BaseWxPayRequest.yuanToFen(fee));//元转成分
-        orderRequest.setOpenid(websiteCodePayReq.getOpenId());
+       // orderRequest.setTotalFee(BaseWxPayRequest.yuanToFen(fee));//元转成分
+        orderRequest.setTotalFee(1);
+        orderRequest.setOpenid("o3vDm6fgLfx8bATw2K1cEKy4HU4E");
         orderRequest.setTradeType("JSAPI");
         orderRequest.setSpbillCreateIp(websiteCodePayReq.getUserId());
         orderRequest.setTimeStart(DateFormatUtils.format(new Date(), "yyyyMMddHHmmss"));

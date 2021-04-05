@@ -26,9 +26,9 @@ public interface BaseController {
      * @return the id
      */
     default Integer getCurrentAdminUserId() {
-        if ("dev".equalsIgnoreCase(SpringUtil.getActiveProfile())) {
-            return 100;
-        }
+//        if ("dev".equalsIgnoreCase(SpringUtil.getActiveProfile())) {
+//            return 100;
+//        }
         return StpUtil.getLoginIdAsInt();
     }
 

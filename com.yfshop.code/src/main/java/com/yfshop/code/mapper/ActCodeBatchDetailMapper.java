@@ -9,8 +9,10 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  * </p>
  *
  * @author yoush
- * @since 2021-03-22
+ * @since 2021-04-02
  */
-public interface ActCodeBatchDetailMapper extends BaseMapper<ActCodeBatchDetail> {
+public interface ActCodeBatchDetailMapper extends EasyBaseMapper<ActCodeBatchDetail> {
+
+
 
 }

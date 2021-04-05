@@ -3,7 +3,7 @@
 <mapper namespace="com.yfshop.admin.dao.ActCodeDao">
 
     <select id="queryActCodeList" resultType="com.yfshop.admin.api.activity.result.ActCodeResult">
-        select b.*,a.act_name as act_name
+        select b.*,b.is_download as isDownload,b.is_send as isSend,a.act_title as act_title
         from yf_act_code_batch b left join yf_draw_activity a on a.id = b.act_id
         where 1=1
         <if test="req.startTime!=null">
@@ -22,7 +22,7 @@
     </select>
 
     <select id="sumActCodeByBeforeId" resultType="java.lang.Integer">
-        select sum(b.quantity)
-        from yf_act_code_batch b  where b.create_time &gt;= #{statDate) and b.id &lt; #{id}
+        select IFNULL(sum(b.quantity),0)
+        from yf_act_code_batch b  where b.create_time &gt;= #{startDate} and b.id &lt; #{id}
     </select>
 </mapper>
