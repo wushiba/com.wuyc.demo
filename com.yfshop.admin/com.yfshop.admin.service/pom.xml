@@ -14,20 +14,6 @@
     <description>后台管理业务模块</description>
 
     <dependencies>
-        <dependency>
-            <groupId>com.yfshop.parent</groupId>
-            <artifactId>com.yfshop.common</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.springframework.boot</groupId>
-                    <artifactId>spring-boot-starter-web</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>cn.dev33</groupId>
-                    <artifactId>sa-token-spring-boot-starter</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
 
         <dependency>
             <groupId>org.apache.commons</groupId>
@@ -78,6 +64,14 @@
                 <exclusion>
                     <groupId>org.springframework.boot</groupId>
                     <artifactId>spring-jdbc</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-web</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>cn.dev33</groupId>
+                    <artifactId>sa-token-spring-boot-starter</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
