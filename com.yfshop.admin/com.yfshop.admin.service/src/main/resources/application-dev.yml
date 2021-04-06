@@ -19,12 +19,12 @@ spring:
     url: jdbc:mysql://121.40.70.203:3306/yf_shop?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
     username: root
     password: Wuyc521125!
-#    url: jdbc:mysql://127.0.0.1:3306/yfshop?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
-#    username: root
-#    password: root
-#    url: jdbc:mysql://prev.mysql.lb.hello.com:3306/db_online_jf?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
-#    username: jjbJfSaas
-#    password: onlineJfsaas
+    #    url: jdbc:mysql://127.0.0.1:3306/yfshop?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
+    #    username: root
+    #    password: root
+    #    url: jdbc:mysql://prev.mysql.lb.hello.com:3306/db_online_jf?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
+    #    username: jjbJfSaas
+    #    password: onlineJfsaas
     maxPoolPreparedStatementPerConnectionSize: 20
     testOnBorrow: false
     testWhileIdle: true
@@ -78,6 +78,27 @@ qiniu:
   secret: QFrGQnxFdOzz-iNKQmilWQGdnrzy-3ScVGYGVQG7
   prefix: /yufanshop
 
+xxl:
+  job:
+    admin:
+      ### xxl-job admin address list, such as "http://address" or "http://address01,http://address02"
+      addresses: http://192.168.11.197:8780/xxl-job-admin
+      ### xxl-job, access token
+    accessToken:
+    ### xxl-job executor appname
+    executor:
+      appname: yufshop-admin-executor-task
+      ### xxl-job executor registry-address: default use address to registry , otherwise use ip:port if address is null
+      address=:
+      ### xxl-job executor server-info
+      ip=:
+      port: 19999
+      ### xxl-job executor log-path
+      logpath: /data/applogs/xxl-job/jobhandler
+      ### xxl-job executor log-retention-days
+      logretentiondays: 30
+
+
 websiteCode:
   dir: F://websiteCode/
   url: http://192.168.11.34:8088/#/MerchantRegisterPrep?websiteCode=
@@ -86,3 +107,4 @@ actCode:
   srcDir: F://actCode/src/
   targetDir: F://actCode/target/
   url: http://192.168.11.34:8088/#/Activity?actCode=
+

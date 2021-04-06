@@ -1,4 +1,4 @@
-package com.yfshop.admin.config;
+package com.yfshop.shop.config;
 
 import cn.dev33.satoken.config.SaTokenConfig;
 import cn.dev33.satoken.stp.StpLogic;

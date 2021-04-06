@@ -1,8 +1,9 @@
-package com.yfshop.admin.api.user;
+package com.yfshop.shop.service.user.service;
 
-import com.yfshop.admin.api.user.request.UserReq;
-import com.yfshop.admin.api.user.result.UserResult;
+
 import com.yfshop.common.exception.ApiException;
+import com.yfshop.shop.service.user.request.UserReq;
+import com.yfshop.shop.service.user.result.UserResult;
 
 /**
  * 微信用户服务服务
@@ -10,13 +11,9 @@ import com.yfshop.common.exception.ApiException;
  * @author youshenghui
  * Created in 2021-03-23 9:10
  */
-public interface UserService {
+public interface FrontUserService {
 
     UserResult getUserByOpenId(String openId) throws ApiException;
-
-    Void subscribe(UserReq userReq) throws ApiException;
-
-    Void unsubscribe(UserReq userReq) throws ApiException;
 
     Integer checkSubscribe(String openId);
 

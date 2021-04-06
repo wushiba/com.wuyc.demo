@@ -55,21 +55,7 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-aop</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-quartz</artifactId>
-        </dependency>
 
-        <dependency>
-            <groupId>com.aliyun.mns</groupId>
-            <artifactId>aliyun-sdk-mns</artifactId>
-            <exclusions>
-                <exclusion>
-                    <artifactId>httpclient</artifactId>
-                    <groupId>org.apache.httpcomponents</groupId>
-                </exclusion>
-            </exclusions>
-        </dependency>
 
         <dependency>
             <groupId>com.yfshop.parent</groupId>
@@ -85,12 +71,6 @@
             <artifactId>jsoup</artifactId>
         </dependency>
 
-        <!--httpclient依赖 start-->
-        <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpclient</artifactId>
-        </dependency>
-        <!--httpclient依赖 end-->
 
         <!--fast-json相关 start-->
         <dependency>
@@ -98,12 +78,7 @@
             <artifactId>fastjson</artifactId>
         </dependency>
         <!--fast-json相关 end-->
-        <!--好用的反射工具 start-->
-        <dependency>
-            <groupId>org.reflections</groupId>
-            <artifactId>reflections</artifactId>
-        </dependency>
-        <!--好用的反射工具 end-->
+
     </dependencies>
 
 

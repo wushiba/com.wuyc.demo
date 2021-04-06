@@ -14,16 +14,16 @@ public abstract class AbstractBaseController implements BaseController {
     public String getCurrentOpenId() {
         String openId = getCookieValue("yfopen");
         if (StringUtils.isNotBlank(openId)) {
-            return saTokenDaoRedis.get(String.format("yfopen:wx:token:%s", openId));
+            return saTokenDaoRedis.get(String.format("yfopen:login:token:%s", openId));
         }
         return null;
     }
 
     @Override
     public Integer getCurrentUserId() {
-        String userId = getCookieValue("shop");
+        String userId = getCookieValue("user");
         if (StringUtils.isNotBlank(userId)) {
-            String u = saTokenDaoRedis.get(String.format("shop:user:token:%s", userId));
+            String u = saTokenDaoRedis.get(String.format("user:login:token:%s", userId));
             return u == null ? null : Integer.valueOf(u);
         }
         return null;

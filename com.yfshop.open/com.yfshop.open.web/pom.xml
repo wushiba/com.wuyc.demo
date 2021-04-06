@@ -43,12 +43,6 @@
             <artifactId>spring-boot-starter-thymeleaf</artifactId>
         </dependency>
 
-        <!--httpclient依赖 start-->
-        <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpclient</artifactId>
-        </dependency>
-        <!--httpclient依赖 end-->
 
         <!--fast-json相关 start-->
         <dependency>

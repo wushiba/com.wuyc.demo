@@ -40,8 +40,8 @@ class MerchantInfoController extends AbstractBaseController {
     @DubboReference(check = false)
     private UserService userService;
 
-    public static StpLogic wxLogic = new WxStpLogic("wx");
-    public static StpLogic userLogic = new UserStpLogic("user");
+    public static StpLogic wxLogic = new WxStpLogic();
+    public static StpLogic userLogic = new UserStpLogic();
 
 
     /**

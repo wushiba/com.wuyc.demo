@@ -7,11 +7,10 @@ import com.yfshop.common.util.BeanUtil;
 public class UserStpLogic extends StpLogic {
     private SaTokenConfig saTokenConfig;
 
-    public UserStpLogic(String loginKey) {
-        super(loginKey);
+    public UserStpLogic() {
+        super("login");
         saTokenConfig = BeanUtil.convert(super.getConfig(), SaTokenConfig.class);
-        saTokenConfig.setCookieDomain("shop");
-        saTokenConfig.setTokenName("shop");
+        saTokenConfig.setTokenName("user");
     }
 
     @Override
