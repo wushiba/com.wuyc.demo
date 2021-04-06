@@ -262,7 +262,7 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
 
         insertUserOrderDetail(userId, orderId, null, null, ReceiveWayEnum.ZT.getCode(), "N", 1, itemSku.getItemId(), itemSku.getId(),
                 itemResult.getItemTitle(), itemSku.getSkuSalePrice(), itemSku.getSkuCover(), itemFreight, itemSku.getSkuSalePrice(), itemSku.getSkuSalePrice(),
-                itemFreight, userCoupon.getId(), UserOrderStatusEnum.WAIT_PAY.getCode(), null, itemSku.getSpecNameIdValueIdJson());
+                itemFreight, userCoupon.getId(), UserOrderStatusEnum.WAIT_PAY.getCode(), null, itemSku.getSpecNameValueJson());
 
         insertUserOrderAddress(orderId, addressInfo.getMobile(), addressInfo.getRealname(), addressInfo.getProvince(), addressInfo.getProvinceId(),
                 addressInfo.getCity(), addressInfo.getCityId(), addressInfo.getDistrict(), addressInfo.getDistrictId(), addressInfo.getAddress());
@@ -297,10 +297,10 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
         }
 
         List<UserCart> userCartList = userCartMapper.selectList(Wrappers.lambdaQuery(UserCart.class)
-                .eq(UserCart::getUserId, userCouponId)
+                .eq(UserCart::getUserId, userId)
                 .in(UserCart::getId, cartIdList));
         Asserts.assertCollectionNotEmpty(userCartList, 500, "购物车id不正确");
-        Asserts.assertNotEquals(userCartList.size(), cartIdList.size(), 500, "购物车数据不正确，请刷新重试");
+        Asserts.assertEquals(userCartList.size(), cartIdList.size(), 500, "购物车数据不正确，请刷新重试");
 
 
         // 扣库存，这里要做手写SQL，搞乐观锁

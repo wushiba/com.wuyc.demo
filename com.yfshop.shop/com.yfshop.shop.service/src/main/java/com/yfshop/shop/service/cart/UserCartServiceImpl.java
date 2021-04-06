@@ -296,8 +296,8 @@ public class UserCartServiceImpl implements UserCartService {
             result.setSkuTitle(targetSku.getSkuTitle());
             result.setSkuSubTitle(targetSku.getSkuSubTitle());
             result.setSkuCover(targetSku.getSkuCover());
-            result.setSkuSpecValueIdPath(targetSku.getSpecValueIdPath());
-            result.setSkuSpecNameValueJson(targetSku.getSpecNameValueJson());
+            result.setSpecValueIdPath(targetSku.getSpecValueIdPath());
+            result.setSpecNameValueJson(targetSku.getSpecNameValueJson());
             result.setSkuSalePrice(targetSku.getSkuSalePrice());
             result.setSkuMarketPrice(targetSku.getSkuMarketPrice());
         }

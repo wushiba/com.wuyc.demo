@@ -3,9 +3,11 @@ package com.yfshop.shop.service.user;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.yfshop.code.mapper.OrderAddressMapper;
+import com.yfshop.code.mapper.UserAddressMapper;
 import com.yfshop.code.mapper.UserMapper;
 import com.yfshop.code.model.OrderAddress;
 import com.yfshop.code.model.User;
+import com.yfshop.code.model.UserAddress;
 import com.yfshop.common.constants.CacheConstants;
 import com.yfshop.common.exception.ApiException;
 import com.yfshop.common.exception.Asserts;
@@ -29,6 +31,9 @@ public class FrontUserServiceImpl implements FrontUserService {
 
     @Resource
     private OrderAddressMapper orderAddressMapper;
+
+    @Resource
+    private UserAddressMapper userAddressMapper;
 
     @Resource
     private RedisService redisService;
@@ -78,8 +83,8 @@ public class FrontUserServiceImpl implements FrontUserService {
             return JSON.parseObject(userAddressObject.toString(), UserAddressResult.class);
         }
 
-        OrderAddress orderAddress = orderAddressMapper.selectOne(Wrappers.lambdaQuery(OrderAddress.class)
-                .eq(OrderAddress::getId, addressId));
+        UserAddress orderAddress = userAddressMapper.selectOne(Wrappers.lambdaQuery(UserAddress.class)
+                .eq(UserAddress::getId, addressId));
         Asserts.assertNonNull(orderAddress, 500, "收货地址不存在");
         redisService.set(CacheConstants.USER_ADDRESS_ID, JSON.toJSONString(orderAddress), 60 * 60 * 24);
         return BeanUtil.convert(orderAddress, UserAddressResult.class);
