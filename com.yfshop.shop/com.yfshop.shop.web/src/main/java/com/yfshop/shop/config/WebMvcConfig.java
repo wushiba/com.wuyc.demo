@@ -1,6 +1,8 @@
 package com.yfshop.shop.config;
 
 import com.yfshop.common.config.BaseWebMvcConfig;
+import com.yfshop.common.log.WebSystemOperateLogAspect;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
@@ -11,4 +13,10 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 public class WebMvcConfig extends BaseWebMvcConfig {
+
+    @Bean
+    public WebSystemOperateLogAspect webSystemOperateLogAspect() {
+        return new WebSystemOperateLogAspect();
+    }
+
 }

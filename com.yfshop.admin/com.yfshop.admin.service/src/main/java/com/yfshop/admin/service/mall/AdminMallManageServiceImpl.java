@@ -70,6 +70,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -432,6 +433,7 @@ public class AdminMallManageServiceImpl implements AdminMallManageService {
             // 没有规格则创建默认规格
             req.setSpecNameAndValues(Collections.singletonList(ItemSpecNameAndValue.createDefaultSpec()));
         }
+        req.getSpecNameAndValues().sort(Comparator.comparing(ItemSpecNameAndValue::getSort));
         List<ItemSpecNameAndValue> specNameAndValues = req.getSpecNameAndValues();
         Integer itemId = req.getItemId();
 
@@ -564,7 +566,7 @@ public class AdminMallManageServiceImpl implements AdminMallManageService {
             // {\"颜色\":\"黑色\"}
             JSONObject specNameValueJson = new JSONObject(cartesianProduct.size());
             // {\"规格id\":\"规格值id\"}
-            JSONObject specNameIdValueIdJson = new JSONObject(cartesianProduct.size());
+            JSONObject specNameIdValueIdJson = new JSONObject(cartesianProduct.size(), true);
             for (String specIdValue : cartesianProduct) {
                 String[] nameAndValueIndex = StringUtils.split(specIdValue, "-");
                 // 规格名称
@@ -625,6 +627,7 @@ public class AdminMallManageServiceImpl implements AdminMallManageService {
             // 没有规格则创建默认规格
             skuRequest.setSpecNameAndValues(Collections.singletonList(ItemSpecNameAndValue.createDefaultSpec()));
         }
+        req.getSpecInfo().getSpecNameAndValues().sort(Comparator.comparing(ItemSpecNameAndValue::getSort));
 
         // 校验候选sku信息
         List<ItemCandidateSku> candidateSkuList = req.getCandidateSkus();
@@ -712,7 +715,7 @@ public class AdminMallManageServiceImpl implements AdminMallManageService {
                 .collect(Collectors.toMap(ItemSpecName::getId, ItemSpecName::getSpecName));
 
         // 建立{规格名称:[规格名称-规格值]}映射,
-        Map<String, List<String>> specNameAndSpecValuesIndexMap = new HashMap<>(specNameAndValues.size());
+        Map<String, List<String>> specNameAndSpecValuesIndexMap = new LinkedHashMap<>(specNameAndValues.size());
         for (ItemSpecNameAndValue specNameAndValue : specNameAndValues) {
             String specName = specNameAndValue.getSpecName();
             // ["specName-specValue", "specName-specValue"]
@@ -739,7 +742,7 @@ public class AdminMallManageServiceImpl implements AdminMallManageService {
             // {\"颜色\":\"黑色\"}
             JSONObject specNameValueJson = new JSONObject(cartesianProduct.size());
             // {\"规格id\":\"规格值id\"}
-            JSONObject specNameIdValueIdJson = new JSONObject(cartesianProduct.size());
+            JSONObject specNameIdValueIdJson = new JSONObject(cartesianProduct.size(), true);
             for (String specIdValue : cartesianProduct) {
                 String[] nameAndValueIndex = StringUtils.split(specIdValue, "-");
                 // 规格名称
