@@ -1,8 +1,10 @@
 package com.yfshop.shop.result;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 /**
@@ -54,12 +56,12 @@ public class YfUserCouponResult implements Serializable{
 	
     /** 指定可使用商品ids */
     private String canUseItemIds;
-	
-    /**  */
-    private Date validStartTime;
-	
-    /**  */
-    private Date validEndTime;
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", locale = "zh", timezone = "GMT+8")
+    private LocalDateTime validStartTime;
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", locale = "zh", timezone = "GMT+8")
+    private LocalDateTime validEndTime;
 	
     /** 用户昵称 */
     private String nickname;

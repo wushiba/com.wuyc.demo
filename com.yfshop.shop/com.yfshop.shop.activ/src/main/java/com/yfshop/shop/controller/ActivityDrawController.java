@@ -33,26 +33,26 @@ public class ActivityDrawController implements BaseController {
 
     @RequestMapping(value = "activity/getDetail", method = {RequestMethod.POST})
     @ResponseBody
-    @IpAccessLimit(limit = 10, second = 1)
+//    @IpAccessLimit(limit = 10, second = 1)
     public CommonResult<YfDrawActivityResult> getActivityDetail(Integer id) {
         return CommonResult.success(activityDrawService.getDrawActivityDetailById(id));
     }
 
     @RequestMapping(value = "record/findList", method = {RequestMethod.GET, RequestMethod.POST})
     @ResponseBody
-    @IpAccessLimit(limit = 10, second = 1)
+//    @IpAccessLimit(limit = 10, second = 1)
     public CommonResult<List<YfUserCouponResult>> findDrawRecordList() {
         QueryUserCouponReq req = new QueryUserCouponReq();
-        req.setUserId(getCurrentUserId());
+        req.setUserId(101);
         return CommonResult.success(activityCouponService.findUserCouponList(req));
     }
 
     @RequestMapping(value = "user/clickDraw", method = {RequestMethod.GET, RequestMethod.POST})
     @ResponseBody
-    @IpAccessLimit(limit = 10, second = 1)
+//    @IpAccessLimit(limit = 10, second = 1)
     public CommonResult<YfUserCouponResult> userClickDraw(HttpServletRequest request, String actCode) {
 //        return CommonResult.success(activityDrawService.userClickDraw(getCurrentUserId(), getRequestIpStr(request), actCode));
 //        String activeProfile = SpringUtil.getActiveProfile();
-        return CommonResult.success(activityDrawService.userClickDraw(90, "115.239.212.133", actCode));
+        return CommonResult.success(activityDrawService.userClickDraw(101, "115.239.212.133", actCode));
     }
 }

@@ -24,6 +24,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.stream.Collectors;
 
@@ -115,33 +116,40 @@ public class ActivityDrawServiceImpl implements ActivityDrawService {
         Object prizeObject = redisService.get(CacheConstants.DRAW_PRIZE_NAME_PREFIX + actCodeBatchDetail.getActId());
         List<DrawPrize> prizeList = JSON.parseArray(prizeObject.toString(), DrawPrize.class);
         Asserts.assertCollectionNotEmpty(prizeList, 500, "活动暂未配置奖品，请稍微再试");
-        DrawPrize firstPrize = prizeList.stream().filter(data ->
-                data.getPrizeLevel() == 1).collect(Collectors.toList()).get(0);
-        DrawPrize secondPrize = prizeList.stream().filter(data ->
-                data.getPrizeLevel() == 2).collect(Collectors.toList()).get(0);
+
+        DrawPrize firstPrize = prizeList.stream().filter(data ->  data.getPrizeLevel() == 1).collect(Collectors.toList()).get(0);
+        DrawPrize secondPrize = prizeList.stream().filter(data -> data.getPrizeLevel() == 2).collect(Collectors.toList()).get(0);
+        DrawPrize thirdPrize = prizeList.stream().filter(data -> data.getPrizeLevel() == 3).collect(Collectors.toList()).get(0);
+        Map<Integer, List<DrawPrize>> prizeMap = prizeList.stream().collect(Collectors.groupingBy(DrawPrize::getPrizeLevel));
+        Integer prizeLevel = 3;
+        Integer couponId = thirdPrize.getCouponId();
 
         // 根据ip查询地址, 找不到归属地默认抽到三等奖
         Integer provinceId = this.getProvinceByIpStr(ipStr);
+        if (provinceId == null) {
+            return activityCouponService.createUserCoupon(userId, prizeLevel, couponId);
+        }
 
         // 判断省份抽奖规则有没有走定制化, 找不到根据活动奖品概率去发奖品, 根据大盒小盒,去抽奖
         DrawProvinceRate provinceRate = this.getProvinceRateByActIdAndProvince(actCodeBatchDetail.getActId(), provinceId);
-        Integer couponId = null;
         if (provinceRate == null) {
             if (BoxSpecValEnum.BIG.getCode().equalsIgnoreCase(actCodeBatchDetail.getBoxSpecVal())) {
-                Integer integer = startDraw(firstPrize.getWinRate(), secondPrize.getWinRate());
+                prizeLevel = startDraw(firstPrize.getWinRate(), secondPrize.getWinRate());
+                couponId = prizeMap.get(prizeLevel).get(0).getCouponId();
             } else {
-                startDraw(firstPrize.getWinRate(), secondPrize.getSmallBoxRate());
+                prizeLevel = startDraw(firstPrize.getWinRate(), secondPrize.getSmallBoxRate());
+                couponId = prizeMap.get(prizeLevel).get(0).getCouponId();
             }
         } else {
             if (BoxSpecValEnum.BIG.getCode().equalsIgnoreCase(actCodeBatchDetail.getBoxSpecVal())) {
-                startDraw(provinceRate.getFirstWinRate(), provinceRate.getSecondWinRate());
+                prizeLevel = startDraw(provinceRate.getFirstWinRate(), provinceRate.getSecondWinRate());
+                couponId = prizeMap.get(prizeLevel).get(0).getCouponId();
             } else {
-                startDraw(provinceRate.getFirstWinRate(), provinceRate.getSecondSmallBoxWinRate());
+                prizeLevel =startDraw(provinceRate.getFirstWinRate(), provinceRate.getSecondSmallBoxWinRate());
+                couponId = prizeMap.get(prizeLevel).get(0).getCouponId();
             }
         }
-
-        activityCouponService.createUserCoupon(userId, firstPrize.getCouponId());
-        return null;
+        return activityCouponService.createUserCoupon(userId, prizeLevel, couponId);
     }
 
     private DrawProvinceRate getProvinceRateByActIdAndProvince(Integer actId, Integer provinceId) {
