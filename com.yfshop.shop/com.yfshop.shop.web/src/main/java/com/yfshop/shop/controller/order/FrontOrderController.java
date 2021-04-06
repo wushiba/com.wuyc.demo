@@ -123,10 +123,10 @@ public class FrontOrderController implements BaseController {
      * @param   orderDetailId     订单详情id
      * @return  YfUserOrderDetailResult
      */
-    @RequestMapping(value = "/order/findList", method = {RequestMethod.GET, RequestMethod.POST})
+    @RequestMapping(value = "/order/getOrderDetail", method = {RequestMethod.GET, RequestMethod.POST})
     @ResponseBody
     @SaCheckLogin
-    public CommonResult<YfUserOrderDetailResult> findUserOrderList(Integer orderId, Integer orderDetailId) {
+    public CommonResult<YfUserOrderDetailResult> getUserOrderDetail(Integer orderId, Integer orderDetailId) {
         return CommonResult.success(frontUserOrderService.getUserOrderDetail(getCurrentUserId(), orderId, orderDetailId));
     }
 
@@ -135,11 +135,23 @@ public class FrontOrderController implements BaseController {
      * @param   orderId   订单id
      * @return  Void
      */
+    @RequestMapping(value = "/order/cancelOrder", method = {RequestMethod.GET, RequestMethod.POST})
+    @ResponseBody
+    @SaCheckLogin
+    public CommonResult<Void> cancelOrder(Integer orderId) {
+        return CommonResult.success(frontUserOrderService.cancelOrder(getCurrentUserId(), orderId));
+    }
+
+    /**
+     * 用户确认订单
+     * @param   orderDetailId   订单详情id
+     * @return  Void
+     */
     @RequestMapping(value = "/order/confirmOrder", method = {RequestMethod.GET, RequestMethod.POST})
     @ResponseBody
     @SaCheckLogin
-    public CommonResult<Void> confirmOrder(Integer orderId) {
-        return CommonResult.success(frontUserOrderService.confirmOrder(getCurrentUserId(), orderId));
+    public CommonResult<Void> confirmOrder(Integer orderDetailId) {
+        return CommonResult.success(frontUserOrderService.confirmOrder(getCurrentUserId(), orderDetailId));
     }
 
 }
