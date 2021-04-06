@@ -79,7 +79,7 @@ public class UserAddressServiceImpl implements UserAddressService {
         userAddress.setCreateTime(LocalDateTime.now());
         userAddress.setUpdateTime(LocalDateTime.now());
         userAddress.setUserId(userId);
-        userAddress.setIsDefault("N");
+        userAddress.setIsDefault(req.getIsDefault());
         userAddress.setRealname(req.getRealname());
         userAddress.setMobile(req.getMobile());
         userAddress.setSex(req.getSex());
@@ -114,7 +114,7 @@ public class UserAddressServiceImpl implements UserAddressService {
         userAddress.setId(req.getUserAddressId());
         userAddress.setCreateTime(LocalDateTime.now());
         userAddress.setUpdateTime(LocalDateTime.now());
-        userAddress.setIsDefault("N");
+        userAddress.setIsDefault(req.getIsDefault());
         userAddress.setRealname(req.getRealname());
         userAddress.setMobile(req.getMobile());
         userAddress.setSex(req.getSex());
