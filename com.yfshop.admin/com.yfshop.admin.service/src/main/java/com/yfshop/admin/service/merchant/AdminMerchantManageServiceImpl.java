@@ -93,7 +93,7 @@ public class AdminMerchantManageServiceImpl implements AdminMerchantManageServic
             // 使用当前商户作为上级
             pm = this.getParent(merchantId);
         }
-        Asserts.assertNonNull(pm, 500, "错误的上级pid" + req.getPid());
+        Asserts.assertNonNull(pm, 500, "错误的上级pid" + (req.getPid() == null ? merchantId : req.getPid()));
         Asserts.assertTrue("Y".equalsIgnoreCase(pm.getIsEnable()), 500, "上级商户" + req.getPid() + "已被禁用");
         Asserts.assertTrue("N".equalsIgnoreCase(pm.getIsDelete()), 500, "上级商户" + req.getPid() + "已被删除");
 
@@ -164,7 +164,7 @@ public class AdminMerchantManageServiceImpl implements AdminMerchantManageServic
             // 使用当前商户作为上级
             pm = this.getParent(merchantId);
         }
-        Asserts.assertNonNull(pm, 500, "错误的上级pid" + req.getPid());
+        Asserts.assertNonNull(pm, 500, "错误的上级pid" + (req.getPid() == null ? merchantId : req.getPid()));
         Asserts.assertTrue("Y".equalsIgnoreCase(pm.getIsEnable()), 500, "上级商户" + req.getPid() + "已被禁用");
         Asserts.assertTrue("N".equalsIgnoreCase(pm.getIsDelete()), 500, "上级商户" + req.getPid() + "已被删除");
 
