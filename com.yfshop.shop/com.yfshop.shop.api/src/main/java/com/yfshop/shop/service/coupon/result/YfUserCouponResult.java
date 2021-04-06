@@ -49,6 +49,8 @@ public class YfUserCouponResult implements Serializable{
 
     /** 抽奖活动id */
     private Integer drawActivityId;
+
+    private Integer drawPrizeLevel;
 	
     /** 优惠券面值，必须是整数 */
     private Integer couponPrice;

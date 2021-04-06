@@ -25,10 +25,11 @@ public interface FrontUserOrderService {
 
 	/**
 	 * 用户订单详情
-	 * @param userId		用户id
-	 * @param orderId		订单id
+	 * @param userId			用户id
+	 * @param orderId			订单id
+	 * @param orderDetailId		订单详情id
 	 * @return
-	 * @Description:
+	 * @throws ApiException
 	 */
 	public YfUserOrderDetailResult getUserOrderDetail(Integer userId, Integer orderId, Integer orderDetailId) throws ApiException;
 
@@ -38,7 +39,7 @@ public interface FrontUserOrderService {
 	 * @param orderId	订单id
 	 * @throws ApiException
 	 */
-	public void cancelOrder(Integer userId, Integer orderId) throws ApiException;
+	public Void cancelOrder(Integer userId, Integer orderId) throws ApiException;
 
 	/**
 	 * 用户确认订单
@@ -46,7 +47,7 @@ public interface FrontUserOrderService {
 	 * @param orderDetailId		订单详情id
 	 * @throws ApiException
 	 */
-	public void confirmOrder(Integer userId, Integer orderDetailId) throws ApiException;
+	public Void confirmOrder(Integer userId, Integer orderDetailId) throws ApiException;
 
 	/**
 	 * 商品单个立即购买
@@ -80,6 +81,6 @@ public interface FrontUserOrderService {
 	 * @return
 	 * @throws ApiException
 	 */
-	Void submitOrderByUserCouponId(Integer userId, String userCouponIds, String userMobile, String websiteCode) throws ApiException;
+	Void submitOrderByUserCouponIds(Integer userId, String userCouponIds, String userMobile, String websiteCode) throws ApiException;
 
 }

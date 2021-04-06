@@ -64,19 +64,25 @@ public class FrontMerchantServiceImpl implements FrontMerchantService {
             return null;
         }
 
+        List<MerchantResult> resultList = new ArrayList<>();
+        if (districtId != null) {
+            resultList = merchantResultList.stream().filter(data -> data.getDistrictId().intValue() == districtId)
+                    .collect(Collectors.toList());
+            return resultList;
+        }
+
         GeoResults<RedisGeoCommands.GeoLocation<Object>> geoResults = redisService.findNearDataList(CacheConstants.MERCHANT_GRO_DATA,
                 longitude, latitude, CacheConstants.USER_MERCHANT_DISTANCE, CacheConstants.USER_MERCHANT_DISTANCE_UNIT);
         if (geoResults == null) {
-            return null;
+            return resultList;
         }
 
-        List<MerchantResult> resultList = new ArrayList<>();
         Map<Integer, List<MerchantResult>> merchantMap = merchantResultList.stream().collect(Collectors.groupingBy(MerchantResult::getId));
         for (GeoResult<RedisGeoCommands.GeoLocation<Object>> locationGeoResult : geoResults) {
             Distance dist = locationGeoResult.getDistance();
             RedisGeoCommands.GeoLocation<Object> content = locationGeoResult.getContent();
-            Object merchantId = content.getName();
             Point point = content.getPoint();
+            Object merchantId = content.getName();
             System.out.println("merchantId=" + merchantId.toString() + "&distance=" + dist.toString() + "&coordinate=" + point.toString());
             resultList.addAll(merchantMap.get(Integer.valueOf(merchantId.toString())));
         }

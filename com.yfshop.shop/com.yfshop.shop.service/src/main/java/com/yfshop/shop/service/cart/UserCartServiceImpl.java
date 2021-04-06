@@ -18,6 +18,8 @@ import com.yfshop.shop.service.cart.result.UserCartResult;
 import com.yfshop.shop.service.cart.result.UserCartSummary;
 import com.yfshop.shop.service.coupon.result.YfUserCouponResult;
 import com.yfshop.shop.service.coupon.service.FrontUserCouponService;
+import com.yfshop.shop.service.mall.result.ItemResult;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -31,6 +33,8 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -217,6 +221,28 @@ public class UserCartServiceImpl implements UserCartService {
         cartSummary.setTotalFreight(totalFreight);
         cartSummary.setCarts(null);
         return cartSummary;
+    }
+
+    @Override
+    public List<UserCartResult> findItemList(Integer skuId, Integer num, String cartIds) {
+        List<UserCartResult> resultList = new ArrayList<>();
+        if (StringUtils.isNotEmpty(cartIds)) {
+            List<Integer> cartIdList = Arrays.stream(StringUtils.split(cartIds, ","))
+                    .map(Integer::valueOf)
+                    .collect(Collectors.toList());
+            List<UserCart> userCartList = cartMapper.selectList(Wrappers.lambdaQuery(UserCart.class)
+                    .in(UserCart::getId, cartIdList));
+            resultList = BeanUtil.convertList(userCartList, UserCartResult.class);
+        } else {
+            ItemSku itemSku = skuMapper.selectById(skuId);
+            UserCartResult userCartResult = BeanUtil.convert(itemSku, UserCartResult.class);
+            userCartResult.setSkuId(skuId);
+            userCartResult.setNum(num);
+            Item item = itemMapper.selectById(itemSku.getItemId());
+            userCartResult.setSkuTitle(item.getItemTitle());
+            resultList.add(userCartResult);
+        }
+        return resultList;
     }
 
     private UserCartSummary calcUserCart(List<UserCart> userCarts) {

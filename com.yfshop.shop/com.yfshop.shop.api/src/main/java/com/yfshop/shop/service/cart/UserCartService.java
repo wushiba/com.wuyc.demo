@@ -3,6 +3,7 @@ package com.yfshop.shop.service.cart;
 import com.yfshop.common.exception.ApiException;
 import com.yfshop.shop.service.cart.result.UserCartResult;
 import com.yfshop.shop.service.cart.result.UserCartSummary;
+import com.yfshop.shop.service.mall.result.ItemResult;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
@@ -90,5 +91,14 @@ public interface UserCartService {
      */
     @Deprecated
     UserCartSummary calcUserBuySkuDetails(Integer userId, Integer skuId, int num);
+
+    /**
+     * 查询订单结算页商品信息
+     * @param skuId     skuId
+     * @param num       商品数量
+     * @param cartIds   购物车ids
+     * @return
+     */
+    List<UserCartResult> findItemList(Integer skuId, Integer num, String cartIds);
 
 }

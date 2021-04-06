@@ -106,9 +106,9 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
     /**
      * 订单id为空说明查的是子订单详情
      * 订单id不为空代表查的是整个订单的详情，一般用于未支付，订单取消的订单
-     * @param userId		用户id
-     * @param orderId		订单id
-     * @param orderDetailId
+     * @param userId		    用户id
+     * @param orderId		    订单id
+     * @param orderDetailId     订单详情id
      * @return
      * @throws ApiException
      */
@@ -122,7 +122,9 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
                 .eq(Order::getUserId, userId)
                 .eq(Order::getId, orderId));
         List<OrderDetail> detailList = orderDetailMapper.selectList(Wrappers.lambdaQuery(OrderDetail.class)
-                .eq(OrderDetail::getUserId, userId).eq(OrderDetail::getOrderId, orderId).orderByDesc(OrderDetail::getId));
+                .eq(OrderDetail::getUserId, userId)
+                .eq(OrderDetail::getOrderId, orderId)
+                .orderByDesc(OrderDetail::getId));
 
         if (orderDetailId == null) {
             List<YfUserOrderDetailResult.YfUserOrderItem> itemList = BeanUtil.convertList(detailList, YfUserOrderDetailResult.YfUserOrderItem.class);
@@ -154,7 +156,7 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
      * @throws ApiException
      */
     @Override
-    public void cancelOrder(Integer userId, Integer orderId) throws ApiException {
+    public Void cancelOrder(Integer userId, Integer orderId) throws ApiException {
         Order order = orderMapper.selectOne(Wrappers.lambdaQuery(Order.class)
                 .eq(Order::getUserId, userId)
                 .eq(Order::getId, orderId));
@@ -171,6 +173,7 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
                 userCouponMapper.updateById(userCoupon);
             }
         });
+        return null;
     }
 
     /**
@@ -180,7 +183,7 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
      * @throws ApiException
      */
     @Override
-    public void confirmOrder(Integer userId, Integer orderDetailId) throws ApiException {
+    public Void confirmOrder(Integer userId, Integer orderDetailId) throws ApiException {
         OrderDetail orderDetail = orderDetailMapper.selectOne(Wrappers.lambdaQuery(OrderDetail.class)
                 .eq(OrderDetail::getUserId, userId)
                 .eq(OrderDetail::getId, orderDetailId));
@@ -201,6 +204,7 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
             userCoupon.setId(orderDetail.getUserCouponId());
             userCouponMapper.updateById(userCoupon);
         }
+        return null;
     }
 
     /**
@@ -334,7 +338,7 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Void submitOrderByUserCouponId(Integer userId, String userCouponIds, String userMobile, String websiteCode) throws ApiException {
+    public Void submitOrderByUserCouponIds(Integer userId, String userCouponIds, String userMobile, String websiteCode) throws ApiException {
         // 校验网点码商户
         MerchantResult merchantResult = frontMerchantService.getMerchantByWebsiteCode(websiteCode);
 

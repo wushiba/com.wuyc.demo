@@ -2,22 +2,8 @@ package com.yfshop.shop.service.mall;
 
 import cn.hutool.core.collection.CollectionUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
-import com.yfshop.code.mapper.BannerMapper;
-import com.yfshop.code.mapper.ItemCategoryMapper;
-import com.yfshop.code.mapper.ItemContentMapper;
-import com.yfshop.code.mapper.ItemImageMapper;
-import com.yfshop.code.mapper.ItemMapper;
-import com.yfshop.code.mapper.ItemSkuMapper;
-import com.yfshop.code.mapper.ItemSpecNameMapper;
-import com.yfshop.code.mapper.ItemSpecValueMapper;
-import com.yfshop.code.model.Banner;
-import com.yfshop.code.model.Item;
-import com.yfshop.code.model.ItemCategory;
-import com.yfshop.code.model.ItemContent;
-import com.yfshop.code.model.ItemImage;
-import com.yfshop.code.model.ItemSku;
-import com.yfshop.code.model.ItemSpecName;
-import com.yfshop.code.model.ItemSpecValue;
+import com.yfshop.code.mapper.*;
+import com.yfshop.code.model.*;
 import com.yfshop.common.constants.CacheConstants;
 import com.yfshop.common.enums.BannerPositionsEnum;
 import com.yfshop.common.util.BeanUtil;
@@ -30,11 +16,13 @@ import com.yfshop.shop.service.mall.result.ItemResult;
 import com.yfshop.shop.service.mall.result.ItemSkuResult;
 import com.yfshop.shop.service.mall.result.ItemSpecNameResult;
 import com.yfshop.shop.service.mall.result.ItemSpecValueResult;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.cache.annotation.Cacheable;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -62,6 +50,8 @@ public class MallServiceImpl implements MallService {
     private ItemSpecValueMapper specValueMapper;
     @Resource
     private BannerMapper bannerMapper;
+    @Resource
+    private UserCartMapper userCartMapper;
 
     @Cacheable(cacheManager = CacheConstants.CACHE_MANAGE_NAME,
             cacheNames = CacheConstants.MALL_CATEGORY_CACHE_NAME,
@@ -163,5 +153,6 @@ public class MallServiceImpl implements MallService {
                 .eq(Banner::getIsEnable, "Y").orderByAsc(Banner::getSort));
         return banners.stream().map(Banner::getImageUrl).collect(Collectors.toList());
     }
+
 
 }
