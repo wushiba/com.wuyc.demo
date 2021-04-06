@@ -35,6 +35,8 @@ public interface CacheConstants {
     String USER_INFO_ID = "user_info_id_";
     /** 用户请求ip地址缓存 */
     String USER_REQUEST_IP_STR = "user_ip_str_";
+    /** 用户收货地址缓存 */
+    String USER_ADDRESS_ID = "user_address_id_";
 
     /** 抽奖唯一编码 */
     String ACT_CODE_BATCH_ACT_NO = "act_code_batch_act_no_";

@@ -58,7 +58,7 @@ public interface FrontUserOrderService {
 	 * @return
 	 * @throws ApiException
 	 */
-	Void submitOrderBySkuId(Integer userId, Integer skuId, Integer num, Long userCouponId, Long addressId) throws ApiException;
+	Void submitOrderBySkuId(Integer userId, Integer skuId, Integer num, Long userCouponId, Integer addressId) throws ApiException;
 
 	/**
 	 * 商品购物车下单购买
@@ -69,7 +69,7 @@ public interface FrontUserOrderService {
 	 * @return
 	 * @throws ApiException
 	 */
-	Void submitOrderByCart(Integer userId, String cartIds, Long userCouponId, Long addressId) throws ApiException;
+	Void submitOrderByCart(Integer userId, String cartIds, Long userCouponId, Integer addressId) throws ApiException;
 
 	/**
 	 * 优惠券购买商品
