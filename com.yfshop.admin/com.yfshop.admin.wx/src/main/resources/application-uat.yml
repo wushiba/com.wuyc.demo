@@ -3,12 +3,11 @@ server:
   port: 9098
 dubbo:
   registry:
-    address: zookeeper://127.0.0.1:2181
-    dynamic: true
+    address: zookeeper://yf-srv-staging:2181
   metadataReport:
-    address: zookeeper://127.0.0.1:2181
+    address: zookeeper://yf-srv-staging:2181
   configcenter:
-    address: zookeeper://127.0.0.1:2181
+    address: zookeeper://yf-srv-staging:2181
   application:
     name: yfshop-admin-wx
   consumer:
