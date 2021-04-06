@@ -78,6 +78,7 @@ public class AdminMerchantManageServiceImpl implements AdminMerchantManageServic
         // 查询上级
         Merchant pm;
         if (currentLoginMerchantRole == GroupRoleEnum.ZB && createMerchantRole == GroupRoleEnum.JXS) {
+            Asserts.assertNonNull(req.getPid(), 500, "上级商户不能为空");
             // 总部建经销商时，必须要有二级
             LambdaQueryWrapper<Merchant> query = Wrappers.lambdaQuery(Merchant.class)
                     .eq(Merchant::getPid, merchantId)
