@@ -289,13 +289,6 @@
             </dependency>
             <!--easypoi end-->
 
-
-            <dependency>
-                <groupId>net.sourceforge.htmlunit</groupId>
-                <artifactId>htmlunit</artifactId>
-                <version>2.45.0</version>
-            </dependency>
-
             <dependency>
                 <groupId>org.projectlombok</groupId>
                 <artifactId>lombok</artifactId>
