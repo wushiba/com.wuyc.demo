@@ -8,29 +8,29 @@ package com.yfshop.common.enums;
  */
 public enum GroupRoleEnum {
 
-    SYS("sys", "系统管理员"),
+    SYS("sys", 0, "系统管理员"),
 
-    ZB("zb", "总部"),
+    ZB("zb", 1, "总部"),
 
-    FGS("fgs", "分公司"),
+    FGS("fgs", 2, "分公司"),
 
-    SQ("sq", "省区"),
+    SQ("sq", 2, "省区"),
 
-    JXS("jxs", "经销商"),
+    JXS("jxs", 3, "经销商"),
 
-    FXS("fxs", "分销商"),
+    FXS("fxs", 4, "分销商"),
 
-    YWY("ywy", "业务员"),
+    YWY("ywy", 4, "业务员"),
 
-    CXY("cxy", "促销员"),
+    CXY("cxy", 5, "促销员"),
 
-    GC("gc", "工厂"),
+    WD("wd", 6, "网点"),
 
-    CK("ck", "仓库"),
+    GC("gc", -1, "工厂"),
 
-    WL("wl", "物料"),
+    CK("ck", -1, "仓库"),
 
-    WD("wd", "网点");
+    WL("wl", -1, "物料");
 
     /**
      * 枚举编码
@@ -42,8 +42,14 @@ public enum GroupRoleEnum {
      */
     private final String description;
 
-    GroupRoleEnum(String code, String description) {
+    /**
+     * 角色级别
+     */
+    private final Integer level;
+
+    GroupRoleEnum(String code, Integer level, String description) {
         this.code = code;
+        this.level = level;
         this.description = description;
     }
 
@@ -65,5 +71,9 @@ public enum GroupRoleEnum {
 
     public String getDescription() {
         return description;
+    }
+
+    public Integer getLevel() {
+        return level;
     }
 }

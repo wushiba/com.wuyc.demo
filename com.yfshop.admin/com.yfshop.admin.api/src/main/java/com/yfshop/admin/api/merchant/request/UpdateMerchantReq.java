@@ -1,7 +1,6 @@
 package com.yfshop.admin.api.merchant.request;
 
 import com.yfshop.common.enums.GroupRoleEnum;
-import com.yfshop.common.validate.annotation.CandidateValue;
 import com.yfshop.common.validate.annotation.CheckEnum;
 import com.yfshop.common.validate.annotation.Mobile;
 import io.swagger.annotations.ApiModel;
@@ -27,7 +26,7 @@ public class UpdateMerchantReq implements Serializable {
 
     @ApiModelProperty(value = "商户类型", required = true)
     @NotBlank(message = "商户类型不能为空")
-    @CheckEnum(value = GroupRoleEnum.class, whitelist = {"zb", "fgs", "jxs", "ywy", "cxy", "wd"}, message = "不支持的商户类型")
+    @CheckEnum(value = GroupRoleEnum.class, whitelist = {"zb", "fgs", "sq", "jxs", "ywy", "fxs", "cxy", "wd"}, message = "不支持的商户类型")
     private String roleAlias;
 
     @ApiModelProperty(value = "商户名称", required = true)

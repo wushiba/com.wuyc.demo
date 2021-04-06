@@ -22,7 +22,7 @@ public class CreateMerchantReq implements Serializable {
 
     @ApiModelProperty(value = "商户类型", required = true)
     @NotBlank(message = "商户类型不能为空")
-    @CheckEnum(value = GroupRoleEnum.class, whitelist = {"zb", "fgs", "jxs", "ywy", "cxy"}, message = "不支持的商户类型")
+    @CheckEnum(value = GroupRoleEnum.class, whitelist = {"zb", "fgs", "sq", "jxs", "ywy", "fxs", "cxy"}, message = "不支持的商户类型")
     private String roleAlias;
 
     @ApiModelProperty(value = "商户名称", required = true)
