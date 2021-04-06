@@ -20,7 +20,6 @@ public class QueryMerchantReq implements Serializable {
     private Integer pageIndex = 1;
     @ApiModelProperty(value = "每页展示数量")
     private Integer pageSize = 10;
-
     @ApiModelProperty(value = "开始日期")
     private Date startCreateTime;
     @ApiModelProperty(value = "结束日期")

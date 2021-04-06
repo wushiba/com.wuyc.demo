@@ -57,7 +57,7 @@ public class AdminWebsiteCodeManageServiceImpl implements AdminWebsiteCodeManage
                 .and(req.getMerchantId() != null, wrapper -> wrapper
                         .eq(WebsiteCodeDetail::getPid, req.getMerchantId())
                         .or()
-                        .like(WebsiteCodeDetail::getPidPath, req.getMerchantId()))
+                        .like(WebsiteCodeDetail::getPidPath, req.getMerchantId()+"."))
                 .eq(StringUtils.isNotBlank(req.getAlias()), WebsiteCodeDetail::getAlias, req.getAlias())
                 .eq(req.getBatchId() != null, WebsiteCodeDetail::getBatchId, req.getBatchId())
                 .eq(StringUtils.isNotBlank(req.getIsActivate()), WebsiteCodeDetail::getIsActivate, req.getIsActivate())
@@ -76,7 +76,7 @@ public class AdminWebsiteCodeManageServiceImpl implements AdminWebsiteCodeManage
                 .and(wrapper -> wrapper
                         .eq(WebsiteCodeDetail::getPid, req.getMerchantId())
                         .or()
-                        .like(WebsiteCodeDetail::getPidPath, req.getMerchantId()))
+                        .like(WebsiteCodeDetail::getPidPath, req.getMerchantId()+"."))
                 .eq(StringUtils.isNotBlank(req.getAlias()), WebsiteCodeDetail::getAlias, req.getAlias())
                 .eq(req.getBatchId() != null, WebsiteCodeDetail::getBatchId, req.getBatchId())
                 .eq(StringUtils.isNotBlank(req.getIsActivate()), WebsiteCodeDetail::getIsActivate, req.getIsActivate())

@@ -3,12 +3,12 @@ server:
   port: 9097
 dubbo:
   registry:
-    address: zookeeper://10.10.3.31:2181
+    address: zookeeper://yf-srv-staging:2181
     dynamic: true
   metadataReport:
-    address: zookeeper://10.10.3.31:2181
+    address: zookeeper://yf-srv-staging:2181
   configcenter:
-    address: zookeeper://10.10.3.31:2181
+    address: zookeeper://yf-srv-staging:2181
   application:
     name: yfshop-admin-web
   consumer:
@@ -16,13 +16,13 @@ dubbo:
     retries: 0
     check: false
   scan:
-    base-packages: com.yfshop.admin.com.yfshop.open.controller
+    base-packages: com.yfshop.admin
 
 spring:
   redis:
     database: 0
-    host: 127.0.0.1
-    password: ''
+    host: yf-sz-redis-staging.redis.rds.aliyuncs.com
+    password: SZ9v4UrVJKfCCDKUxia
     port: 6379
     timeout: 1000
     jedis:

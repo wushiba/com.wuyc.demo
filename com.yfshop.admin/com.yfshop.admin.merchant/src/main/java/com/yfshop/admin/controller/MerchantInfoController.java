@@ -6,6 +6,8 @@ import cn.dev33.satoken.stp.StpUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.github.binarywang.wxpay.bean.order.WxPayMpOrderResult;
 import com.yfshop.admin.api.merchant.*;
+import com.yfshop.admin.api.merchant.request.MerchantGroupReq;
+import com.yfshop.admin.api.merchant.result.MerchantGroupResult;
 import com.yfshop.admin.api.merchant.result.MerchantResult;
 import com.yfshop.admin.api.user.UserService;
 import com.yfshop.admin.api.user.result.UserResult;
@@ -40,7 +42,6 @@ class MerchantInfoController extends AbstractBaseController {
     @DubboReference(check = false)
     private UserService userService;
 
-    public static StpLogic wxLogic = new WxStpLogic();
     public static StpLogic userLogic = new UserStpLogic();
 
 
@@ -64,6 +65,22 @@ class MerchantInfoController extends AbstractBaseController {
     public CommonResult<MerchantResult> getWebsiteInfo() {
         MerchantResult merchantResult = merchantInfoService.getWebsiteInfo(getCurrentAdminUserId());
         return CommonResult.success(merchantResult);
+    }
+
+
+    /**
+     * 获取商户组
+     *
+     * @return
+     */
+    @SaCheckLogin
+    @RequestMapping(value = "/merchantGroup", method = {RequestMethod.POST})
+    public CommonResult<MerchantGroupResult> merchantGroup(MerchantGroupReq merchantGroupReq) {
+        if (merchantGroupReq.getMerchantId() == null) {
+            merchantGroupReq.setMerchantId(getCurrentAdminUserId());
+        }
+        MerchantGroupResult merchantGroupResult = merchantInfoService.merchantGroup(merchantGroupReq);
+        return CommonResult.success(merchantGroupResult);
     }
 
 
@@ -224,7 +241,7 @@ class MerchantInfoController extends AbstractBaseController {
     @RequestMapping(value = "/applyWebsiteCodePay", method = {RequestMethod.POST})
     public CommonResult<WxPayMpOrderResult> applyWebsiteCodePay(@RequestBody WebsiteCodePayReq websiteCodePayReq) {
         String openId = getCurrentOpenId();
-        //Asserts.assertNonNull(openId, 500, "需要微信授权");
+        Asserts.assertNonNull(openId, 500, "需要微信授权");
         websiteCodePayReq.setOpenId(getCurrentOpenId());
         websiteCodePayReq.setUserId(getRequestIpStr());
         WxPayMpOrderResult wxPayMpOrderResult = merchantInfoService.applyWebsiteCodePay(websiteCodePayReq);
@@ -267,10 +284,4 @@ class MerchantInfoController extends AbstractBaseController {
         return CommonResult.success(null);
     }
 
-
-    @RequestMapping(value = "/getWebsiteCodeQrcode", method = {RequestMethod.GET})
-    public CommonResult<Void> getWebsiteCodeQrcode(String qrcode) {
-
-        return CommonResult.success(null);
-    }
 }
