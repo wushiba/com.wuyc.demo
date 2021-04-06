@@ -1,5 +1,6 @@
 package com.yfshop.shop.service.order.result;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -18,6 +19,7 @@ public class YfUserOrderListResult implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /** 下单时间 */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", locale = "zh", timezone = "GMT+8")
     private LocalDateTime createTime;
 
     private Long orderId;

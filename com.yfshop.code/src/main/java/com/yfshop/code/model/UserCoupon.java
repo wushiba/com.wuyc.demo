@@ -50,6 +50,8 @@ public class UserCoupon extends Model<UserCoupon> {
      */
     private String couponResource;
 
+    private Integer drawPrizeLevel;
+
     /** 抽奖活动id */
     private Integer drawActivityId;
 

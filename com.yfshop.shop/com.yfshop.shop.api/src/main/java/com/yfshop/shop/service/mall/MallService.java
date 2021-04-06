@@ -22,4 +22,6 @@ public interface MallService {
     List<String> queryHomeBanners();
 
     List<String> queryLoopBanners();
+
+
 }

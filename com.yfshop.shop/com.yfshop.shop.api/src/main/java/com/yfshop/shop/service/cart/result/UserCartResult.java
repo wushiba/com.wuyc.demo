@@ -62,12 +62,12 @@ public class UserCartResult implements Serializable {
     /**
      * 规格值id字符串(1,2,3,4,5)
      */
-    private String skuSpecValueIdPath;
+    private String specValueIdPath;
 
     /**
      * 规格名称和值的json串({"尺码":"38","颜色":"黑色"})
      */
-    private String skuSpecNameValueJson;
+    private String specNameValueJson;
 
     /**
      * 商品售价
