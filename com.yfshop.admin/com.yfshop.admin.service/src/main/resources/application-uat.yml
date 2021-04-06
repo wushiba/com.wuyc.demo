@@ -96,11 +96,11 @@ xxl:
 
 
 websiteCode:
-  dir: /opt/yufshop/websiteCode/
+  dir: /home/www/web-deploy/yufan-admin-service/websiteCode/
   url: http://merchant.yufan.51jujibao.com/#/MerchantRegisterPrep?websiteCode=
 
 actCode:
-  srcDir: /opt/yufshop/actCode/src/
-  targetDir: /opt/yufshop/actCode/target/
-  url: http://activity.yufan.51jujibao.com/#/Activity?actCode=
+  srcDir: /home/www/web-deploy/yufan-admin-service/actCode/src/
+  targetDir: /home/www/web-deploy/yufan-admin-service/actCode/target/
+  url: http://activ.yufan.51jujibao.com/#/Activity?actCode=
 

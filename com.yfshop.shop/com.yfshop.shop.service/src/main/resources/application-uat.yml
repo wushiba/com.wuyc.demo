@@ -30,11 +30,11 @@ spring:
   
 dubbo:
   registry:
-    address: zookeeper://yf-srv-staging
+    address: zookeeper://yf-srv-staging:2181
   metadataReport:
-    address: zookeeper://yf-srv-staging
+    address: zookeeper://yf-srv-staging:2181
   configcenter:
-    address: zookeeper://yf-srv-staging
+    address: zookeeper://yf-srv-staging:2181
   protocol:
     port: 20880
     name: dubbo
