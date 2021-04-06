@@ -21,7 +21,7 @@ dubbo:
     
 spring:
     redis:
-        database: 0
+        database: 1
         host: 127.0.0.1
         password: ''
         jedis:
@@ -32,4 +32,3 @@ spring:
             min-idle: 0
         port: 6379
         timeout: 1000
-

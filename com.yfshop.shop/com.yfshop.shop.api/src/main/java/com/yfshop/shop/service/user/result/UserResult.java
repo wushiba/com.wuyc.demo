@@ -20,12 +20,7 @@ public class UserResult implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private Integer id;
-
-    /**
-     * 微信openId
-     */
-    private String openId;
-
+    
     /**
      * 用户昵称
      */
