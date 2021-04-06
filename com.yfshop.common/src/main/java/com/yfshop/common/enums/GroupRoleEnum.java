@@ -26,11 +26,11 @@ public enum GroupRoleEnum {
 
     WD("wd", 6, "网点"),
 
-    GC("gc", -1, "工厂"),
+    GC("gc", Integer.MAX_VALUE, "工厂"),
 
-    CK("ck", -1, "仓库"),
+    CK("ck", Integer.MAX_VALUE, "仓库"),
 
-    WL("wl", -1, "物料");
+    WL("wl", Integer.MAX_VALUE, "物料");
 
     /**
      * 枚举编码

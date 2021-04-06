@@ -78,6 +78,7 @@ public class AdminMerchantManageServiceImpl implements AdminMerchantManageServic
         // 查询上级
         Merchant pm;
         if (currentLoginMerchantRole == GroupRoleEnum.ZB && createMerchantRole == GroupRoleEnum.JXS) {
+            Asserts.assertNonNull(req.getPid(), 500, "上级商户不能为空");
             // 总部建经销商时，必须要有二级
             LambdaQueryWrapper<Merchant> query = Wrappers.lambdaQuery(Merchant.class)
                     .eq(Merchant::getPid, merchantId)
@@ -93,7 +94,7 @@ public class AdminMerchantManageServiceImpl implements AdminMerchantManageServic
             // 使用当前商户作为上级
             pm = this.getParent(merchantId);
         }
-        Asserts.assertNonNull(pm, 500, "错误的上级pid" + req.getPid());
+        Asserts.assertNonNull(pm, 500, "错误的上级pid" + (req.getPid() == null ? merchantId : req.getPid()));
         Asserts.assertTrue("Y".equalsIgnoreCase(pm.getIsEnable()), 500, "上级商户" + req.getPid() + "已被禁用");
         Asserts.assertTrue("N".equalsIgnoreCase(pm.getIsDelete()), 500, "上级商户" + req.getPid() + "已被删除");
 
@@ -164,7 +165,7 @@ public class AdminMerchantManageServiceImpl implements AdminMerchantManageServic
             // 使用当前商户作为上级
             pm = this.getParent(merchantId);
         }
-        Asserts.assertNonNull(pm, 500, "错误的上级pid" + req.getPid());
+        Asserts.assertNonNull(pm, 500, "错误的上级pid" + (req.getPid() == null ? merchantId : req.getPid()));
         Asserts.assertTrue("Y".equalsIgnoreCase(pm.getIsEnable()), 500, "上级商户" + req.getPid() + "已被禁用");
         Asserts.assertTrue("N".equalsIgnoreCase(pm.getIsDelete()), 500, "上级商户" + req.getPid() + "已被删除");
 
