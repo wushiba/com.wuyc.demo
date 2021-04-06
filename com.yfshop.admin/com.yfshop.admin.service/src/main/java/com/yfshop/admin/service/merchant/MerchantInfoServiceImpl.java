@@ -12,6 +12,8 @@ import com.github.binarywang.wxpay.bean.order.WxPayMpOrderResult;
 import com.github.binarywang.wxpay.bean.request.BaseWxPayRequest;
 import com.github.binarywang.wxpay.bean.request.WxPayUnifiedOrderRequest;
 import com.yfshop.admin.api.merchant.MerchantInfoService;
+import com.yfshop.admin.api.merchant.request.MerchantGroupReq;
+import com.yfshop.admin.api.merchant.result.MerchantGroupResult;
 import com.yfshop.admin.api.merchant.result.MerchantResult;
 import com.yfshop.admin.api.website.request.WebsiteCodeAddressReq;
 import com.yfshop.admin.api.website.request.WebsiteCodeBindReq;
@@ -232,7 +234,7 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
                 .and(itemWrapper -> itemWrapper
                         .eq(WebsiteCodeDetail::getMerchantId, merchantId)
                         .or()
-                        .like(WebsiteCodeDetail::getPidPath, merchantId))
+                        .like(WebsiteCodeDetail::getPidPath, merchantId + "."))
                 .eq(WebsiteCodeDetail::getIsActivate, status)
                 .ge(dateTime != null, WebsiteCodeDetail::getCreateTime, dateTime)
                 .lt(nextDate != null, WebsiteCodeDetail::getCreateTime, nextDate)
@@ -252,7 +254,7 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
                 .and(itemWrapper -> itemWrapper
                         .eq(WebsiteCode::getMerchantId, merchantId)
                         .or()
-                        .like(WebsiteCode::getPidPath, merchantId))
+                        .like(WebsiteCode::getPidPath, merchantId + "."))
                 .in(CollectionUtil.isNotEmpty(allStatus), WebsiteCode::getOrderStatus, allStatus)
                 .eq(StringUtils.isNotBlank(status) && !"ALL".equals(status), WebsiteCode::getOrderStatus, status)
                 .orderByDesc(WebsiteCode::getId);
@@ -405,9 +407,9 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
         orderRequest.setBody("网点码申请");
         orderRequest.setOutTradeNo(websiteCode.getOrderNo());
         orderRequest.setNotifyUrl("http://wx.luckylottery.cloud/pay/notify/order/websiteCodePay");
-       // orderRequest.setTotalFee(BaseWxPayRequest.yuanToFen(fee));//元转成分
-        orderRequest.setTotalFee(1);
-        orderRequest.setOpenid("o3vDm6fgLfx8bATw2K1cEKy4HU4E");
+        orderRequest.setTotalFee(BaseWxPayRequest.yuanToFen(fee));//元转成分
+//        orderRequest.setTotalFee(1);
+        orderRequest.setOpenid(websiteCodePayReq.getOpenId());
         orderRequest.setTradeType("JSAPI");
         orderRequest.setSpbillCreateIp(websiteCodePayReq.getUserId());
         orderRequest.setTimeStart(DateFormatUtils.format(new Date(), "yyyyMMddHHmmss"));
@@ -455,7 +457,7 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
     }
 
     @Override
-    public void websitePayOrderNotify(WxPayOrderNotifyResult notifyResult) {
+    public void websitePayOrderNotify(WxPayOrderNotifyResult notifyResult) throws ApiException {
         WebsiteCode websiteCode = new WebsiteCode();
         websiteCode.setPayMethod("WxPay");
         websiteCode.setBillno(notifyResult.getTransactionId());
@@ -467,4 +469,56 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
         }
     }
 
+
+    @Override
+    public MerchantGroupResult merchantGroup(MerchantGroupReq merchantGroupReq) throws ApiException {
+        MerchantGroupResult merchantGroupResult = new MerchantGroupResult();
+        Integer myselfCount = getCurrentWebsiteCount(merchantGroupReq.getMerchantId(), merchantGroupReq.getStartCreateTime(), merchantGroupReq.getEndCreateTime());
+        Integer count = getAllWebsiteCount(merchantGroupReq.getMerchantId(), merchantGroupReq.getStartCreateTime(), merchantGroupReq.getEndCreateTime());
+        merchantGroupResult.setCount(count);
+        LambdaQueryWrapper lambdaQueryWrapper = Wrappers.<Merchant>lambdaQuery()
+                .eq(Merchant::getPid, merchantGroupReq.getMerchantId())
+                .ne(Merchant::getRoleAlias, "wd")
+                .eq(Merchant::getIsEnable, "Y");
+        List<Merchant> merchantList = merchantMapper.selectList(lambdaQueryWrapper);
+        List<MerchantGroupResult> merchantGroupResults = new ArrayList<>();
+        if (myselfCount > 0) {
+            Merchant merchant = merchantMapper.selectById(merchantGroupReq.getMerchantId());
+            MerchantGroupResult myself = new MerchantGroupResult();
+            myself.setHaveWebsite(true);
+            myself.setMerchantId(merchant.getId());
+            myself.setMerchantName(merchant.getMerchantName());
+            myself.setCount(myselfCount);
+            merchantGroupResults.add(myself);
+        }
+        merchantList.forEach(item -> {
+            MerchantGroupResult child = new MerchantGroupResult();
+            child.setMerchantId(item.getId());
+            child.setMerchantName(item.getMerchantName());
+            Integer childCount = getAllWebsiteCount(item.getId(), merchantGroupReq.getStartCreateTime(), merchantGroupReq.getEndCreateTime());
+            child.setCount(childCount);
+            merchantGroupResults.add(child);
+        });
+        return merchantGroupResult;
+    }
+
+    private Integer getCurrentWebsiteCount(Integer merchantId, Date startCreateTime, Date endCreateTime) {
+        LambdaQueryWrapper lambdaQueryWrapper = Wrappers.<Merchant>lambdaQuery()
+                .eq(Merchant::getPid, merchantId)
+                .eq(Merchant::getRoleAlias, "wd")
+                .eq(Merchant::getIsEnable, "Y")
+                .ge(startCreateTime != null, Merchant::getCreateTime, startCreateTime)
+                .lt(endCreateTime != null, Merchant::getCreateTime, endCreateTime != null ? DateUtil.plusDays(endCreateTime, 1) : null);
+        return merchantMapper.selectCount(lambdaQueryWrapper);
+    }
+
+    private Integer getAllWebsiteCount(Integer merchantId, Date startCreateTime, Date endCreateTime) {
+        LambdaQueryWrapper lambdaQueryWrapper = Wrappers.<Merchant>lambdaQuery()
+                .like(Merchant::getPidPath, merchantId + ".")
+                .eq(Merchant::getRoleAlias, "wd")
+                .eq(Merchant::getIsEnable, "Y")
+                .ge(startCreateTime != null, Merchant::getCreateTime, startCreateTime)
+                .lt(endCreateTime != null, Merchant::getCreateTime, endCreateTime != null ? DateUtil.plusDays(endCreateTime, 1) : null);
+        return merchantMapper.selectCount(lambdaQueryWrapper);
+    }
 }

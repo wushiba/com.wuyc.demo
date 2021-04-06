@@ -3,12 +3,12 @@ server:
   port: 9094
 dubbo:
   registry:
-    address: zookeeper://10.10.3.31:2181
+    address: zookeeper://yf-srv-staging:2181
     dynamic: true
   metadataReport:
-    address: zookeeper://10.10.3.31:2181
+    address: zookeeper://yf-srv-staging:2181
   configcenter:
-    address: zookeeper://10.10.3.31:2181
+    address: zookeeper://yf-srv-staging:2181
   application:
     name: yfshop-admin-web
   consumer:
@@ -16,4 +16,30 @@ dubbo:
     retries: 0
     check: false
   scan:
-    base-packages: com.yfshop.admin.com.yfshop.open.controller
+    base-packages: com.yfshop.admin
+
+
+spring:
+  # redis配置
+  redis:
+    # Redis数据库索引（默认为0）
+    database: 1
+    # Redis服务器地址
+    host: yf-sz-redis-staging.redis.rds.aliyuncs.com
+    # Redis服务器连接端口
+    port: 6379
+    # Redis服务器连接密码（默认为空）
+    password: SZ9v4UrVJKfCCDKUxia
+    # 连接超时时间（毫秒）
+    timeout: 1000ms
+    lettuce:
+      pool:
+        # 连接池最大连接数
+        max-active: 200
+        # 连接池最大阻塞等待时间（使用负值表示没有限制）
+        max-wait: -1ms
+        # 连接池中的最大空闲连接
+        max-idle: 10
+        # 连接池中的最小空闲连接
+        min-idle: 0
+

@@ -3,6 +3,8 @@ package com.yfshop.admin.api.merchant;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.github.binarywang.wxpay.bean.notify.WxPayOrderNotifyResult;
 import com.github.binarywang.wxpay.bean.order.WxPayMpOrderResult;
+import com.yfshop.admin.api.merchant.request.MerchantGroupReq;
+import com.yfshop.admin.api.merchant.result.MerchantGroupResult;
 import com.yfshop.admin.api.merchant.result.MerchantResult;
 import com.yfshop.admin.api.website.request.WebsiteCodeAddressReq;
 import com.yfshop.admin.api.website.request.WebsiteCodeBindReq;
@@ -142,6 +144,7 @@ public interface MerchantInfoService {
 
     /**
      * 校验网点码跳转
+     *
      * @param websiteCode
      * @return
      * @throws ApiException
@@ -158,6 +161,7 @@ public interface MerchantInfoService {
 
     /**
      * 获取网点码
+     *
      * @param openId
      * @return
      * @throws ApiException
@@ -166,7 +170,16 @@ public interface MerchantInfoService {
 
     /**
      * 网点码支付回调
+     *
      * @param notifyResult
      */
-    void websitePayOrderNotify(WxPayOrderNotifyResult notifyResult);
+    void websitePayOrderNotify(WxPayOrderNotifyResult notifyResult) throws ApiException;
+
+    /**
+     * 获取商户层级数据
+     *
+     * @param merchantGroupReq
+     * @return
+     */
+    MerchantGroupResult merchantGroup(MerchantGroupReq merchantGroupReq) throws ApiException;
 }

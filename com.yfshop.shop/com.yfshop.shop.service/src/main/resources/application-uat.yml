@@ -22,17 +22,21 @@ spring:
     testOnReturn: false
     driverClassName: com.mysql.cj.jdbc.Driver
     maxActive: 20
-  
+
+  redis:
+    host: yf-sz-redis-staging.redis.rds.aliyuncs.com
+    port: 6379
+    password: SZ9v4UrVJKfCCDKUxia
   
 dubbo:
   registry:
-    address: zookeeper://10.10.3.31:2181
+    address: zookeeper://yf-srv-staging
   metadataReport:
-    address: zookeeper://10.10.3.31:2181
+    address: zookeeper://yf-srv-staging
   configcenter:
-    address: zookeeper://10.10.3.31:2181
+    address: zookeeper://yf-srv-staging
   protocol:
-    port: 20952
+    port: 20880
     name: dubbo
   scan:
     base-packages: com.yfshop.shop.service
