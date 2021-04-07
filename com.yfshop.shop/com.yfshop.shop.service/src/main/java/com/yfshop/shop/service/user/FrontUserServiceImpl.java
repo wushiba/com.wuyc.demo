@@ -86,7 +86,7 @@ public class FrontUserServiceImpl implements FrontUserService {
         UserAddress orderAddress = userAddressMapper.selectOne(Wrappers.lambdaQuery(UserAddress.class)
                 .eq(UserAddress::getId, addressId));
         Asserts.assertNonNull(orderAddress, 500, "收货地址不存在");
-        redisService.set(CacheConstants.USER_ADDRESS_ID, JSON.toJSONString(orderAddress), 60 * 60 * 24);
+        redisService.set(CacheConstants.USER_ADDRESS_ID, JSON.toJSONString(orderAddress), 60 * 60);
         return BeanUtil.convert(orderAddress, UserAddressResult.class);
     }
 

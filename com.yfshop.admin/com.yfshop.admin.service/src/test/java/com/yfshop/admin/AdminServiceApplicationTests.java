@@ -12,8 +12,13 @@ import com.yfshop.admin.api.mall.request.SaveItemSkuReq;
 import com.yfshop.admin.api.mall.request.SaveItemSkuReq.ItemCandidateSku;
 import com.yfshop.admin.api.mall.result.BannerResult;
 import com.yfshop.admin.api.mall.result.ItemSkuResult;
+import com.yfshop.admin.api.menu.AdminMenuManageService;
+import com.yfshop.admin.api.menu.result.MenuResult;
+import com.yfshop.code.manager.MenuManager;
 import com.yfshop.code.mapper.ItemMapper;
 import com.yfshop.code.model.Item;
+import com.yfshop.code.model.Menu;
+import com.yfshop.common.enums.GroupRoleEnum;
 import com.yfshop.common.enums.ReceiveWayEnum;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.junit.jupiter.api.Test;
@@ -37,8 +42,12 @@ public class AdminServiceApplicationTests {
     private ItemMapper itemMapper;
     @Resource
     private ApplicationContext applicationContext;
+    @Resource
+    private MenuManager menuManager;
+    @Resource
+    private AdminMenuManageService adminMenuManageService;
 
-    @Test
+    //    @Test
     void contextLoads2222222() {
         if (true) {
             return;
@@ -51,7 +60,7 @@ public class AdminServiceApplicationTests {
         }
     }
 
-    @Test
+    //    @Test
     void contextLoads() {
         if (true) {
             return;
@@ -214,7 +223,7 @@ public class AdminServiceApplicationTests {
         }
     }
 
-//    @Test
+    //    @Test
     public void aVoid() {
         if (true) {
             try {
@@ -323,4 +332,652 @@ public class AdminServiceApplicationTests {
             e.printStackTrace();
         }
     }
+
+//    @Test
+    public void createMenus() {
+        createSystemMenus();
+        createZongBuMenus();
+        createFGSmenus();
+        createSQmenus();
+        createJXSmenus();
+        createYWY_FXS_CXY_menus();
+        createWLMenus();
+        queryMenus();
+    }
+
+    public void createSystemMenus() {
+        /*
+        超管：能访问所有菜单
+        */
+
+        {
+            // 超管
+
+            Menu 商户管理 = new Menu();
+            商户管理.setMenuName("商户管理");
+            商户管理.setMenuAlias("shgl_" + GroupRoleEnum.SYS.getCode());
+            商户管理.setMenuIcon(null);
+            商户管理.setLinkUrl(null);
+            商户管理.setRoleAlias(GroupRoleEnum.SYS.getCode());
+            商户管理.setSort(1);
+            商户管理.setParentMenuAlias(null);
+            Menu 网点类型配置 = new Menu();
+            网点类型配置.setParentMenuAlias(商户管理.getMenuAlias());
+            网点类型配置.setMenuName("网点类型配置");
+            网点类型配置.setMenuAlias("wdlxpz_" + GroupRoleEnum.SYS.getCode());
+            网点类型配置.setMenuIcon(null);
+            网点类型配置.setLinkUrl("/");
+            网点类型配置.setRoleAlias(GroupRoleEnum.SYS.getCode());
+            网点类型配置.setSort(1);
+            Menu 码源工厂管理 = new Menu();
+            码源工厂管理.setParentMenuAlias(商户管理.getMenuAlias());
+            码源工厂管理.setMenuName("码源工厂管理");
+            码源工厂管理.setMenuAlias("mygcgl_" + GroupRoleEnum.SYS.getCode());
+            码源工厂管理.setMenuIcon(null);
+            码源工厂管理.setLinkUrl("/");
+            码源工厂管理.setRoleAlias(GroupRoleEnum.SYS.getCode());
+            码源工厂管理.setSort(2);
+
+            Menu 网点码管理 = new Menu();
+            网点码管理.setMenuName("网点码管理");
+            网点码管理.setMenuAlias("wdmgl_" + GroupRoleEnum.SYS.getCode());
+            网点码管理.setMenuIcon(null);
+            网点码管理.setLinkUrl(null);
+            网点码管理.setRoleAlias(GroupRoleEnum.SYS.getCode());
+            网点码管理.setSort(2);
+            网点码管理.setParentMenuAlias(null);
+            Menu 活动码管理 = new Menu();
+            活动码管理.setParentMenuAlias(网点码管理.getMenuAlias());
+            活动码管理.setMenuName("活动码管理");
+            活动码管理.setMenuAlias("hdmgl_" + GroupRoleEnum.SYS.getCode());
+            活动码管理.setMenuIcon(null);
+            活动码管理.setLinkUrl("/");
+            活动码管理.setRoleAlias(GroupRoleEnum.SYS.getCode());
+            活动码管理.setSort(1);
+
+            Menu 活动管理 = new Menu();
+            活动管理.setParentMenuAlias(null);
+            活动管理.setMenuName("活动管理");
+            活动管理.setMenuAlias("hdgl_" + GroupRoleEnum.SYS.getCode());
+            活动管理.setMenuIcon(null);
+            活动管理.setLinkUrl(null);
+            活动管理.setRoleAlias(GroupRoleEnum.SYS.getCode());
+            活动管理.setSort(3);
+            Menu 活动数据 = new Menu();
+            活动数据.setParentMenuAlias(活动管理.getMenuAlias());
+            活动数据.setMenuName("活动数据");
+            活动数据.setMenuAlias("hdsj_" + GroupRoleEnum.SYS.getCode());
+            活动数据.setMenuIcon(null);
+            活动数据.setLinkUrl("/");
+            活动数据.setRoleAlias(GroupRoleEnum.SYS.getCode());
+            活动数据.setSort(1);
+            Menu 活动报表统计 = new Menu();
+            活动报表统计.setParentMenuAlias(活动管理.getMenuAlias());
+            活动报表统计.setMenuName("活动报表统计");
+            活动报表统计.setMenuAlias("hdbbtj_" + GroupRoleEnum.SYS.getCode());
+            活动报表统计.setMenuIcon(null);
+            活动报表统计.setLinkUrl("/");
+            活动报表统计.setRoleAlias(GroupRoleEnum.SYS.getCode());
+            活动报表统计.setSort(2);
+
+            Menu 分类管理 = new Menu();
+            分类管理.setParentMenuAlias(null);
+            分类管理.setMenuName("分类管理");
+            分类管理.setMenuAlias("flgl_" + GroupRoleEnum.SYS.getCode());
+            分类管理.setMenuIcon(null);
+            分类管理.setLinkUrl(null);
+            分类管理.setRoleAlias(GroupRoleEnum.SYS.getCode());
+            分类管理.setSort(4);
+
+            Menu 商品管理 = new Menu();
+            商品管理.setParentMenuAlias(null);
+            商品管理.setMenuName("商品管理");
+            商品管理.setMenuAlias("spgl_" + GroupRoleEnum.SYS.getCode());
+            商品管理.setMenuIcon(null);
+            商品管理.setLinkUrl(null);
+            商品管理.setRoleAlias(GroupRoleEnum.SYS.getCode());
+            商品管理.setSort(5);
+
+            Menu 订单管理 = new Menu();
+            订单管理.setParentMenuAlias(null);
+            订单管理.setMenuName("订单管理");
+            订单管理.setMenuAlias("ddgl_" + GroupRoleEnum.SYS.getCode());
+            订单管理.setMenuIcon(null);
+            订单管理.setLinkUrl(null);
+            订单管理.setRoleAlias(GroupRoleEnum.SYS.getCode());
+            订单管理.setSort(6);
+
+            Menu banner配置 = new Menu();
+            banner配置.setParentMenuAlias(null);
+            banner配置.setMenuName("banner配置");
+            banner配置.setMenuAlias("bannerpz_" + GroupRoleEnum.SYS.getCode());
+            banner配置.setMenuIcon(null);
+            banner配置.setLinkUrl(null);
+            banner配置.setRoleAlias(GroupRoleEnum.SYS.getCode());
+            banner配置.setSort(7);
+
+            Menu 首页配置 = new Menu();
+            首页配置.setParentMenuAlias(null);
+            首页配置.setMenuName("首页配置");
+            首页配置.setMenuAlias("sypz_" + GroupRoleEnum.SYS.getCode());
+            首页配置.setMenuIcon(null);
+            首页配置.setLinkUrl(null);
+            首页配置.setRoleAlias(GroupRoleEnum.SYS.getCode());
+            首页配置.setSort(8);
+
+            Menu 优惠券管理 = new Menu();
+            优惠券管理.setParentMenuAlias(null);
+            优惠券管理.setMenuName("优惠券管理");
+            优惠券管理.setMenuAlias("yhqgl_" + GroupRoleEnum.SYS.getCode());
+            优惠券管理.setMenuIcon(null);
+            优惠券管理.setLinkUrl(null);
+            优惠券管理.setRoleAlias(GroupRoleEnum.SYS.getCode());
+            优惠券管理.setSort(9);
+
+            Menu 公众号消息模板配置 = new Menu();
+            公众号消息模板配置.setParentMenuAlias(null);
+            公众号消息模板配置.setMenuName("公众号消息模板配置");
+            公众号消息模板配置.setMenuAlias("gzhxxmbpz_" + GroupRoleEnum.SYS.getCode());
+            公众号消息模板配置.setMenuIcon(null);
+            公众号消息模板配置.setLinkUrl(null);
+            公众号消息模板配置.setRoleAlias(GroupRoleEnum.SYS.getCode());
+            公众号消息模板配置.setSort(10);
+
+            Menu 物料管理 = new Menu();
+            物料管理.setParentMenuAlias(null);
+            物料管理.setMenuName("物料管理");
+            物料管理.setMenuAlias("wlgl_" + GroupRoleEnum.SYS.getCode());
+            物料管理.setMenuIcon(null);
+            物料管理.setLinkUrl(null);
+            物料管理.setRoleAlias(GroupRoleEnum.SYS.getCode());
+            物料管理.setSort(11);
+
+            List<Menu> list = new ArrayList<>();
+            list.add(商户管理);
+            list.add(网点类型配置);
+            list.add(码源工厂管理);
+
+            list.add(网点码管理);
+            list.add(活动码管理);
+
+            list.add(活动管理);
+            list.add(活动数据);
+            list.add(活动报表统计);
+
+            list.add(分类管理);
+
+            list.add(商品管理);
+
+            list.add(订单管理);
+
+            list.add(banner配置);
+
+            list.add(首页配置);
+
+            list.add(优惠券管理);
+
+            list.add(公众号消息模板配置);
+
+            list.add(物料管理);
+
+            menuManager.saveBatch(list);
+        }
+
+
+    }
+
+    public void createZongBuMenus() {
+        /*
+        一级总部 ：能访问所有菜单、供应商的网点码管理不可见
+        */
+
+        {
+            Menu 商户管理 = new Menu();
+            商户管理.setMenuName("商户管理");
+            商户管理.setMenuAlias("shgl_" + GroupRoleEnum.ZB.getCode());
+            商户管理.setMenuIcon(null);
+            商户管理.setLinkUrl(null);
+            商户管理.setRoleAlias(GroupRoleEnum.ZB.getCode());
+            商户管理.setSort(1);
+            商户管理.setParentMenuAlias(null);
+            Menu 网点类型配置 = new Menu();
+            网点类型配置.setParentMenuAlias(商户管理.getMenuAlias());
+            网点类型配置.setMenuName("网点类型配置");
+            网点类型配置.setMenuAlias("wdlxpz_" + GroupRoleEnum.ZB.getCode());
+            网点类型配置.setMenuIcon(null);
+            网点类型配置.setLinkUrl("/");
+            网点类型配置.setRoleAlias(GroupRoleEnum.ZB.getCode());
+            网点类型配置.setSort(1);
+            Menu 码源工厂管理 = new Menu();
+            码源工厂管理.setParentMenuAlias(商户管理.getMenuAlias());
+            码源工厂管理.setMenuName("码源工厂管理");
+            码源工厂管理.setMenuAlias("mygcgl_" + GroupRoleEnum.ZB.getCode());
+            码源工厂管理.setMenuIcon(null);
+            码源工厂管理.setLinkUrl("/");
+            码源工厂管理.setRoleAlias(GroupRoleEnum.ZB.getCode());
+            码源工厂管理.setSort(2);
+
+            Menu 网点码管理 = new Menu();
+            网点码管理.setMenuName("网点码管理");
+            网点码管理.setMenuAlias("wdmgl_" + GroupRoleEnum.ZB.getCode());
+            网点码管理.setMenuIcon(null);
+            网点码管理.setLinkUrl(null);
+            网点码管理.setRoleAlias(GroupRoleEnum.ZB.getCode());
+            网点码管理.setSort(2);
+            网点码管理.setParentMenuAlias(null);
+            Menu 活动码管理 = new Menu();
+            活动码管理.setParentMenuAlias(网点码管理.getMenuAlias());
+            活动码管理.setMenuName("活动码管理");
+            活动码管理.setMenuAlias("hdmgl_" + GroupRoleEnum.ZB.getCode());
+            活动码管理.setMenuIcon(null);
+            活动码管理.setLinkUrl("/");
+            活动码管理.setRoleAlias(GroupRoleEnum.ZB.getCode());
+            活动码管理.setSort(1);
+
+            Menu 活动管理 = new Menu();
+            活动管理.setParentMenuAlias(null);
+            活动管理.setMenuName("活动管理");
+            活动管理.setMenuAlias("hdgl_" + GroupRoleEnum.ZB.getCode());
+            活动管理.setMenuIcon(null);
+            活动管理.setLinkUrl(null);
+            活动管理.setRoleAlias(GroupRoleEnum.ZB.getCode());
+            活动管理.setSort(3);
+            Menu 活动数据 = new Menu();
+            活动数据.setParentMenuAlias(活动管理.getMenuAlias());
+            活动数据.setMenuName("活动数据");
+            活动数据.setMenuAlias("hdsj_" + GroupRoleEnum.ZB.getCode());
+            活动数据.setMenuIcon(null);
+            活动数据.setLinkUrl("/");
+            活动数据.setRoleAlias(GroupRoleEnum.ZB.getCode());
+            活动数据.setSort(1);
+            Menu 活动报表统计 = new Menu();
+            活动报表统计.setParentMenuAlias(活动管理.getMenuAlias());
+            活动报表统计.setMenuName("活动报表统计");
+            活动报表统计.setMenuAlias("hdbbtj_" + GroupRoleEnum.ZB.getCode());
+            活动报表统计.setMenuIcon(null);
+            活动报表统计.setLinkUrl("/");
+            活动报表统计.setRoleAlias(GroupRoleEnum.ZB.getCode());
+            活动报表统计.setSort(2);
+
+            Menu 分类管理 = new Menu();
+            分类管理.setParentMenuAlias(null);
+            分类管理.setMenuName("分类管理");
+            分类管理.setMenuAlias("flgl_" + GroupRoleEnum.ZB.getCode());
+            分类管理.setMenuIcon(null);
+            分类管理.setLinkUrl(null);
+            分类管理.setRoleAlias(GroupRoleEnum.ZB.getCode());
+            分类管理.setSort(4);
+
+            Menu 商品管理 = new Menu();
+            商品管理.setParentMenuAlias(null);
+            商品管理.setMenuName("商品管理");
+            商品管理.setMenuAlias("spgl_" + GroupRoleEnum.ZB.getCode());
+            商品管理.setMenuIcon(null);
+            商品管理.setLinkUrl(null);
+            商品管理.setRoleAlias(GroupRoleEnum.ZB.getCode());
+            商品管理.setSort(5);
+
+            Menu 订单管理 = new Menu();
+            订单管理.setParentMenuAlias(null);
+            订单管理.setMenuName("订单管理");
+            订单管理.setMenuAlias("ddgl_" + GroupRoleEnum.ZB.getCode());
+            订单管理.setMenuIcon(null);
+            订单管理.setLinkUrl(null);
+            订单管理.setRoleAlias(GroupRoleEnum.ZB.getCode());
+            订单管理.setSort(6);
+
+            Menu banner配置 = new Menu();
+            banner配置.setParentMenuAlias(null);
+            banner配置.setMenuName("banner配置");
+            banner配置.setMenuAlias("bannerpz_" + GroupRoleEnum.ZB.getCode());
+            banner配置.setMenuIcon(null);
+            banner配置.setLinkUrl(null);
+            banner配置.setRoleAlias(GroupRoleEnum.ZB.getCode());
+            banner配置.setSort(7);
+
+            Menu 首页配置 = new Menu();
+            首页配置.setParentMenuAlias(null);
+            首页配置.setMenuName("首页配置");
+            首页配置.setMenuAlias("sypz_" + GroupRoleEnum.ZB.getCode());
+            首页配置.setMenuIcon(null);
+            首页配置.setLinkUrl(null);
+            首页配置.setRoleAlias(GroupRoleEnum.ZB.getCode());
+            首页配置.setSort(8);
+
+            Menu 优惠券管理 = new Menu();
+            优惠券管理.setParentMenuAlias(null);
+            优惠券管理.setMenuName("优惠券管理");
+            优惠券管理.setMenuAlias("yhqgl_" + GroupRoleEnum.ZB.getCode());
+            优惠券管理.setMenuIcon(null);
+            优惠券管理.setLinkUrl(null);
+            优惠券管理.setRoleAlias(GroupRoleEnum.ZB.getCode());
+            优惠券管理.setSort(9);
+
+            Menu 公众号消息模板配置 = new Menu();
+            公众号消息模板配置.setParentMenuAlias(null);
+            公众号消息模板配置.setMenuName("公众号消息模板配置");
+            公众号消息模板配置.setMenuAlias("gzhxxmbpz_" + GroupRoleEnum.ZB.getCode());
+            公众号消息模板配置.setMenuIcon(null);
+            公众号消息模板配置.setLinkUrl(null);
+            公众号消息模板配置.setRoleAlias(GroupRoleEnum.ZB.getCode());
+            公众号消息模板配置.setSort(10);
+
+            List<Menu> list = new ArrayList<>();
+            list.add(商户管理);
+            list.add(网点类型配置);
+            list.add(码源工厂管理);
+
+            list.add(网点码管理);
+            list.add(活动码管理);
+
+            list.add(活动管理);
+            list.add(活动数据);
+            list.add(活动报表统计);
+
+            list.add(分类管理);
+
+            list.add(商品管理);
+
+            list.add(订单管理);
+
+            list.add(banner配置);
+
+            list.add(首页配置);
+
+            list.add(优惠券管理);
+
+            list.add(公众号消息模板配置);
+
+            menuManager.saveBatch(list);
+        }
+
+
+    }
+
+    public void createFGSmenus() {
+        /*
+        二级分公司、省区：商户管理（管理自己和下级商户账号）
+        三级经销商：商户管理（管理自己和下级商户账号）
+        四级业务员 分销商：商户管理（管理自己和下级商户账号）
+        五级促销员：商户管理（（管理自己和下级商户账号）
+        六级网点：不可登录后台
+        物料供应商：网点码管理（物料供应商的网点码管理）
+        */
+
+        {
+            Menu 商户管理 = new Menu();
+            商户管理.setMenuName("商户管理");
+            商户管理.setMenuAlias("shgl_" + GroupRoleEnum.FGS.getCode());
+            商户管理.setMenuIcon(null);
+            商户管理.setLinkUrl(null);
+            商户管理.setRoleAlias(GroupRoleEnum.FGS.getCode());
+            商户管理.setSort(1);
+            商户管理.setParentMenuAlias(null);
+            Menu 网点类型配置 = new Menu();
+            网点类型配置.setParentMenuAlias(商户管理.getMenuAlias());
+            网点类型配置.setMenuName("网点类型配置");
+            网点类型配置.setMenuAlias("wdlxpz_" + GroupRoleEnum.FGS.getCode());
+            网点类型配置.setMenuIcon(null);
+            网点类型配置.setLinkUrl("/");
+            网点类型配置.setRoleAlias(GroupRoleEnum.FGS.getCode());
+            网点类型配置.setSort(1);
+            Menu 码源工厂管理 = new Menu();
+            码源工厂管理.setParentMenuAlias(商户管理.getMenuAlias());
+            码源工厂管理.setMenuName("码源工厂管理");
+            码源工厂管理.setMenuAlias("mygcgl_" + GroupRoleEnum.FGS.getCode());
+            码源工厂管理.setMenuIcon(null);
+            码源工厂管理.setLinkUrl("/");
+            码源工厂管理.setRoleAlias(GroupRoleEnum.FGS.getCode());
+            码源工厂管理.setSort(2);
+
+            List<Menu> list = new ArrayList<>();
+            list.add(商户管理);
+            list.add(网点类型配置);
+            list.add(码源工厂管理);
+
+            menuManager.saveBatch(list);
+        }
+    }
+
+    public void createSQmenus() {
+        /*
+        二级分公司、省区：商户管理（管理自己和下级商户账号）
+        */
+
+        {
+            Menu 商户管理 = new Menu();
+            商户管理.setMenuName("商户管理");
+            商户管理.setMenuAlias("shgl_" + GroupRoleEnum.SQ.getCode());
+            商户管理.setMenuIcon(null);
+            商户管理.setLinkUrl(null);
+            商户管理.setRoleAlias(GroupRoleEnum.SQ.getCode());
+            商户管理.setSort(1);
+            商户管理.setParentMenuAlias(null);
+            Menu 网点类型配置 = new Menu();
+            网点类型配置.setParentMenuAlias(商户管理.getMenuAlias());
+            网点类型配置.setMenuName("网点类型配置");
+            网点类型配置.setMenuAlias("wdlxpz_" + GroupRoleEnum.SQ.getCode());
+            网点类型配置.setMenuIcon(null);
+            网点类型配置.setLinkUrl("/");
+            网点类型配置.setRoleAlias(GroupRoleEnum.SQ.getCode());
+            网点类型配置.setSort(1);
+            Menu 码源工厂管理 = new Menu();
+            码源工厂管理.setParentMenuAlias(商户管理.getMenuAlias());
+            码源工厂管理.setMenuName("码源工厂管理");
+            码源工厂管理.setMenuAlias("mygcgl_" + GroupRoleEnum.SQ.getCode());
+            码源工厂管理.setMenuIcon(null);
+            码源工厂管理.setLinkUrl("/");
+            码源工厂管理.setRoleAlias(GroupRoleEnum.SQ.getCode());
+            码源工厂管理.setSort(2);
+
+            List<Menu> list = new ArrayList<>();
+            list.add(商户管理);
+            list.add(网点类型配置);
+            list.add(码源工厂管理);
+
+            menuManager.saveBatch(list);
+        }
+    }
+
+    public void createJXSmenus() {
+        /*
+        三级经销商：商户管理（管理自己和下级商户账号）
+        四级业务员 分销商：商户管理（管理自己和下级商户账号）
+        五级促销员：商户管理（（管理自己和下级商户账号）
+        六级网点：不可登录后台
+        物料供应商：网点码管理（物料供应商的网点码管理）
+        */
+
+        {
+            Menu 商户管理 = new Menu();
+            商户管理.setMenuName("商户管理");
+            商户管理.setMenuAlias("shgl_" + GroupRoleEnum.JXS.getCode());
+            商户管理.setMenuIcon(null);
+            商户管理.setLinkUrl(null);
+            商户管理.setRoleAlias(GroupRoleEnum.JXS.getCode());
+            商户管理.setSort(1);
+            商户管理.setParentMenuAlias(null);
+            Menu 网点类型配置 = new Menu();
+            网点类型配置.setParentMenuAlias(商户管理.getMenuAlias());
+            网点类型配置.setMenuName("网点类型配置");
+            网点类型配置.setMenuAlias("wdlxpz_" + GroupRoleEnum.JXS.getCode());
+            网点类型配置.setMenuIcon(null);
+            网点类型配置.setLinkUrl("/");
+            网点类型配置.setRoleAlias(GroupRoleEnum.JXS.getCode());
+            网点类型配置.setSort(1);
+            Menu 码源工厂管理 = new Menu();
+            码源工厂管理.setParentMenuAlias(商户管理.getMenuAlias());
+            码源工厂管理.setMenuName("码源工厂管理");
+            码源工厂管理.setMenuAlias("mygcgl_" + GroupRoleEnum.JXS.getCode());
+            码源工厂管理.setMenuIcon(null);
+            码源工厂管理.setLinkUrl("/");
+            码源工厂管理.setRoleAlias(GroupRoleEnum.JXS.getCode());
+            码源工厂管理.setSort(2);
+
+            List<Menu> list = new ArrayList<>();
+            list.add(商户管理);
+            list.add(网点类型配置);
+            list.add(码源工厂管理);
+
+            menuManager.saveBatch(list);
+        }
+    }
+
+    public void createYWY_FXS_CXY_menus() {
+        /*
+        四级业务员 分销商：商户管理（管理自己和下级商户账号）
+        五级促销员：商户管理（（管理自己和下级商户账号）
+        */
+
+        {
+            Menu 商户管理 = new Menu();
+            商户管理.setMenuName("商户管理");
+            商户管理.setMenuAlias("shgl_" + GroupRoleEnum.YWY.getCode());
+            商户管理.setMenuIcon(null);
+            商户管理.setLinkUrl(null);
+            商户管理.setRoleAlias(GroupRoleEnum.YWY.getCode());
+            商户管理.setSort(1);
+            商户管理.setParentMenuAlias(null);
+            Menu 网点类型配置 = new Menu();
+            网点类型配置.setParentMenuAlias(商户管理.getMenuAlias());
+            网点类型配置.setMenuName("网点类型配置");
+            网点类型配置.setMenuAlias("wdlxpz_" + GroupRoleEnum.YWY.getCode());
+            网点类型配置.setMenuIcon(null);
+            网点类型配置.setLinkUrl("/");
+            网点类型配置.setRoleAlias(GroupRoleEnum.YWY.getCode());
+            网点类型配置.setSort(1);
+            Menu 码源工厂管理 = new Menu();
+            码源工厂管理.setParentMenuAlias(商户管理.getMenuAlias());
+            码源工厂管理.setMenuName("码源工厂管理");
+            码源工厂管理.setMenuAlias("mygcgl_" + GroupRoleEnum.YWY.getCode());
+            码源工厂管理.setMenuIcon(null);
+            码源工厂管理.setLinkUrl("/");
+            码源工厂管理.setRoleAlias(GroupRoleEnum.YWY.getCode());
+            码源工厂管理.setSort(2);
+
+            List<Menu> list = new ArrayList<>();
+            list.add(商户管理);
+            list.add(网点类型配置);
+            list.add(码源工厂管理);
+
+            menuManager.saveBatch(list);
+        }
+
+        {
+            Menu 商户管理 = new Menu();
+            商户管理.setMenuName("商户管理");
+            商户管理.setMenuAlias("shgl_" + GroupRoleEnum.FXS.getCode());
+            商户管理.setMenuIcon(null);
+            商户管理.setLinkUrl(null);
+            商户管理.setRoleAlias(GroupRoleEnum.FXS.getCode());
+            商户管理.setSort(1);
+            商户管理.setParentMenuAlias(null);
+            Menu 网点类型配置 = new Menu();
+            网点类型配置.setParentMenuAlias(商户管理.getMenuAlias());
+            网点类型配置.setMenuName("网点类型配置");
+            网点类型配置.setMenuAlias("wdlxpz_" + GroupRoleEnum.FXS.getCode());
+            网点类型配置.setMenuIcon(null);
+            网点类型配置.setLinkUrl("/");
+            网点类型配置.setRoleAlias(GroupRoleEnum.FXS.getCode());
+            网点类型配置.setSort(1);
+            Menu 码源工厂管理 = new Menu();
+            码源工厂管理.setParentMenuAlias(商户管理.getMenuAlias());
+            码源工厂管理.setMenuName("码源工厂管理");
+            码源工厂管理.setMenuAlias("mygcgl_" + GroupRoleEnum.FXS.getCode());
+            码源工厂管理.setMenuIcon(null);
+            码源工厂管理.setLinkUrl("/");
+            码源工厂管理.setRoleAlias(GroupRoleEnum.FXS.getCode());
+            码源工厂管理.setSort(2);
+
+            List<Menu> list = new ArrayList<>();
+            list.add(商户管理);
+            list.add(网点类型配置);
+            list.add(码源工厂管理);
+
+            menuManager.saveBatch(list);
+        }
+
+        {
+            Menu 商户管理 = new Menu();
+            商户管理.setMenuName("商户管理");
+            商户管理.setMenuAlias("shgl_" + GroupRoleEnum.CXY.getCode());
+            商户管理.setMenuIcon(null);
+            商户管理.setLinkUrl(null);
+            商户管理.setRoleAlias(GroupRoleEnum.CXY.getCode());
+            商户管理.setSort(1);
+            商户管理.setParentMenuAlias(null);
+            Menu 网点类型配置 = new Menu();
+            网点类型配置.setParentMenuAlias(商户管理.getMenuAlias());
+            网点类型配置.setMenuName("网点类型配置");
+            网点类型配置.setMenuAlias("wdlxpz_" + GroupRoleEnum.CXY.getCode());
+            网点类型配置.setMenuIcon(null);
+            网点类型配置.setLinkUrl("/");
+            网点类型配置.setRoleAlias(GroupRoleEnum.CXY.getCode());
+            网点类型配置.setSort(1);
+            Menu 码源工厂管理 = new Menu();
+            码源工厂管理.setParentMenuAlias(商户管理.getMenuAlias());
+            码源工厂管理.setMenuName("码源工厂管理");
+            码源工厂管理.setMenuAlias("mygcgl_" + GroupRoleEnum.CXY.getCode());
+            码源工厂管理.setMenuIcon(null);
+            码源工厂管理.setLinkUrl("/");
+            码源工厂管理.setRoleAlias(GroupRoleEnum.CXY.getCode());
+            码源工厂管理.setSort(2);
+
+            List<Menu> list = new ArrayList<>();
+            list.add(商户管理);
+            list.add(网点类型配置);
+            list.add(码源工厂管理);
+
+            menuManager.saveBatch(list);
+        }
+
+        {
+            List<MenuResult> menus = adminMenuManageService.queryMerchantMenus(10359);
+            System.out.println(JSON.toJSONString(menus, true));
+        }
+
+        {
+            List<MenuResult> menus = adminMenuManageService.queryMerchantMenus(10362);
+            System.out.println(JSON.toJSONString(menus, true));
+        }
+    }
+
+    public void createWLMenus() {
+        /*
+            超管：能访问所有菜单
+            一级总部 ：能访问所有菜单、供应商的网点码管理不可见
+            二级分公司、省区：商户管理（管理自己和下级商户账号）
+            三级经销商：商户管理（管理自己和下级商户账号）
+            四级业务员 分销商：商户管理（管理自己和下级商户账号）
+            五级促销员：商户管理（（管理自己和下级商户账号）
+            六级网点：不可登录后台
+            物料供应商：网点码管理（物料供应商的网点码管理）
+        */
+
+        {
+            Menu 物料管理 = new Menu();
+            物料管理.setParentMenuAlias(null);
+            物料管理.setMenuName("物料管理");
+            物料管理.setMenuAlias("wlgl_" + GroupRoleEnum.WL.getCode());
+            物料管理.setMenuIcon(null);
+            物料管理.setLinkUrl(null);
+            物料管理.setRoleAlias(GroupRoleEnum.WL.getCode());
+            物料管理.setSort(11);
+
+            List<Menu> list = new ArrayList<>();
+            list.add(物料管理);
+
+            menuManager.saveBatch(list);
+        }
+
+
+    }
+
+    public void queryMenus() {
+        for (GroupRoleEnum roleEnum : GroupRoleEnum.values()) {
+            List<MenuResult> menus = adminMenuManageService.queryMenusByRoleAlias(roleEnum.getCode());
+            System.out.println(JSON.toJSONString(menus, true));
+        }
+    }
+
 }

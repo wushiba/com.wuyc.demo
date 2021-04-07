@@ -11,14 +11,21 @@ public class QueryUserCouponReq implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    private Integer userId;
+
+    /** 优惠券id */
     private Integer couponId;
 
-    /** 是否使用， 已使用，传Y， 未使用，传N */
-    private String useStatus;
+    /** 奖品等级 */
+    private Integer drawPrizeLevel;
+
+    /** 是否可用， 已使用，传Y， 未使用，传N */
+    private String isCanUse;
+
+    private Integer itemId;
+
+    private Integer skuId;
 
     private Long orderId;
-
-    /** 可用, 传N， 不可用传Y */
-    private String isCanUse;
 
 }

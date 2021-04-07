@@ -16,6 +16,7 @@ import com.yfshop.common.util.BeanUtil;
 import com.yfshop.shop.dao.UserCartDao;
 import com.yfshop.shop.service.cart.result.UserCartResult;
 import com.yfshop.shop.service.cart.result.UserCartSummary;
+import com.yfshop.shop.service.coupon.request.QueryUserCouponReq;
 import com.yfshop.shop.service.coupon.result.YfUserCouponResult;
 import com.yfshop.shop.service.coupon.service.FrontUserCouponService;
 import com.yfshop.shop.service.mall.result.ItemResult;
@@ -210,8 +211,10 @@ public class UserCartServiceImpl implements UserCartService {
         BigDecimal totalFreight = calcTotalFreight();
 
         // TODO: 2021/3/24 优惠信息
-        List<YfUserCouponResult> availableCoupons = frontUserCouponService
-                .findUserCouponList(userId, "Y", null);
+        QueryUserCouponReq userCouponReq = new QueryUserCouponReq();
+        userCouponReq.setUserId(userId);
+        userCouponReq.setIsCanUse("Y");
+        List<YfUserCouponResult> availableCoupons = frontUserCouponService.findUserCouponList(userCouponReq);
 
         // 封装数据
         UserCartSummary cartSummary = new UserCartSummary();
@@ -313,7 +316,10 @@ public class UserCartServiceImpl implements UserCartService {
             throw new UnsupportedOperationException();
         }
         // 用户可用优惠券
-        YfUserCouponResult availableCoupon = frontUserCouponService.findUserCouponList(userId, "Y", null).stream()
+        QueryUserCouponReq userCouponReq = new QueryUserCouponReq();
+        userCouponReq.setUserId(userId);
+        userCouponReq.setIsCanUse("Y");
+        YfUserCouponResult availableCoupon = frontUserCouponService.findUserCouponList(userCouponReq).stream()
                 .filter(userCoupon -> "ALL".equalsIgnoreCase(userCoupon.getUseRangeType())
                         || userCoupon.getCanUseItemIds().equals(itemId.toString()))
                 .findFirst().orElse(null);

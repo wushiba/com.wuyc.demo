@@ -13,16 +13,20 @@ import com.yfshop.common.exception.ApiException;
 import com.yfshop.common.exception.Asserts;
 import com.yfshop.common.service.RedisService;
 import com.yfshop.common.util.BeanUtil;
+import com.yfshop.shop.dao.UserCouponDao;
+import com.yfshop.shop.service.coupon.request.QueryUserCouponReq;
 import com.yfshop.shop.service.coupon.result.YfCouponResult;
 import com.yfshop.shop.service.coupon.result.YfUserCouponResult;
 import com.yfshop.shop.service.coupon.service.FrontUserCouponService;
 import org.apache.dubbo.config.annotation.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @Title:用户优惠券Service实现
@@ -44,6 +48,10 @@ public class FrontUserCouponServiceImpl implements FrontUserCouponService {
 
     @Resource
     private UserCouponMapper userCouponMapper;
+
+    @Resource
+    private UserCouponDao userCouponDao;
+
 
     /**
      * 根据id查询优惠券信息
@@ -69,18 +77,18 @@ public class FrontUserCouponServiceImpl implements FrontUserCouponService {
 
     /**
      * 查询用户优惠券YfUserCoupon
-     * @param userId	用户id
-     * @param isCanUse	是否可用， 可用传Y， 不可用传N
-     * @param couponId	优惠券id， 没有可以不传
+     * @param userCouponReq	查询条件
      * @return
      * @throws ApiException
      */
     @Override
-    public List<YfUserCouponResult> findUserCouponList(Integer userId, String isCanUse, Integer couponId) throws ApiException {
-        LambdaQueryWrapper<UserCoupon> queryWrapper = Wrappers.lambdaQuery(UserCoupon.class)
-                .eq(UserCoupon::getUserId, userId);
+    public List<YfUserCouponResult> findUserCouponList(QueryUserCouponReq userCouponReq) throws ApiException {
+        Asserts.assertNonNull(userCouponReq.getUserId(), 500, "用户id不可以为空");
 
-        if ("Y".equalsIgnoreCase(isCanUse)) {
+        LambdaQueryWrapper<UserCoupon> queryWrapper = Wrappers.lambdaQuery(UserCoupon.class)
+                .eq(UserCoupon::getUserId, userCouponReq.getUserId());
+
+        if ("Y".equalsIgnoreCase(userCouponReq.getIsCanUse())) {
             queryWrapper.eq(UserCoupon::getUseStatus, UserCouponStatusEnum.NO_USE.getCode())
                     .gt(UserCoupon::getValidEndTime, new Date());
         } else {
@@ -89,13 +97,31 @@ public class FrontUserCouponServiceImpl implements FrontUserCouponService {
                     .lt(UserCoupon::getValidEndTime, new Date());
         }
 
-        if (couponId != null) {
-            queryWrapper.eq(UserCoupon::getCouponId, couponId);
+        if (userCouponReq.getCouponId() != null) {
+            queryWrapper.eq(UserCoupon::getCouponId, userCouponReq.getCouponId());
+        }
+
+        if (userCouponReq.getDrawPrizeLevel() != null) {
+            queryWrapper.eq(UserCoupon::getDrawPrizeLevel, userCouponReq.getDrawPrizeLevel());
         }
 
         queryWrapper.orderByDesc(UserCoupon::getId);
         List<UserCoupon> dataList = userCouponMapper.selectList(queryWrapper);
-        return BeanUtil.convertList(dataList, YfUserCouponResult.class);
+        List<YfUserCouponResult> resultList = BeanUtil.convertList(dataList, YfUserCouponResult.class);
+
+        if (userCouponReq.getItemId() == null) {
+            return resultList;
+        }
+        return resultList.stream().filter(data -> "ALL".equalsIgnoreCase(data.getUseRangeType()) ||
+                data.getCanUseItemIds().contains(userCouponReq.getItemId() + "")).collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void useUserCoupon(Long userCouponId) throws ApiException {
+        Asserts.assertNonNull(userCouponId, 500, "用户优惠券id不可以为空");
+        int result = userCouponDao.updateUserCouponInUse(userCouponId);
+        Asserts.assertFalse(result < 1, 500, "优惠券使用失败，不可以重复使用");
     }
 
 }

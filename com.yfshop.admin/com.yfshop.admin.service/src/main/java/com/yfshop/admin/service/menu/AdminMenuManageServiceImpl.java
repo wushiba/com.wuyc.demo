@@ -15,6 +15,7 @@ import com.yfshop.code.mapper.MerchantMapper;
 import com.yfshop.code.model.Menu;
 import com.yfshop.code.model.Merchant;
 import com.yfshop.common.constants.CacheConstants;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.cache.annotation.Cacheable;
 
@@ -56,6 +57,16 @@ public class AdminMenuManageServiceImpl implements AdminMenuManageService {
         }
         List<Menu> menus = menuMapper.selectList(Wrappers.lambdaQuery(Menu.class)
                 .eq(Menu::getRoleAlias, merchant.getRoleAlias()));
+        return buildMenu(menus);
+    }
+
+    @Override
+    public List<MenuResult> queryMenusByRoleAlias(String roleAlias) {
+        if (StringUtils.isBlank(roleAlias)) {
+            return new ArrayList<>(0);
+        }
+        List<Menu> menus = menuMapper.selectList(Wrappers.lambdaQuery(Menu.class)
+                .eq(Menu::getRoleAlias, roleAlias));
         return buildMenu(menus);
     }
 
