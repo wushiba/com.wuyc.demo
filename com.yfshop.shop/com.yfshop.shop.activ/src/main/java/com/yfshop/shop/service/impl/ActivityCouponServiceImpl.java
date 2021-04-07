@@ -69,7 +69,7 @@ public class ActivityCouponServiceImpl implements ActivityCouponService {
 	}
 
 	@Override
-	public YfUserCouponResult createUserCoupon(Integer userId, Integer prizeLevel, Integer couponId) throws ApiException {
+	public YfUserCouponResult createUserCoupon(Integer userId, Integer drawActivityId, Integer prizeLevel, Integer couponId) throws ApiException {
 		User user = userMapper.selectById(userId);
 		Asserts.assertNonNull(user, 500, "用户不存在,请先授权关注公众号");
 
@@ -100,6 +100,7 @@ public class ActivityCouponServiceImpl implements ActivityCouponService {
 		userCoupon.setValidStartTime(startDate);
 		userCoupon.setValidEndTime(endDate);
 		userCoupon.setDrawPrizeLevel(prizeLevel);
+		userCoupon.setDrawActivityId(drawActivityId);
 		userCoupon.setCouponPrice(coupon.getCouponPrice());
 		userCoupon.setUseConditionPrice(coupon.getUseConditionPrice());
 		userCoupon.setCouponResource(CouponResourceEnum.DRAW.getCode());
