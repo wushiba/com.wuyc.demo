@@ -25,16 +25,16 @@ spring:
     # 页面模板页地址
     prefix: file:///home/www/web-deploy/html/merchant.yufan.51jujibao.com/
     suffix: .html
-    mode: HTML5
+    mode: HTML
     encoding: UTF-8
     cache: false
     servlet:
       content-type: text/html
-    web:
-      resources:
-        static-locations: classpath:/META-INF/resources/,classpath:/resources/,classpath:/static/,${spring.thymeleaf.prefix}
-    mvc:
-      static-path-pattern: /**
+  web:
+    resources:
+      static-locations: classpath:/META-INF/resources/,classpath:/resources/,classpath:/static/,${spring.thymeleaf.prefix}
+  mvc:
+    static-path-pattern: /**
   # redis配置
   redis:
     # Redis数据库索引（默认为0）
