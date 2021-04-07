@@ -18,4 +18,11 @@ public interface AdminMenuManageService {
      */
     List<MenuResult> queryMerchantMenus(Integer merchantId);
 
+    /**
+     * 根据角色查询菜单
+     *
+     * @param roleAlias the role alias
+     * @return the menu list
+     */
+    List<MenuResult> queryMenusByRoleAlias(String roleAlias);
 }
