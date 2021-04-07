@@ -17,7 +17,7 @@ public class WxMpProperties {
     /**
      * 是否使用redis存储access token
      */
-    private boolean useRedis;
+    private boolean useRedis=false;
 
     /**
      * redis 配置

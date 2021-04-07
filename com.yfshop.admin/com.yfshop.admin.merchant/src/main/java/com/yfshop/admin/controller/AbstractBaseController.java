@@ -1,20 +1,20 @@
 package com.yfshop.admin.controller;
 
-import cn.dev33.satoken.dao.SaTokenDaoRedisJackson;
+import com.yfshop.auth.api.service.AuthService;
 import com.yfshop.common.base.BaseController;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.apache.dubbo.config.annotation.DubboReference;
 
 public abstract class AbstractBaseController implements BaseController {
 
-    @Autowired
-    SaTokenDaoRedisJackson saTokenDaoRedis;
+    @DubboReference
+    public AuthService authService;
 
     @Override
     public String getCurrentOpenId() {
         String openId = getCookieValue("yfopen");
         if (StringUtils.isNotBlank(openId)) {
-            return saTokenDaoRedis.get(String.format("yfopen:login:token:%s", openId));
+            return authService.get(String.format("yfopen:login:token:%s", openId));
         }
         return null;
     }
@@ -23,7 +23,7 @@ public abstract class AbstractBaseController implements BaseController {
     public Integer getCurrentUserId() {
         String userId = getCookieValue("user");
         if (StringUtils.isNotBlank(userId)) {
-            String u = saTokenDaoRedis.get(String.format("user:login:token:%s", userId));
+            String u = authService.get(String.format("user:login:token:%s", userId));
             return u == null ? null : Integer.valueOf(u);
         }
         return null;

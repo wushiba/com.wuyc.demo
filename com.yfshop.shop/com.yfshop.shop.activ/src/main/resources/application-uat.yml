@@ -37,7 +37,7 @@ spring:
       static-locations: classpath:/META-INF/resources/,classpath:/resources/,classpath:/static/,${spring.thymeleaf.prefix}
   mvc:
     static-path-pattern: /**
-    
+
   redis:
     database: 0
     host: yf-sz-redis-staging.redis.rds.aliyuncs.com

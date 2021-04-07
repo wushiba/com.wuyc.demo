@@ -12,6 +12,7 @@
 
     <modules>
         <module>com.yfshop.admin</module>
+        <module>com.yfshop.auth</module>
         <module>com.yfshop.shop</module>
         <module>com.yfshop.open</module>
         <module>com.yfshop.code</module>
@@ -349,14 +350,6 @@
                 <artifactId>sa-token-spring-boot-starter</artifactId>
                 <version>${cn.dev33.version}</version>
             </dependency>
-
-            <!--
-            <dependency>
-                <groupId>cn.dev33</groupId>
-                <artifactId>sa-token-dao-redis</artifactId>
-                <version>${cn.dev33.version}</version>
-            </dependency>
-            -->
 
             <!-- sa-token整合redis (使用jackson序列化方式) -->
             <dependency>
