@@ -54,7 +54,7 @@ public class BaseRedisConfig {
     }
 
     @Bean
-    @Profile("pro")
+    @Profile({"pro", "uat"})
     public RedisCacheManager redisCacheManager(RedisConnectionFactory redisConnectionFactory, RedisSerializer<Object> redisSerializer) {
         RedisCacheWriter redisCacheWriter = RedisCacheWriter.nonLockingRedisCacheWriter(redisConnectionFactory);
         //设置Redis缓存有效期为1天
