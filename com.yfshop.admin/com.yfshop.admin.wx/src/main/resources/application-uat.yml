@@ -61,7 +61,7 @@ dubbo:
 
 logging:
   level:
-    org.springframework.web: DEBUG
+    org.springframework.web: INFO
     com.yfshop.admin: DEBUG
     me.chanjar.weixin: DEBUG
     com.github.binarywang.wxpay: DEBUG
