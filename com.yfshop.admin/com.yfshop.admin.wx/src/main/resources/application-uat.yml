@@ -42,11 +42,7 @@ logging:
     com.github.binarywang.wxpay: DEBUG
 wx:
   mp:
-    useRedis: true
-    redisConfig:
-      host: yf-sz-redis-staging.redis.rds.aliyuncs.com
-      port: 6379
-      password: SZ9v4UrVJKfCCDKUxia
+    useRedis: false
     configs:
       - appId: wxfe620617eec2f4b0 # 第一个公众号的appid
         secret: 64a61d9e95094f1e974861b62ec4dce8 # 公众号的appsecret
