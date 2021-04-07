@@ -16,7 +16,7 @@ class IndexController implements BaseController {
 
     @RequestMapping("/")
     public CommonResult index() {
-        logger.info("来自{}的请求",getRequestIpStr());
+       // logger.info("来自{}的请求",getRequestIpStr());
         return CommonResult.success("ok");
     }
 
