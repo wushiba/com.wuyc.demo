@@ -15,6 +15,15 @@ import java.util.List;
 public interface FrontUserOrderService {
 
 	/**
+	 * 校验提交订单的时候是否支持自提
+	 * @param userId	用户id
+	 * @param itemId	商品id
+	 * @param skuId		商品skuId
+	 * @return	支持自提，返回true， 否则返回false
+	 */
+	Boolean checkSubmitOrderIsCanZt(Integer userId, Integer itemId, Integer skuId);
+
+	/**
 	 * 用户订单列表
 	 * @param userId		用户id
 	 * @param useStatus		订单状态

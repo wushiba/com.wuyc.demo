@@ -1,12 +1,18 @@
 package com.yfshop.shop.service.mall;
 
 import cn.hutool.core.collection.CollectionUtil;
+import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.yfshop.code.mapper.*;
 import com.yfshop.code.model.*;
 import com.yfshop.common.constants.CacheConstants;
 import com.yfshop.common.enums.BannerPositionsEnum;
+import com.yfshop.common.exception.ApiException;
+import com.yfshop.common.exception.Asserts;
+import com.yfshop.common.service.RedisService;
 import com.yfshop.common.util.BeanUtil;
+import com.yfshop.shop.dao.ItemDao;
+import com.yfshop.shop.service.coupon.result.YfCouponResult;
 import com.yfshop.shop.service.mall.req.QueryItemDetailReq;
 import com.yfshop.shop.service.mall.req.QueryItemReq;
 import com.yfshop.shop.service.mall.result.ItemCategoryResult;
@@ -19,6 +25,7 @@ import com.yfshop.shop.service.mall.result.ItemSpecValueResult;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
@@ -34,6 +41,8 @@ import java.util.stream.Collectors;
 @DubboService
 public class MallServiceImpl implements MallService {
 
+    @Resource
+    private ItemDao itemDao;
     @Resource
     private ItemCategoryMapper itemCategoryMapper;
     @Resource
@@ -52,6 +61,8 @@ public class MallServiceImpl implements MallService {
     private BannerMapper bannerMapper;
     @Resource
     private UserCartMapper userCartMapper;
+    @Resource
+    private RedisService redisService;
 
     @Cacheable(cacheManager = CacheConstants.CACHE_MANAGE_NAME,
             cacheNames = CacheConstants.MALL_CATEGORY_CACHE_NAME,
@@ -154,5 +165,39 @@ public class MallServiceImpl implements MallService {
         return banners.stream().map(Banner::getImageUrl).collect(Collectors.toList());
     }
 
+
+    @Override
+    public ItemSkuResult getItemSkuBySkuId(Integer skuId) throws ApiException {
+        Asserts.assertNonNull(skuId, 500, "商品skuId不可以为空");
+        Object itemSkuObject = redisService.get(CacheConstants.MALL_ITEM_SKU_CACHE_KEY_PREFIX);
+        if (itemSkuObject != null) {
+            return JSON.parseObject(itemSkuObject.toString(), ItemSkuResult.class);
+        }
+
+        ItemSku itemSku = skuMapper.selectOne(Wrappers.lambdaQuery(ItemSku.class).eq(ItemSku::getId, skuId));
+        Asserts.assertNonNull(itemSku, 500, "商品sku不存在");
+
+        ItemSkuResult itemSkuResult = BeanUtil.convert(itemSku, ItemSkuResult.class);
+        redisService.set(CacheConstants.MALL_ITEM_SKU_CACHE_KEY_PREFIX, JSON.toJSONString(itemSkuResult), 60 * 60);
+        return itemSkuResult;
+    }
+
+    /**
+     * 修改商品sku库存
+     * @param   skuId     skuId
+     * @param   num       扣减库存的数量
+     * @return
+     * @throws ApiException
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public Integer updateItemSkuStock(Integer skuId, Integer num) throws ApiException {
+        Asserts.assertNonNull(skuId, 500, "商品skuId不可以为空");
+        Asserts.assertFalse(skuId == null || skuId <= 0 , 500, "请传入正确的数量");
+
+        int result = itemDao.updateItemSkuStock(skuId, num);
+        Asserts.assertFalse(result < 0 , 500, "库存不足，请稍后重试");
+        return result;
+    }
 
 }

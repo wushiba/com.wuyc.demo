@@ -9,7 +9,6 @@ import com.yfshop.common.enums.UserOrderStatusEnum;
 import com.yfshop.common.exception.ApiException;
 import com.yfshop.common.exception.Asserts;
 import com.yfshop.common.util.BeanUtil;
-import com.yfshop.shop.dao.UserCartDao;
 import com.yfshop.shop.service.activity.result.YfDrawActivityResult;
 import com.yfshop.shop.service.activity.result.YfDrawPrizeResult;
 import com.yfshop.shop.service.activity.service.FrontDrawService;
@@ -76,6 +75,30 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
 
     @Resource
     private FrontMerchantService frontMerchantService;
+
+    /**
+     * 校验提交订单的时候是否支持自提
+     * @param userId	用户id
+     * @param itemId	商品id
+     * @return 支持自提，返回true， 否则返回false
+     */
+    @Override
+    public Boolean checkSubmitOrderIsCanZt(Integer userId, Integer itemId, Integer skuId) {
+        UserCoupon userCoupon = userCouponMapper.selectOne(Wrappers.lambdaQuery(UserCoupon.class)
+                .eq(UserCoupon::getUserId, userId)
+                .eq(UserCoupon::getDrawPrizeLevel, 2)
+                .gt(UserCoupon::getValidEndTime, new Date())
+                .eq(UserCoupon::getUseStatus, UserCouponStatusEnum.NO_USE.getCode()));
+        if (userCoupon == null) {
+            return false;
+        }
+
+        if ("ALL".equalsIgnoreCase(userCoupon.getUseRangeType()) || userCoupon.getCanUseItemIds().contains(itemId + "")) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 
     /**
      * 查询用户所有订单, 根据订单状态去组装. 因为单个用户不可能会有很多订单
@@ -220,9 +243,8 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Void submitOrderBySkuId(Integer userId, Integer skuId, Integer num, Long userCouponId, Integer addressId) throws ApiException {
-        // 校验sku 以及商品
-        ItemSku itemSku = itemSkuMapper.selectOne(Wrappers.lambdaQuery(ItemSku.class).eq(ItemSku::getId, skuId));
-        Asserts.assertNonNull(itemSku, 500, "商品sku不存在");
+        // 校验sku以及商品
+        ItemSkuResult itemSku = mallService.getItemSkuBySkuId(skuId);
         Asserts.assertFalse(itemSku.getSkuStock() < num, 500, "商品库存不足");
         QueryItemDetailReq req = new QueryItemDetailReq();
         req.setItemId(itemSku.getItemId());
@@ -234,15 +256,11 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
         UserCoupon userCoupon = new UserCoupon();
         if (userCouponId != null) {
             userCoupon = userCouponMapper.selectOne(Wrappers.lambdaQuery(UserCoupon.class).eq(UserCoupon::getId, userCouponId));
-            Asserts.assertNonNull(userCoupon, 500, "用户优惠券不存在");
-            Asserts.assertFalse(userCoupon.getValidEndTime().isBefore(LocalDateTime.now()), 500, "优惠券已过期");
-            Asserts.assertEquals(userCoupon.getUseStatus(), UserCouponStatusEnum.NO_USE.getCode(), 500, "优惠券状态不正确");
+            this.checkUserCoupon(userCoupon);
         }
 
-        // 扣库存，这里要做手写SQL，搞乐观锁
-        itemSku.setSkuStock(itemSku.getSkuStock() - num);
-        int result = itemSkuMapper.updateById(itemSku);
-        Asserts.assertFalse(result < 1, 500, "商品库存不足，请稍后重试");
+        // 扣库存
+        mallService.updateItemSkuStock(itemSku.getId(), num);
 
         if (userCoupon.getId() != null) {
             userCoupon.setUseStatus(UserCouponStatusEnum.IN_USE.getCode());
@@ -281,7 +299,8 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Void submitOrderByCart(Integer userId, String cartIds, Long userCouponId, Integer addressId) throws ApiException {
-        List<Integer> cartIdList = Arrays.stream(StringUtils.split(cartIds, ",")).map(Integer::valueOf).collect(Collectors.toList());
+        List<Integer> cartIdList = Arrays.stream(StringUtils.split(cartIds, ",")).map(Integer::valueOf)
+                .collect(Collectors.toList());
         Asserts.assertCollectionNotEmpty(cartIdList, 500, "购物车id不可以为空");
         Asserts.assertFalse(cartIdList.size() > 1 && userCouponId != null, 500, "您不能使用优惠券");
 
@@ -291,25 +310,34 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
         UserCoupon userCoupon = new UserCoupon();
         if (userCouponId != null) {
             userCoupon = userCouponMapper.selectOne(Wrappers.lambdaQuery(UserCoupon.class).eq(UserCoupon::getId, userCouponId));
-            Asserts.assertNonNull(userCoupon, 500, "用户优惠券不存在");
-            Asserts.assertFalse(userCoupon.getValidEndTime().isBefore(LocalDateTime.now()), 500, "用户优惠券已过期");
-            Asserts.assertEquals(userCoupon.getUseStatus(), UserCouponStatusEnum.NO_USE.getCode(), 500, "用户优惠券状态不正确");
+            this.checkUserCoupon(userCoupon);
         }
 
         List<UserCart> userCartList = userCartMapper.selectList(Wrappers.lambdaQuery(UserCart.class)
-                .eq(UserCart::getUserId, userId)
-                .in(UserCart::getId, cartIdList));
+                .eq(UserCart::getUserId, userId).in(UserCart::getId, cartIdList));
         Asserts.assertCollectionNotEmpty(userCartList, 500, "购物车id不正确");
         Asserts.assertEquals(userCartList.size(), cartIdList.size(), 500, "购物车数据不正确，请刷新重试");
 
+        // 运费商品等一些金额
+        Integer itemCount = 0;
+        Integer childOrderCount = userCartList.size();
+        BigDecimal couponPrice = new BigDecimal("0.0");
+        BigDecimal orderFreight = new BigDecimal("0.0");
+        BigDecimal orderPrice = new BigDecimal("0.0");
+        BigDecimal payPrice = new BigDecimal("0.0");
+
         // 扣库存，这里要做手写SQL，搞乐观锁
+        Map<Integer, ItemSku> itemSkuMap = new HashMap<>();
         for (UserCart userCart : userCartList) {
             ItemSku itemSku = itemSkuMapper.selectOne(Wrappers.lambdaQuery(ItemSku.class).eq(ItemSku::getId, userCart.getSkuId()));
             Asserts.assertNonNull(itemSku, 500, "商品sku不存在");
             Asserts.assertFalse(itemSku.getSkuStock() < userCart.getNum(), 500, "商品库存不足");
-            itemSku.setSkuStock(itemSku.getSkuStock() - userCart.getNum());
-            int result = itemSkuMapper.updateById(itemSku);
-            Asserts.assertFalse(result < 1, 500, "商品库存不足，请稍后重试");
+            mallService.updateItemSkuStock(itemSku.getId(), userCart.getNum());
+            itemSkuMap.put(itemSku.getId(), itemSku);
+            itemCount += userCart.getNum();
+            orderFreight = orderFreight.add(new BigDecimal(userCart.getNum() * 2));
+            orderPrice = orderFreight.add((itemSku.getSkuSalePrice().multiply(new BigDecimal(2))));
+            payPrice = orderFreight.add(orderPrice);
         }
 
         // 修改优惠券状态
@@ -317,12 +345,29 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
             userCoupon.setUseStatus(UserCouponStatusEnum.IN_USE.getCode());
             int updateStatus = userCouponMapper.updateById(userCoupon);
             Asserts.assertFalse(updateStatus < 1, 500, "优惠券状态不正确，请稍后重试");
+            couponPrice = new BigDecimal(userCoupon.getCouponPrice());
+            payPrice = payPrice.subtract(couponPrice);
         }
+
+        Order order = insertUserOrder(userId, ReceiveWayEnum.ZT.getCode(), itemCount, childOrderCount, orderPrice, couponPrice, orderFreight, payPrice, "N", null);
+        Long orderId = order.getId();
+        for (UserCart userCart : userCartList) {
+            ItemSku itemSku = itemSkuMap.get(userCart.getSkuId());
+            BigDecimal childCouponPrice = new BigDecimal("0.0");
+            BigDecimal childOrderFreight = new BigDecimal(userCart.getNum() * 2);
+            BigDecimal childOrderPrice = itemSku.getSkuSalePrice().multiply(new BigDecimal(userCart.getNum()));
+            BigDecimal childPayPrice = childOrderPrice.add(childOrderFreight).subtract(childCouponPrice);
+
+            insertUserOrderDetail(userId, orderId, null, null, ReceiveWayEnum.PS.getCode(), "N", userCart.getNum(),
+                    itemSku.getItemId(), itemSku.getId(), itemSku.getSkuTitle(), itemSku.getSkuSalePrice(), itemSku.getSkuCover(), childOrderFreight, childCouponPrice,
+                    childOrderPrice, childPayPrice, userCoupon.getId(), UserOrderStatusEnum.WAIT_PAY.getCode(), null, itemSku.getSpecNameIdValueIdJson());
+        }
+
+        insertUserOrderAddress(orderId, addressInfo.getMobile(), addressInfo.getRealname(), addressInfo.getProvince(), addressInfo.getProvinceId(), addressInfo.getCity(),
+                addressInfo.getCityId(), addressInfo.getDistrict(), addressInfo.getDistrictId(), addressInfo.getAddress());
 
         // 删除购物车id
         userCartMapper.deleteBatchIds(cartIdList);
-
-        // 创建用户订单
         return null;
     }
 
@@ -352,8 +397,7 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
         for (Long userCouponId : userCouponIdList) {
             List<UserCoupon> dataList = userCouponMap.get(userCouponId);
             Asserts.assertCollectionNotEmpty(dataList, 500, "用户优惠券不存在");
-            Asserts.assertFalse(dataList.get(0).getValidEndTime().isBefore(LocalDateTime.now()), 500, "用户优惠券已过期");
-            Asserts.assertEquals(dataList.get(0).getUseStatus(), UserCouponStatusEnum.NO_USE.getCode(), 500, "用户优惠券状态不正确");
+            this.checkUserCoupon(dataList.get(0));
         }
 
         // 校验抽奖活动,当前有且仅有一个活动进行中
@@ -376,10 +420,9 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
         ItemSkuResult itemSku = itemDetail.getItemSkuList().get(0);
 
         // 扣优惠券对应的商品库存
-        ItemSku skuInfo = BeanUtil.convert(itemSku, ItemSku.class);
-        itemSku.setSkuStock(itemSku.getSkuStock() - userCouponIdList.size());
-        int result = itemSkuMapper.updateById(skuInfo);
-        Asserts.assertFalse(result < 1, 500, "奖品库存不足，请稍后重试");
+        mallService.updateItemSkuStock(itemSku.getId(), userCouponIdList.size());
+
+        // 修改优惠券状态
 
         // 根据优惠券计算订单金额，创建订单,子订单, 收货地址 一个优惠券对应一个子订单，一个子订单运费2块钱
         Integer itemCount = userCouponIdList.size();
@@ -571,6 +614,16 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
         return orderAddress;
     }
 
+    /**
+     * 校验优惠券
+     * @param userCoupon
+     * @throws ApiException
+     */
+    private void checkUserCoupon(UserCoupon userCoupon) throws ApiException {
+        Asserts.assertNonNull(userCoupon, 500, "用户优惠券不存在");
+        Asserts.assertFalse(userCoupon.getValidEndTime().isBefore(LocalDateTime.now()), 500, "优惠券已过期");
+        Asserts.assertEquals(userCoupon.getUseStatus(), UserCouponStatusEnum.NO_USE.getCode(), 500, "优惠券状态不正确");
+    }
 
 }
 

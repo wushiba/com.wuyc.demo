@@ -1,6 +1,7 @@
 package com.yfshop.shop.service.coupon.service;
 
 import com.yfshop.common.exception.ApiException;
+import com.yfshop.shop.service.coupon.request.QueryUserCouponReq;
 import com.yfshop.shop.service.coupon.result.YfCouponResult;
 import com.yfshop.shop.service.coupon.result.YfUserCouponResult;
 import java.util.List;
@@ -24,11 +25,16 @@ public interface FrontUserCouponService {
 
 	/**
 	 * 查询用户优惠券YfUserCoupon
-	 * @param userId	用户id
-	 * @param isCanUse	是否可用， 可用传Y， 不可用传N
-	 * @param couponId	优惠券id， 没有可以不传
+	 * @param userCouponReq	查询条件
 	 * @return	List<YfUserCouponResult>
 	 */
-	public List<YfUserCouponResult> findUserCouponList(Integer userId, String isCanUse, Integer couponId) throws ApiException;
+	public List<YfUserCouponResult> findUserCouponList(QueryUserCouponReq userCouponReq) throws ApiException;
+
+	/**
+	 * 用户使用优惠券，修改券状态
+	 * @param userCouponId
+	 * @throws ApiException
+	 */
+	public void useUserCoupon(Long userCouponId) throws ApiException;
 
 }

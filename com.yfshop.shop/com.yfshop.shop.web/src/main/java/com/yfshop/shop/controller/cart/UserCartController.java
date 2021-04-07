@@ -8,6 +8,7 @@ import com.yfshop.shop.controller.vo.UserCartPageData;
 import com.yfshop.shop.service.cart.UserCartService;
 import com.yfshop.shop.service.cart.result.UserCartResult;
 import com.yfshop.shop.service.cart.result.UserCartSummary;
+import com.yfshop.shop.service.coupon.request.QueryUserCouponReq;
 import com.yfshop.shop.service.coupon.result.YfUserCouponResult;
 import com.yfshop.shop.service.coupon.service.FrontUserCouponService;
 import io.swagger.annotations.ApiImplicitParam;
@@ -54,8 +55,11 @@ public class UserCartController implements BaseController {
     public CommonResult<UserCartPageData> queryUserCartPageData() {
         CompletableFuture<List<UserCartResult>> userCartsFuture = CompletableFuture.supplyAsync(
                 () -> userCartService.queryUserCarts(getCurrentUserId()));
+        QueryUserCouponReq userCouponReq = new QueryUserCouponReq();
+        userCouponReq.setUserId(getCurrentUserId());
+        userCouponReq.setIsCanUse("Y");
         CompletableFuture<List<YfUserCouponResult>> userCouponsFuture = CompletableFuture.supplyAsync(
-                () -> userCouponService.findUserCouponList(getCurrentUserId(), "Y", null));
+                () -> userCouponService.findUserCouponList(userCouponReq));
         try {
             UserCartPageData userCartPageData = new UserCartPageData();
             userCartPageData.setCarts(userCartsFuture.get(10, TimeUnit.SECONDS));

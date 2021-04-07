@@ -6,6 +6,7 @@ import com.yfshop.common.base.BaseController;
 import com.yfshop.common.exception.ApiException;
 import com.yfshop.shop.service.cart.UserCartService;
 import com.yfshop.shop.service.cart.result.UserCartResult;
+import com.yfshop.shop.service.coupon.request.QueryUserCouponReq;
 import com.yfshop.shop.service.coupon.result.YfUserCouponResult;
 import com.yfshop.shop.service.coupon.service.FrontUserCouponService;
 import com.yfshop.shop.service.merchant.result.MerchantResult;
@@ -39,6 +40,13 @@ public class FrontOrderController implements BaseController {
     @DubboReference(check = false)
     private FrontUserCouponService frontUserCouponService;
 
+    @RequestMapping(value = "/order/checkIsCanZt", method = {RequestMethod.GET, RequestMethod.POST})
+    @ResponseBody
+    @SaCheckLogin
+    public CommonResult<Boolean> checkSubmitOrderIsCanZt(Integer itemId, Integer skuId) {
+        return CommonResult.success(frontUserOrderService.checkSubmitOrderIsCanZt(getCurrentUserId(), itemId, skuId));
+    }
+
     /**
      * 查询附近的商户
      * @param districtId    区id
@@ -55,8 +63,9 @@ public class FrontOrderController implements BaseController {
 
     @RequestMapping(value = "/coupon/findList", method = {RequestMethod.GET, RequestMethod.POST})
     @ResponseBody
-    public CommonResult<List<YfUserCouponResult>> findUserCouponList(String isCanUse, Integer couponId) {
-        return CommonResult.success(frontUserCouponService.findUserCouponList(101, isCanUse, couponId));
+    public CommonResult<List<YfUserCouponResult>> findUserCouponList(QueryUserCouponReq userCouponReq) {
+        userCouponReq.setUserId(getCurrentUserId());
+        return CommonResult.success(frontUserCouponService.findUserCouponList(userCouponReq));
     }
 
     /**
