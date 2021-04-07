@@ -20,6 +20,8 @@ dubbo:
     base-packages: com.yfshop.admin
 
 spring:
+  mvc:
+    static-path-pattern: file:///home/www/web-deploy/html/upms.yufan.51jujibao.com/static/**
   thymeleaf:
     # 页面模板页地址
     prefix: file:///home/www/web-deploy/html/upms.yufan.51jujibao.com/
