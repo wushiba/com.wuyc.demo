@@ -11,7 +11,7 @@ spring:
     filters: stat,wall,slf4j
     poolPreparedStatements: true
     type: com.alibaba.druid.pool.DruidDataSource
-    url: jdbc:mysql://10.10.204.28:3306/yufan_shop?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
+    url: jdbc:mysql://10.10.204.28:3306/yf_shop?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
     username: jjbJfSaas
     password: onlineJfsaas
     maxPoolPreparedStatementPerConnectionSize: 20
