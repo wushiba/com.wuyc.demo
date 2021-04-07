@@ -15,7 +15,7 @@ spring:
         url: jdbc:mysql://121.40.70.203:3306/yf_shop?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
         username: root
         password: Wuyc521125!
-    #    url: jdbc:mysql://prev.mysql.lb.hello.com:3306/db_online_jf?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
+    #    url: jdbc:mysql://10.10.204.28:3306/db_online_jf?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
     #    username: jjbJfSaas
     #    password: onlineJfsaas
         maxPoolPreparedStatementPerConnectionSize: 20

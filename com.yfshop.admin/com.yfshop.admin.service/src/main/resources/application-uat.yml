@@ -16,7 +16,7 @@ spring:
     filters: stat,wall,slf4j
     poolPreparedStatements: true
     type: com.alibaba.druid.pool.DruidDataSource
-    url: jdbc:mysql://prev.mysql.lb.hello.com:3306/yufan_shop?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
+    url: jdbc:mysql://10.10.204.28:3306/yufan_shop?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
     username: jjbJfSaas
     password: onlineJfsaas
     maxPoolPreparedStatementPerConnectionSize: 20
@@ -50,11 +50,11 @@ spring:
 
 dubbo:
   registry:
-    address: zookeeper://yf-srv-staging:2181
+    address: zookeeper://10.11.3.98:2181
   metadataReport:
-    address: zookeeper://yf-srv-staging:2181
+    address: zookeeper://10.11.3.98:2181
   configcenter:
-    address: zookeeper://yf-srv-staging:2181
+    address: zookeeper://10.11.3.98:2181
   protocol:
     port: 20882
     name: dubbo
@@ -78,7 +78,7 @@ xxl:
   job:
     admin:
       ### xxl-job admin address list, such as "http://address" or "http://address01,http://address02"
-      addresses: http://yf-srv-staging:8780/xxl-job-admin
+      addresses: http://10.11.3.98:8780/xxl-job-admin
       ### xxl-job, access token
     accessToken:
     ### xxl-job executor appname

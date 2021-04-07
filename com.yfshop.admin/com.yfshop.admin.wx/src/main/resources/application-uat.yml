@@ -6,9 +6,8 @@ dubbo:
     address: zookeeper://10.11.3.98:2181
   metadataReport:
     address: zookeeper://10.11.3.98:2181
-
   configcenter:
-    address: zookeeper://yf-srv-staging:2181
+    address: zookeeper://10.11.3.98:2181
   application:
     name: yfshop-admin-wx
   consumer:
