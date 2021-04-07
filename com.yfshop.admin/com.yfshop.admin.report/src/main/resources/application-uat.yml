@@ -33,6 +33,9 @@ dubbo:
     address: zookeeper://yf-srv-staging:2181
   configcenter:
     address: zookeeper://yf-srv-staging:2181
+  protocol:
+    port: 20884
+    name: dubbo
   scan:
     base-packages: com.yfshop.admin.service
   provider:

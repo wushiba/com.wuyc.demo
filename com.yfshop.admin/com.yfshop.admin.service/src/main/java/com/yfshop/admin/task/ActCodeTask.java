@@ -2,6 +2,7 @@ package com.yfshop.admin.task;
 
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.io.IoUtil;
+import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.HexUtil;
 import cn.hutool.crypto.SecureUtil;
 import cn.hutool.crypto.symmetric.AES;
@@ -24,11 +25,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import javax.mail.MessagingException;
+import javax.mail.internet.MimeMessage;
 import java.io.BufferedReader;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
@@ -75,6 +81,12 @@ public class ActCodeTask {
 
     @Autowired
     QiniuConfig qiniuConfig;
+
+    @Autowired
+    private JavaMailSender mailSender;
+
+    @Value("${spring.mail.username}")
+    private String from;
 
     private static final Logger logger = LoggerFactory.getLogger(ActCodeTask.class);
     private static String aesKey = "7eac05ddfdb4d246fa0e23293c7961d98ecbf471b574c38a";
@@ -140,5 +152,22 @@ public class ActCodeTask {
         actCodeBatch.setQuantity(sourceCodes.size());
         actCodeBatchMapper.updateById(actCodeBatch);
         buildActCode(actCodeBatch, sourceCodes);
+    }
+
+    @Async
+    public void sendAttachmentsMail(String to, String subject, String content, String filePath, String... cc) throws MessagingException {
+        MimeMessage message = mailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(message, true);
+        helper.setFrom(from);
+        helper.setTo(to);
+        helper.setSubject(subject);
+        helper.setText(content, true);
+        if (ArrayUtil.isNotEmpty(cc)) {
+            helper.setCc(cc);
+        }
+        File file = new File(filePath);
+        FileSystemResource fileResource = new FileSystemResource(file);
+        helper.addAttachment(file.getName(), fileResource);
+        mailSender.send(message);
     }
 }
