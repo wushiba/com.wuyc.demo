@@ -15,8 +15,8 @@ spring:
     poolPreparedStatements: true
     type: com.alibaba.druid.pool.DruidDataSource
     url: jdbc:mysql://10.10.204.28:3306/yf_shop?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
-    username: jjbJfSaas
-    password: onlineJfsaas
+    username: youshenghui
+    password: SbaFqsJr4mbt5STZ4Ja
     maxPoolPreparedStatementPerConnectionSize: 20
     testOnBorrow: false
     testWhileIdle: true
