@@ -1,24 +1,20 @@
 package com.yfshop.admin.controller;
 
+import com.yfshop.common.api.CommonResult;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
 
 
-@Controller
+@RestController
 class IndexController {
 
 
     @RequestMapping("/")
-    public ModelAndView index() {
-        ModelAndView mav = new ModelAndView("index");
-        return mav;
-    }
+    public CommonResult index() {
 
-    @RequestMapping("/index.html/**")
-    public ModelAndView adminIndex() {
-        ModelAndView mav = new ModelAndView("index");
-        return mav;
+        return CommonResult.success("ok");
     }
 
 
