@@ -1,15 +1,6 @@
 ---
 server:
   port: 9098
-  thymeleaf:
-    # 页面模板页地址
-    prefix: file:///home/www/web-deploy/html/wx.yufan.51jujibao.com/
-    suffix: .html
-    mode: HTML5
-    encoding: UTF-8
-    cache: false
-    servlet:
-      content-type: text/html
 dubbo:
   registry:
     address: zookeeper://10.11.3.98:2181
@@ -29,6 +20,20 @@ dubbo:
 
 
 spring:
+  thymeleaf:
+    # 页面模板页地址
+    prefix: file:///home/www/web-deploy/html/wx.yufan.51jujibao.com/
+    suffix: .html
+    mode: HTML5
+    encoding: UTF-8
+    cache: false
+    servlet:
+      content-type: text/html
+  web:
+    resources:
+      static-locations: classpath:/META-INF/resources/,classpath:/resources/,classpath:/static/,${spring.thymeleaf.prefix}
+  mvc:
+    static-path-pattern: /**
   # redis配置
   redis:
     # Redis数据库索引（默认为0）
