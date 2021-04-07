@@ -29,12 +29,13 @@ public interface ActivityCouponService {
 
 	/**
 	 * 用户抽中优惠券后生成优惠券
-	 * @param userId		用户id
-	 * @param prizeLevel	奖品等级
-	 * @param couponId		优惠券id
+	 * @param userId			用户id
+	 * @param drawActivityId	抽奖活动
+	 * @param prizeLevel		奖品等级
+	 * @param couponId			优惠券id
 	 * @return
 	 * @throws ApiException
 	 */
-	public YfUserCouponResult createUserCoupon(Integer userId, Integer prizeLevel, Integer couponId) throws ApiException;
+	public YfUserCouponResult createUserCoupon(Integer userId, Integer drawActivityId, Integer prizeLevel, Integer couponId) throws ApiException;
 
 }

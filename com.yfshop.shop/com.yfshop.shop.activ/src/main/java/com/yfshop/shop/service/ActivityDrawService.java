@@ -19,6 +19,20 @@ import java.util.List;
  */
 public interface ActivityDrawService {
 
+	/**
+	 * 查询抽奖活动
+	 * @param id	抽奖活动id
+	 * @return
+	 * @throws ApiException
+	 */
+	public YfDrawActivityResult getDrawActivityById(Integer id) throws ApiException;
+
+	/**
+	 * 查询抽奖活动和奖品详情
+	 * @param id	抽奖活动id
+	 * @return
+	 * @throws ApiException
+	 */
 	public YfDrawActivityResult getDrawActivityDetailById(Integer id) throws ApiException;
 
 	/**
