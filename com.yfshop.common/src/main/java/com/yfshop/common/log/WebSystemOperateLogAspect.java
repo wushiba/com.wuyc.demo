@@ -1,5 +1,6 @@
 package com.yfshop.common.log;
 
+import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.extra.servlet.ServletUtil;
@@ -32,7 +33,6 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.Serializable;
@@ -98,7 +98,7 @@ public class WebSystemOperateLogAspect {
         String requestUrl = request.getRequestURL().toString();
         String visitorIp = request.getRemoteAddr();
         boolean isAjax = this.isAjaxRequest(request, targetClass, targetMethod);
-        Integer merchantId = this.merchantLoginInfo(request);
+        Integer merchantId = this.loginInfo(request);
         Object requestParameter = this.fetchRequestParameter(request, joinPoint, targetMethod);
 
         VisitInfo visitInfo = new VisitInfo();
@@ -176,29 +176,11 @@ public class WebSystemOperateLogAspect {
         return false;
     }
 
-    private Integer merchantLoginInfo(HttpServletRequest request) {
-        String merchantId = null;
-        String sessionId = null;
-        Cookie[] cookies = request.getCookies();
-        if (cookies != null && cookies.length > 0) {
-            for (Cookie cookie : cookies) {
-                if ("QY_MERCHANT_COOKIE".equals(cookie.getName())) {
-                    String[] parameterPair = cookie.getValue().split("&");
-                    Map<String, String> map = new HashMap<>(16);
-                    for (String aParameterPair : parameterPair) {
-                        String[] parameter = aParameterPair.split("=");
-                        map.put(parameter[0], parameter[1]);
-                    }
-                    merchantId = map.get("merchantId");
-                    sessionId = map.get("sessionId");
-                }
-            }
+    private Integer loginInfo(HttpServletRequest request) {
+        if (StpUtil.isLogin()) {
+            return StpUtil.getLoginIdAsInt();
         }
-        if (merchantId == null) {
-            return null;
-        } else {
-            return Integer.valueOf(merchantId);
-        }
+        return null;
     }
 
     private Object fetchRequestParameter(HttpServletRequest request, JoinPoint point, Method targetMethod) {

@@ -6,6 +6,8 @@ import com.yfshop.common.base.BaseController;
 import com.yfshop.common.exception.ApiException;
 import com.yfshop.shop.service.cart.UserCartService;
 import com.yfshop.shop.service.cart.result.UserCartResult;
+import com.yfshop.shop.service.coupon.result.YfUserCouponResult;
+import com.yfshop.shop.service.coupon.service.FrontUserCouponService;
 import com.yfshop.shop.service.merchant.result.MerchantResult;
 import com.yfshop.shop.service.merchant.service.FrontMerchantService;
 import com.yfshop.shop.service.order.result.YfUserOrderDetailResult;
@@ -34,6 +36,9 @@ public class FrontOrderController implements BaseController {
     @DubboReference(check = false)
     private FrontUserOrderService frontUserOrderService;
 
+    @DubboReference(check = false)
+    private FrontUserCouponService frontUserCouponService;
+
     /**
      * 查询附近的商户
      * @param districtId    区id
@@ -46,6 +51,12 @@ public class FrontOrderController implements BaseController {
     @SaCheckLogin
     public CommonResult<List<MerchantResult>> findNearMerchantList(Integer districtId, Double longitude, Double latitude) {
         return CommonResult.success(frontMerchantService.findNearMerchantList(districtId, longitude, latitude));
+    }
+
+    @RequestMapping(value = "/coupon/findList", method = {RequestMethod.GET, RequestMethod.POST})
+    @ResponseBody
+    public CommonResult<List<YfUserCouponResult>> findUserCouponList(String isCanUse, Integer couponId) {
+        return CommonResult.success(frontUserCouponService.findUserCouponList(101, isCanUse, couponId));
     }
 
     /**

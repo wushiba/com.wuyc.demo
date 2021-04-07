@@ -136,15 +136,14 @@ public class ActivityDrawServiceImpl implements ActivityDrawService {
         Asserts.assertEquals(yfDrawActivityResult.getIsEnable(), "Y", 500, "活动暂未开启,请联系管理员");
         Asserts.assertFalse(yfDrawActivityResult.getEndTime().isAfter(LocalDateTime.now()), 500, "活动暂未开始,请稍后再试");
         Asserts.assertFalse(yfDrawActivityResult.getEndTime().isBefore(LocalDateTime.now()), 500, "活动暂已结束,请稍后再试");
-
         List<YfDrawPrizeResult> prizeList = yfDrawActivityResult.getPrizeList();
         Asserts.assertCollectionNotEmpty(prizeList, 500, "活动暂未配置奖品，请稍微再试");
-
-        Map<Integer, List<YfDrawPrizeResult>> prizeMap = prizeList.stream().collect(Collectors.groupingBy(YfDrawPrizeResult::getPrizeLevel));
+        Map<Integer, List<YfDrawPrizeResult>> prizeMap = prizeList.stream().collect(Collectors
+                .groupingBy(YfDrawPrizeResult::getPrizeLevel));
+        Integer prizeLevel = 3;
         YfDrawPrizeResult firstPrize = prizeMap.get(1).get(0);
         YfDrawPrizeResult secondPrize = prizeMap.get(2).get(0);
         YfDrawPrizeResult thirdPrize = prizeMap.get(3).get(0);
-        Integer prizeLevel = 3;
         Integer couponId = thirdPrize.getCouponId();
 
         // 根据ip查询地址, 找不到归属地默认抽到三等奖
