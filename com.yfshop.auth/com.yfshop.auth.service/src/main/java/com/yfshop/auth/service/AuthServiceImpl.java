@@ -1,6 +1,7 @@
 package com.yfshop.auth.service;
 
 import cn.dev33.satoken.dao.SaTokenDao;
+import cn.dev33.satoken.dao.SaTokenDaoRedisJackson;
 import cn.dev33.satoken.util.SaTokenInsideUtil;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -21,135 +22,74 @@ import java.util.concurrent.TimeUnit;
 
 @DubboService
 public class AuthServiceImpl implements AuthService {
-    public ObjectMapper objectMapper;
     @Autowired
-    public StringRedisTemplate stringRedisTemplate;
-    public RedisTemplate<String, Object> objectRedisTemplate;
+    public SaTokenDaoRedisJackson saTokenDaoRedisJackson;
 
-
-    @Autowired
-    public void setObjectRedisTemplate(RedisConnectionFactory connectionFactory) {
-        StringRedisSerializer keySerializer = new StringRedisSerializer();
-        GenericJackson2JsonRedisSerializer valueSerializer = new GenericJackson2JsonRedisSerializer();
-        try {
-            Field field = GenericJackson2JsonRedisSerializer.class.getDeclaredField("mapper");
-            field.setAccessible(true);
-            ObjectMapper objectMapper = (ObjectMapper)field.get(valueSerializer);
-            objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-            this.objectMapper = objectMapper;
-        } catch (Exception var6) {
-            System.err.println(var6.getMessage());
-        }
-
-        RedisTemplate<String, Object> template = new RedisTemplate();
-        template.setConnectionFactory(connectionFactory);
-        template.setKeySerializer(keySerializer);
-        template.setHashKeySerializer(keySerializer);
-        template.setValueSerializer(valueSerializer);
-        template.setHashValueSerializer(valueSerializer);
-        template.afterPropertiesSet();
-        if (this.objectRedisTemplate == null) {
-            this.objectRedisTemplate = template;
-        }
-
-    }
 
     @Override
     public String get(String key) {
-        return (String)this.stringRedisTemplate.opsForValue().get(key);
+        return saTokenDaoRedisJackson.get(key);
     }
 
     @Override
     public void set(String key, String value, long timeout) {
-        if (timeout == SaTokenDao.NEVER_EXPIRE) {
-            this.stringRedisTemplate.opsForValue().set(key, value);
-        } else {
-            this.stringRedisTemplate.opsForValue().set(key, value, timeout, TimeUnit.SECONDS);
-        }
+        saTokenDaoRedisJackson.set(key, value, timeout);
 
     }
 
     @Override
     public void update(String key, String value) {
-        long expire = this.getTimeout(key);
-        if (expire != SaTokenDao.NOT_VALUE_EXPIRE) {
-            this.set(key, value, expire);
-        }
+        saTokenDaoRedisJackson.update(key, value);
     }
 
     @Override
     public void delete(String key) {
-        this.stringRedisTemplate.delete(key);
+        saTokenDaoRedisJackson.delete(key);
     }
 
     @Override
     public long getTimeout(String key) {
-        return this.stringRedisTemplate.getExpire(key);
+        return saTokenDaoRedisJackson.getTimeout(key);
     }
 
     @Override
     public void updateTimeout(String key, long timeout) {
-        if (timeout == SaTokenDao.NEVER_EXPIRE) {
-            long expire = this.getTimeout(key);
-            if (expire != SaTokenDao.NEVER_EXPIRE) {
-                this.set(key, this.get(key), timeout);
-            }
-
-        } else {
-            this.stringRedisTemplate.expire(key, timeout, TimeUnit.SECONDS);
-        }
+        saTokenDaoRedisJackson.updateTimeout(key, timeout);
     }
 
     @Override
     public Object getObject(String key) {
-        return this.objectRedisTemplate.opsForValue().get(key);
+        return saTokenDaoRedisJackson.getObject(key);
     }
 
     @Override
     public void setObject(String key, Object object, long timeout) {
-        if (timeout == SaTokenDao.NEVER_EXPIRE) {
-            this.objectRedisTemplate.opsForValue().set(key, object);
-        } else {
-            this.objectRedisTemplate.opsForValue().set(key, object, timeout, TimeUnit.SECONDS);
-        }
-
+        saTokenDaoRedisJackson.setObject(key, object, timeout);
     }
 
     @Override
     public void updateObject(String key, Object object) {
-        long expire = this.getObjectTimeout(key);
-        if (expire != SaTokenDao.NOT_VALUE_EXPIRE) {
-            this.setObject(key, object, expire);
-        }
+        saTokenDaoRedisJackson.updateObject(key,object);
     }
 
     @Override
     public void deleteObject(String key) {
-        this.objectRedisTemplate.delete(key);
+        this.saTokenDaoRedisJackson.deleteObject(key);
     }
 
     @Override
     public long getObjectTimeout(String key) {
-        return this.objectRedisTemplate.getExpire(key);
+        return this.saTokenDaoRedisJackson.getObjectTimeout(key);
     }
 
     @Override
     public void updateObjectTimeout(String key, long timeout) {
-        if (timeout == SaTokenDao.NEVER_EXPIRE) {
-            long expire = this.getObjectTimeout(key);
-            if (expire != SaTokenDao.NEVER_EXPIRE) {
-                this.setObject(key, this.getObject(key), timeout);
-            }
-
-        } else {
-            this.objectRedisTemplate.expire(key, timeout, TimeUnit.SECONDS);
-        }
+        saTokenDaoRedisJackson.updateObjectTimeout(key,timeout);
     }
 
     @Override
     public List<String> searchData(String prefix, String keyword, int start, int size) {
-        Set<String> keys = this.stringRedisTemplate.keys(prefix + "*" + keyword + "*");
-        List<String> list = new ArrayList(keys);
-        return SaTokenInsideUtil.searchList(list, start, size);
+
+        return saTokenDaoRedisJackson.searchData(prefix,keyword,start,size);
     }
 }
