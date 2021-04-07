@@ -34,6 +34,8 @@ spring:
       static-locations: classpath:/META-INF/resources/,classpath:/resources/,classpath:/static/,${spring.thymeleaf.prefix}
   mvc:
     static-path-pattern: /**
+
+
   # redis配置
   redis:
     # Redis数据库索引（默认为0）
@@ -59,10 +61,10 @@ spring:
 
 logging:
   level:
-    org.springframework.web: INFO
+    org.springframework.web: DEBUG
     com.yfshop.admin: DEBUG
     me.chanjar.weixin: DEBUG
-    com.github.binarywang.wxpay: debug
+    com.github.binarywang.wxpay: DEBUG
 wx:
   mp:
     useRedis: true

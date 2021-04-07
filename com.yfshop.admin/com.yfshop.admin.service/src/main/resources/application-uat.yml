@@ -97,10 +97,10 @@ xxl:
 
 websiteCode:
   dir: /home/www/web-deploy/yufan-admin-service/websiteCode/
-  url: http://merchant.yufan.51jujibao.com/#/MerchantRegisterPrep?websiteCode=
+  url: http://prev-merchant.yufan.51jujibao.com/#/MerchantRegisterPrep?websiteCode=
 
 actCode:
   srcDir: /home/www/web-deploy/yufan-admin-service/actCode/src/
   targetDir: /home/www/web-deploy/yufan-admin-service/actCode/target/
-  url: http://activ.yufan.51jujibao.com/#/Activity?actCode=
+  url: http://prev-activ.yufan.51jujibao.com/#/Activity?actCode=
 

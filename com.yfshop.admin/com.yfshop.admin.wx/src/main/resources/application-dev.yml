@@ -48,7 +48,7 @@ logging:
     org.springframework.web: INFO
     com.yfshop.admin: DEBUG
     me.chanjar.weixin: DEBUG
-    com.github.binarywang.wxpay: debug
+    com.github.binarywang.wxpay: DEBUG
 wx:
   mp:
     useRedis: true
