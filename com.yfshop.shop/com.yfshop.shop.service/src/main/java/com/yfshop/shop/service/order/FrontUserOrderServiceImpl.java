@@ -234,9 +234,9 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
         UserCoupon userCoupon = new UserCoupon();
         if (userCouponId != null) {
             userCoupon = userCouponMapper.selectOne(Wrappers.lambdaQuery(UserCoupon.class).eq(UserCoupon::getId, userCouponId));
-            Asserts.assertNonNull(userCoupon, 500, "优惠券不存在");
+            Asserts.assertNonNull(userCoupon, 500, "用户优惠券不存在");
+            Asserts.assertFalse(userCoupon.getValidEndTime().isBefore(LocalDateTime.now()), 500, "优惠券已过期");
             Asserts.assertEquals(userCoupon.getUseStatus(), UserCouponStatusEnum.NO_USE.getCode(), 500, "优惠券状态不正确");
-            Asserts.assertFalse(userCoupon.getValidEndTime().isAfter(LocalDateTime.now()), 500, "优惠券已过期");
         }
 
         // 扣库存，这里要做手写SQL，搞乐观锁
@@ -291,9 +291,9 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
         UserCoupon userCoupon = new UserCoupon();
         if (userCouponId != null) {
             userCoupon = userCouponMapper.selectOne(Wrappers.lambdaQuery(UserCoupon.class).eq(UserCoupon::getId, userCouponId));
-            Asserts.assertNonNull(userCoupon, 500, "优惠券不存在");
-            Asserts.assertFalse(userCoupon.getValidEndTime().isAfter(LocalDateTime.now()), 500, "优惠券已过期");
-            Asserts.assertEquals(userCoupon.getUseStatus(), UserCouponStatusEnum.NO_USE.getCode(), 500, "优惠券状态不正确");
+            Asserts.assertNonNull(userCoupon, 500, "用户优惠券不存在");
+            Asserts.assertFalse(userCoupon.getValidEndTime().isBefore(LocalDateTime.now()), 500, "用户优惠券已过期");
+            Asserts.assertEquals(userCoupon.getUseStatus(), UserCouponStatusEnum.NO_USE.getCode(), 500, "用户优惠券状态不正确");
         }
 
         List<UserCart> userCartList = userCartMapper.selectList(Wrappers.lambdaQuery(UserCart.class)
@@ -343,15 +343,15 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
         MerchantResult merchantResult = frontMerchantService.getMerchantByWebsiteCode(websiteCode);
 
         // 校验用户优惠券
-        List<Integer> userCouponIdList = Arrays.stream(StringUtils.split(userCouponIds, ",")).map(Integer::valueOf).collect(Collectors.toList());
+        List<Long> userCouponIdList = Arrays.stream(StringUtils.split(userCouponIds, ",")).map(Long::valueOf).collect(Collectors.toList());
         Asserts.assertCollectionNotEmpty(userCouponIdList, 500, "用户优惠券id不可以为空");
         List<UserCoupon> userCouponList = userCouponMapper.selectList(Wrappers.lambdaQuery(UserCoupon.class).in(UserCoupon::getId, userCouponIdList));
-        Asserts.assertCollectionNotEmpty(userCouponList, 500, "用户优惠券不存在");
+        Asserts.assertCollectionNotEmpty(userCouponList, 500, "用户优惠券查询不到");
         Map<Long, List<UserCoupon>> userCouponMap = userCouponList.stream().collect(Collectors.groupingBy(UserCoupon::getId));
-        for (Integer userCouponId : userCouponIdList) {
+        for (Long userCouponId : userCouponIdList) {
             List<UserCoupon> dataList = userCouponMap.get(userCouponId);
             Asserts.assertCollectionNotEmpty(dataList, 500, "用户优惠券不存在");
-            Asserts.assertFalse(dataList.get(0).getValidEndTime().isAfter(LocalDateTime.now()), 500, "用户优惠券已过期");
+            Asserts.assertFalse(dataList.get(0).getValidEndTime().isBefore(LocalDateTime.now()), 500, "用户优惠券已过期");
             Asserts.assertEquals(dataList.get(0).getUseStatus(), UserCouponStatusEnum.NO_USE.getCode(), 500, "用户优惠券状态不正确");
         }
 
@@ -379,6 +379,9 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
         itemSku.setSkuStock(itemSku.getSkuStock() - userCouponIdList.size());
         int result = itemSkuMapper.updateById(skuInfo);
         Asserts.assertFalse(result < 1, 500, "奖品库存不足，请稍后重试");
+
+
+
 
         // 根据优惠券计算订单金额，创建订单,子订单, 收货地址 一个优惠券对应一个子订单，一个子订单运费2块钱
         Integer itemCount = userCouponIdList.size();

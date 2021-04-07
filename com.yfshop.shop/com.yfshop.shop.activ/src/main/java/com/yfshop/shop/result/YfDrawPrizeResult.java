@@ -48,6 +48,9 @@ public class YfDrawPrizeResult implements Serializable{
 	
     /** 中奖几率, 1%存100 */
     private Integer winRate;
+
+    /** 二等奖小盒中奖概率 */
+    private Integer smallBoxRate;
 	
     /** 排序 */
     private Integer sort;

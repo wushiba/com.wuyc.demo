@@ -23,6 +23,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -68,6 +69,21 @@ public class ActivityDrawServiceImpl implements ActivityDrawService {
     private ActivityCouponService activityCouponService;
 
     @Override
+    public YfDrawActivityResult getDrawActivityById(Integer id) throws ApiException {
+        DrawActivity drawActivity = null;
+        Object activityObject = redisService.get(CacheConstants.DRAW_ACTIVITY_PREFIX + id);
+        if (activityObject != null) {
+            drawActivity = JSON.parseObject(activityObject.toString(), DrawActivity.class);
+        } else {
+            drawActivity = drawActivityMapper.selectById(id);
+        }
+        if (drawActivity == null) {
+            return null;
+        }
+        return BeanUtil.convert(drawActivity, YfDrawActivityResult.class);
+    }
+
+    @Override
     public YfDrawActivityResult getDrawActivityDetailById(Integer id) throws ApiException {
         DrawActivity drawActivity = null;
         Object activityObject = redisService.get(CacheConstants.DRAW_ACTIVITY_PREFIX + id);
@@ -110,24 +126,31 @@ public class ActivityDrawServiceImpl implements ActivityDrawService {
 
         YfActCodeBatchDetailResult actCodeBatchDetail = activityActCodeBatchService.getYfActCodeBatchDetailByActCode(actCode);
         Asserts.assertNonNull(actCodeBatchDetail, 500, "请扫描正确的券码");
+        Integer drawActivityId = actCodeBatchDetail.getActId();
+
         // todo 要判断是否使用
 
         // 获取奖品，每个奖品登记优惠券id， 可以走缓存
-        Object prizeObject = redisService.get(CacheConstants.DRAW_PRIZE_NAME_PREFIX + actCodeBatchDetail.getActId());
-        List<DrawPrize> prizeList = JSON.parseArray(prizeObject.toString(), DrawPrize.class);
+        YfDrawActivityResult yfDrawActivityResult = getDrawActivityDetailById(drawActivityId);
+        Asserts.assertNonNull(yfDrawActivityResult, 500, "活动不存在,请联系管理员");
+        Asserts.assertEquals(yfDrawActivityResult.getIsEnable(), "Y", 500, "活动暂未开启,请联系管理员");
+        Asserts.assertFalse(yfDrawActivityResult.getEndTime().isAfter(LocalDateTime.now()), 500, "活动暂未开始,请稍后再试");
+        Asserts.assertFalse(yfDrawActivityResult.getEndTime().isBefore(LocalDateTime.now()), 500, "活动暂已结束,请稍后再试");
+
+        List<YfDrawPrizeResult> prizeList = yfDrawActivityResult.getPrizeList();
         Asserts.assertCollectionNotEmpty(prizeList, 500, "活动暂未配置奖品，请稍微再试");
 
-        DrawPrize firstPrize = prizeList.stream().filter(data ->  data.getPrizeLevel() == 1).collect(Collectors.toList()).get(0);
-        DrawPrize secondPrize = prizeList.stream().filter(data -> data.getPrizeLevel() == 2).collect(Collectors.toList()).get(0);
-        DrawPrize thirdPrize = prizeList.stream().filter(data -> data.getPrizeLevel() == 3).collect(Collectors.toList()).get(0);
-        Map<Integer, List<DrawPrize>> prizeMap = prizeList.stream().collect(Collectors.groupingBy(DrawPrize::getPrizeLevel));
+        Map<Integer, List<YfDrawPrizeResult>> prizeMap = prizeList.stream().collect(Collectors.groupingBy(YfDrawPrizeResult::getPrizeLevel));
+        YfDrawPrizeResult firstPrize = prizeMap.get(1).get(0);
+        YfDrawPrizeResult secondPrize = prizeMap.get(2).get(0);
+        YfDrawPrizeResult thirdPrize = prizeMap.get(3).get(0);
         Integer prizeLevel = 3;
         Integer couponId = thirdPrize.getCouponId();
 
         // 根据ip查询地址, 找不到归属地默认抽到三等奖
         Integer provinceId = this.getProvinceByIpStr(ipStr);
         if (provinceId == null) {
-            return activityCouponService.createUserCoupon(userId, prizeLevel, couponId);
+            return activityCouponService.createUserCoupon(userId, drawActivityId, prizeLevel, couponId);
         }
 
         // 判断省份抽奖规则有没有走定制化, 找不到根据活动奖品概率去发奖品, 根据大盒小盒,去抽奖
@@ -149,7 +172,7 @@ public class ActivityDrawServiceImpl implements ActivityDrawService {
                 couponId = prizeMap.get(prizeLevel).get(0).getCouponId();
             }
         }
-        return activityCouponService.createUserCoupon(userId, prizeLevel, couponId);
+        return activityCouponService.createUserCoupon(userId, drawActivityId, prizeLevel, couponId);
     }
 
     private DrawProvinceRate getProvinceRateByActIdAndProvince(Integer actId, Integer provinceId) {
