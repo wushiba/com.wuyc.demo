@@ -12,12 +12,12 @@ server:
       content-type: text/html
 dubbo:
   registry:
-    address: zookeeper://yf-srv-staging:2181
+    address: zookeeper://10.11.3.98:2181
     dynamic: true
   metadataReport:
-    address: zookeeper://yf-srv-staging:2181
+    address: zookeeper://10.11.3.98:2181
   configcenter:
-    address: zookeeper://yf-srv-staging:2181
+    address: zookeeper://10.11.3.98:2181
   application:
     name: yfshop-admin-web
   consumer:
