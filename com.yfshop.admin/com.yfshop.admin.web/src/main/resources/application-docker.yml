@@ -1,6 +1,6 @@
 ---
 server:
-  port: 9097
+  port: 9095
 dubbo:
   registry:
     address: zookeeper://${ZOOKEEPER_HOST:192.168.11.197}:${ZOOKEEPER_PORT:2181}

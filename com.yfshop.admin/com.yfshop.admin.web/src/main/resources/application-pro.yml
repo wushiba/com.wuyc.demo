@@ -1,6 +1,6 @@
 ---
 server:
-  port: 9097
+  port: 9095
 dubbo:
   registry:
     address: zookeeper://10.10.3.35:2181
