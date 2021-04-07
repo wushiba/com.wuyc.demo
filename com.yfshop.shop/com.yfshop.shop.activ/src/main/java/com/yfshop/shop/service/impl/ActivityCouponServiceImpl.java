@@ -13,6 +13,7 @@ import com.yfshop.code.model.Coupon;
 import com.yfshop.code.model.User;
 import com.yfshop.code.model.UserCoupon;
 import com.yfshop.common.enums.CouponResourceEnum;
+import com.yfshop.common.enums.UserCouponStatusEnum;
 import com.yfshop.common.exception.Asserts;
 import com.yfshop.common.util.BeanUtil;
 import com.yfshop.shop.request.QueryCouponReq;
@@ -109,11 +110,11 @@ public class ActivityCouponServiceImpl implements ActivityCouponService {
 		userCoupon.setCouponDesc(coupon.getCouponDesc());
 
 		// TODO: 2021/3/23 手机号用户还没有？
-		userCoupon.setMobile(null);
-		userCoupon.setNickname(user.getNickname());
-		userCoupon.setUseStatus("N");
-		userCoupon.setUseTime(now);
+		userCoupon.setUseTime(null);
 		userCoupon.setOrderId(null);
+		userCoupon.setMobile(user.getMobile());
+		userCoupon.setNickname(user.getNickname());
+		userCoupon.setUseStatus(UserCouponStatusEnum.NO_USE.getCode());
 		userCouponMapper.insert(userCoupon);
 		return BeanUtil.convert(userCoupon, YfUserCouponResult.class);
 	}

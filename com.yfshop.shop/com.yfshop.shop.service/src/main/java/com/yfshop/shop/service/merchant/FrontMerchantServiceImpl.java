@@ -103,7 +103,6 @@ public class FrontMerchantServiceImpl implements FrontMerchantService {
                 .eq(WebsiteCodeDetail::getAlias, websiteCode));
         Asserts.assertNonNull(websiteCodeDetail, 500, "请扫描正确的网点码");
 
-
         Object merchantObject = redisService.get(CacheConstants.MERCHANT_INFO_DATA);
         if (merchantObject != null) {
             return JSON.parseObject(merchantObject.toString(), MerchantResult.class);

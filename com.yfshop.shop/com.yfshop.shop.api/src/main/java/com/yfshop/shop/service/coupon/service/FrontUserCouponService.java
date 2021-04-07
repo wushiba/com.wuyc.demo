@@ -29,6 +29,6 @@ public interface FrontUserCouponService {
 	 * @param couponId	优惠券id， 没有可以不传
 	 * @return	List<YfUserCouponResult>
 	 */
-	public List<YfUserCouponResult> findUserCanUseCouponList(Integer userId, String isCanUse, Integer couponId) throws ApiException;
+	public List<YfUserCouponResult> findUserCouponList(Integer userId, String isCanUse, Integer couponId) throws ApiException;
 
 }

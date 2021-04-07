@@ -55,7 +55,7 @@ public class UserCartController implements BaseController {
         CompletableFuture<List<UserCartResult>> userCartsFuture = CompletableFuture.supplyAsync(
                 () -> userCartService.queryUserCarts(getCurrentUserId()));
         CompletableFuture<List<YfUserCouponResult>> userCouponsFuture = CompletableFuture.supplyAsync(
-                () -> userCouponService.findUserCanUseCouponList(getCurrentUserId(), "Y", null));
+                () -> userCouponService.findUserCouponList(getCurrentUserId(), "Y", null));
         try {
             UserCartPageData userCartPageData = new UserCartPageData();
             userCartPageData.setCarts(userCartsFuture.get(10, TimeUnit.SECONDS));
