@@ -1,15 +1,7 @@
 ---
 server:
   port: 9097
-  thymeleaf:
-    # 页面模板页地址
-    prefix: file:///home/www/web-deploy/html/upms.yufan.51jujibao.com/
-    suffix: .html
-    mode: HTML5
-    encoding: UTF-8
-    cache: false
-    servlet:
-      content-type: text/html
+
 dubbo:
   registry:
     address: zookeeper://10.11.3.98:2181
@@ -28,6 +20,15 @@ dubbo:
     base-packages: com.yfshop.admin
 
 spring:
+  thymeleaf:
+    # 页面模板页地址
+    prefix: file:///home/www/web-deploy/html/upms.yufan.51jujibao.com/
+    suffix: .html
+    mode: HTML5
+    encoding: UTF-8
+    cache: false
+    servlet:
+      content-type: text/html
   redis:
     database: 0
     host: yf-sz-redis-staging.redis.rds.aliyuncs.com

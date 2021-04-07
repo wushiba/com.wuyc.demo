@@ -1,15 +1,7 @@
 ---
 server:
   port: 9094
-  thymeleaf:
-    # 页面模板页地址
-    prefix: file:///home/www/web-deploy/html/merchant.yufan.51jujibao.com/
-    suffix: .html
-    mode: HTML5
-    encoding: UTF-8
-    cache: false
-    servlet:
-      content-type: text/html
+
 dubbo:
   registry:
     address: zookeeper://10.11.3.98:2181
@@ -29,6 +21,15 @@ dubbo:
 
 
 spring:
+  thymeleaf:
+    # 页面模板页地址
+    prefix: file:///home/www/web-deploy/html/merchant.yufan.51jujibao.com/
+    suffix: .html
+    mode: HTML5
+    encoding: UTF-8
+    cache: false
+    servlet:
+      content-type: text/html
   # redis配置
   redis:
     # Redis数据库索引（默认为0）

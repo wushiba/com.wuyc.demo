@@ -1,15 +1,6 @@
 ---
 server:
   port: 9091
-  thymeleaf:
-    # 页面模板页地址
-    prefix: file:///home/www/web-deploy/html/activ.yufan.51jujibao.com/
-    suffix: .html
-    mode: HTML5
-    encoding: UTF-8
-    cache: false
-    servlet:
-      content-type: text/html
 spring:
   datasource:
     connectionProperties: druid.stat.mergeSql=true;druid.stat.slowSqlMillis=5000
@@ -31,6 +22,17 @@ spring:
     testOnReturn: false
     driverClassName: com.mysql.cj.jdbc.Driver
     maxActive: 20
+
+  thymeleaf:
+    # 页面模板页地址
+    prefix: file:///home/www/web-deploy/html/activ.yufan.51jujibao.com/
+    suffix: .html
+    mode: HTML5
+    encoding: UTF-8
+    cache: false
+    servlet:
+      content-type: text/html
+
   redis:
     database: 0
     host: yf-sz-redis-staging.redis.rds.aliyuncs.com
