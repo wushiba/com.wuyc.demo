@@ -56,6 +56,8 @@ public interface CacheConstants {
     /** 商品详情 */
     String MALL_ITEM_DETAIL_CACHE_NAME = "MallItemDetailCacheName";
     String MALL_ITEM_DETAIL_CACHE_KEY_PREFIX = "mall_item_detail_";
+    /** 商品skuId缓存详情 */
+    String MALL_ITEM_SKU_CACHE_KEY_PREFIX = "mall_item_sku_";
 
     /** 用户收货地址 */
     String MALL_USER_ADDRESS_CACHE_NAME = "MallUserAddressCacheName";
