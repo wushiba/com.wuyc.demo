@@ -302,7 +302,6 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
         Asserts.assertCollectionNotEmpty(userCartList, 500, "购物车id不正确");
         Asserts.assertEquals(userCartList.size(), cartIdList.size(), 500, "购物车数据不正确，请刷新重试");
 
-
         // 扣库存，这里要做手写SQL，搞乐观锁
         for (UserCart userCart : userCartList) {
             ItemSku itemSku = itemSkuMapper.selectOne(Wrappers.lambdaQuery(ItemSku.class).eq(ItemSku::getId, userCart.getSkuId()));
@@ -343,9 +342,11 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
         MerchantResult merchantResult = frontMerchantService.getMerchantByWebsiteCode(websiteCode);
 
         // 校验用户优惠券
-        List<Long> userCouponIdList = Arrays.stream(StringUtils.split(userCouponIds, ",")).map(Long::valueOf).collect(Collectors.toList());
+        List<Long> userCouponIdList = Arrays.stream(StringUtils.split(userCouponIds, ","))
+                .map(Long::valueOf).collect(Collectors.toList());
         Asserts.assertCollectionNotEmpty(userCouponIdList, 500, "用户优惠券id不可以为空");
-        List<UserCoupon> userCouponList = userCouponMapper.selectList(Wrappers.lambdaQuery(UserCoupon.class).in(UserCoupon::getId, userCouponIdList));
+        List<UserCoupon> userCouponList = userCouponMapper.selectList(Wrappers.lambdaQuery(UserCoupon.class)
+                .in(UserCoupon::getId, userCouponIdList));
         Asserts.assertCollectionNotEmpty(userCouponList, 500, "用户优惠券查询不到");
         Map<Long, List<UserCoupon>> userCouponMap = userCouponList.stream().collect(Collectors.groupingBy(UserCoupon::getId));
         for (Long userCouponId : userCouponIdList) {
@@ -379,9 +380,6 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
         itemSku.setSkuStock(itemSku.getSkuStock() - userCouponIdList.size());
         int result = itemSkuMapper.updateById(skuInfo);
         Asserts.assertFalse(result < 1, 500, "奖品库存不足，请稍后重试");
-
-
-
 
         // 根据优惠券计算订单金额，创建订单,子订单, 收货地址 一个优惠券对应一个子订单，一个子订单运费2块钱
         Integer itemCount = userCouponIdList.size();

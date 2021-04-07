@@ -7,8 +7,8 @@ import com.yfshop.code.mapper.CouponMapper;
 import com.yfshop.code.mapper.UserCouponMapper;
 import com.yfshop.code.model.Coupon;
 import com.yfshop.code.model.UserCoupon;
-import com.yfshop.code.model.WebsiteCodeDetail;
 import com.yfshop.common.constants.CacheConstants;
+import com.yfshop.common.enums.UserCouponStatusEnum;
 import com.yfshop.common.exception.ApiException;
 import com.yfshop.common.exception.Asserts;
 import com.yfshop.common.service.RedisService;
@@ -16,8 +16,6 @@ import com.yfshop.common.util.BeanUtil;
 import com.yfshop.shop.service.coupon.result.YfCouponResult;
 import com.yfshop.shop.service.coupon.result.YfUserCouponResult;
 import com.yfshop.shop.service.coupon.service.FrontUserCouponService;
-import com.yfshop.shop.service.merchant.FrontMerchantServiceImpl;
-import com.yfshop.shop.service.merchant.result.WebsiteCodeDetailResult;
 import org.apache.dubbo.config.annotation.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -78,15 +76,16 @@ public class FrontUserCouponServiceImpl implements FrontUserCouponService {
      * @throws ApiException
      */
     @Override
-    public List<YfUserCouponResult> findUserCanUseCouponList(Integer userId, String isCanUse, Integer couponId) throws ApiException {
+    public List<YfUserCouponResult> findUserCouponList(Integer userId, String isCanUse, Integer couponId) throws ApiException {
         LambdaQueryWrapper<UserCoupon> queryWrapper = Wrappers.lambdaQuery(UserCoupon.class)
                 .eq(UserCoupon::getUserId, userId);
 
         if ("Y".equalsIgnoreCase(isCanUse)) {
-            queryWrapper.eq(UserCoupon::getUseStatus, "Y")
+            queryWrapper.eq(UserCoupon::getUseStatus, UserCouponStatusEnum.NO_USE.getCode())
                     .gt(UserCoupon::getValidEndTime, new Date());
         } else {
-            queryWrapper.eq(UserCoupon::getUseStatus, "N")
+            queryWrapper.in(UserCoupon::getUseStatus, UserCouponStatusEnum.IN_USE.getCode()
+                    , UserCouponStatusEnum.HAS_USE.getCode())
                     .lt(UserCoupon::getValidEndTime, new Date());
         }
 

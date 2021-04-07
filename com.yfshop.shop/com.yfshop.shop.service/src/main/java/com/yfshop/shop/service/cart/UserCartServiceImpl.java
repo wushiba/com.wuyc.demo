@@ -211,7 +211,7 @@ public class UserCartServiceImpl implements UserCartService {
 
         // TODO: 2021/3/24 优惠信息
         List<YfUserCouponResult> availableCoupons = frontUserCouponService
-                .findUserCanUseCouponList(userId, "Y", null);
+                .findUserCouponList(userId, "Y", null);
 
         // 封装数据
         UserCartSummary cartSummary = new UserCartSummary();
@@ -313,7 +313,7 @@ public class UserCartServiceImpl implements UserCartService {
             throw new UnsupportedOperationException();
         }
         // 用户可用优惠券
-        YfUserCouponResult availableCoupon = frontUserCouponService.findUserCanUseCouponList(userId, "Y", null).stream()
+        YfUserCouponResult availableCoupon = frontUserCouponService.findUserCouponList(userId, "Y", null).stream()
                 .filter(userCoupon -> "ALL".equalsIgnoreCase(userCoupon.getUseRangeType())
                         || userCoupon.getCanUseItemIds().equals(itemId.toString()))
                 .findFirst().orElse(null);

@@ -77,11 +77,6 @@ public class AdminActCodeManageServiceImpl implements AdminActCodeManageService 
     @Autowired
     private ActCodeTask actCodeTask;
 
-    @Autowired
-    private JavaMailSender mailSender;
-
-    @Value("${spring.mail.username}")
-    private String from;
 
     @Override
     public IPage<ActCodeResult> queryActCodeList(ActCodeQueryReq req) {
@@ -158,7 +153,7 @@ public class AdminActCodeManageServiceImpl implements AdminActCodeManageService 
         String msg = "您好：\n" +
                 "此邮件内含光明活动码（溯源码+抽奖活动码），请妥善保管，切勿外传。\n" +
                 "                                                                                                雨帆 ";
-        sendAttachmentsMail(sourceFactory.getEmail(), "光明活动码（溯源码+抽奖活动码）", msg, filePath);
+        actCodeTask.sendAttachmentsMail(sourceFactory.getEmail(), "光明活动码（溯源码+抽奖活动码）", msg, filePath);
         actCodeBatch.setIsSend("Y");
         actCodeBatchMapper.updateById(actCodeBatch);
         ActCodeBatchRecord actCodeBatchRecord = new ActCodeBatchRecord();
@@ -189,22 +184,5 @@ public class AdminActCodeManageServiceImpl implements AdminActCodeManageService 
     public List<ActCodeBatchRecordResult> queryActCodeDownloadRecord(Integer batchId) {
         List<ActCodeBatchRecord> actCodeBatchRecords = actCodeBatchRecordMapper.selectList(Wrappers.<ActCodeBatchRecord>lambdaQuery().eq(ActCodeBatchRecord::getBatchId, batchId));
         return BeanUtil.convertList(actCodeBatchRecords, ActCodeBatchRecordResult.class);
-    }
-
-    private void sendAttachmentsMail(String to, String subject, String content, String filePath, String... cc) throws MessagingException {
-        MimeMessage message = mailSender.createMimeMessage();
-        MimeMessageHelper helper = new MimeMessageHelper(message, true);
-        helper.setFrom(from);
-        helper.setTo(to);
-        helper.setSubject(subject);
-        helper.setText(content, true);
-        if (ArrayUtil.isNotEmpty(cc)) {
-            helper.setCc(cc);
-        }
-        File file = new File(filePath);
-        FileSystemResource fileResource = new FileSystemResource(file);
-        helper.addAttachment(file.getName(), fileResource);
-
-        mailSender.send(message);
     }
 }
