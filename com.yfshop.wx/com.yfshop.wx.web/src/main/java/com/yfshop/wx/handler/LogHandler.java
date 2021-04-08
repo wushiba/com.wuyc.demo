@@ -1,6 +1,7 @@
 package com.yfshop.wx.handler;
 
-import com.yfshop.admin.utils.JsonUtils;
+
+import com.yfshop.wx.utils.JsonUtils;
 import me.chanjar.weixin.common.session.WxSessionManager;
 import me.chanjar.weixin.mp.api.WxMpService;
 import me.chanjar.weixin.mp.bean.message.WxMpXmlMessage;

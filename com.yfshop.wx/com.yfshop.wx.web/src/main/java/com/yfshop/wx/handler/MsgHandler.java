@@ -1,13 +1,11 @@
 package com.yfshop.wx.handler;
 
-import com.yfshop.admin.builder.TextBuilder;
-import com.yfshop.admin.utils.JsonUtils;
-import me.chanjar.weixin.common.error.WxErrorException;
+import com.yfshop.wx.builder.TextBuilder;
+import com.yfshop.wx.utils.JsonUtils;
 import me.chanjar.weixin.common.session.WxSessionManager;
 import me.chanjar.weixin.mp.api.WxMpService;
 import me.chanjar.weixin.mp.bean.message.WxMpXmlMessage;
 import me.chanjar.weixin.mp.bean.message.WxMpXmlOutMessage;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;

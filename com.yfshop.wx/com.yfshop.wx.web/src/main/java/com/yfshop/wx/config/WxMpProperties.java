@@ -1,6 +1,6 @@
 package com.yfshop.wx.config;
 
-import com.yfshop.admin.utils.JsonUtils;
+import com.yfshop.wx.utils.JsonUtils;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
