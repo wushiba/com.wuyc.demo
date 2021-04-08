@@ -3,17 +3,16 @@ package com.yfshop.shop.controller.cart;
 import cn.dev33.satoken.annotation.SaCheckLogin;
 import com.yfshop.common.api.CommonResult;
 import com.yfshop.common.base.BaseController;
-import com.yfshop.common.exception.ApiException;
 import com.yfshop.shop.controller.vo.UserCartPageData;
 import com.yfshop.shop.service.cart.UserCartService;
 import com.yfshop.shop.service.cart.result.UserCartResult;
-import com.yfshop.shop.service.cart.result.UserCartSummary;
 import com.yfshop.shop.service.coupon.request.QueryUserCouponReq;
 import com.yfshop.shop.service.coupon.result.YfUserCouponResult;
 import com.yfshop.shop.service.coupon.service.FrontUserCouponService;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
+import lombok.SneakyThrows;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.stereotype.Controller;
@@ -23,13 +22,14 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.validation.constraints.Min;
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
 /**
@@ -52,6 +52,7 @@ public class UserCartController implements BaseController {
     @RequestMapping(value = "/queryUserCartPageData", method = {RequestMethod.GET, RequestMethod.POST})
     @ResponseBody
     @SaCheckLogin
+    @SneakyThrows({InterruptedException.class, ExecutionException.class, TimeoutException.class})
     public CommonResult<UserCartPageData> queryUserCartPageData() {
         CompletableFuture<List<UserCartResult>> userCartsFuture = CompletableFuture.supplyAsync(
                 () -> userCartService.queryUserCarts(getCurrentUserId()));
@@ -60,15 +61,10 @@ public class UserCartController implements BaseController {
         userCouponReq.setIsCanUse("Y");
         CompletableFuture<List<YfUserCouponResult>> userCouponsFuture = CompletableFuture.supplyAsync(
                 () -> userCouponService.findUserCouponList(userCouponReq));
-        try {
-            UserCartPageData userCartPageData = new UserCartPageData();
-            userCartPageData.setCarts(userCartsFuture.get(10, TimeUnit.SECONDS));
-            userCartPageData.setCoupons(userCouponsFuture.get(10, TimeUnit.SECONDS));
-            return CommonResult.success(userCartPageData);
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new ApiException("查询超时，请稍后再试！");
-        }
+        UserCartPageData userCartPageData = new UserCartPageData();
+        userCartPageData.setCarts(userCartsFuture.get(10, TimeUnit.SECONDS));
+        userCartPageData.setCoupons(userCouponsFuture.get(10, TimeUnit.SECONDS));
+        return CommonResult.success(userCartPageData);
     }
 
     @ApiOperation(value = "添加商品到购物车", httpMethod = "GET")
