@@ -1,9 +1,8 @@
 package com.yfshop.wx.config;
 
-import com.yfshop.admin.handler.*;
+import com.yfshop.wx.handler.*;
 import lombok.AllArgsConstructor;
 import me.chanjar.weixin.common.redis.JedisWxRedisOps;
-import me.chanjar.weixin.mp.api.WxMpMessageHandler;
 import me.chanjar.weixin.mp.api.WxMpMessageRouter;
 import me.chanjar.weixin.mp.api.WxMpService;
 import me.chanjar.weixin.mp.api.impl.WxMpServiceImpl;
@@ -13,7 +12,6 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import redis.clients.jedis.JedisPool;
-
 
 import java.util.List;
 import java.util.stream.Collectors;

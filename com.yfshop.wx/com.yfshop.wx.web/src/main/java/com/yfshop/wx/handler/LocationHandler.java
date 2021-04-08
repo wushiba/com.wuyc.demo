@@ -1,6 +1,6 @@
 package com.yfshop.wx.handler;
 
-import com.yfshop.admin.builder.TextBuilder;
+import com.yfshop.wx.builder.TextBuilder;
 import me.chanjar.weixin.common.session.WxSessionManager;
 import me.chanjar.weixin.mp.api.WxMpService;
 import me.chanjar.weixin.mp.bean.message.WxMpXmlMessage;
