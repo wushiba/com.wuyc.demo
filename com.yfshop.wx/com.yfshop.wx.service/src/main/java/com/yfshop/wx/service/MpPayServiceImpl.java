@@ -2,6 +2,7 @@ package com.yfshop.wx.service;
 
 import com.github.binarywang.wxpay.bean.order.WxPayMpOrderResult;
 import com.github.binarywang.wxpay.bean.request.WxPayUnifiedOrderRequest;
+import com.github.binarywang.wxpay.constant.WxPayConstants;
 import com.github.binarywang.wxpay.exception.WxPayException;
 import com.github.binarywang.wxpay.service.WxPayService;
 import com.yfshop.wx.api.service.MpPayService;
@@ -15,7 +16,7 @@ public class MpPayServiceImpl implements MpPayService {
 
     @Override
     public WxPayMpOrderResult createPayOrder(WxPayUnifiedOrderRequest request) throws WxPayException {
-        request.setSignType("HMACSHA256");
+        request.setSignType(WxPayConstants.SignType.HMAC_SHA256);
         WxPayMpOrderResult wxPayMpOrderResult=wxPayService.createOrder(request);
         System.out.println(wxPayMpOrderResult.toString());
         return wxPayMpOrderResult;
