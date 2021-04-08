@@ -23,7 +23,7 @@ public class RedisConfig extends BaseRedisConfig {
     private static final Logger logger = LoggerFactory.getLogger(RedisConfig.class);
 
     @Bean
-    @Profile({"pro"})
+    @Profile({"pro", "uat"})
     @Override
     public RedisCacheManager cacheManager(RedisConnectionFactory redisConnectionFactory, RedisSerializer<Object> redisSerializer) {
         RedisCacheWriter redisCacheWriter = RedisCacheWriter.nonLockingRedisCacheWriter(redisConnectionFactory);
