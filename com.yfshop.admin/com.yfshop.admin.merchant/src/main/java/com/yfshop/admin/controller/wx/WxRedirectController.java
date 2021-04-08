@@ -1,14 +1,10 @@
 package com.yfshop.admin.controller.wx;
 
-import cn.dev33.satoken.stp.StpLogic;
-import cn.dev33.satoken.stp.StpUtil;
 import com.yfshop.admin.api.merchant.result.MerchantResult;
 import com.yfshop.admin.api.user.UserService;
-import com.yfshop.admin.api.user.request.UserReq;
 import com.yfshop.admin.config.WxMpProperties;
 import com.yfshop.admin.config.WxStpLogic;
 import com.yfshop.common.api.CommonResult;
-import com.yfshop.common.util.BeanUtil;
 import lombok.AllArgsConstructor;
 import me.chanjar.weixin.common.bean.WxOAuth2UserInfo;
 import me.chanjar.weixin.common.bean.oauth2.WxOAuth2AccessToken;
