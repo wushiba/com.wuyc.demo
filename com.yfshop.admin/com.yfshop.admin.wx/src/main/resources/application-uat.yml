@@ -54,5 +54,5 @@ wx:
     mchKey: F1887D3F9E6EE7A32FE5E76F4AB80D63
     subAppId: #服务商模式下的子商户公众账号ID
     subMchId: #服务商模式下的子商户号
-    keyPath: classpath:/static/apiclient_cert.p12
+    keyPath: /home/www/web-deploy/yufan-admin-wx/cert/apiclient_cert.p12
 
