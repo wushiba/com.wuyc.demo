@@ -26,11 +26,20 @@ public class YfUserOrderListResult implements Serializable {
 
     private Long orderDetailId;
 
+    /** 商品数量 */
+    private Integer itemCount;
+
     /** 订单状态 */
     private String orderStatus;
 
     /** 订单总金额 */
     private BigDecimal orderPrice;
+
+    /** 优惠金额 */
+    private BigDecimal couponPrice;
+
+    /** 运费 */
+    private BigDecimal freight;
 
     /** 实际付款金额 */
     private BigDecimal payPrice;
@@ -49,6 +58,9 @@ public class YfUserOrderListResult implements Serializable {
         private static final long serialVersionUID = 1L;
 
         private Integer skuId;
+
+        /** 商品数量 */
+        private Integer itemCount;
 
         private Integer itemId;
 

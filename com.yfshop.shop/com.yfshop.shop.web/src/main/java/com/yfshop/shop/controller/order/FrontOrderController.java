@@ -99,7 +99,7 @@ public class FrontOrderController implements BaseController {
     @RequestMapping(value = "/order/submitOrderBySkuId", method = {RequestMethod.GET, RequestMethod.POST})
     @ResponseBody
     @SaCheckLogin
-    public CommonResult<Void> submitOrderBySkuId(Integer skuId, Integer num, Long userCouponId, Integer addressId) {
+    public CommonResult<Void> submitOrderBySkuId(Integer skuId, Integer num, Long userCouponId, Long addressId) {
         return CommonResult.success(frontUserOrderService.submitOrderBySkuId(getCurrentUserId(), skuId, num, userCouponId, addressId));
     }
 
@@ -113,7 +113,7 @@ public class FrontOrderController implements BaseController {
     @RequestMapping(value = "/order/submitOrderByCart", method = {RequestMethod.GET, RequestMethod.POST})
     @ResponseBody
     @SaCheckLogin
-    public CommonResult<Void> submitOrderByCart(String cartIds, Long userCouponId, Integer addressId) {
+    public CommonResult<Void> submitOrderByCart(String cartIds, Long userCouponId, Long addressId) {
         return CommonResult.success(frontUserOrderService.submitOrderByCart(getCurrentUserId(), cartIds, userCouponId, addressId));
     }
 
@@ -153,7 +153,7 @@ public class FrontOrderController implements BaseController {
     @RequestMapping(value = "/order/getOrderDetail", method = {RequestMethod.GET, RequestMethod.POST})
     @ResponseBody
     @SaCheckLogin
-    public CommonResult<YfUserOrderDetailResult> getUserOrderDetail(Integer orderId, Integer orderDetailId) {
+    public CommonResult<YfUserOrderDetailResult> getUserOrderDetail(Long orderId, Long orderDetailId) {
         return CommonResult.success(frontUserOrderService.getUserOrderDetail(getCurrentUserId(), orderId, orderDetailId));
     }
 
@@ -165,7 +165,7 @@ public class FrontOrderController implements BaseController {
     @RequestMapping(value = "/order/cancelOrder", method = {RequestMethod.GET, RequestMethod.POST})
     @ResponseBody
     @SaCheckLogin
-    public CommonResult<Void> cancelOrder(Integer orderId) {
+    public CommonResult<Void> cancelOrder(Long orderId) {
         return CommonResult.success(frontUserOrderService.cancelOrder(getCurrentUserId(), orderId));
     }
 
@@ -177,7 +177,7 @@ public class FrontOrderController implements BaseController {
     @RequestMapping(value = "/order/confirmOrder", method = {RequestMethod.GET, RequestMethod.POST})
     @ResponseBody
     @SaCheckLogin
-    public CommonResult<Void> confirmOrder(Integer orderDetailId) {
+    public CommonResult<Void> confirmOrder(Long orderDetailId) {
         return CommonResult.success(frontUserOrderService.confirmOrder(getCurrentUserId(), orderDetailId));
     }
 

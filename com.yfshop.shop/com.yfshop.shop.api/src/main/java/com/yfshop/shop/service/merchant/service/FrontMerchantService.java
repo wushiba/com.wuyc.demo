@@ -25,4 +25,13 @@ public interface FrontMerchantService {
      */
     MerchantResult getMerchantByWebsiteCode(String websiteCode) throws ApiException;
 
+    /**
+     * 用户自提二等奖成功后，生成网点记账单
+     * @param orderId     用户主订单id
+     * @return
+     * @throws ApiException
+     */
+    Void insertWebsiteBill(Long orderId) throws ApiException;
+
+
 }

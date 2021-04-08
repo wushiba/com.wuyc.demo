@@ -1,5 +1,6 @@
 package com.yfshop.shop.service.order.result;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -18,17 +19,27 @@ public class YfUserOrderDetailResult implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /** 下单时间 */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", locale = "zh", timezone = "GMT+8")
     private LocalDateTime createTime;
 
     private Long orderId;
 
     private Long orderDetailId;
 
+    /** 商品数量 */
+    private Integer itemCount;
+
     /** 订单状态 */
     private String orderStatus;
 
     /** 订单总金额 */
     private BigDecimal orderPrice;
+
+    /** 优惠金额 */
+    private BigDecimal couponPrice;
+
+    /** 运费 */
+    private BigDecimal freight;
 
     /** 实际付款金额 */
     private BigDecimal payPrice;
@@ -51,6 +62,9 @@ public class YfUserOrderDetailResult implements Serializable {
         private Integer skuId;
 
         private Integer itemId;
+
+        /** 商品数量 */
+        private Integer itemCount;
 
         private String itemTitle;
 
