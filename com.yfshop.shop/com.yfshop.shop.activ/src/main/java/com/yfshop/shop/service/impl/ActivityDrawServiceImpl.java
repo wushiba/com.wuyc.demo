@@ -128,7 +128,7 @@ public class ActivityDrawServiceImpl implements ActivityDrawService {
         Asserts.assertNonNull(actCodeBatchDetail, 500, "请扫描正确的券码");
         Integer drawActivityId = actCodeBatchDetail.getActId();
 
-        // todo 要判断是否使用
+        // todo 要判断是否使用, 根据actCode查询用户优惠券表
 
         // 获取奖品，每个奖品登记优惠券id， 可以走缓存
         YfDrawActivityResult yfDrawActivityResult = getDrawActivityDetailById(drawActivityId);

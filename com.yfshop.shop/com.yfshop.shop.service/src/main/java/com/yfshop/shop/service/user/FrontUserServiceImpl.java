@@ -35,10 +35,11 @@ public class FrontUserServiceImpl implements FrontUserService {
 
     @Override
     public UserResult getUserById(Integer userId) throws ApiException {
-        Asserts.assertNonNull(userId, 500, "用户id不可以为空");
-        User user = userMapper.selectOne(Wrappers.lambdaQuery(User.class).eq(User::getId, userId));
-        Asserts.assertNonNull(user, 500, "用户id不存在");
+        if (userId == null || userId <= 0) {
+            return null;
+        }
 
+        User user = null;
         Object userObject = redisService.get(CacheConstants.USER_INFO_ID + userId);
         if (userObject != null) {
             user = JSON.parseObject(userObject.toString(), User.class);
@@ -47,7 +48,7 @@ public class FrontUserServiceImpl implements FrontUserService {
             redisService.set(CacheConstants.USER_INFO_ID + userId,
                     JSON.toJSONString(user), 60 * 30);
         }
-        return user == null ? null : BeanUtil.convert(user, UserResult.class) ;
+        return user == null ? null : BeanUtil.convert(user, UserResult.class);
     }
 
     @Override

@@ -45,4 +45,15 @@ public interface FrontUserCouponService {
 	 */
 	public void updateCouponOrderOrderId(Long userCouponId, Long childOrderId) throws ApiException;
 
+	/**
+	 * 用户抽中优惠券后生成优惠券
+	 * @param userId			用户id
+	 * @param drawActivityId	抽奖活动
+	 * @param prizeLevel		奖品等级
+	 * @param couponId			优惠券id
+	 * @return
+	 * @throws com.baomidou.mybatisplus.extension.exceptions.ApiException
+	 */
+	public YfUserCouponResult createUserCoupon(Integer userId, Integer drawActivityId, Integer prizeLevel, Integer couponId) throws ApiException;
+
 }

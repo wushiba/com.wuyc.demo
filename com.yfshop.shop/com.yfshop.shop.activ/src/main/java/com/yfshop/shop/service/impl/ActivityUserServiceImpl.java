@@ -1,24 +1,16 @@
 package com.yfshop.shop.service.impl;
 
 import com.alibaba.fastjson.JSON;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.exceptions.ApiException;
 import com.yfshop.code.mapper.UserMapper;
-import com.yfshop.code.model.Coupon;
-import com.yfshop.code.model.IpAddress;
 import com.yfshop.code.model.User;
 import com.yfshop.common.constants.CacheConstants;
 import com.yfshop.common.service.RedisService;
 import com.yfshop.common.util.BeanUtil;
-import com.yfshop.shop.request.QueryCouponReq;
-import com.yfshop.shop.result.YfCouponResult;
 import com.yfshop.shop.result.YfUserResult;
 import com.yfshop.shop.service.ActivityUserService;
 import org.springframework.stereotype.Service;
-
 import javax.annotation.Resource;
-import java.util.List;
 
 /**
  * @Title:用户Service接口

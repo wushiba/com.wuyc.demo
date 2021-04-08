@@ -28,4 +28,7 @@ public class QueryUserCouponReq implements Serializable {
 
     private Long orderId;
 
+    /** 对应 CouponResourceEnum */
+    private String couponResource;
+
 }

@@ -2,17 +2,22 @@ package com.yfshop.shop.service.coupon;
 
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.yfshop.code.mapper.CouponMapper;
 import com.yfshop.code.mapper.UserCouponMapper;
+import com.yfshop.code.mapper.UserMapper;
 import com.yfshop.code.model.Coupon;
+import com.yfshop.code.model.User;
 import com.yfshop.code.model.UserCoupon;
 import com.yfshop.common.constants.CacheConstants;
+import com.yfshop.common.enums.CouponResourceEnum;
 import com.yfshop.common.enums.UserCouponStatusEnum;
 import com.yfshop.common.exception.ApiException;
 import com.yfshop.common.exception.Asserts;
 import com.yfshop.common.service.RedisService;
 import com.yfshop.common.util.BeanUtil;
+import com.yfshop.common.util.StringUtil;
 import com.yfshop.shop.dao.UserCouponDao;
 import com.yfshop.shop.service.coupon.request.QueryUserCouponReq;
 import com.yfshop.shop.service.coupon.result.YfCouponResult;
@@ -24,6 +29,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -41,17 +49,15 @@ public class FrontUserCouponServiceImpl implements FrontUserCouponService {
     private static final Logger logger = LoggerFactory.getLogger(FrontUserCouponServiceImpl.class);
 
     @Resource
+    private UserMapper userMapper;
+    @Resource
     private RedisService redisService;
-
     @Resource
     private CouponMapper couponMapper;
-
-    @Resource
-    private UserCouponMapper userCouponMapper;
-
     @Resource
     private UserCouponDao userCouponDao;
-
+    @Resource
+    private UserCouponMapper userCouponMapper;
 
     /**
      * 根据id查询优惠券信息
@@ -104,6 +110,9 @@ public class FrontUserCouponServiceImpl implements FrontUserCouponService {
         if (userCouponReq.getDrawPrizeLevel() != null) {
             queryWrapper.eq(UserCoupon::getDrawPrizeLevel, userCouponReq.getDrawPrizeLevel());
         }
+        if (StringUtils.isBlank(userCouponReq.getCouponResource())) {
+            queryWrapper.eq(UserCoupon::getCouponResource, userCouponReq.getCouponResource());
+        }
 
         queryWrapper.orderByDesc(UserCoupon::getId);
         List<UserCoupon> dataList = userCouponMapper.selectList(queryWrapper);
@@ -128,6 +137,56 @@ public class FrontUserCouponServiceImpl implements FrontUserCouponService {
     public void updateCouponOrderOrderId(Long userCouponId, Long childOrderId) throws ApiException {
         Asserts.assertNonNull(userCouponId, 500, "用户优惠券id不可以为空");
         Asserts.assertNonNull(childOrderId, 500, "订单id不可以为空");
+    }
+
+    @Override
+    public YfUserCouponResult createUserCoupon(Integer userId, Integer drawActivityId, Integer prizeLevel, Integer couponId) throws com.baomidou.mybatisplus.extension.exceptions.ApiException {
+        User user = userMapper.selectById(userId);
+        Asserts.assertNonNull(user, 500, "用户不存在,请先授权关注公众号");
+
+        Coupon coupon = couponMapper.selectById(couponId);
+        Asserts.assertNonNull(coupon, 500, "优惠券不存在");
+
+        String validType = coupon.getValidType();
+        LocalDateTime startDate = null, endDate = null;
+        LocalDateTime now = LocalDateTime.now();
+        if ("DATE_RANGE".equalsIgnoreCase(validType)) {
+            startDate = coupon.getValidStartTime();
+            endDate = coupon.getValidEndTime();
+        } else if ("TODAY".equalsIgnoreCase(validType)) {
+            startDate = LocalDateTime.of(LocalDate.now(), LocalTime.MIN);
+            endDate = LocalDateTime.of(LocalDate.now(), LocalTime.MAX);
+        } else if ("FIX_DAY".equalsIgnoreCase(validType)) {
+            startDate = now;
+            endDate = now.plusDays(coupon.getValidDay());
+        }
+
+        UserCoupon userCoupon = new UserCoupon();
+        userCoupon.setCreateTime(now);
+        userCoupon.setUserId(userId);
+        userCoupon.setMerchantId(null);
+        userCoupon.setPidPath(null);
+        userCoupon.setCouponId(couponId);
+        userCoupon.setCouponTitle(coupon.getCouponTitle());
+        userCoupon.setValidStartTime(startDate);
+        userCoupon.setValidEndTime(endDate);
+        userCoupon.setDrawPrizeLevel(prizeLevel);
+        userCoupon.setDrawActivityId(drawActivityId);
+        userCoupon.setCouponPrice(coupon.getCouponPrice());
+        userCoupon.setUseConditionPrice(coupon.getUseConditionPrice());
+        userCoupon.setCouponResource(CouponResourceEnum.DRAW.getCode());
+        userCoupon.setUseRangeType(coupon.getUseRangeType());
+        userCoupon.setCanUseItemIds(coupon.getCanUseItemIds());
+        userCoupon.setCouponDesc(coupon.getCouponDesc());
+
+        // TODO: 2021/3/23 手机号用户还没有？
+        userCoupon.setUseTime(null);
+        userCoupon.setOrderId(null);
+        userCoupon.setMobile(user.getMobile());
+        userCoupon.setNickname(user.getNickname());
+        userCoupon.setUseStatus(UserCouponStatusEnum.NO_USE.getCode());
+        userCouponMapper.insert(userCoupon);
+        return BeanUtil.convert(userCoupon, YfUserCouponResult.class);
     }
 
 }
