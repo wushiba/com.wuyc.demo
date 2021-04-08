@@ -82,36 +82,36 @@ public class WebSystemOperateLogAspect {
 
     @Around("targetPoint()")
     public Object doAround(ProceedingJoinPoint joinPoint) throws Throwable {
-        ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder
-                .getRequestAttributes();
-        if (attributes == null) {
-            return joinPoint.proceed();
-        }
-        Class<?> targetClass = joinPoint.getTarget().getClass();
-        Method targetMethod = ReflectUtil.getMethodByName(targetClass, joinPoint.getSignature().getName());
-        if (this.shouldIgnore(targetClass, targetMethod)) {
-            return joinPoint.proceed();
-        }
-
-        HttpServletRequest request = attributes.getRequest();
-        String requestMethod = request.getMethod();
-        String requestUrl = request.getRequestURL().toString();
-        String visitorIp = request.getRemoteAddr();
-        boolean isAjax = this.isAjaxRequest(request, targetClass, targetMethod);
-        Integer merchantId = this.loginInfo(request);
-        Object requestParameter = this.fetchRequestParameter(request, joinPoint, targetMethod);
-
         VisitInfo visitInfo = new VisitInfo();
-        visitInfo.setRequestMethod(requestMethod);
-        visitInfo.setMerchantId(merchantId);
-        visitInfo.setUserId(null);
-        visitInfo.setRequestUrl(requestUrl);
-        visitInfo.setVisitorClientIp(visitorIp);
-        visitInfo.setRequestParameter(requestParameter);
-        visitInfo.setMethodInfo(joinPoint.toLongString());
-        visitInfo.setStartTimestamp(System.currentTimeMillis());
-        visitInfo.setIsAjax(isAjax);
         try {
+            ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder
+                    .getRequestAttributes();
+            if (attributes == null) {
+                return joinPoint.proceed();
+            }
+            Class<?> targetClass = joinPoint.getTarget().getClass();
+            Method targetMethod = ReflectUtil.getMethodByName(targetClass, joinPoint.getSignature().getName());
+            if (this.shouldIgnore(targetClass, targetMethod)) {
+                return joinPoint.proceed();
+            }
+
+            HttpServletRequest request = attributes.getRequest();
+            String requestMethod = request.getMethod();
+            String requestUrl = request.getRequestURL().toString();
+            String visitorIp = request.getRemoteAddr();
+            boolean isAjax = this.isAjaxRequest(request, targetClass, targetMethod);
+            Integer merchantId = this.loginInfo(request);
+            Object requestParameter = this.fetchRequestParameter(request, joinPoint, targetMethod);
+            visitInfo.setRequestMethod(requestMethod);
+            visitInfo.setMerchantId(merchantId);
+            visitInfo.setUserId(null);
+            visitInfo.setRequestUrl(requestUrl);
+            visitInfo.setVisitorClientIp(visitorIp);
+            visitInfo.setRequestParameter(requestParameter);
+            visitInfo.setMethodInfo(joinPoint.toLongString());
+            visitInfo.setStartTimestamp(System.currentTimeMillis());
+            visitInfo.setIsAjax(isAjax);
+
             // execute the handler method
             Object result = joinPoint.proceed();
 
@@ -192,7 +192,12 @@ public class WebSystemOperateLogAspect {
                 || StringUtils.containsIgnoreCase(request.getContentType(), X_WWW_FORM_URLENCODED)) {
             requestParam = ServletUtil.getParamMap(request);
         } else {
-            requestParam = JSON.parseObject(this.parseMethodParameters(point, targetMethod));
+            String jsonObj = this.parseMethodParameters(point, targetMethod);
+            if (jsonObj.startsWith("[")) {
+                requestParam = JSON.parseArray(jsonObj);
+            } else {
+                requestParam = JSON.parseObject(this.parseMethodParameters(point, targetMethod));
+            }
         }
         return requestParam;
     }
