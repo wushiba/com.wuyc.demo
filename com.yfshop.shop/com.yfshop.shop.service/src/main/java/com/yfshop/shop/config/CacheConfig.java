@@ -21,7 +21,7 @@ public class CacheConfig {
     private static final long MAXIMUM_SIZE = 1000;
 
     @Bean
-    @Profile("dev")
+    @Profile({"dev","uat"})
     public CaffeineCacheManager cacheManager() {
         Caffeine<Object, Object> caffeine = Caffeine.newBuilder()
                 // 最后一次写入后经过固定时间过期
