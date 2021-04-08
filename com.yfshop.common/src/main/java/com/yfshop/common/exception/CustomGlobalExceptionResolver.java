@@ -46,6 +46,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.TimeoutException;
 
 /**
  * 基于HandlerExceptionResolver的
@@ -257,6 +258,11 @@ public class CustomGlobalExceptionResolver implements HandlerExceptionResolver, 
             codeAndMessage.setMessage("服务调用失败");
             return codeAndMessage;
         }
+        if ("org.apache.dubbo.remoting.TimeoutException".equals(t.getClass().getName())) {
+            codeAndMessage.setCode(ERROR_CODE);
+            codeAndMessage.setMessage("服务调用超时");
+            return codeAndMessage;
+        }
         // 登陆权限验证异常
         if (t instanceof SaTokenException) {
             String message;
@@ -297,6 +303,11 @@ public class CustomGlobalExceptionResolver implements HandlerExceptionResolver, 
             }
             codeAndMessage.setCode(ERROR_CODE);
             codeAndMessage.setMessage(message);
+            return codeAndMessage;
+        }
+        if (t instanceof TimeoutException) {
+            codeAndMessage.setCode(ERROR_CODE);
+            codeAndMessage.setMessage("访问超时");
             return codeAndMessage;
         }
         if (t instanceof RuntimeException) {
