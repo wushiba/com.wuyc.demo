@@ -1,6 +1,5 @@
-package com.yfshop.admin.api.wx;
+package com.yfshop.wx.api.service;
 
-import com.github.binarywang.wxpay.bean.notify.WxPayOrderNotifyResult;
 import com.github.binarywang.wxpay.bean.order.WxPayMpOrderResult;
 import com.github.binarywang.wxpay.bean.request.WxPayUnifiedOrderRequest;
 import com.github.binarywang.wxpay.exception.WxPayException;

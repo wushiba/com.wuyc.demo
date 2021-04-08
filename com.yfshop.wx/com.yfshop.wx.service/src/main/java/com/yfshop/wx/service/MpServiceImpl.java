@@ -1,6 +1,7 @@
-package com.yfshop.admin.service;
+package com.yfshop.wx.service;
 
-import com.yfshop.admin.api.wx.MpService;
+
+import com.yfshop.wx.api.service.MpService;
 import lombok.AllArgsConstructor;
 import me.chanjar.weixin.common.error.WxErrorException;
 import me.chanjar.weixin.mp.api.WxMpService;
