@@ -31,6 +31,7 @@ public interface CacheConstants {
     /** 抽奖活动下面的省份定制化缓存 */
     String DRAW_PROVINCE_RATE_PREFIX = "draw_province_rate_act_id_";
 
+    String USER_ID = "user_address_id_";
     /** 用户请求ip地址缓存 */
     String USER_INFO_ID = "user_info_id_";
     /** 用户请求ip地址缓存 */

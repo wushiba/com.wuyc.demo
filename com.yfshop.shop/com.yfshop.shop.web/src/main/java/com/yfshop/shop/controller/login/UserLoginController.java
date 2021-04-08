@@ -25,10 +25,16 @@ public class UserLoginController extends AbstractBaseController {
     @ResponseBody
     public CommonResult<UserResult> loginByWx() {
         String openId = getCurrentOpenId();
-        Asserts.assertNonNull(openId, 500, "微信未授权！");
+        Asserts.assertNonNull(openId, 500, "微信未授权!");
         UserResult userResult = frontUserService.getUserByOpenId(openId);
         StpUtil.setLoginId(userResult.getId());
         return CommonResult.success(userResult);
+    }
+
+    @RequestMapping(value = "/getUserInfo", method = {RequestMethod.GET, RequestMethod.POST})
+    @ResponseBody
+    public CommonResult<UserResult> getCurrUserInfo() {
+        return CommonResult.success(frontUserService.getUserById(getCurrentUserId()));
     }
 
 }
