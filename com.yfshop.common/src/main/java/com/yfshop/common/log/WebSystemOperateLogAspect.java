@@ -6,6 +6,7 @@ import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.extra.servlet.ServletUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.serializer.SerializerFeature;
+import com.google.common.collect.Maps;
 import com.yfshop.common.exception.ApiException;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
@@ -33,6 +34,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.Serializable;
@@ -43,6 +45,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
@@ -111,6 +114,7 @@ public class WebSystemOperateLogAspect {
         visitInfo.setMethodInfo(joinPoint.toLongString());
         visitInfo.setStartTimestamp(System.currentTimeMillis());
         visitInfo.setIsAjax(isAjax);
+        visitInfo.setCookies(readCookies(request));
         try {
             // execute the handler method
             Object result = joinPoint.proceed();
@@ -289,6 +293,25 @@ public class WebSystemOperateLogAspect {
         return attributes;
     }
 
+    private Map<String, Map<String, Object>> readCookies(HttpServletRequest request) {
+        Map<String, Cookie> cookieMap = ServletUtil.readCookieMap(request);
+        Map<String, Map<String, Object>> cookieIndexMap = Maps.newHashMapWithExpectedSize(cookieMap.size());
+        for (Entry<String, Cookie> entry : cookieMap.entrySet()) {
+            String cookieName = entry.getKey();
+            Cookie cookie = entry.getValue();
+            Map<String, Object> cookieInfo = Maps.newHashMapWithExpectedSize(7);
+            cookieInfo.put("value", cookie.getValue());
+            cookieInfo.put("comment", cookie.getComment());
+            cookieInfo.put("domain", cookie.getDomain());
+            cookieInfo.put("maxAge", cookie.getMaxAge());
+            cookieInfo.put("path", cookie.getPath());
+            cookieInfo.put("secure", cookie.getSecure());
+            cookieInfo.put("version", cookie.getVersion());
+            cookieIndexMap.put(cookieName, cookieInfo);
+        }
+        return cookieIndexMap;
+    }
+
     private boolean isProductProfile() {
         return "pro".equalsIgnoreCase(profile);
     }
@@ -366,6 +389,11 @@ public class WebSystemOperateLogAspect {
          * 错误信息
          */
         private String errorMsg;
+
+        /**
+         * cookie信息
+         */
+        private Map<String, Map<String, Object>> cookies;
     }
 
     @Data
