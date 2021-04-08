@@ -34,9 +34,9 @@ spring:
     driverClassName: com.mysql.cj.jdbc.Driver
     maxActive: 20
   redis:
-    host: yf-sz-redis-staging.redis.rds.aliyuncs.com
+    host: 127.0.0.1
     port: 6379
-    password: SZ9v4UrVJKfCCDKUxia
+    password:
 
   mail:
     host: smtp.126.com
