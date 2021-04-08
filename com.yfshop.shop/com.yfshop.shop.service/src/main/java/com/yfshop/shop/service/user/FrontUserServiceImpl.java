@@ -28,15 +28,27 @@ public class FrontUserServiceImpl implements FrontUserService {
 
     @Resource
     private UserMapper userMapper;
-
-    @Resource
-    private OrderAddressMapper orderAddressMapper;
-
     @Resource
     private UserAddressMapper userAddressMapper;
-
     @Resource
     private RedisService redisService;
+
+    @Override
+    public UserResult getUserById(Integer userId) throws ApiException {
+        Asserts.assertNonNull(userId, 500, "用户id不可以为空");
+        User user = userMapper.selectOne(Wrappers.lambdaQuery(User.class).eq(User::getId, userId));
+        Asserts.assertNonNull(user, 500, "用户id不存在");
+
+        Object userObject = redisService.get(CacheConstants.USER_INFO_ID + userId);
+        if (userObject != null) {
+            user = JSON.parseObject(userObject.toString(), User.class);
+        } else {
+            user = userMapper.selectById(userId);
+            redisService.set(CacheConstants.USER_INFO_ID + userId,
+                    JSON.toJSONString(user), 60 * 30);
+        }
+        return user == null ? null : BeanUtil.convert(user, UserResult.class) ;
+    }
 
     @Override
     public UserResult getUserByOpenId(String openId) throws ApiException {

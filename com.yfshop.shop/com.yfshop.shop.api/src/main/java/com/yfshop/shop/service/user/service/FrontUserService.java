@@ -14,6 +14,8 @@ import com.yfshop.shop.service.user.result.UserResult;
  */
 public interface FrontUserService {
 
+    UserResult getUserById(Integer userId) throws ApiException;
+
     UserResult getUserByOpenId(String openId) throws ApiException;
 
     Integer checkSubscribe(String openId);
