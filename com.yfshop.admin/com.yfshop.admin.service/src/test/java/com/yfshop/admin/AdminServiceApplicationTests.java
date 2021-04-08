@@ -15,8 +15,12 @@ import com.yfshop.admin.api.mall.result.ItemSkuResult;
 import com.yfshop.admin.api.menu.AdminMenuManageService;
 import com.yfshop.admin.api.menu.result.MenuResult;
 import com.yfshop.code.manager.MenuManager;
+import com.yfshop.code.mapper.ItemContentMapper;
+import com.yfshop.code.mapper.ItemImageMapper;
 import com.yfshop.code.mapper.ItemMapper;
 import com.yfshop.code.model.Item;
+import com.yfshop.code.model.ItemContent;
+import com.yfshop.code.model.ItemImage;
 import com.yfshop.code.model.Menu;
 import com.yfshop.common.enums.GroupRoleEnum;
 import com.yfshop.common.enums.ReceiveWayEnum;
@@ -30,6 +34,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @SpringBootTest
 public class AdminServiceApplicationTests {
@@ -40,6 +45,10 @@ public class AdminServiceApplicationTests {
     private AdminMallManageService adminMallManageService2;
     @Resource
     private ItemMapper itemMapper;
+    @Resource
+    private ItemImageMapper itemImageMapper;
+    @Resource
+    private ItemContentMapper itemContentMapper;
     @Resource
     private ApplicationContext applicationContext;
     @Resource
@@ -333,7 +342,7 @@ public class AdminServiceApplicationTests {
         }
     }
 
-//    @Test
+    //    @Test
     public void createMenus() {
         createSystemMenus();
         createZongBuMenus();
@@ -980,4 +989,231 @@ public class AdminServiceApplicationTests {
         }
     }
 
+    //    @Test
+    public void createItemSpecSku1() {
+        // 商品信息
+        Item item = new Item();
+        item.setCreateTime(LocalDateTime.now());
+        item.setUpdateTime(LocalDateTime.now());
+        item.setCategoryId(2);
+        item.setReceiveWay(ReceiveWayEnum.ALL.getCode());
+        item.setItemTitle("椰岛鹿龟酒1688轻著版礼盒");
+        item.setItemSubTitle("椰岛鹿龟酒1688轻著版礼盒");
+        item.setItemPrice(BigDecimal.valueOf(1688));
+        item.setItemMarketPrice(BigDecimal.valueOf(1888));
+        item.setFreight(BigDecimal.ZERO);
+        item.setItemStock(0);
+        item.setItemCover("http://img.alicdn.com/imgextra/i2/2567390825/O1CN01CUexZo1HxtNvsPEnp_!!2567390825.jpg_430x430q90.jpg");
+        item.setIsEnable("Y");
+        item.setIsDelete("N");
+        item.setSpecNum(1);
+        item.setSort(1);
+        itemMapper.insert(item);
+        // 商品详情
+        ItemContent content = new ItemContent();
+        content.setCreateTime(LocalDateTime.now());
+        content.setUpdateTime(LocalDateTime.now());
+        content.setItemId(item.getId());
+        content.setContent("详情");
+        itemContentMapper.insert(content);
+        // 商品图片
+        String[] imageUrls = {"http://img.alicdn.com/imgextra/i2/2567390825/O1CN01CUexZo1HxtNvsPEnp_!!2567390825.jpg_430x430q90.jpg"};
+        for (int i = 0; i < imageUrls.length; i++) {
+            String imageUrl = imageUrls[i];
+            ItemImage image = new ItemImage();
+            image.setCreateTime(LocalDateTime.now());
+            image.setUpdateTime(LocalDateTime.now());
+            image.setItemId(item.getId());
+            image.setImageUrl(imageUrl);
+            image.setSort(i + 1);
+            itemImageMapper.insert(image);
+        }
+
+        // 规格信息
+        List<ItemSpecNameAndValue> itemSpecNameAndValues = new ArrayList<>();
+        ItemSpecNameAndValue itemSpecNameAndValue1 = new ItemSpecNameAndValue();
+        itemSpecNameAndValue1.setSpecName("净含量");
+        itemSpecNameAndValue1.setSpecValues(Lists.newArrayList("600"));
+        itemSpecNameAndValue1.setSort(1);
+        itemSpecNameAndValues.add(itemSpecNameAndValue1);
+
+        // 预览sku
+        GenerateItemSkuReq previewReq = new GenerateItemSkuReq();
+        previewReq.setItemId(item.getId());
+        previewReq.setSpecNameAndValues(itemSpecNameAndValues);
+        List<ItemSkuResult> previewSkuList = adminMallManageService.previewItemSku(previewReq);
+
+        // 保存sku
+        List<ItemCandidateSku> candidateSkuList = previewSkuList.stream().map(skuResult -> {
+            ItemCandidateSku itemCandidateSku = new ItemCandidateSku();
+            itemCandidateSku.setItemId(item.getId());
+            itemCandidateSku.setSpecNameValueJson(skuResult.getSpecNameValueJson());
+            itemCandidateSku.setIsEnable("Y");
+            itemCandidateSku.setStock(10);
+            itemCandidateSku.setPrice(BigDecimal.ONE);
+            itemCandidateSku.setMarketPrice(BigDecimal.TEN);
+            return itemCandidateSku;
+        }).collect(Collectors.toList());
+        GenerateItemSkuReq generateItemSkuReq = new GenerateItemSkuReq();
+        generateItemSkuReq.setItemId(item.getId());
+        generateItemSkuReq.setSpecNameAndValues(itemSpecNameAndValues);
+        SaveItemSkuReq req = new SaveItemSkuReq();
+        req.setSpecInfo(generateItemSkuReq);
+        req.setCandidateSkus(candidateSkuList);
+        adminMallManageService.saveItemSku(req);
+    }
+
+    //    @Test
+    public void createItemSpecSku2() {
+        // 商品信息
+        Item item = new Item();
+        item.setCreateTime(LocalDateTime.now());
+        item.setUpdateTime(LocalDateTime.now());
+        item.setCategoryId(2);
+        item.setReceiveWay(ReceiveWayEnum.ALL.getCode());
+        item.setItemTitle("椰岛鹿龟酒养生保健酒33度");
+        item.setItemSubTitle("椰岛鹿龟酒养生保健酒33度");
+        item.setItemPrice(BigDecimal.valueOf(266));
+        item.setItemMarketPrice(BigDecimal.valueOf(666));
+        item.setFreight(BigDecimal.ZERO);
+        item.setItemStock(0);
+        item.setItemCover("https://img.alicdn.com/imgextra/i3/2567390825/O1CN01aXU8R61HxtGSCMjtN_!!2567390825.png_430x430q90.jpg");
+        item.setIsEnable("Y");
+        item.setIsDelete("N");
+        item.setSpecNum(1);
+        item.setSort(1);
+        itemMapper.insert(item);
+        // 商品详情
+        ItemContent content = new ItemContent();
+        content.setCreateTime(LocalDateTime.now());
+        content.setUpdateTime(LocalDateTime.now());
+        content.setItemId(item.getId());
+        content.setContent("详情");
+        itemContentMapper.insert(content);
+        // 商品图片
+        String[] imageUrls = {"https://img.alicdn.com/imgextra/i3/2567390825/O1CN01aXU8R61HxtGSCMjtN_!!2567390825.png_430x430q90.jpg"};
+        for (int i = 0; i < imageUrls.length; i++) {
+            String imageUrl = imageUrls[i];
+            ItemImage image = new ItemImage();
+            image.setCreateTime(LocalDateTime.now());
+            image.setUpdateTime(LocalDateTime.now());
+            image.setItemId(item.getId());
+            image.setImageUrl(imageUrl);
+            image.setSort(i + 1);
+            itemImageMapper.insert(image);
+        }
+
+        // 规格信息
+        List<ItemSpecNameAndValue> itemSpecNameAndValues = new ArrayList<>();
+        ItemSpecNameAndValue itemSpecNameAndValue1 = new ItemSpecNameAndValue();
+        itemSpecNameAndValue1.setSpecName("净含量");
+        itemSpecNameAndValue1.setSpecValues(Lists.newArrayList("500ml"));
+        itemSpecNameAndValue1.setSort(1);
+        itemSpecNameAndValues.add(itemSpecNameAndValue1);
+
+        // 预览sku
+        GenerateItemSkuReq previewReq = new GenerateItemSkuReq();
+        previewReq.setItemId(item.getId());
+        previewReq.setSpecNameAndValues(itemSpecNameAndValues);
+        List<ItemSkuResult> previewSkuList = adminMallManageService.previewItemSku(previewReq);
+
+        // 保存sku
+        List<ItemCandidateSku> candidateSkuList = previewSkuList.stream().map(skuResult -> {
+            ItemCandidateSku itemCandidateSku = new ItemCandidateSku();
+            itemCandidateSku.setItemId(item.getId());
+            itemCandidateSku.setSpecNameValueJson(skuResult.getSpecNameValueJson());
+            itemCandidateSku.setIsEnable("Y");
+            itemCandidateSku.setStock(10);
+            itemCandidateSku.setPrice(item.getItemPrice());
+            itemCandidateSku.setMarketPrice(item.getItemMarketPrice());
+            return itemCandidateSku;
+        }).collect(Collectors.toList());
+        GenerateItemSkuReq generateItemSkuReq = new GenerateItemSkuReq();
+        generateItemSkuReq.setItemId(item.getId());
+        generateItemSkuReq.setSpecNameAndValues(itemSpecNameAndValues);
+        SaveItemSkuReq req = new SaveItemSkuReq();
+        req.setSpecInfo(generateItemSkuReq);
+        req.setCandidateSkus(candidateSkuList);
+        adminMallManageService.saveItemSku(req);
+    }
+
+    //    @Test
+    public void createItemSpecSku3() {
+        // 商品信息
+        Item item = new Item();
+        item.setCreateTime(LocalDateTime.now());
+        item.setUpdateTime(LocalDateTime.now());
+        item.setCategoryId(2);
+        item.setReceiveWay(ReceiveWayEnum.ALL.getCode());
+        item.setItemTitle("火锅食材");
+        item.setItemSubTitle("火锅食材");
+        item.setItemPrice(BigDecimal.valueOf(35));
+        item.setItemMarketPrice(BigDecimal.valueOf(65));
+        item.setFreight(BigDecimal.ZERO);
+        item.setItemStock(0);
+        item.setItemCover("https://img.alicdn.com/imgextra/https://img.alicdn.com/imgextra/i2/3342239014/O1CN01B2Nmhc2GSSmYwXYrI_!!3342239014.jpg_430x430q90.jpg");
+        item.setIsEnable("Y");
+        item.setIsDelete("N");
+        item.setSpecNum(2);
+        item.setSort(1);
+        itemMapper.insert(item);
+        // 商品详情
+        ItemContent content = new ItemContent();
+        content.setCreateTime(LocalDateTime.now());
+        content.setUpdateTime(LocalDateTime.now());
+        content.setItemId(item.getId());
+        content.setContent("详情");
+        itemContentMapper.insert(content);
+        // 商品图片
+        String[] imageUrls = {
+                "https://img.alicdn.com/imgextra/https://img.alicdn.com/imgextra/i2/3342239014/O1CN01B2Nmhc2GSSmYwXYrI_!!3342239014.jpg_430x430q90.jpg",
+                "https://img.alicdn.com/imgextra/https://img.alicdn.com/imgextra/i2/3342239014/O1CN01B2Nmhc2GSSmYwXYrI_!!3342239014.jpg_430x430q90.jpg"
+        };
+        for (int i = 0; i < imageUrls.length; i++) {
+            String imageUrl = imageUrls[i];
+            ItemImage image = new ItemImage();
+            image.setCreateTime(LocalDateTime.now());
+            image.setUpdateTime(LocalDateTime.now());
+            image.setItemId(item.getId());
+            image.setImageUrl(imageUrl);
+            image.setSort(i + 1);
+            itemImageMapper.insert(image);
+        }
+
+        // 规格信息
+        List<ItemSpecNameAndValue> itemSpecNameAndValues = new ArrayList<>();
+        ItemSpecNameAndValue itemSpecNameAndValue1 = new ItemSpecNameAndValue();
+        itemSpecNameAndValue1.setSpecName("口味");
+        itemSpecNameAndValue1.setSpecValues(Lists.newArrayList(
+                "【3荤2素】毛血旺310克*3盒+麻辣火锅300克*2盒",
+                "【3荤3素】肉丸锅350g+鸡肉锅330g+脆皮肠锅350g+3盒麻辣火锅300g")
+        );
+        itemSpecNameAndValue1.setSort(1);
+        itemSpecNameAndValues.add(itemSpecNameAndValue1);
+
+        // 预览sku
+        GenerateItemSkuReq previewReq = new GenerateItemSkuReq();
+        previewReq.setItemId(item.getId());
+        previewReq.setSpecNameAndValues(itemSpecNameAndValues);
+        List<ItemSkuResult> previewSkuList = adminMallManageService.previewItemSku(previewReq);
+
+        // 保存sku
+        List<ItemCandidateSku> candidateSkuList = previewSkuList.stream().map(skuResult -> {
+            ItemCandidateSku itemCandidateSku = new ItemCandidateSku();
+            itemCandidateSku.setItemId(item.getId());
+            itemCandidateSku.setSpecNameValueJson(skuResult.getSpecNameValueJson());
+            itemCandidateSku.setIsEnable("Y");
+            itemCandidateSku.setStock(10);
+            itemCandidateSku.setPrice(item.getItemPrice());
+            itemCandidateSku.setMarketPrice(item.getItemMarketPrice());
+            return itemCandidateSku;
+        }).collect(Collectors.toList());
+        GenerateItemSkuReq generateItemSkuReq = new GenerateItemSkuReq();
+        generateItemSkuReq.setItemId(item.getId());
+        generateItemSkuReq.setSpecNameAndValues(itemSpecNameAndValues);
+        SaveItemSkuReq req = new SaveItemSkuReq();
+        req.setSpecInfo(generateItemSkuReq);
+        req.setCandidateSkus(candidateSkuList);
+        adminMallManageService.saveItemSku(req);
+    }
 }
