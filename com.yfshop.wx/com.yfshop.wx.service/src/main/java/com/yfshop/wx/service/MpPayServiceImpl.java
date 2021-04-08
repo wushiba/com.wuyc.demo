@@ -15,6 +15,7 @@ public class MpPayServiceImpl implements MpPayService {
 
     @Override
     public WxPayMpOrderResult createPayOrder(WxPayUnifiedOrderRequest request) throws WxPayException {
+        request.setSignType("HMACSHA256");
         WxPayMpOrderResult wxPayMpOrderResult=wxPayService.createOrder(request);
         System.out.println(wxPayMpOrderResult.toString());
         return wxPayMpOrderResult;
