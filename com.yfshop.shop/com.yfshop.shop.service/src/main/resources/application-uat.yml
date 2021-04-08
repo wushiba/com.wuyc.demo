@@ -26,7 +26,7 @@ spring:
   redis:
     host: yf-sz-redis-staging.redis.rds.aliyuncs.com
     port: 6379
-    password: SZ9v4UrVJKfCCDKUxia
+    password: redis_staging:SZ9v4UrVJKfCCDKUxia
   
 dubbo:
   registry:
