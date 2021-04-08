@@ -66,6 +66,7 @@ public class UserCartController implements BaseController {
             userCartPageData.setCoupons(userCouponsFuture.get(10, TimeUnit.SECONDS));
             return CommonResult.success(userCartPageData);
         } catch (Exception e) {
+            e.printStackTrace();
             throw new ApiException("查询超时，请稍后再试！");
         }
     }

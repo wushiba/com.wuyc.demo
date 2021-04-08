@@ -70,8 +70,9 @@ public class UserCartServiceImpl implements UserCartService {
         List<UserCart> userCarts = cartMapper.selectList(Wrappers.lambdaQuery(UserCart.class)
                 .eq(UserCart::getUserId, userId));
         // 查询sku信息
-        Map<Integer, ItemSku> skuIndexMap = skuMapper.selectBatchIds(userCarts.stream().map(UserCart::getSkuId)
-                .collect(Collectors.toList())).stream().collect(Collectors.toMap(ItemSku::getId, s -> s));
+        List<Integer> skuIdList = userCarts.stream().map(UserCart::getSkuId).collect(Collectors.toList());
+        if (CollectionUtil.isEmpty(skuIdList)) return new ArrayList<>();
+        Map<Integer, ItemSku> skuIndexMap = skuMapper.selectBatchIds(skuIdList).stream().collect(Collectors.toMap(ItemSku::getId, s -> s));
         List<UserCartResult> userCartResults = BeanUtil.convertList(userCarts, UserCartResult.class);
         for (UserCartResult userCartResult : userCartResults) {
             ItemSku itemSku = skuIndexMap.get(userCartResult.getSkuId());

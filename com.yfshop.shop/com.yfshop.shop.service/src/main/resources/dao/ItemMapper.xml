@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.yfshop.shop.dao.UserCartDao">
+<mapper namespace="com.yfshop.shop.dao.ItemDao">
 
-    <update id="updateCartNum">
+    <update id="updateItemSkuStock">
         update yf_item_sku
-        set sku_stock - #{num}
+        set sku_stock = sku_stock - #{num}
         where id = #{skuId} and (sku_stock - #{num} > 0)
     </update>
 </mapper>

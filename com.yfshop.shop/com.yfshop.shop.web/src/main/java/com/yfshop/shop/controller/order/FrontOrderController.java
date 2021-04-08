@@ -40,6 +40,13 @@ public class FrontOrderController implements BaseController {
     @DubboReference(check = false)
     private FrontUserCouponService frontUserCouponService;
 
+    @RequestMapping(value = "/merchant/getMerchantByWebsiteCode", method = {RequestMethod.GET, RequestMethod.POST})
+    @ResponseBody
+    @SaCheckLogin
+    public CommonResult<MerchantResult> getMerchantByWebsiteCode(String websiteCode) {
+        return CommonResult.success(frontMerchantService.getMerchantByWebsiteCode(websiteCode));
+    }
+
     @RequestMapping(value = "/order/checkIsCanZt", method = {RequestMethod.GET, RequestMethod.POST})
     @ResponseBody
     @SaCheckLogin
@@ -93,7 +100,7 @@ public class FrontOrderController implements BaseController {
     @ResponseBody
     @SaCheckLogin
     public CommonResult<Void> submitOrderBySkuId(Integer skuId, Integer num, Long userCouponId, Integer addressId) {
-        return CommonResult.success(frontUserOrderService.submitOrderBySkuId(101, skuId, num, userCouponId, addressId));
+        return CommonResult.success(frontUserOrderService.submitOrderBySkuId(getCurrentUserId(), skuId, num, userCouponId, addressId));
     }
 
     /**
@@ -107,7 +114,7 @@ public class FrontOrderController implements BaseController {
     @ResponseBody
     @SaCheckLogin
     public CommonResult<Void> submitOrderByCart(String cartIds, Long userCouponId, Integer addressId) {
-        return CommonResult.success(frontUserOrderService.submitOrderByCart(101, cartIds, userCouponId, addressId));
+        return CommonResult.success(frontUserOrderService.submitOrderByCart(getCurrentUserId(), cartIds, userCouponId, addressId));
     }
 
     /**
@@ -122,7 +129,7 @@ public class FrontOrderController implements BaseController {
     @ResponseBody
     @SaCheckLogin
     public CommonResult<Void> submitOrderByUserCouponIds(String userCouponIds, String userMobile, String websiteCode) {
-        return CommonResult.success(frontUserOrderService.submitOrderByUserCouponIds(101, userCouponIds, userMobile, websiteCode));
+        return CommonResult.success(frontUserOrderService.submitOrderByUserCouponIds(getCurrentUserId(), userCouponIds, userMobile, websiteCode));
     }
 
     /**
@@ -134,7 +141,7 @@ public class FrontOrderController implements BaseController {
     @ResponseBody
     @SaCheckLogin
     public CommonResult<List<YfUserOrderListResult>> findUserOrderList(String orderStatus) {
-        return CommonResult.success(frontUserOrderService.findUserOrderList(101, orderStatus));
+        return CommonResult.success(frontUserOrderService.findUserOrderList(getCurrentUserId(), orderStatus));
     }
 
     /**
@@ -147,7 +154,7 @@ public class FrontOrderController implements BaseController {
     @ResponseBody
     @SaCheckLogin
     public CommonResult<YfUserOrderDetailResult> getUserOrderDetail(Integer orderId, Integer orderDetailId) {
-        return CommonResult.success(frontUserOrderService.getUserOrderDetail(101, orderId, orderDetailId));
+        return CommonResult.success(frontUserOrderService.getUserOrderDetail(getCurrentUserId(), orderId, orderDetailId));
     }
 
     /**
@@ -159,7 +166,7 @@ public class FrontOrderController implements BaseController {
     @ResponseBody
     @SaCheckLogin
     public CommonResult<Void> cancelOrder(Integer orderId) {
-        return CommonResult.success(frontUserOrderService.cancelOrder(101, orderId));
+        return CommonResult.success(frontUserOrderService.cancelOrder(getCurrentUserId(), orderId));
     }
 
     /**
@@ -171,7 +178,7 @@ public class FrontOrderController implements BaseController {
     @ResponseBody
     @SaCheckLogin
     public CommonResult<Void> confirmOrder(Integer orderDetailId) {
-        return CommonResult.success(frontUserOrderService.confirmOrder(101, orderDetailId));
+        return CommonResult.success(frontUserOrderService.confirmOrder(getCurrentUserId(), orderDetailId));
     }
 
 }

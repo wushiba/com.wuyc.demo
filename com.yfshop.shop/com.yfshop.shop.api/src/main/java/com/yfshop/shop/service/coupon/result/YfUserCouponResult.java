@@ -65,10 +65,12 @@ public class YfUserCouponResult implements Serializable{
     private String canUseItemIds;
 	
     /**  */
-    private Date validStartTime;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", locale = "zh", timezone = "GMT+8")
+    private LocalDateTime validStartTime;
 	
     /**  */
-    private Date validEndTime;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", locale = "zh", timezone = "GMT+8")
+    private LocalDateTime validEndTime;
 	
     /** 用户昵称 */
     private String nickname;

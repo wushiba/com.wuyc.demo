@@ -13,6 +13,7 @@ import com.yfshop.shop.service.activity.result.YfDrawActivityResult;
 import com.yfshop.shop.service.activity.result.YfDrawPrizeResult;
 import com.yfshop.shop.service.activity.service.FrontDrawService;
 import com.yfshop.shop.service.address.result.UserAddressResult;
+import com.yfshop.shop.service.coupon.service.FrontUserCouponService;
 import com.yfshop.shop.service.mall.MallService;
 import com.yfshop.shop.service.mall.req.QueryItemDetailReq;
 import com.yfshop.shop.service.mall.result.ItemResult;
@@ -44,37 +45,27 @@ import java.util.stream.Collectors;
 public class FrontUserOrderServiceImpl implements FrontUserOrderService {
 
     @Resource
-    private ItemMapper itemMapper;
-
-    @Resource
     private MallService mallService;
-
     @Resource
     private OrderMapper orderMapper;
-
     @Resource
     private UserCartMapper userCartMapper;
-
     @Resource
     private ItemSkuMapper itemSkuMapper;
-
     @Resource
     private FrontDrawService frontDrawService;
-
     @Resource
     private UserCouponMapper userCouponMapper;
-
     @Resource
     private OrderDetailMapper orderDetailMapper;
-
     @Resource
     private OrderAddressMapper orderAddressMapper;
-
     @Resource
     private FrontUserService frontUserService;
-
     @Resource
     private FrontMerchantService frontMerchantService;
+    @Resource
+    private FrontUserCouponService frontUserCouponService;
 
     /**
      * 校验提交订单的时候是否支持自提
@@ -259,13 +250,10 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
             this.checkUserCoupon(userCoupon);
         }
 
-        // 扣库存
+        // 扣库存, 修改优惠券状态
         mallService.updateItemSkuStock(itemSku.getId(), num);
-
         if (userCoupon.getId() != null) {
-            userCoupon.setUseStatus(UserCouponStatusEnum.IN_USE.getCode());
-            int updateStatus = userCouponMapper.updateById(userCoupon);
-            Asserts.assertFalse(updateStatus < 1, 500, "优惠券状态不正确，请稍后重试");
+            frontUserCouponService.useUserCoupon(userCoupon.getId());
         }
 
         // 下单，创建订单，订单详情，收货地址
@@ -342,9 +330,7 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
 
         // 修改优惠券状态
         if (userCoupon.getId() != null) {
-            userCoupon.setUseStatus(UserCouponStatusEnum.IN_USE.getCode());
-            int updateStatus = userCouponMapper.updateById(userCoupon);
-            Asserts.assertFalse(updateStatus < 1, 500, "优惠券状态不正确，请稍后重试");
+            frontUserCouponService.useUserCoupon(userCoupon.getId());
             couponPrice = new BigDecimal(userCoupon.getCouponPrice());
             payPrice = payPrice.subtract(couponPrice);
         }
@@ -354,13 +340,16 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
         for (UserCart userCart : userCartList) {
             ItemSku itemSku = itemSkuMap.get(userCart.getSkuId());
             BigDecimal childCouponPrice = new BigDecimal("0.0");
+            if (userCoupon.getId() != null) {
+                childCouponPrice = new BigDecimal(userCoupon.getCouponPrice());
+            }
             BigDecimal childOrderFreight = new BigDecimal(userCart.getNum() * 2);
             BigDecimal childOrderPrice = itemSku.getSkuSalePrice().multiply(new BigDecimal(userCart.getNum()));
             BigDecimal childPayPrice = childOrderPrice.add(childOrderFreight).subtract(childCouponPrice);
 
             insertUserOrderDetail(userId, orderId, null, null, ReceiveWayEnum.PS.getCode(), "N", userCart.getNum(),
                     itemSku.getItemId(), itemSku.getId(), itemSku.getSkuTitle(), itemSku.getSkuSalePrice(), itemSku.getSkuCover(), childOrderFreight, childCouponPrice,
-                    childOrderPrice, childPayPrice, userCoupon.getId(), UserOrderStatusEnum.WAIT_PAY.getCode(), null, itemSku.getSpecNameIdValueIdJson());
+                    childOrderPrice, childPayPrice, userCouponId, UserOrderStatusEnum.WAIT_PAY.getCode(), null, itemSku.getSpecNameIdValueIdJson());
         }
 
         insertUserOrderAddress(orderId, addressInfo.getMobile(), addressInfo.getRealname(), addressInfo.getProvince(), addressInfo.getProvinceId(), addressInfo.getCity(),
@@ -441,7 +430,6 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
                 merchantResult.getCityId(), merchantResult.getDistrict(), merchantResult.getDistrictId(), merchantResult.getAddress());
         return null;
     }
-
 
     //----------------------------------------------------- private method ---------------------------------------------------------------------------------
 

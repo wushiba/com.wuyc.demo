@@ -124,5 +124,11 @@ public class FrontUserCouponServiceImpl implements FrontUserCouponService {
         Asserts.assertFalse(result < 1, 500, "优惠券使用失败，不可以重复使用");
     }
 
+    @Override
+    public void updateCouponOrderOrderId(Long userCouponId, Long childOrderId) throws ApiException {
+        Asserts.assertNonNull(userCouponId, 500, "用户优惠券id不可以为空");
+        Asserts.assertNonNull(childOrderId, 500, "订单id不可以为空");
+    }
+
 }
 

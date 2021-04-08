@@ -47,7 +47,11 @@ public interface BaseController {
      * @return the user id
      */
     default Integer getCurrentUserId() {
-        return StpUtil.getLoginIdAsInt();
+        if ("dev".equalsIgnoreCase(SpringUtil.getActiveProfile())) {
+            return 101;
+        } else {
+            return StpUtil.getLoginIdAsInt();
+        }
     }
 
     /**
