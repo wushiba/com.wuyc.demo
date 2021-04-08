@@ -107,5 +107,5 @@ websiteCode:
 actCode:
   srcDir: F://actCode/src/
   targetDir: F://actCode/target/
-  url: http://192.168.11.34:8088/#/Activity?actCode=
+  url: http://192.168.11.34:8088/#/LuckDrawPage?actCode=
 

@@ -103,6 +103,6 @@ websiteCode:
 actCode:
   srcDir: /home/www/web-deploy/yufan-admin-service/actCode/src/
   targetDir: /home/www/web-deploy/yufan-admin-service/actCode/target/
-  url: http://prev-activ.yufan.51jujibao.com/#/Activity?actCode=
+  url: http://prev-activ.yufan.51jujibao.com/#/LuckDrawPage?actCode=
 
 
