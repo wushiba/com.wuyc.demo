@@ -6,6 +6,7 @@ import com.yfshop.admin.api.merchant.result.MerchantResult;
 import com.yfshop.admin.api.user.UserService;
 import com.yfshop.admin.api.user.request.UserReq;
 import com.yfshop.admin.config.WxMpProperties;
+import com.yfshop.admin.config.WxStpLogic;
 import com.yfshop.common.api.CommonResult;
 import com.yfshop.common.util.BeanUtil;
 import lombok.AllArgsConstructor;
@@ -29,6 +30,7 @@ public class WxRedirectController {
     private final WxMpService wxService;
     @DubboReference(check = false)
     UserService userService;
+    WxStpLogic wxStpLogic =new WxStpLogic();
 
 
     @RequestMapping("/authByCode")
@@ -40,9 +42,7 @@ public class WxRedirectController {
         try {
             WxOAuth2AccessToken accessToken = wxService.getOAuth2Service().getAccessToken(code);
             WxOAuth2UserInfo user = wxService.getOAuth2Service().getUserInfo(accessToken, null);
-            UserReq userReq = BeanUtil.convert(user, UserReq.class);
-            userReq.setOpenId(user.getOpenid());
-            StpUtil.setLoginId(user.getOpenid());
+            wxStpLogic.setLoginId(user.getOpenid());
         } catch (WxErrorException e) {
             e.printStackTrace();
             return CommonResult.failed();
