@@ -41,7 +41,7 @@ dubbo:
   configcenter:
     address: zookeeper://10.11.3.98:2181
   protocol:
-    port: 20880
+    port: 20881
     name: dubbo
   scan:
     base-packages: com.yfshop.shop.service

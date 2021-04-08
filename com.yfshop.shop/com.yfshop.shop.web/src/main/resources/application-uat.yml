@@ -17,7 +17,7 @@ dubbo:
     retries: 0
     check: false
   scan:
-    base-packages: com.yfshop.shop
+    base-packages: com.yfshop.shop.controller
 
 spring:
   thymeleaf:
