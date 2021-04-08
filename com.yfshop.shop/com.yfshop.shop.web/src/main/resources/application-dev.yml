@@ -16,7 +16,7 @@ dubbo:
     retries: 0
     check: false
   scan:
-    base-packages: com.yfshop.shop.com.yfshop.open.controller
+    base-packages: com.yfshop.shop.controller
     
     
 spring:
