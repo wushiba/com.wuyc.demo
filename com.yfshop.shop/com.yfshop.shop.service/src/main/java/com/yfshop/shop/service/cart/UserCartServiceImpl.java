@@ -76,6 +76,7 @@ public class UserCartServiceImpl implements UserCartService {
         List<UserCartResult> userCartResults = BeanUtil.convertList(userCarts, UserCartResult.class);
         for (UserCartResult userCartResult : userCartResults) {
             ItemSku itemSku = skuIndexMap.get(userCartResult.getSkuId());
+            userCartResult.setSkuSalePrice(itemSku.getSkuSalePrice());
             // 是否有效
             userCartResult.setIsAvailable(itemSku != null && "Y".equals(itemSku.getIsEnable()) ? "Y" : "N");
         }
@@ -237,6 +238,12 @@ public class UserCartServiceImpl implements UserCartService {
             List<UserCart> userCartList = cartMapper.selectList(Wrappers.lambdaQuery(UserCart.class)
                     .in(UserCart::getId, cartIdList));
             resultList = BeanUtil.convertList(userCartList, UserCartResult.class);
+
+            List<Integer> skuIdList = userCartList.stream().map(UserCart::getSkuId).collect(Collectors.toList());
+            Map<Integer, ItemSku> skuIndexMap = skuMapper.selectBatchIds(skuIdList).stream().collect(Collectors.toMap(ItemSku::getId, s -> s));
+            resultList.forEach(data -> {
+                data.setSkuSalePrice(skuIndexMap.get(data.getSkuId()).getSkuSalePrice());
+            });
         } else {
             ItemSku itemSku = skuMapper.selectById(skuId);
             UserCartResult userCartResult = BeanUtil.convert(itemSku, UserCartResult.class);
