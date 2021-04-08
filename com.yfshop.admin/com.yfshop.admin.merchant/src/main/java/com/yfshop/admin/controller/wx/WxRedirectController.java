@@ -30,7 +30,7 @@ public class WxRedirectController {
     private final WxMpService wxService;
     @DubboReference(check = false)
     UserService userService;
-    WxStpLogic wxStpLogic =new WxStpLogic();
+    final static WxStpLogic wxStpLogic =new WxStpLogic();
 
 
     @RequestMapping("/authByCode")
