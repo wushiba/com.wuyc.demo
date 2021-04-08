@@ -32,7 +32,7 @@ public class MpPayServiceImpl implements MpPayService {
                 .timeStamp(wxPayMpOrderResult.getTimeStamp())
                 .nonceStr(wxPayMpOrderResult.getNonceStr())
                 .packageValue(wxPayMpOrderResult.getPackageValue())
-                .signType(wxPayMpOrderResult.getPaySign())
+                .signType(wxPayMpOrderResult.getSignType())
                 .build();
         Map<String, String> params = SignUtils.xmlBean2Map(payResult);
         StringBuilder toSign = new StringBuilder();
