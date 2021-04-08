@@ -12,6 +12,7 @@
 
     <modules>
         <module>com.yfshop.admin</module>
+        <module>com.yfshop.wx</module>
         <module>com.yfshop.auth</module>
         <module>com.yfshop.shop</module>
         <module>com.yfshop.open</module>

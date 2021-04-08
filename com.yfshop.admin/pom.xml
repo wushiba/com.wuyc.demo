@@ -16,7 +16,6 @@
 
     <modules>
         <module>com.yfshop.admin.web</module>
-        <module>com.yfshop.admin.wx</module>
         <module>com.yfshop.admin.merchant</module>
         <module>com.yfshop.admin.api</module>
         <module>com.yfshop.admin.service</module>

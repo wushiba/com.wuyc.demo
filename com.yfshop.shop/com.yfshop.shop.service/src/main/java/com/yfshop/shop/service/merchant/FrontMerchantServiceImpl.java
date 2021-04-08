@@ -1,14 +1,14 @@
 package com.yfshop.shop.service.merchant;
+import java.time.LocalDateTime;
 
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.yfshop.code.mapper.*;
-import com.yfshop.code.model.Merchant;
-import com.yfshop.code.model.MerchantDetail;
-import com.yfshop.code.model.WebsiteCodeDetail;
+import com.yfshop.code.model.*;
 import com.yfshop.common.constants.CacheConstants;
 import com.yfshop.common.enums.GroupRoleEnum;
+import com.yfshop.common.enums.ReceiveWayEnum;
 import com.yfshop.common.exception.ApiException;
 import com.yfshop.common.exception.Asserts;
 import com.yfshop.common.service.RedisService;
@@ -23,6 +23,7 @@ import org.springframework.data.geo.GeoResult;
 import org.springframework.data.geo.GeoResults;
 import org.springframework.data.geo.Point;
 import org.springframework.data.redis.connection.RedisGeoCommands;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
@@ -36,10 +37,22 @@ public class FrontMerchantServiceImpl implements FrontMerchantService {
     private static final Logger logger = LoggerFactory.getLogger(FrontMerchantServiceImpl.class);
 
     @Resource
+    private OrderMapper orderMapper;
+
+    @Resource
     private RedisService redisService;
 
     @Resource
     private MerchantMapper merchantMapper;
+
+    @Resource
+    private OrderDetailMapper orderDetailMapper;
+
+    @Resource
+    private WebsiteBillMapper websiteBillMapper;
+
+    @Resource
+    private OrderAddressMapper orderAddressMapper;
 
     @Resource
     private MerchantDetailMapper merchantDetailMapper;
@@ -113,6 +126,46 @@ public class FrontMerchantServiceImpl implements FrontMerchantService {
                 .eq(Merchant::getId, websiteCodeDetail.getMerchantId()));
         redisService.set(CacheConstants.MERCHANT_INFO_DATA, JSON.toJSONString(websiteCodeDetail), 60 * 60 * 24);
         return BeanUtil.convert(merchant, MerchantResult.class);
+    }
+
+    /**
+     * 用户自提二等奖成功后，生成网点记账单
+     * @param orderId     用户主订单id
+     * @return
+     * @throws ApiException
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public Void insertWebsiteBill(Long orderId) throws ApiException {
+        Asserts.assertNonNull(orderId, 500, "主订单id不可以为空");
+        Order order = orderMapper.selectById(orderId);
+        Asserts.assertNonNull(order, 500, "订单不存在");
+        Asserts.assertNotEquals(order.getReceiveWay(), ReceiveWayEnum.ZT.getCode(), 500, "订单不存在");
+        Asserts.assertNonNull(order, 500, "只有二等奖自提订单才可以生成记账单");
+
+        OrderAddress orderAddress = orderAddressMapper.selectOne(Wrappers.lambdaQuery(OrderAddress.class)
+                .eq(OrderAddress::getOrderId, orderId));
+
+        List<OrderDetail> detailList = orderDetailMapper.selectList(Wrappers.lambdaQuery(OrderDetail.class)
+                .eq(OrderDetail::getOrderId, orderId));
+
+        detailList.forEach(detail -> {
+            WebsiteBill websiteBill = new WebsiteBill();
+            websiteBill.setCreateTime(LocalDateTime.now());
+            websiteBill.setUpdateTime(LocalDateTime.now());
+            websiteBill.setMerchantId(detail.getMerchantId());
+            websiteBill.setPidPath(detail.getPidPath());
+            websiteBill.setUserId(detail.getUserId());
+            websiteBill.setNickname(orderAddress.getRealname());
+            websiteBill.setOrderId(orderId);
+            websiteBill.setItemTitle(detail.getItemTitle());
+            websiteBill.setPayPrice(detail.getPayPrice());
+            websiteBill.setBillNo(order.getBillNo());
+            websiteBill.setIsConfirm("N");
+            websiteBill.setWebsiteCode("");
+            websiteBillMapper.insert(websiteBill);
+        });
+        return null;
     }
 
 

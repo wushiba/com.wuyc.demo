@@ -1,0 +1,13 @@
+---
+spring:
+  application:
+    name: yfshop-auth-service
+  main:
+    web-application-type: none
+  profiles:
+    active: @profiles.active@
+
+mybatis-plus:
+  mapper-locations:
+    - classpath:dao/*.xml
+    - classpath*:com/**/mapper/*.xml

@@ -10,7 +10,7 @@ public class WxStpLogic extends StpLogic {
     public WxStpLogic() {
         super("login");
         saTokenConfig = BeanUtil.convert(super.getConfig(), SaTokenConfig.class);
-        saTokenConfig.setTokenName("yfOpen");
+        saTokenConfig.setTokenName("yfopen");
     }
 
     @Override

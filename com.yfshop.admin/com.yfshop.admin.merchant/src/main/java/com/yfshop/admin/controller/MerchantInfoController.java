@@ -64,6 +64,13 @@ class MerchantInfoController extends AbstractBaseController {
     @RequestMapping(value = "/websiteInfo", method = {RequestMethod.POST})
     public CommonResult<MerchantResult> getWebsiteInfo() {
         MerchantResult merchantResult = merchantInfoService.getWebsiteInfo(getCurrentAdminUserId());
+        String openId = getCurrentOpenId();
+        if (StringUtils.isBlank(merchantResult.getHeadImgUrl()) && StringUtils.isNotBlank(openId)) {
+            UserResult userResult = userService.getUserByOpenId(openId);
+            if (userResult != null) {
+                merchantResult.setHeadImgUrl(userResult.getHeadImgUrl());
+            }
+        }
         return CommonResult.success(merchantResult);
     }
 

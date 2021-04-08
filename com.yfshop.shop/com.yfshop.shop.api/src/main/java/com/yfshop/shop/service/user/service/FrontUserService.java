@@ -26,6 +26,6 @@ public interface FrontUserService {
      * @return
      * @throws ApiException
      */
-    UserAddressResult getUserAddressById(Integer addressId) throws ApiException;
+    UserAddressResult getUserAddressById(Long addressId) throws ApiException;
 
 }

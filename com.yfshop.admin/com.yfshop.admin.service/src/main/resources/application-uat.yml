@@ -5,7 +5,8 @@ logging:
   level:
     com.yfshop.code.mapper: debug
     com.yfshop: debug
-
+    me.chanjar.weixin: DEBUG
+    com.github.binarywang.wxpay: DEBUG
 spring:
   datasource:
     connectionProperties: druid.stat.mergeSql=true;druid.stat.slowSqlMillis=5000
@@ -103,4 +104,5 @@ actCode:
   srcDir: /home/www/web-deploy/yufan-admin-service/actCode/src/
   targetDir: /home/www/web-deploy/yufan-admin-service/actCode/target/
   url: http://prev-activ.yufan.51jujibao.com/#/Activity?actCode=
+
 

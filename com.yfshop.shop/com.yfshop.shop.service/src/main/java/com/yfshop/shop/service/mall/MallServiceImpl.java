@@ -79,9 +79,9 @@ public class MallServiceImpl implements MallService {
             key = "'" + CacheConstants.MALL_CATEGORY_ITEMS_CACHE_KEY_PREFIX + "' + #root.args[0].categoryId")
     @Override
     public List<ItemResult> queryItems(QueryItemReq req) {
-        if (req == null || req.getCategoryId() == null) {
-            return new ArrayList<>(0);
-        }
+//        if (req == null || req.getCategoryId() == null) {
+//            return new ArrayList<>(0);
+//        }
         List<Item> items = itemMapper.selectList(Wrappers.lambdaQuery(Item.class)
                 .eq(req.getCategoryId() != null, Item::getCategoryId, req.getCategoryId())
                 .eq(Item::getIsEnable, "Y").eq(Item::getIsDelete, "N"));
