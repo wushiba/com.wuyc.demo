@@ -268,7 +268,7 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
 
         insertUserOrderDetail(userId, orderId, null, null, ReceiveWayEnum.ZT.getCode(), "N", 1, itemSku.getItemId(), itemSku.getId(),
                 itemResult.getItemTitle(), itemSku.getSkuSalePrice(), itemSku.getSkuCover(), itemFreight, itemSku.getSkuSalePrice(), itemSku.getSkuSalePrice(),
-                itemFreight, userCoupon.getId(), UserOrderStatusEnum.WAIT_PAY.getCode(), null, itemSku.getSpecNameValueJson());
+                itemFreight, userCoupon.getId(), UserOrderStatusEnum.WAIT_PAY.getCode(), itemSku.getSpecValueIdPath(), itemSku.getSpecNameValueJson());
 
         insertUserOrderAddress(orderId, addressInfo.getMobile(), addressInfo.getRealname(), addressInfo.getProvince(), addressInfo.getProvinceId(),
                 addressInfo.getCity(), addressInfo.getCityId(), addressInfo.getDistrict(), addressInfo.getDistrictId(), addressInfo.getAddress());
@@ -349,7 +349,7 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
 
             insertUserOrderDetail(userId, orderId, null, null, ReceiveWayEnum.PS.getCode(), "N", userCart.getNum(),
                     itemSku.getItemId(), itemSku.getId(), itemSku.getSkuTitle(), itemSku.getSkuSalePrice(), itemSku.getSkuCover(), childOrderFreight, childCouponPrice,
-                    childOrderPrice, childPayPrice, userCouponId, UserOrderStatusEnum.WAIT_PAY.getCode(), null, itemSku.getSpecNameIdValueIdJson());
+                    childOrderPrice, childPayPrice, userCouponId, UserOrderStatusEnum.WAIT_PAY.getCode(), itemSku.getSpecValueIdPath(), itemSku.getSpecNameValueJson());
         }
 
         insertUserOrderAddress(orderId, addressInfo.getMobile(), addressInfo.getRealname(), addressInfo.getProvince(), addressInfo.getProvinceId(), addressInfo.getCity(),
@@ -408,10 +408,13 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
         ItemResult itemDetail = mallService.findItemDetail(req);
         ItemSkuResult itemSku = itemDetail.getItemSkuList().get(0);
 
+        // 修改优惠券状态
+        userCouponIdList.forEach(userCouponId -> {
+            frontUserCouponService.useUserCoupon(userCouponId);
+        });
+
         // 扣优惠券对应的商品库存
         mallService.updateItemSkuStock(itemSku.getId(), userCouponIdList.size());
-
-        // 修改优惠券状态
 
         // 根据优惠券计算订单金额，创建订单,子订单, 收货地址 一个优惠券对应一个子订单，一个子订单运费2块钱
         Integer itemCount = userCouponIdList.size();
@@ -424,7 +427,7 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
         userCouponList.forEach(userCoupon -> {
             insertUserOrderDetail(userId, orderId, merchantResult.getId(), merchantResult.getPidPath(), ReceiveWayEnum.ZT.getCode(), "N", 1,
                     itemSku.getItemId(), itemSku.getId(), itemDetail.getItemTitle(), itemSku.getSkuSalePrice(), itemSku.getSkuCover(), itemFreight, itemSku.getSkuSalePrice(),
-                    itemSku.getSkuSalePrice(), itemFreight, userCoupon.getId(), UserOrderStatusEnum.WAIT_PAY.getCode(), null, itemSku.getSpecNameIdValueIdJson());
+                    itemSku.getSkuSalePrice(), itemFreight, userCoupon.getId(), UserOrderStatusEnum.WAIT_PAY.getCode(), itemSku.getSpecValueIdPath(), itemSku.getSpecNameValueJson());
         });
         insertUserOrderAddress(orderId, userMobile, userMobile, merchantResult.getProvince(), merchantResult.getProvinceId(), merchantResult.getCity(),
                 merchantResult.getCityId(), merchantResult.getDistrict(), merchantResult.getDistrictId(), merchantResult.getAddress());
