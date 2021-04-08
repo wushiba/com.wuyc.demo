@@ -1,0 +1,58 @@
+---
+server:
+  port: 9098
+dubbo:
+  registry:
+    address: zookeeper://10.11.3.98:2181
+  metadataReport:
+    address: zookeeper://10.11.3.98:2181
+  configcenter:
+    address: zookeeper://10.11.3.98:2181
+  application:
+    name: yfshop-admin-wx
+  consumer:
+    timeout: 30000
+    retries: 0
+    check: false
+  scan:
+    base-packages: com.yfshop.wx
+
+
+#spring:
+#  thymeleaf:
+#    # 页面模板页地址
+#    prefix: file:///home/www/web-deploy/html/wx.yufan.51jujibao.com/
+#    suffix: .html
+#    mode: HTML5
+#    encoding: UTF-8
+#    cache: false
+#    servlet:
+#      content-type: text/html
+#  web:
+#    resources:
+#      static-locations: classpath:/META-INF/resources/,classpath:/resources/,classpath:/static/,${spring.thymeleaf.prefix}
+#  mvc:
+#    static-path-pattern: /**
+
+logging:
+  level:
+    org.springframework.web: INFO
+    com.yfshop.admin: DEBUG
+    me.chanjar.weixin: DEBUG
+    com.github.binarywang.wxpay: DEBUG
+wx:
+  mp:
+    useRedis: false
+    configs:
+      - appId: wxfe620617eec2f4b0 # 第一个公众号的appid
+        secret: 64a61d9e95094f1e974861b62ec4dce8 # 公众号的appsecret
+        token: yufanshop # 接口配置里的Token值
+        aesKey: U2ztwhpnvy5SNDiICGloZA0Pgi2WdgDmsO4abHCEtvz # 接口配置里的EncodingAESKey
+  pay:
+    appId: wxfe620617eec2f4b0
+    mchId: 1607782065
+    mchKey: F1887D3F9E6EE7A32FE5E76F4AB80D63
+    subAppId: #服务商模式下的子商户公众账号ID
+    subMchId: #服务商模式下的子商户号
+    keyPath: /home/www/web-deploy/yufan-admin-wx/cert/apiclient_cert.p12
+

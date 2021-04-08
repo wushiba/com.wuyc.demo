@@ -16,7 +16,7 @@
 
     <modules>
         <module>com.yfshop.wx.api</module>
-<!--        <module>com.yfshop.wx.web</module>-->
+        <module>com.yfshop.wx.web</module>
         <module>com.yfshop.wx.service</module>
     </modules>
 
