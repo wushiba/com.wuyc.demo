@@ -9,6 +9,7 @@ import com.yfshop.common.enums.UserOrderStatusEnum;
 import com.yfshop.common.exception.ApiException;
 import com.yfshop.common.exception.Asserts;
 import com.yfshop.common.util.BeanUtil;
+import com.yfshop.shop.dao.OrderDao;
 import com.yfshop.shop.service.activity.result.YfDrawActivityResult;
 import com.yfshop.shop.service.activity.result.YfDrawPrizeResult;
 import com.yfshop.shop.service.activity.service.FrontDrawService;
@@ -44,6 +45,8 @@ import java.util.stream.Collectors;
 @Service(dynamic = true)
 public class FrontUserOrderServiceImpl implements FrontUserOrderService {
 
+    @Resource
+    private OrderDao orderDao;
     @Resource
     private MallService mallService;
     @Resource
@@ -127,7 +130,7 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
      * @throws ApiException
      */
     @Override
-    public YfUserOrderDetailResult getUserOrderDetail(Integer userId, Integer orderId, Integer orderDetailId) throws ApiException {
+    public YfUserOrderDetailResult getUserOrderDetail(Integer userId, Long orderId, Long orderDetailId) throws ApiException {
         // todo 量大的话可以做1分钟秒缓存
         Asserts.assertFalse(orderId == null && orderDetailId == null , 500, "订单标识不可以为空");
         YfUserOrderDetailResult userOrderDetailResult;
@@ -170,7 +173,7 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
      * @throws ApiException
      */
     @Override
-    public Void cancelOrder(Integer userId, Integer orderId) throws ApiException {
+    public Void cancelOrder(Integer userId, Long orderId) throws ApiException {
         Order order = orderMapper.selectOne(Wrappers.lambdaQuery(Order.class)
                 .eq(Order::getUserId, userId)
                 .eq(Order::getId, orderId));
@@ -197,7 +200,7 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
      * @throws ApiException
      */
     @Override
-    public Void confirmOrder(Integer userId, Integer orderDetailId) throws ApiException {
+    public Void confirmOrder(Integer userId, Long orderDetailId) throws ApiException {
         OrderDetail orderDetail = orderDetailMapper.selectOne(Wrappers.lambdaQuery(OrderDetail.class)
                 .eq(OrderDetail::getUserId, userId)
                 .eq(OrderDetail::getId, orderDetailId));
@@ -233,7 +236,7 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Void submitOrderBySkuId(Integer userId, Integer skuId, Integer num, Long userCouponId, Integer addressId) throws ApiException {
+    public Void submitOrderBySkuId(Integer userId, Integer skuId, Integer num, Long userCouponId, Long addressId) throws ApiException {
         // 校验sku以及商品
         ItemSkuResult itemSku = mallService.getItemSkuBySkuId(skuId);
         Asserts.assertFalse(itemSku.getSkuStock() < num, 500, "商品库存不足");
@@ -266,7 +269,7 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
         Order order = insertUserOrder(userId, ReceiveWayEnum.PS.getCode(), num, 1, orderPrice, couponPrice, orderFreight, payPrice, "N", null);
         Long orderId = order.getId();
 
-        insertUserOrderDetail(userId, orderId, null, null, ReceiveWayEnum.ZT.getCode(), "N", 1, itemSku.getItemId(), itemSku.getId(),
+        insertUserOrderDetail(userId, orderId, null, null, ReceiveWayEnum.PS.getCode(), "N", 1, itemSku.getItemId(), itemSku.getId(),
                 itemResult.getItemTitle(), itemSku.getSkuSalePrice(), itemSku.getSkuCover(), itemFreight, itemSku.getSkuSalePrice(), itemSku.getSkuSalePrice(),
                 itemFreight, userCoupon.getId(), UserOrderStatusEnum.WAIT_PAY.getCode(), itemSku.getSpecValueIdPath(), itemSku.getSpecNameValueJson());
 
@@ -286,7 +289,7 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Void submitOrderByCart(Integer userId, String cartIds, Long userCouponId, Integer addressId) throws ApiException {
+    public Void submitOrderByCart(Integer userId, String cartIds, Long userCouponId, Long addressId) throws ApiException {
         List<Integer> cartIdList = Arrays.stream(StringUtils.split(cartIds, ",")).map(Integer::valueOf)
                 .collect(Collectors.toList());
         Asserts.assertCollectionNotEmpty(cartIdList, 500, "购物车id不可以为空");
@@ -324,7 +327,7 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
             itemSkuMap.put(itemSku.getId(), itemSku);
             itemCount += userCart.getNum();
             orderFreight = orderFreight.add(new BigDecimal(userCart.getNum() * 2));
-            orderPrice = orderFreight.add((itemSku.getSkuSalePrice().multiply(new BigDecimal(2))));
+            orderPrice = orderPrice.add((itemSku.getSkuSalePrice().multiply(new BigDecimal(userCart.getNum()))));
             payPrice = orderFreight.add(orderPrice);
         }
 
@@ -335,7 +338,7 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
             payPrice = payPrice.subtract(couponPrice);
         }
 
-        Order order = insertUserOrder(userId, ReceiveWayEnum.ZT.getCode(), itemCount, childOrderCount, orderPrice, couponPrice, orderFreight, payPrice, "N", null);
+        Order order = insertUserOrder(userId, ReceiveWayEnum.PS.getCode(), itemCount, childOrderCount, orderPrice, couponPrice, orderFreight, payPrice, "N", null);
         Long orderId = order.getId();
         for (UserCart userCart : userCartList) {
             ItemSku itemSku = itemSkuMap.get(userCart.getSkuId());
@@ -431,6 +434,29 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
         });
         insertUserOrderAddress(orderId, userMobile, userMobile, merchantResult.getProvince(), merchantResult.getProvinceId(), merchantResult.getCity(),
                 merchantResult.getCityId(), merchantResult.getDistrict(), merchantResult.getDistrictId(), merchantResult.getAddress());
+        return null;
+    }
+
+    /**
+     * 用户付款后修改订单状态
+     * @param orderId   主订单id
+     * @return
+     * @throws ApiException
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public Void updateOrderPayStatus(Long orderId) throws ApiException {
+        Asserts.assertNonNull(orderId, 500, "主订单id不可以为空");
+        Order order = orderMapper.selectById(orderId);
+        Asserts.assertNonNull(order, 500, "订单不存在");
+        Asserts.assertNotEquals(order.getIsPay(), "Y", 500, "订单不可以重复修改状态");
+
+        // 修改订单状态，用乐观锁
+        int result = orderDao.updateOrderPayStatus(orderId);
+        if (result <= 0) {
+            Asserts.assertNotEquals(order.getIsPay(), "Y", 500, "订单不可以重复修改状态");
+        }
+        frontMerchantService.insertWebsiteBill(orderId);
         return null;
     }
 

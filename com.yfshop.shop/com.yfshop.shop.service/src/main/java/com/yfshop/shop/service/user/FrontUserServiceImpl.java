@@ -75,7 +75,7 @@ public class FrontUserServiceImpl implements FrontUserService {
      * @throws ApiException
      */
     @Override
-    public UserAddressResult getUserAddressById(Integer addressId) throws ApiException {
+    public UserAddressResult getUserAddressById(Long addressId) throws ApiException {
         Asserts.assertNonNull(addressId, 500, "收货地址id不可以为空");
 
         Object userAddressObject = redisService.get(CacheConstants.USER_ADDRESS_ID);
