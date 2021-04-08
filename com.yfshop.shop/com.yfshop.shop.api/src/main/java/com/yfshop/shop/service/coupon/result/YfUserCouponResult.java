@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Date;
 
@@ -56,7 +57,7 @@ public class YfUserCouponResult implements Serializable{
     private Integer couponPrice;
 	
     /** 使用条件: 0代表无门槛使用, 其余数字代表到指定数字才可以使用 */
-    private Double useConditionPrice;
+    private BigDecimal useConditionPrice;
 	
     /** 使用范围类型: ALL(全场通用), (ITEM)指定商品 */
     private String useRangeType;
@@ -85,7 +86,8 @@ public class YfUserCouponResult implements Serializable{
     private String couponDesc;
 	
     /**  */
-    private Date useTime;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", locale = "zh", timezone = "GMT+8")
+    private LocalDateTime useTime;
 	
     /** 订单编号 */
     private Integer orderId;
