@@ -21,6 +21,7 @@ import com.yfshop.shop.service.coupon.result.YfUserCouponResult;
 import com.yfshop.shop.service.coupon.service.FrontUserCouponService;
 import com.yfshop.shop.service.user.result.UserResult;
 import com.yfshop.shop.service.user.service.FrontUserService;
+import org.apache.dubbo.config.annotation.DubboService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -38,7 +39,7 @@ import java.util.stream.Collectors;
  * @Since:2021-03-24 19:09:17
  * @Version:1.1.0
  */
-@Service
+@DubboService
 public class FrontDrawServiceImpl implements FrontDrawService {
 
     private static final Logger logger = LoggerFactory.getLogger(FrontDrawServiceImpl.class);
