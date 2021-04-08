@@ -28,8 +28,6 @@ public class WxPayConfiguration {
     payConfig.setAppId(StringUtils.trimToNull(this.properties.getAppId()));
     payConfig.setMchId(StringUtils.trimToNull(this.properties.getMchId()));
     payConfig.setMchKey(StringUtils.trimToNull(this.properties.getMchKey()));
-    payConfig.setSubAppId(StringUtils.trimToNull(this.properties.getSubAppId()));
-    payConfig.setSubMchId(StringUtils.trimToNull(this.properties.getSubMchId()));
     payConfig.setKeyPath(StringUtils.trimToNull(this.properties.getKeyPath()));
 
     // 可以指定是否使用沙箱环境
