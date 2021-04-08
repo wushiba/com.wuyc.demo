@@ -35,7 +35,9 @@ spring:
       static-locations: classpath:/META-INF/resources/,classpath:/resources/,classpath:/static/,${spring.thymeleaf.prefix}
   mvc:
     static-path-pattern: /**
-
+  sa-token:
+    # 写入Cookie时显式指定的作用域, 用于单点登录二级域名共享Cookie
+    cookie-domain: yufan.51jujibao.com
 logging:
   level:
     org.springframework.web: INFO

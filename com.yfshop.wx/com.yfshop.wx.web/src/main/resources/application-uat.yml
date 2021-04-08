@@ -56,3 +56,7 @@ wx:
     subMchId: #服务商模式下的子商户号
     keyPath: /home/www/web-deploy/yufan-admin-wx/cert/apiclient_cert.p12
 
+spring:
+  sa-token:
+    # 写入Cookie时显式指定的作用域, 用于单点登录二级域名共享Cookie
+    cookie-domain: yufan.51jujibao.com
