@@ -34,18 +34,6 @@ spring:
       static-locations: classpath:/META-INF/resources/,classpath:/resources/,classpath:/static/,${spring.thymeleaf.prefix}
   mvc:
     static-path-pattern: /**
-  redis:
-    database: 0
-    host: yf-sz-redis-staging.redis.rds.aliyuncs.com
-    password: SZ9v4UrVJKfCCDKUxia
-    port: 6379
-    timeout: 1000
-    jedis:
-      pool:
-        max-active: 200
-        max-idle: 10
-        max-wait: -1
-        min-idle: 0
   servlet:
     multipart:
       max-file-size: 50MB

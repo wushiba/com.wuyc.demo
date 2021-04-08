@@ -132,8 +132,10 @@ public class WebSystemOperateLogAspect {
             } else {
                 visitInfo.setReturnResult(result);
             }
-            logger.info("*******************************\r\nWebSystemLogAspect接口访问信息: \n"
-                    + JSON.toJSONString(visitInfo, true) + "\r\n*********************************");
+            if (!"/".equals(request.getServletPath())) {
+                logger.info("*******************************\r\nWebSystemLogAspect接口访问信息: \n"
+                        + JSON.toJSONString(visitInfo, true) + "\r\n*********************************");
+            }
             return result;
         } catch (Throwable e) {
             // log the error msg

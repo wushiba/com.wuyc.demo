@@ -1,5 +1,6 @@
 package com.yfshop.admin.controller;
 
+import cn.dev33.satoken.dao.SaTokenDao;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;

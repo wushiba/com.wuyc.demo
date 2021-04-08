@@ -14,7 +14,6 @@ import com.yfshop.common.exception.Asserts;
 import com.yfshop.common.service.RedisService;
 import com.yfshop.common.util.BeanUtil;
 import com.yfshop.shop.service.merchant.result.MerchantResult;
-import com.yfshop.shop.service.merchant.result.WebsiteCodeDetailResult;
 import com.yfshop.shop.service.merchant.service.FrontMerchantService;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.slf4j.Logger;
@@ -84,7 +83,9 @@ public class FrontMerchantServiceImpl implements FrontMerchantService {
             Point point = content.getPoint();
             Object merchantId = content.getName();
             System.out.println("merchantId=" + merchantId.toString() + "&distance=" + dist.toString() + "&coordinate=" + point.toString());
-            resultList.addAll(merchantMap.get(Integer.valueOf(merchantId.toString())));
+            MerchantResult merchantData = merchantMap.get(Integer.valueOf(merchantId.toString())).get(0);
+            merchantData.setDistance(dist.toString());
+            resultList.add(merchantData);
         }
         return resultList;
     }

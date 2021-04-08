@@ -5,6 +5,7 @@ import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.HexUtil;
 import cn.hutool.crypto.SecureUtil;
+import cn.hutool.crypto.digest.DigestUtil;
 import cn.hutool.crypto.symmetric.AES;
 import cn.hutool.http.HttpUtil;
 import com.qiniu.http.Response;
@@ -20,6 +21,7 @@ import com.yfshop.code.model.ActCodeBatchDetail;
 import com.yfshop.common.exception.ApiException;
 import com.yfshop.common.exception.Asserts;
 import com.yfshop.common.util.DateUtil;
+import com.yfshop.common.util.StringUtil;
 import lombok.SneakyThrows;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -89,34 +91,29 @@ public class ActCodeTask {
     private String from;
 
     private static final Logger logger = LoggerFactory.getLogger(ActCodeTask.class);
-    private static String aesKey = "7eac05ddfdb4d246fa0e23293c7961d98ecbf471b574c38a";
 
-    //活动吗 4位活动id+6位年月日+6位计数+2位crc校验位
+
     @SneakyThrows
     @Async
     public void buildActCode(ActCodeBatch actCodeBatch, List<String> sourceCodes) {
-        AES aes = SecureUtil.aes(HexUtil.decodeHex(aesKey));
         Date date = DateUtil.getDate(DateUtil.localDateTimeToDate(actCodeBatch.getCreateTime()));
-        String dateTime = cn.hutool.core.date.DateUtil.format(date, "yyMMdd");
         List<ActCodeBatchDetail> actCodeBatchDetails = new ArrayList<>();
         List<String> codeFile = new ArrayList<>();
         actCodeBatch.setFileStatus("DONGING");
         actCodeBatchManager.updateById(actCodeBatch);
         logger.info("批从号{},正在生成{}个溯源码", actCodeBatch.getBatchNo(), actCodeBatch.getQuantity());
-        int count = actCodeDao.sumActCodeByBeforeId(actCodeBatch.getId(), date);
         logger.info("开始合成溯源码");
         for (String code : sourceCodes) {
             LocalDateTime now = LocalDateTime.now();
             ActCodeBatchDetail actCodeBatchDetail = new ActCodeBatchDetail();
-            actCodeBatchDetail.setActCode(String.format("%04d%s%08d", actCodeBatch.getActId(), dateTime, ++count));
-            actCodeBatchDetail.setCipherCode(aes.encryptHex(actCodeBatchDetail.getActCode()));
+            actCodeBatchDetail.setActCode(DigestUtil.md5HexTo16(SecureUtil.md5(code)));
             actCodeBatchDetail.setTraceNo(code);
             actCodeBatchDetail.setActId(actCodeBatch.getActId());
             actCodeBatchDetail.setBatchId(actCodeBatch.getId());
             actCodeBatchDetail.setCreateTime(now);
             actCodeBatchDetail.setUpdateTime(now);
             actCodeBatchDetails.add(actCodeBatchDetail);
-            codeFile.add(String.format("%s,%s%s", code, actCodeCodeUrl, actCodeBatchDetail.getCipherCode()));
+            codeFile.add(String.format("%s,%s%s", code, actCodeCodeUrl, actCodeBatchDetail.getActCode()));
         }
         logger.info("溯源码合成结束");
         actCodeBatchDetailManager.saveBatch(actCodeBatchDetails, 1000);
@@ -170,4 +167,5 @@ public class ActCodeTask {
         helper.addAttachment(file.getName(), fileResource);
         mailSender.send(message);
     }
+
 }

@@ -1,6 +1,5 @@
 package com.yfshop.shop.controller;
 
-import cn.hutool.extra.spring.SpringUtil;
 import com.yfshop.common.accesslimit.IpAccessLimit;
 import com.yfshop.common.api.CommonResult;
 import com.yfshop.common.base.BaseController;
@@ -43,7 +42,7 @@ public class ActivityDrawController implements BaseController {
 //    @IpAccessLimit(limit = 10, second = 1)
     public CommonResult<List<YfUserCouponResult>> findDrawRecordList() {
         QueryUserCouponReq req = new QueryUserCouponReq();
-        req.setUserId(101);
+        req.setUserId(getCurrentUserId());
         return CommonResult.success(activityCouponService.findUserCouponList(req));
     }
 
@@ -53,6 +52,6 @@ public class ActivityDrawController implements BaseController {
     public CommonResult<YfUserCouponResult> userClickDraw(HttpServletRequest request, String actCode) {
 //        return CommonResult.success(activityDrawService.userClickDraw(getCurrentUserId(), getRequestIpStr(request), actCode));
 //        String activeProfile = SpringUtil.getActiveProfile();
-        return CommonResult.success(activityDrawService.userClickDraw(101, "115.239.212.133", actCode));
+        return CommonResult.success(activityDrawService.userClickDraw(getCurrentUserId(), "115.239.212.133", actCode));
     }
 }

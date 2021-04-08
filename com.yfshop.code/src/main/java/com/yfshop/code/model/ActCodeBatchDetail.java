@@ -36,11 +36,6 @@ public class ActCodeBatchDetail extends Model<ActCodeBatchDetail> {
     private String actCode;
 
     /**
-     * 加密后的活动码
-     */
-    private String cipherCode;
-
-    /**
      * 溯源码
      */
     private String traceNo;
