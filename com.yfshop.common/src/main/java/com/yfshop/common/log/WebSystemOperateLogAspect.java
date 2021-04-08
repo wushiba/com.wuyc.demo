@@ -192,7 +192,7 @@ public class WebSystemOperateLogAspect {
                 || StringUtils.containsIgnoreCase(request.getContentType(), X_WWW_FORM_URLENCODED)) {
             requestParam = ServletUtil.getParamMap(request);
         } else {
-            requestParam = JSON.parseObject(this.parseMethodParameters(point, targetMethod));
+            requestParam = JSON.parse(this.parseMethodParameters(point, targetMethod));
         }
         return requestParam;
     }
