@@ -1,6 +1,5 @@
 package com.yfshop.admin.service.wx;
 
-import com.github.binarywang.wxpay.bean.notify.WxPayOrderNotifyResult;
 import com.yfshop.admin.api.merchant.MerchantInfoService;
 import com.yfshop.wx.api.request.WxPayOrderNotifyReq;
 import com.yfshop.wx.api.service.MpPayNotifyService;
