@@ -17,7 +17,6 @@ import com.yfshop.common.exception.ApiException;
 import com.yfshop.common.exception.Asserts;
 import com.yfshop.common.service.RedisService;
 import com.yfshop.common.util.BeanUtil;
-import com.yfshop.common.util.StringUtil;
 import com.yfshop.shop.dao.UserCouponDao;
 import com.yfshop.shop.service.coupon.request.QueryUserCouponReq;
 import com.yfshop.shop.service.coupon.result.YfCouponResult;
@@ -140,7 +139,7 @@ public class FrontUserCouponServiceImpl implements FrontUserCouponService {
     }
 
     @Override
-    public YfUserCouponResult createUserCoupon(Integer userId, Integer drawActivityId, Integer prizeLevel, Integer couponId) throws com.baomidou.mybatisplus.extension.exceptions.ApiException {
+    public YfUserCouponResult createUserCoupon(Integer userId, Integer drawActivityId, Integer prizeLevel, Integer couponId, String actCode) throws ApiException {
         User user = userMapper.selectById(userId);
         Asserts.assertNonNull(user, 500, "用户不存在,请先授权关注公众号");
 
@@ -154,8 +153,8 @@ public class FrontUserCouponServiceImpl implements FrontUserCouponService {
             startDate = coupon.getValidStartTime();
             endDate = coupon.getValidEndTime();
         } else if ("TODAY".equalsIgnoreCase(validType)) {
-            startDate = LocalDateTime.of(LocalDate.now(), LocalTime.MIN);
             endDate = LocalDateTime.of(LocalDate.now(), LocalTime.MAX);
+            startDate = LocalDateTime.of(LocalDate.now(), LocalTime.MIN);
         } else if ("FIX_DAY".equalsIgnoreCase(validType)) {
             startDate = now;
             endDate = now.plusDays(coupon.getValidDay());
@@ -170,6 +169,7 @@ public class FrontUserCouponServiceImpl implements FrontUserCouponService {
         userCoupon.setCouponTitle(coupon.getCouponTitle());
         userCoupon.setValidStartTime(startDate);
         userCoupon.setValidEndTime(endDate);
+        userCoupon.setActCode(actCode);
         userCoupon.setDrawPrizeLevel(prizeLevel);
         userCoupon.setDrawActivityId(drawActivityId);
         userCoupon.setCouponPrice(coupon.getCouponPrice());

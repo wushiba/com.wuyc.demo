@@ -50,6 +50,9 @@ public class UserCoupon extends Model<UserCoupon> {
      */
     private String couponResource;
 
+    /** 用户扫码抽奖的码，yf_act_code_batch_detail表的actCode */
+    private String actCode;
+
     private Integer drawPrizeLevel;
 
     /** 抽奖活动id */

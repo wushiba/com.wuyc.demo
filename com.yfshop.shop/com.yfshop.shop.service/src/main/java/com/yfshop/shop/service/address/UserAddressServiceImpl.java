@@ -16,6 +16,7 @@ import com.yfshop.shop.dao.UserAddressDao;
 import com.yfshop.shop.service.address.request.CreateUserAddressReq;
 import com.yfshop.shop.service.address.request.UpdateUserAddressReq;
 import com.yfshop.shop.service.address.result.UserAddressResult;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -75,6 +76,9 @@ public class UserAddressServiceImpl implements UserAddressService {
         Asserts.assertNonNull(city, 500, "市信息不存在");
         Region district = regionMapper.selectById(req.getDistrictId());
         Asserts.assertNonNull(district, 500, "区信息不存在");
+        if (StringUtils.equalsAnyIgnoreCase("Y", req.getIsDefault())) {
+            customUserAddressMapper.disableDefaultAddress(userId);
+        }
         UserAddress userAddress = new UserAddress();
         userAddress.setCreateTime(LocalDateTime.now());
         userAddress.setUpdateTime(LocalDateTime.now());
@@ -110,6 +114,9 @@ public class UserAddressServiceImpl implements UserAddressService {
         Asserts.assertNonNull(city, 500, "市信息不存在");
         Region district = regionMapper.selectById(req.getDistrictId());
         Asserts.assertNonNull(district, 500, "区信息不存在");
+        if (StringUtils.equalsAnyIgnoreCase("Y", req.getIsDefault())) {
+            customUserAddressMapper.disableDefaultAddress(userId);
+        }
         UserAddress userAddress = new UserAddress();
         userAddress.setId(req.getUserAddressId());
         userAddress.setCreateTime(LocalDateTime.now());
