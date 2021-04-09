@@ -1,4 +1,4 @@
-package com.yfshop.shop.dubbo;
+package com.yfshop.admin.dubbo;
 
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.extra.spring.SpringUtil;
