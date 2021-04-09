@@ -252,7 +252,7 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Void submitOrderBySkuId(Integer userId, Integer skuId, Integer num, Long userCouponId, Long addressId) throws ApiException {
+    public Map<String, Object> submitOrderBySkuId(Integer userId, Integer skuId, Integer num, Long userCouponId, Long addressId) throws ApiException {
         // 校验sku以及商品
         ItemSkuResult itemSku = mallService.getItemSkuBySkuId(skuId);
         Asserts.assertFalse(itemSku.getSkuStock() < num, 500, "商品库存不足");
@@ -291,7 +291,10 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
 
         insertUserOrderAddress(orderId, addressInfo.getMobile(), addressInfo.getRealname(), addressInfo.getProvince(), addressInfo.getProvinceId(),
                 addressInfo.getCity(), addressInfo.getCityId(), addressInfo.getDistrict(), addressInfo.getDistrictId(), addressInfo.getAddress());
-        return null;
+        Map<String, Object> resultMap = new HashMap<>(4);
+        resultMap.put("orderId", orderId);
+        resultMap.put("isPay", "N");
+        return resultMap;
     }
 
     /**
@@ -305,7 +308,7 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Void submitOrderByCart(Integer userId, String cartIds, Long userCouponId, Long addressId) throws ApiException {
+    public Map<String, Object> submitOrderByCart(Integer userId, String cartIds, Long userCouponId, Long addressId) throws ApiException {
         List<Integer> cartIdList = Arrays.stream(StringUtils.split(cartIds, ",")).map(Integer::valueOf)
                 .collect(Collectors.toList());
         Asserts.assertCollectionNotEmpty(cartIdList, 500, "购物车id不可以为空");
@@ -376,7 +379,10 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
 
         // 删除购物车id
         userCartMapper.deleteBatchIds(cartIdList);
-        return null;
+        Map<String, Object> resultMap = new HashMap<>(4);
+        resultMap.put("orderId", orderId);
+        resultMap.put("isPay", "N");
+        return resultMap;
     }
 
     /**
@@ -390,7 +396,7 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Void submitOrderByUserCouponIds(Integer userId, String userCouponIds, String userMobile, String websiteCode) throws ApiException {
+    public Map<String, Object> submitOrderByUserCouponIds(Integer userId, String userCouponIds, String userMobile, String websiteCode) throws ApiException {
         // 校验网点码商户
         MerchantResult merchantResult = frontMerchantService.getMerchantByWebsiteCode(websiteCode);
 
@@ -450,7 +456,11 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
         });
         insertUserOrderAddress(orderId, userMobile, userMobile, merchantResult.getProvince(), merchantResult.getProvinceId(), merchantResult.getCity(),
                 merchantResult.getCityId(), merchantResult.getDistrict(), merchantResult.getDistrictId(), merchantResult.getAddress());
-        return null;
+
+        Map<String, Object> resultMap = new HashMap<>(4);
+        resultMap.put("orderId", orderId);
+        resultMap.put("isPay", "N");
+        return resultMap;
     }
 
     /**

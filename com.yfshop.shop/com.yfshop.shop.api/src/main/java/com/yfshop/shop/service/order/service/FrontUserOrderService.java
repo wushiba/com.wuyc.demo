@@ -6,6 +6,7 @@ import com.yfshop.common.exception.ApiException;
 import com.yfshop.shop.service.order.result.YfUserOrderDetailResult;
 import com.yfshop.shop.service.order.result.YfUserOrderListResult;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @Title:用户订单Service接口
@@ -70,7 +71,7 @@ public interface FrontUserOrderService {
 	 * @return
 	 * @throws ApiException
 	 */
-	Void submitOrderBySkuId(Integer userId, Integer skuId, Integer num, Long userCouponId, Long addressId) throws ApiException;
+	Map<String, Object> submitOrderBySkuId(Integer userId, Integer skuId, Integer num, Long userCouponId, Long addressId) throws ApiException;
 
 	/**
 	 * 商品购物车下单购买
@@ -81,7 +82,7 @@ public interface FrontUserOrderService {
 	 * @return
 	 * @throws ApiException
 	 */
-	Void submitOrderByCart(Integer userId, String cartIds, Long userCouponId, Long addressId) throws ApiException;
+	Map<String, Object> submitOrderByCart(Integer userId, String cartIds, Long userCouponId, Long addressId) throws ApiException;
 
 	/**
 	 * 优惠券购买商品
@@ -92,7 +93,7 @@ public interface FrontUserOrderService {
 	 * @return
 	 * @throws ApiException
 	 */
-	Void submitOrderByUserCouponIds(Integer userId, String userCouponIds, String userMobile, String websiteCode) throws ApiException;
+	Map<String, Object> submitOrderByUserCouponIds(Integer userId, String userCouponIds, String userMobile, String websiteCode) throws ApiException;
 
 	/**
 	 * 用户付款后修改订单状态

@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.List;
+import java.util.Map;
 
 @Controller
 @Validated
@@ -101,7 +102,7 @@ public class FrontOrderController implements BaseController {
     @RequestMapping(value = "/order/submitOrderBySkuId", method = {RequestMethod.GET, RequestMethod.POST})
     @ResponseBody
     @SaCheckLogin
-    public CommonResult<Void> submitOrderBySkuId(Integer skuId, Integer num, Long userCouponId, Long addressId) {
+    public CommonResult<Map<String, Object>> submitOrderBySkuId(Integer skuId, Integer num, Long userCouponId, Long addressId) {
         return CommonResult.success(frontUserOrderService.submitOrderBySkuId(getCurrentUserId(), skuId, num, userCouponId, addressId));
     }
 
@@ -115,7 +116,7 @@ public class FrontOrderController implements BaseController {
     @RequestMapping(value = "/order/submitOrderByCart", method = {RequestMethod.GET, RequestMethod.POST})
     @ResponseBody
     @SaCheckLogin
-    public CommonResult<Void> submitOrderByCart(String cartIds, Long userCouponId, Long addressId) {
+    public CommonResult<Map<String, Object>> submitOrderByCart(String cartIds, Long userCouponId, Long addressId) {
         return CommonResult.success(frontUserOrderService.submitOrderByCart(getCurrentUserId(), cartIds, userCouponId, addressId));
     }
 
@@ -130,7 +131,7 @@ public class FrontOrderController implements BaseController {
     @RequestMapping(value = "/order/submitOrderByUserCouponIds", method = {RequestMethod.GET, RequestMethod.POST})
     @ResponseBody
     @SaCheckLogin
-    public CommonResult<Void> submitOrderByUserCouponIds(String userCouponIds, String userMobile, String websiteCode) {
+    public CommonResult<Map<String, Object>> submitOrderByUserCouponIds(String userCouponIds, String userMobile, String websiteCode) {
         return CommonResult.success(frontUserOrderService.submitOrderByUserCouponIds(getCurrentUserId(), userCouponIds, userMobile, websiteCode));
     }
 
