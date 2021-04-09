@@ -36,6 +36,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
@@ -87,6 +88,9 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
 
     @DubboReference
     private MpPayService mpPayService;
+
+    @Value("${wxPay.notifyUrl}")
+    private String wxPayNotifyUrl;
 
 
     @Override
@@ -406,7 +410,7 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
         WxPayUnifiedOrderRequest orderRequest = new WxPayUnifiedOrderRequest();
         orderRequest.setBody("网点码申请");
         orderRequest.setOutTradeNo(websiteCode.getOrderNo());
-        orderRequest.setNotifyUrl("http://prev-wx.yufan.51jujibao.com/pay/notify/order/websiteCodePay");
+        orderRequest.setNotifyUrl(wxPayNotifyUrl+"websiteCodePay");
         orderRequest.setTotalFee(BaseWxPayRequest.yuanToFen(fee));//元转成分
 //        orderRequest.setTotalFee(1);
         orderRequest.setOpenid(websiteCodePayReq.getOpenId());
