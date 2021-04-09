@@ -23,6 +23,7 @@ import com.yfshop.admin.task.WebsiteCodeTask;
 import com.yfshop.code.mapper.*;
 import com.yfshop.code.model.*;
 import com.yfshop.common.enums.GroupRoleEnum;
+import com.yfshop.common.enums.PayPrefixEnum;
 import com.yfshop.common.exception.ApiException;
 import com.yfshop.common.exception.Asserts;
 import com.yfshop.common.util.AddressUtil;
@@ -396,7 +397,7 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
         //websiteCode.setPayMethod("WxPay");
         websiteCode.setAddress(websiteCodeAddress.getProvince() + websiteCodeAddress.getCity() + websiteCodeAddress.getDistrict() + websiteCodeAddress.getAddress());
         //websiteCode.setOrderStatus("WAIT");
-        websiteCode.setOrderNo(String.format("%06d", websiteCodeAddress.getMerchantId()) + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyMMddHHmmssSSS")));
+        websiteCode.setOrderNo(String.format("$s%06d", PayPrefixEnum.WEBSITE_CODE, websiteCodeAddress.getMerchantId()) + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyMMddHHmmssSSS")));
         int count = websiteCodeMapper.update(websiteCode, Wrappers.<WebsiteCode>lambdaQuery()
                 .in(WebsiteCode::getId, websiteCodePayReq.getIds())
                 .eq(WebsiteCode::getOrderStatus, "PENDING"));
@@ -411,7 +412,7 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
         WxPayUnifiedOrderRequest orderRequest = new WxPayUnifiedOrderRequest();
         orderRequest.setBody("网点码申请");
         orderRequest.setOutTradeNo(websiteCode.getOrderNo());
-        orderRequest.setNotifyUrl(wxPayNotifyUrl+"websiteCodePay");
+        orderRequest.setNotifyUrl(wxPayNotifyUrl + "websiteCodePay");
 //        orderRequest.setTotalFee(BaseWxPayRequest.yuanToFen(fee));//元转成分
         orderRequest.setTotalFee(1);
         orderRequest.setOpenid(websiteCodePayReq.getOpenId());
