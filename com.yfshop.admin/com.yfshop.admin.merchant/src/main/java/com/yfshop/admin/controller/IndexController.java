@@ -21,5 +21,10 @@ class IndexController{
         return mav;
     }
 
+    @RequestMapping("/pay")
+    public ModelAndView pay() {
+        ModelAndView mav = new ModelAndView("pay");
+        return mav;
+    }
 
 }
