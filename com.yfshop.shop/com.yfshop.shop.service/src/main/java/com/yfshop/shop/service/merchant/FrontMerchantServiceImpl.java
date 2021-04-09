@@ -117,14 +117,14 @@ public class FrontMerchantServiceImpl implements FrontMerchantService {
                 .eq(WebsiteCodeDetail::getAlias, websiteCode));
         Asserts.assertNonNull(websiteCodeDetail, 500, "请扫描正确的网点码");
 
-        Object merchantObject = redisService.get(CacheConstants.MERCHANT_INFO_DATA);
+        Object merchantObject = redisService.get(CacheConstants.MERCHANT_WEBSITE_CODE + websiteCode);
         if (merchantObject != null) {
             return JSON.parseObject(merchantObject.toString(), MerchantResult.class);
         }
 
         Merchant merchant = merchantMapper.selectOne(Wrappers.lambdaQuery(Merchant.class)
                 .eq(Merchant::getId, websiteCodeDetail.getMerchantId()));
-        redisService.set(CacheConstants.MERCHANT_INFO_DATA, JSON.toJSONString(websiteCodeDetail), 60 * 60 * 24);
+        redisService.set(CacheConstants.MERCHANT_WEBSITE_CODE + websiteCode, JSON.toJSONString(websiteCodeDetail), 60 * 60 * 24);
         return BeanUtil.convert(merchant, MerchantResult.class);
     }
 
