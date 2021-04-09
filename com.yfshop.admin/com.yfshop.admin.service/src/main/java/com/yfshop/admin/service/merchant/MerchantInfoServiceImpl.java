@@ -414,7 +414,7 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
         WxPayUnifiedOrderRequest orderRequest = new WxPayUnifiedOrderRequest();
         orderRequest.setBody("网点码申请");
         orderRequest.setOutTradeNo(websiteCode.getOrderNo());
-        orderRequest.setNotifyUrl(wxPayNotifyUrl + "websiteCodePay");
+        orderRequest.setNotifyUrl(wxPayNotifyUrl + PayPrefixEnum.WEBSITE_CODE.getBizType());
 //        orderRequest.setTotalFee(BaseWxPayRequest.yuanToFen(fee));//元转成分
         orderRequest.setTotalFee(1);
         orderRequest.setOpenid(websiteCodePayReq.getOpenId());
