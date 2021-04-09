@@ -1,6 +1,8 @@
 package com.yfshop.shop.controller.order;
 
 import cn.dev33.satoken.annotation.SaCheckLogin;
+import com.github.binarywang.wxpay.bean.order.WxPayMpOrderResult;
+import com.github.binarywang.wxpay.exception.WxPayException;
 import com.yfshop.common.api.CommonResult;
 import com.yfshop.common.base.BaseController;
 import com.yfshop.common.exception.ApiException;
@@ -180,5 +182,19 @@ public class FrontOrderController implements BaseController {
     public CommonResult<Void> confirmOrder(Long orderDetailId) {
         return CommonResult.success(frontUserOrderService.confirmOrder(getCurrentUserId(), orderDetailId));
     }
+
+    /**
+     * 用户确认订单
+     * @param   orderId   订单id
+     * @return  WxPayMpOrderResult
+     */
+    @RequestMapping(value = "/order/toPay", method = {RequestMethod.GET, RequestMethod.POST})
+    @ResponseBody
+    @SaCheckLogin
+    public CommonResult<WxPayMpOrderResult> orderToPay(Long orderId) throws WxPayException {
+        return CommonResult.success(frontUserOrderService.userOrderToPay(orderId));
+    }
+
+
 
 }

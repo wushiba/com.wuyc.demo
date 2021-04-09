@@ -124,14 +124,14 @@ public class FrontDrawServiceImpl implements FrontDrawService {
 
         // 判断是否使用, 根据actCode查询用户优惠券表
         UserCoupon userCoupon = userCouponMapper.selectOne(Wrappers.lambdaQuery(UserCoupon.class).eq(UserCoupon::getActCode, actCode));
-        Asserts.assertNull(userCoupon, 500, "请勿重复扫码抽奖");
+        Asserts.assertNull(userCoupon, 503, "请勿重复扫码抽奖");
 
         // 获取奖品，每个奖品登记优惠券id， 可以走缓存
         YfDrawActivityResult yfDrawActivityResult = getDrawActivityDetailById(drawActivityId);
-        Asserts.assertNonNull(yfDrawActivityResult, 500, "活动不存在,请联系管理员");
+        Asserts.assertNonNull(yfDrawActivityResult, 501, "活动不存在,请联系管理员");
         Asserts.assertEquals(yfDrawActivityResult.getIsEnable(), "Y", 500, "活动暂未开启,请联系管理员");
-        Asserts.assertFalse(yfDrawActivityResult.getEndTime().isAfter(LocalDateTime.now()), 500, "活动暂未开始,请稍后再试");
-        Asserts.assertFalse(yfDrawActivityResult.getEndTime().isBefore(LocalDateTime.now()), 500, "活动暂已结束,请稍后再试");
+        Asserts.assertFalse(yfDrawActivityResult.getStartTime().isAfter(LocalDateTime.now()), 501, "活动暂未开始,请稍后再试");
+        Asserts.assertFalse(yfDrawActivityResult.getEndTime().isBefore(LocalDateTime.now()), 501, "活动暂已结束,请稍后再试");
         List<YfDrawPrizeResult> prizeList = yfDrawActivityResult.getPrizeList();
         Asserts.assertCollectionNotEmpty(prizeList, 500, "活动暂未配置奖品，请稍微再试");
         Map<Integer, List<YfDrawPrizeResult>> prizeMap = prizeList.stream().collect(Collectors

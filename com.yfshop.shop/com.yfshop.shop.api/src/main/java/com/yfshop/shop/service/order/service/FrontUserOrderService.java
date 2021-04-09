@@ -1,5 +1,7 @@
 package com.yfshop.shop.service.order.service;
 
+import com.github.binarywang.wxpay.bean.order.WxPayMpOrderResult;
+import com.github.binarywang.wxpay.exception.WxPayException;
 import com.yfshop.common.exception.ApiException;
 import com.yfshop.shop.service.order.result.YfUserOrderDetailResult;
 import com.yfshop.shop.service.order.result.YfUserOrderListResult;
@@ -99,5 +101,13 @@ public interface FrontUserOrderService {
 	 * @throws ApiException
 	 */
 	Void updateOrderPayStatus(Long orderId) throws ApiException;
+
+	/**
+	 * 根据订单号唤起微信支付
+	 * @param orderId	用户订单id
+	 * @return
+	 * @throws ApiException
+	 */
+	WxPayMpOrderResult userOrderToPay(Long orderId) throws WxPayException, ApiException;
 
 }
