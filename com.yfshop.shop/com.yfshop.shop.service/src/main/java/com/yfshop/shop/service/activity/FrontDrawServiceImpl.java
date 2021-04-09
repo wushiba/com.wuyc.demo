@@ -1,15 +1,16 @@
 package com.yfshop.shop.service.activity;
 
 import cn.hutool.core.net.NetUtil;
+import cn.hutool.extra.spring.SpringUtil;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
-import com.baomidou.mybatisplus.extension.exceptions.ApiException;
 import com.yfshop.code.mapper.*;
 import com.yfshop.code.model.*;
 import com.yfshop.common.constants.CacheConstants;
 import com.yfshop.common.enums.BoxSpecValEnum;
 import com.yfshop.common.enums.ProvinceEnum;
+import com.yfshop.common.exception.ApiException;
 import com.yfshop.common.exception.Asserts;
 import com.yfshop.common.service.RedisService;
 import com.yfshop.common.util.BeanUtil;
@@ -21,6 +22,7 @@ import com.yfshop.shop.service.coupon.result.YfUserCouponResult;
 import com.yfshop.shop.service.coupon.service.FrontUserCouponService;
 import com.yfshop.shop.service.user.result.UserResult;
 import com.yfshop.shop.service.user.service.FrontUserService;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -123,8 +125,10 @@ public class FrontDrawServiceImpl implements FrontDrawService {
         Integer drawActivityId = actCodeBatchDetail.getActId();
 
         // 判断是否使用, 根据actCode查询用户优惠券表
-        UserCoupon userCoupon = userCouponMapper.selectOne(Wrappers.lambdaQuery(UserCoupon.class).eq(UserCoupon::getActCode, actCode));
-        Asserts.assertNull(userCoupon, 503, "请勿重复扫码抽奖");
+        if ("pro".equalsIgnoreCase(SpringUtil.getActiveProfile()) || !"2bfdd1cc48ac96a9".equalsIgnoreCase(actCode)) {
+            UserCoupon userCoupon = userCouponMapper.selectOne(Wrappers.lambdaQuery(UserCoupon.class).eq(UserCoupon::getActCode, actCode));
+            Asserts.assertNull(userCoupon, 503, "请勿重复扫码抽奖");
+        }
 
         // 获取奖品，每个奖品登记优惠券id， 可以走缓存
         YfDrawActivityResult yfDrawActivityResult = getDrawActivityDetailById(drawActivityId);
