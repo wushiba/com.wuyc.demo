@@ -1,6 +1,7 @@
 package com.yfshop.shop.service.order;
 
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.extra.spring.SpringUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.github.binarywang.wxpay.bean.order.WxPayMpOrderResult;
 import com.github.binarywang.wxpay.bean.request.BaseWxPayRequest;
@@ -504,11 +505,15 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
         orderRequest.setBody("用户订单支付");
         orderRequest.setTradeType("JSAPI");
         orderRequest.setOpenid(user.getOpenId());
-        orderRequest.setNotifyUrl(wxPayNotifyUrl + "websiteCodePay");
-        orderRequest.setSpbillCreateIp(order.getUserId() + "-" + orderId);
-        orderRequest.setTotalFee(BaseWxPayRequest.yuanToFen(order.getPayPrice().toString()));
+        orderRequest.setNotifyUrl(wxPayNotifyUrl + PayPrefixEnum.USER_ORDER.getBizType());
+        orderRequest.setSpbillCreateIp("127.0.0.1");
+        if ("pro".equalsIgnoreCase(SpringUtil.getActiveProfile())){
+            orderRequest.setTotalFee(BaseWxPayRequest.yuanToFen(order.getPayPrice().toString()));
+        } else {
+            orderRequest.setTotalFee(1);
+        }
         orderRequest.setTimeStart(DateFormatUtils.format(new Date(), "yyyyMMddHHmmss"));
-        orderRequest.setOutTradeNo(PayPrefixEnum.USER_ORDER.getBizType() + order.getId() + "_" + order.getPayEntryCount());
+        orderRequest.setOutTradeNo(PayPrefixEnum.USER_ORDER.getPrefix() + order.getId() + "-" + order.getPayEntryCount());
         orderRequest.setTimeExpire(DateFormatUtils.format(new Date(System.currentTimeMillis() + (1000 * 60 * 15)), "yyyyMMddHHmmss"));
         WxPayMpOrderResult payOrderResult = mpPayService.createPayOrder(orderRequest);
 

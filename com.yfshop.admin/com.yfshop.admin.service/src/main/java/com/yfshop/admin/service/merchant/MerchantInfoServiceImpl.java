@@ -387,6 +387,7 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
         return BeanUtil.convert(websiteCodeMapper.selectById(id), WebsiteCodeResult.class);
     }
 
+
     @SneakyThrows
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -398,7 +399,7 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
         //websiteCode.setPayMethod("WxPay");
         websiteCode.setAddress(websiteCodeAddress.getProvince() + websiteCodeAddress.getCity() + websiteCodeAddress.getDistrict() + websiteCodeAddress.getAddress());
         //websiteCode.setOrderStatus("WAIT");
-        websiteCode.setOrderNo(String.format("$s%06d", PayPrefixEnum.WEBSITE_CODE, websiteCodeAddress.getMerchantId()) + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyMMddHHmmssSSS")));
+        websiteCode.setOrderNo(String.format("%06d", websiteCodeAddress.getMerchantId()) + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyMMddHHmmssSSS")));
         int count = websiteCodeMapper.update(websiteCode, Wrappers.<WebsiteCode>lambdaQuery()
                 .in(WebsiteCode::getId, websiteCodePayReq.getIds())
                 .eq(WebsiteCode::getOrderStatus, "PENDING"));
@@ -413,7 +414,7 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
         WxPayUnifiedOrderRequest orderRequest = new WxPayUnifiedOrderRequest();
         orderRequest.setBody("网点码申请");
         orderRequest.setOutTradeNo(websiteCode.getOrderNo());
-        orderRequest.setNotifyUrl(wxPayNotifyUrl + "websiteCodePay");
+        orderRequest.setNotifyUrl(wxPayNotifyUrl + PayPrefixEnum.WEBSITE_CODE.getBizType());
 //        orderRequest.setTotalFee(BaseWxPayRequest.yuanToFen(fee));//元转成分
         orderRequest.setTotalFee(1);
         orderRequest.setOpenid(websiteCodePayReq.getOpenId());
@@ -467,6 +468,8 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
     public void websitePayOrderNotify(WxPayOrderNotifyReq notifyResult) throws ApiException {
         WebsiteCode websiteCode = new WebsiteCode();
         websiteCode.setPayMethod("WxPay");
+        websiteCode.setPayTime(LocalDateTime.now());
+        websiteCode.setOrderStatus("WAIT");
         websiteCode.setBillno(notifyResult.getTransactionId());
         int count = websiteCodeMapper.update(websiteCode, Wrappers.<WebsiteCode>lambdaQuery()
                 .eq(WebsiteCode::getOrderNo, notifyResult.getOutTradeNo())

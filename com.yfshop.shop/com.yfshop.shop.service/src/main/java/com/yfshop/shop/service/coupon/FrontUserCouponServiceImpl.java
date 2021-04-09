@@ -67,7 +67,7 @@ public class FrontUserCouponServiceImpl implements FrontUserCouponService {
     @Override
     public YfCouponResult getCouponResultById(Integer couponId) throws ApiException {
         Asserts.assertNonNull(couponId, 500, "优惠券id不可以为空");
-        Object couponObject = redisService.get(CacheConstants.COUPON_INFO_DATA);
+        Object couponObject = redisService.get(CacheConstants.COUPON_INFO_DATA + couponId);
         if (couponObject != null) {
             return JSON.parseObject(couponObject.toString(), YfCouponResult.class);
         }
@@ -76,7 +76,7 @@ public class FrontUserCouponServiceImpl implements FrontUserCouponService {
         Asserts.assertNonNull(coupon, 500, "优惠券不存在");
 
         YfCouponResult yfCouponResult = BeanUtil.convert(coupon, YfCouponResult.class);
-        redisService.set(CacheConstants.MERCHANT_WEBSITE_CODE, JSON.toJSONString(yfCouponResult), 60 * 60 * 24);
+        redisService.set(CacheConstants.COUPON_INFO_DATA + couponId, JSON.toJSONString(yfCouponResult), 60 * 60 * 24);
         return yfCouponResult;
     }
 
@@ -96,7 +96,7 @@ public class FrontUserCouponServiceImpl implements FrontUserCouponService {
         if ("Y".equalsIgnoreCase(userCouponReq.getIsCanUse())) {
             queryWrapper.eq(UserCoupon::getUseStatus, UserCouponStatusEnum.NO_USE.getCode())
                     .gt(UserCoupon::getValidEndTime, new Date());
-        } else {
+        } else if ("N".equalsIgnoreCase(userCouponReq.getIsCanUse())) {
             queryWrapper.in(UserCoupon::getUseStatus, UserCouponStatusEnum.IN_USE.getCode()
                     , UserCouponStatusEnum.HAS_USE.getCode())
                     .lt(UserCoupon::getValidEndTime, new Date());
@@ -109,7 +109,7 @@ public class FrontUserCouponServiceImpl implements FrontUserCouponService {
         if (userCouponReq.getDrawPrizeLevel() != null) {
             queryWrapper.eq(UserCoupon::getDrawPrizeLevel, userCouponReq.getDrawPrizeLevel());
         }
-        if (StringUtils.isBlank(userCouponReq.getCouponResource())) {
+        if (StringUtils.isNotBlank(userCouponReq.getCouponResource())) {
             queryWrapper.eq(UserCoupon::getCouponResource, userCouponReq.getCouponResource());
         }
 

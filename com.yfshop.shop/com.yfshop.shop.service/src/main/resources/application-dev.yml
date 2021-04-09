@@ -60,3 +60,5 @@ dubbo:
     retries: 0
   consumer:
     check: false
+wxPay:
+  notifyUrl: http://prev-wx.yufan.51jujibao.com/wx/pay/notify/order/

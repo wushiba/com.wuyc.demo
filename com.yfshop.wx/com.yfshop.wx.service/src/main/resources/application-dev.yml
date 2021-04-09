@@ -12,7 +12,7 @@ dubbo:
     port: 20889
     name: dubbo
   scan:
-    base-packages: com.yfshop.auth
+    base-packages: com.yfshop.wx
   provider:
     dynamic: true
     timeout: 30000
@@ -48,12 +48,12 @@ wx:
   mp:
     useRedis: false
     configs:
-      - appId: wxfe620617eec2f4b0 # 第一个公众号的appid
+      - appId: wxf4797fe8b12cdf62 # 第一个公众号的appid
         secret: 64a61d9e95094f1e974861b62ec4dce8 # 公众号的appsecret
         token: yufanshop # 接口配置里的Token值
         aesKey: U2ztwhpnvy5SNDiICGloZA0Pgi2WdgDmsO4abHCEtvz # 接口配置里的EncodingAESKey
   pay:
-    appId: wxfe620617eec2f4b0
+    appId: wxf4797fe8b12cdf62
     mchId: 1607782065
     mchKey: F1887D3F9E6EE7A32FE5E76F4AB80D63
     subAppId: #服务商模式下的子商户公众账号ID

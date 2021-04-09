@@ -169,7 +169,7 @@ public class MallServiceImpl implements MallService {
     @Override
     public ItemSkuResult getItemSkuBySkuId(Integer skuId) throws ApiException {
         Asserts.assertNonNull(skuId, 500, "商品skuId不可以为空");
-        Object itemSkuObject = redisService.get(CacheConstants.MALL_ITEM_SKU_CACHE_KEY_PREFIX);
+        Object itemSkuObject = redisService.get(CacheConstants.MALL_ITEM_SKU_CACHE_KEY_PREFIX + skuId);
         if (itemSkuObject != null) {
             return JSON.parseObject(itemSkuObject.toString(), ItemSkuResult.class);
         }
@@ -178,7 +178,7 @@ public class MallServiceImpl implements MallService {
         Asserts.assertNonNull(itemSku, 500, "商品sku不存在");
 
         ItemSkuResult itemSkuResult = BeanUtil.convert(itemSku, ItemSkuResult.class);
-        redisService.set(CacheConstants.MALL_ITEM_SKU_CACHE_KEY_PREFIX, JSON.toJSONString(itemSkuResult), 60 * 60);
+        redisService.set(CacheConstants.MALL_ITEM_SKU_CACHE_KEY_PREFIX + skuId, JSON.toJSONString(itemSkuResult), 60 * 60);
         return itemSkuResult;
     }
 
