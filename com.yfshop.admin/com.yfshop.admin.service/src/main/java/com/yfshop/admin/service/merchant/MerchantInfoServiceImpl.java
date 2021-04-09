@@ -388,6 +388,7 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
     }
 
 
+    @SneakyThrows
     @Override
     @Transactional(rollbackFor = Exception.class)
     public WxPayMpOrderResult applyWebsiteCodePay(WebsiteCodePayReq websiteCodePayReq) throws ApiException {
