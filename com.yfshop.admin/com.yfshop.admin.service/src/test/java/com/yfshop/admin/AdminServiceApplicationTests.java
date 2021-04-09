@@ -342,369 +342,450 @@ public class AdminServiceApplicationTests {
         }
     }
 
-    //    @Test
+//    @Test
     public void createMenus() {
-        createSystemMenus();
-        createZongBuMenus();
-        createFGSmenus();
-        createSQmenus();
-        createJXSmenus();
+        createSysMenus22222222();
+        createZongBuMenus22222222();
+        createFGSmenus22222222();
+        createSQmenus22222222();
+        createJXSmenus22222222();
         createYWY_FXS_CXY_menus();
         createWLMenus();
         queryMenus();
     }
 
-    public void createSystemMenus() {
-        /*
-        超管：能访问所有菜单
-        */
-
-        {
-            // 超管
-
-            Menu 商户管理 = new Menu();
-            商户管理.setMenuName("商户管理");
-            商户管理.setMenuAlias("shgl_" + GroupRoleEnum.SYS.getCode());
-            商户管理.setMenuIcon(null);
-            商户管理.setLinkUrl(null);
-            商户管理.setRoleAlias(GroupRoleEnum.SYS.getCode());
-            商户管理.setSort(1);
-            商户管理.setParentMenuAlias(null);
-            Menu 网点类型配置 = new Menu();
-            网点类型配置.setParentMenuAlias(商户管理.getMenuAlias());
-            网点类型配置.setMenuName("网点类型配置");
-            网点类型配置.setMenuAlias("wdlxpz_" + GroupRoleEnum.SYS.getCode());
-            网点类型配置.setMenuIcon(null);
-            网点类型配置.setLinkUrl("/");
-            网点类型配置.setRoleAlias(GroupRoleEnum.SYS.getCode());
-            网点类型配置.setSort(1);
-            Menu 码源工厂管理 = new Menu();
-            码源工厂管理.setParentMenuAlias(商户管理.getMenuAlias());
-            码源工厂管理.setMenuName("码源工厂管理");
-            码源工厂管理.setMenuAlias("mygcgl_" + GroupRoleEnum.SYS.getCode());
-            码源工厂管理.setMenuIcon(null);
-            码源工厂管理.setLinkUrl("/");
-            码源工厂管理.setRoleAlias(GroupRoleEnum.SYS.getCode());
-            码源工厂管理.setSort(2);
-
-            Menu 网点码管理 = new Menu();
-            网点码管理.setMenuName("网点码管理");
-            网点码管理.setMenuAlias("wdmgl_" + GroupRoleEnum.SYS.getCode());
-            网点码管理.setMenuIcon(null);
-            网点码管理.setLinkUrl(null);
-            网点码管理.setRoleAlias(GroupRoleEnum.SYS.getCode());
-            网点码管理.setSort(2);
-            网点码管理.setParentMenuAlias(null);
-            Menu 活动码管理 = new Menu();
-            活动码管理.setParentMenuAlias(网点码管理.getMenuAlias());
-            活动码管理.setMenuName("活动码管理");
-            活动码管理.setMenuAlias("hdmgl_" + GroupRoleEnum.SYS.getCode());
-            活动码管理.setMenuIcon(null);
-            活动码管理.setLinkUrl("/");
-            活动码管理.setRoleAlias(GroupRoleEnum.SYS.getCode());
-            活动码管理.setSort(1);
-
-            Menu 活动管理 = new Menu();
-            活动管理.setParentMenuAlias(null);
-            活动管理.setMenuName("活动管理");
-            活动管理.setMenuAlias("hdgl_" + GroupRoleEnum.SYS.getCode());
-            活动管理.setMenuIcon(null);
-            活动管理.setLinkUrl(null);
-            活动管理.setRoleAlias(GroupRoleEnum.SYS.getCode());
-            活动管理.setSort(3);
-            Menu 活动数据 = new Menu();
-            活动数据.setParentMenuAlias(活动管理.getMenuAlias());
-            活动数据.setMenuName("活动数据");
-            活动数据.setMenuAlias("hdsj_" + GroupRoleEnum.SYS.getCode());
-            活动数据.setMenuIcon(null);
-            活动数据.setLinkUrl("/");
-            活动数据.setRoleAlias(GroupRoleEnum.SYS.getCode());
-            活动数据.setSort(1);
-            Menu 活动报表统计 = new Menu();
-            活动报表统计.setParentMenuAlias(活动管理.getMenuAlias());
-            活动报表统计.setMenuName("活动报表统计");
-            活动报表统计.setMenuAlias("hdbbtj_" + GroupRoleEnum.SYS.getCode());
-            活动报表统计.setMenuIcon(null);
-            活动报表统计.setLinkUrl("/");
-            活动报表统计.setRoleAlias(GroupRoleEnum.SYS.getCode());
-            活动报表统计.setSort(2);
-
-            Menu 分类管理 = new Menu();
-            分类管理.setParentMenuAlias(null);
-            分类管理.setMenuName("分类管理");
-            分类管理.setMenuAlias("flgl_" + GroupRoleEnum.SYS.getCode());
-            分类管理.setMenuIcon(null);
-            分类管理.setLinkUrl(null);
-            分类管理.setRoleAlias(GroupRoleEnum.SYS.getCode());
-            分类管理.setSort(4);
-
-            Menu 商品管理 = new Menu();
-            商品管理.setParentMenuAlias(null);
-            商品管理.setMenuName("商品管理");
-            商品管理.setMenuAlias("spgl_" + GroupRoleEnum.SYS.getCode());
-            商品管理.setMenuIcon(null);
-            商品管理.setLinkUrl(null);
-            商品管理.setRoleAlias(GroupRoleEnum.SYS.getCode());
-            商品管理.setSort(5);
-
-            Menu 订单管理 = new Menu();
-            订单管理.setParentMenuAlias(null);
-            订单管理.setMenuName("订单管理");
-            订单管理.setMenuAlias("ddgl_" + GroupRoleEnum.SYS.getCode());
-            订单管理.setMenuIcon(null);
-            订单管理.setLinkUrl(null);
-            订单管理.setRoleAlias(GroupRoleEnum.SYS.getCode());
-            订单管理.setSort(6);
-
-            Menu banner配置 = new Menu();
-            banner配置.setParentMenuAlias(null);
-            banner配置.setMenuName("banner配置");
-            banner配置.setMenuAlias("bannerpz_" + GroupRoleEnum.SYS.getCode());
-            banner配置.setMenuIcon(null);
-            banner配置.setLinkUrl(null);
-            banner配置.setRoleAlias(GroupRoleEnum.SYS.getCode());
-            banner配置.setSort(7);
-
-            Menu 首页配置 = new Menu();
-            首页配置.setParentMenuAlias(null);
-            首页配置.setMenuName("首页配置");
-            首页配置.setMenuAlias("sypz_" + GroupRoleEnum.SYS.getCode());
-            首页配置.setMenuIcon(null);
-            首页配置.setLinkUrl(null);
-            首页配置.setRoleAlias(GroupRoleEnum.SYS.getCode());
-            首页配置.setSort(8);
-
-            Menu 优惠券管理 = new Menu();
-            优惠券管理.setParentMenuAlias(null);
-            优惠券管理.setMenuName("优惠券管理");
-            优惠券管理.setMenuAlias("yhqgl_" + GroupRoleEnum.SYS.getCode());
-            优惠券管理.setMenuIcon(null);
-            优惠券管理.setLinkUrl(null);
-            优惠券管理.setRoleAlias(GroupRoleEnum.SYS.getCode());
-            优惠券管理.setSort(9);
-
-            Menu 公众号消息模板配置 = new Menu();
-            公众号消息模板配置.setParentMenuAlias(null);
-            公众号消息模板配置.setMenuName("公众号消息模板配置");
-            公众号消息模板配置.setMenuAlias("gzhxxmbpz_" + GroupRoleEnum.SYS.getCode());
-            公众号消息模板配置.setMenuIcon(null);
-            公众号消息模板配置.setLinkUrl(null);
-            公众号消息模板配置.setRoleAlias(GroupRoleEnum.SYS.getCode());
-            公众号消息模板配置.setSort(10);
-
-            Menu 物料管理 = new Menu();
-            物料管理.setParentMenuAlias(null);
-            物料管理.setMenuName("物料管理");
-            物料管理.setMenuAlias("wlgl_" + GroupRoleEnum.SYS.getCode());
-            物料管理.setMenuIcon(null);
-            物料管理.setLinkUrl(null);
-            物料管理.setRoleAlias(GroupRoleEnum.SYS.getCode());
-            物料管理.setSort(11);
-
-            List<Menu> list = new ArrayList<>();
-            list.add(商户管理);
-            list.add(网点类型配置);
-            list.add(码源工厂管理);
-
-            list.add(网点码管理);
-            list.add(活动码管理);
-
-            list.add(活动管理);
-            list.add(活动数据);
-            list.add(活动报表统计);
-
-            list.add(分类管理);
-
-            list.add(商品管理);
-
-            list.add(订单管理);
-
-            list.add(banner配置);
-
-            list.add(首页配置);
-
-            list.add(优惠券管理);
-
-            list.add(公众号消息模板配置);
-
-            list.add(物料管理);
-
-            menuManager.saveBatch(list);
-        }
+    public void createSysMenus22222222() {
+        String roleCode = GroupRoleEnum.SYS.getCode();
+        List<Menu> list = new ArrayList<>();
+        // 超管
+        Menu parent商户管理 = new Menu();
+        parent商户管理.setMenuName("商户管理");
+        parent商户管理.setMenuAlias("parent_shgl_" + roleCode);
+        parent商户管理.setMenuIcon(null);
+        parent商户管理.setLinkUrl("/merchantsManagement");
+        parent商户管理.setRoleAlias(roleCode);
+        parent商户管理.setSort(1);
+        parent商户管理.setParentMenuAlias(null);
+        Menu 商户管理 = new Menu();
+        商户管理.setMenuName("商户管理");
+        商户管理.setMenuAlias("shgl_" + roleCode);
+        商户管理.setMenuIcon(null);
+        商户管理.setLinkUrl("/merchantsManagement/merchantsList");
+        商户管理.setRoleAlias(roleCode);
+        商户管理.setSort(1);
+        商户管理.setParentMenuAlias(parent商户管理.getMenuAlias());
+        Menu 网点类型配置 = new Menu();
+        网点类型配置.setParentMenuAlias(parent商户管理.getMenuAlias());
+        网点类型配置.setMenuName("网点类型配置");
+        网点类型配置.setMenuAlias("wdlxpz_" + roleCode);
+        网点类型配置.setMenuIcon(null);
+        网点类型配置.setLinkUrl("/merchantsManagement/netWorkTypeList");
+        网点类型配置.setRoleAlias(roleCode);
+        网点类型配置.setSort(2);
+        Menu 码源工厂管理 = new Menu();
+        码源工厂管理.setParentMenuAlias(parent商户管理.getMenuAlias());
+        码源工厂管理.setMenuName("码源工厂管理");
+        码源工厂管理.setMenuAlias("mygcgl_" + roleCode);
+        码源工厂管理.setMenuIcon(null);
+        码源工厂管理.setLinkUrl("/merchantsManagement/codeFactory");
+        码源工厂管理.setRoleAlias(roleCode);
+        码源工厂管理.setSort(3);
+        list.add(parent商户管理);
+        list.add(商户管理);
+        list.add(网点类型配置);
+        list.add(码源工厂管理);
 
 
+        Menu parent二维码管理 = new Menu();
+        parent二维码管理.setParentMenuAlias(null);
+        parent二维码管理.setMenuName("二维码管理");
+        parent二维码管理.setMenuAlias("parent_ewmgl_" + roleCode);
+        parent二维码管理.setMenuIcon(null);
+        parent二维码管理.setLinkUrl("/networkCodeManagement");
+        parent二维码管理.setRoleAlias(roleCode);
+        parent二维码管理.setSort(2);
+        Menu 网点码管理 = new Menu();
+        网点码管理.setMenuName("网点码管理");
+        网点码管理.setMenuAlias("wdmgl_" + roleCode);
+        网点码管理.setMenuIcon(null);
+        网点码管理.setLinkUrl("/networkCodeManagement/networkCodeList");
+        网点码管理.setRoleAlias(roleCode);
+        网点码管理.setSort(1);
+        网点码管理.setParentMenuAlias(parent二维码管理.getMenuAlias());
+        Menu 活动码管理 = new Menu();
+        活动码管理.setMenuName("活动码管理");
+        活动码管理.setMenuAlias("hdmgl_" + roleCode);
+        活动码管理.setMenuIcon(null);
+        活动码管理.setLinkUrl("/networkCodeManagement/activityCodeList");
+        活动码管理.setRoleAlias(roleCode);
+        活动码管理.setSort(2);
+        活动码管理.setParentMenuAlias(parent二维码管理.getMenuAlias());
+        list.add(parent二维码管理);
+        list.add(网点码管理);
+        list.add(活动码管理);
+
+
+        Menu parent供应商后台 = new Menu();
+        parent供应商后台.setParentMenuAlias(null);
+        parent供应商后台.setMenuName("供应商后台");
+        parent供应商后台.setMenuAlias("parent_gysht_" + roleCode);
+        parent供应商后台.setMenuIcon(null);
+        parent供应商后台.setLinkUrl("/networkCodeManagement");
+        parent供应商后台.setRoleAlias(roleCode);
+        parent供应商后台.setSort(3);
+        Menu 商户码管理 = new Menu();
+        商户码管理.setParentMenuAlias(parent供应商后台.getMenuAlias());
+        商户码管理.setMenuName("商户码管理");
+        商户码管理.setMenuAlias("shmgl_" + roleCode);
+        商户码管理.setMenuIcon(null);
+        商户码管理.setLinkUrl("/networkCodeManagement/networkCodeListForGys");
+        商户码管理.setRoleAlias(roleCode);
+        商户码管理.setSort(1);
+        list.add(parent供应商后台);
+        list.add(商户码管理);
+
+
+        Menu parent活动管理 = new Menu();
+        parent活动管理.setParentMenuAlias(null);
+        parent活动管理.setMenuName("活动管理");
+        parent活动管理.setMenuAlias("parent_hdgl_" + roleCode);
+        parent活动管理.setMenuIcon(null);
+        parent活动管理.setLinkUrl("/activitysManagement");
+        parent活动管理.setRoleAlias(roleCode);
+        parent活动管理.setSort(4);
+        Menu 活动管理 = new Menu();
+        活动管理.setParentMenuAlias(parent活动管理.getMenuAlias());
+        活动管理.setMenuName("活动管理");
+        活动管理.setMenuAlias("hdgl_" + roleCode);
+        活动管理.setMenuIcon(null);
+        活动管理.setLinkUrl("/activitysManagement/activitysList");
+        活动管理.setRoleAlias(roleCode);
+        活动管理.setSort(1);
+        Menu 活动数据 = new Menu();
+        活动数据.setParentMenuAlias(parent活动管理.getMenuAlias());
+        活动数据.setMenuName("活动数据");
+        活动数据.setMenuAlias("hdsj_" + roleCode);
+        活动数据.setMenuIcon(null);
+        活动数据.setLinkUrl("/activitysManagement/activitysDataList");
+        活动数据.setRoleAlias(roleCode);
+        活动数据.setSort(2);
+        Menu 活动报表统计 = new Menu();
+        活动报表统计.setParentMenuAlias(parent活动管理.getMenuAlias());
+        活动报表统计.setMenuName("活动报表统计");
+        活动报表统计.setMenuAlias("hdbbtj_" + roleCode);
+        活动报表统计.setMenuIcon(null);
+        活动报表统计.setLinkUrl("/activitysManagement/activitysEcharts");
+        活动报表统计.setRoleAlias(roleCode);
+        活动报表统计.setSort(3);
+        list.add(parent活动管理);
+        list.add(活动管理);
+        list.add(活动数据);
+        list.add(活动报表统计);
+
+
+        Menu parent商城管理 = new Menu();
+        parent商城管理.setParentMenuAlias(null);
+        parent商城管理.setMenuName("商城管理");
+        parent商城管理.setMenuAlias("parent_scgl_" + roleCode);
+        parent商城管理.setMenuIcon(null);
+        parent商城管理.setLinkUrl("/shopManagement");
+        parent商城管理.setRoleAlias(roleCode);
+        parent商城管理.setSort(5);
+        Menu 分类管理 = new Menu();
+        分类管理.setParentMenuAlias(parent商城管理.getMenuAlias());
+        分类管理.setMenuName("分类管理");
+        分类管理.setMenuAlias("flgl_" + roleCode);
+        分类管理.setMenuIcon(null);
+        分类管理.setLinkUrl("/shopManagement/shopTypeList");
+        分类管理.setRoleAlias(roleCode);
+        分类管理.setSort(1);
+        Menu 商品管理 = new Menu();
+        商品管理.setParentMenuAlias(parent商城管理.getMenuAlias());
+        商品管理.setMenuName("商品管理");
+        商品管理.setMenuAlias("spgl_" + roleCode);
+        商品管理.setMenuIcon(null);
+        商品管理.setLinkUrl("/shopManagement/goodsList");
+        商品管理.setRoleAlias(roleCode);
+        商品管理.setSort(2);
+        Menu 订单管理 = new Menu();
+        订单管理.setParentMenuAlias(parent商城管理.getMenuAlias());
+        订单管理.setMenuName("订单管理");
+        订单管理.setMenuAlias("ddgl_" + roleCode);
+        订单管理.setMenuIcon(null);
+        订单管理.setLinkUrl("/shopManagement/orderList");
+        订单管理.setRoleAlias(roleCode);
+        订单管理.setSort(3);
+        Menu banner配置 = new Menu();
+        banner配置.setParentMenuAlias(parent商城管理.getMenuAlias());
+        banner配置.setMenuName("banner配置");
+        banner配置.setMenuAlias("bannerpz_" + roleCode);
+        banner配置.setMenuIcon(null);
+        banner配置.setLinkUrl("/shopManagement/bannerList");
+        banner配置.setRoleAlias(roleCode);
+        banner配置.setSort(4);
+        Menu 首页配置 = new Menu();
+        首页配置.setParentMenuAlias(parent商城管理.getMenuAlias());
+        首页配置.setMenuName("首页配置");
+        首页配置.setMenuAlias("sypz_" + roleCode);
+        首页配置.setMenuIcon(null);
+        首页配置.setLinkUrl("/shopManagement/homepageList");
+        首页配置.setRoleAlias(roleCode);
+        首页配置.setSort(5);
+        Menu 优惠券管理 = new Menu();
+        优惠券管理.setParentMenuAlias(parent商城管理.getMenuAlias());
+        优惠券管理.setMenuName("优惠券管理");
+        优惠券管理.setMenuAlias("yhqgl_" + roleCode);
+        优惠券管理.setMenuIcon(null);
+        优惠券管理.setLinkUrl("/shopManagement/couponList");
+        优惠券管理.setRoleAlias(roleCode);
+        优惠券管理.setSort(6);
+        list.add(parent商城管理);
+        list.add(分类管理);
+        list.add(商品管理);
+        list.add(订单管理);
+        list.add(banner配置);
+        list.add(首页配置);
+        list.add(优惠券管理);
+
+        Menu parent基础配置 = new Menu();
+        parent基础配置.setParentMenuAlias(null);
+        parent基础配置.setMenuName("基础配置");
+        parent基础配置.setMenuAlias("parent_jcpz_" + roleCode);
+        parent基础配置.setMenuIcon(null);
+        parent基础配置.setLinkUrl("/settingManagement");
+        parent基础配置.setRoleAlias(roleCode);
+        parent基础配置.setSort(6);
+        Menu 模板消息网点码报表 = new Menu();
+        模板消息网点码报表.setParentMenuAlias(parent基础配置.getMenuAlias());
+        模板消息网点码报表.setMenuName("模板消息网点码报表");
+        模板消息网点码报表.setMenuAlias("mbxxwdmbb_" + roleCode);
+        模板消息网点码报表.setMenuIcon(null);
+        模板消息网点码报表.setLinkUrl("/settingManagement/messageData");
+        模板消息网点码报表.setRoleAlias(roleCode);
+        模板消息网点码报表.setSort(1);
+        Menu 模板消息优惠券过期 = new Menu();
+        模板消息优惠券过期.setParentMenuAlias(parent基础配置.getMenuAlias());
+        模板消息优惠券过期.setMenuName("模板消息优惠券过期");
+        模板消息优惠券过期.setMenuAlias("mbxxyhqgq_" + roleCode);
+        模板消息优惠券过期.setMenuIcon(null);
+        模板消息优惠券过期.setLinkUrl("/settingManagement/messageTimeout");
+        模板消息优惠券过期.setRoleAlias(roleCode);
+        模板消息优惠券过期.setSort(2);
+        list.add(parent基础配置);
+        list.add(模板消息网点码报表);
+        list.add(模板消息优惠券过期);
+
+        menuManager.saveBatch(list);
     }
 
-    public void createZongBuMenus() {
-        /*
+    public void createZongBuMenus22222222() {
+       /*
         一级总部 ：能访问所有菜单、供应商的网点码管理不可见
         */
-
-        {
-            Menu 商户管理 = new Menu();
-            商户管理.setMenuName("商户管理");
-            商户管理.setMenuAlias("shgl_" + GroupRoleEnum.ZB.getCode());
-            商户管理.setMenuIcon(null);
-            商户管理.setLinkUrl(null);
-            商户管理.setRoleAlias(GroupRoleEnum.ZB.getCode());
-            商户管理.setSort(1);
-            商户管理.setParentMenuAlias(null);
-            Menu 网点类型配置 = new Menu();
-            网点类型配置.setParentMenuAlias(商户管理.getMenuAlias());
-            网点类型配置.setMenuName("网点类型配置");
-            网点类型配置.setMenuAlias("wdlxpz_" + GroupRoleEnum.ZB.getCode());
-            网点类型配置.setMenuIcon(null);
-            网点类型配置.setLinkUrl("/");
-            网点类型配置.setRoleAlias(GroupRoleEnum.ZB.getCode());
-            网点类型配置.setSort(1);
-            Menu 码源工厂管理 = new Menu();
-            码源工厂管理.setParentMenuAlias(商户管理.getMenuAlias());
-            码源工厂管理.setMenuName("码源工厂管理");
-            码源工厂管理.setMenuAlias("mygcgl_" + GroupRoleEnum.ZB.getCode());
-            码源工厂管理.setMenuIcon(null);
-            码源工厂管理.setLinkUrl("/");
-            码源工厂管理.setRoleAlias(GroupRoleEnum.ZB.getCode());
-            码源工厂管理.setSort(2);
-
-            Menu 网点码管理 = new Menu();
-            网点码管理.setMenuName("网点码管理");
-            网点码管理.setMenuAlias("wdmgl_" + GroupRoleEnum.ZB.getCode());
-            网点码管理.setMenuIcon(null);
-            网点码管理.setLinkUrl(null);
-            网点码管理.setRoleAlias(GroupRoleEnum.ZB.getCode());
-            网点码管理.setSort(2);
-            网点码管理.setParentMenuAlias(null);
-            Menu 活动码管理 = new Menu();
-            活动码管理.setParentMenuAlias(网点码管理.getMenuAlias());
-            活动码管理.setMenuName("活动码管理");
-            活动码管理.setMenuAlias("hdmgl_" + GroupRoleEnum.ZB.getCode());
-            活动码管理.setMenuIcon(null);
-            活动码管理.setLinkUrl("/");
-            活动码管理.setRoleAlias(GroupRoleEnum.ZB.getCode());
-            活动码管理.setSort(1);
-
-            Menu 活动管理 = new Menu();
-            活动管理.setParentMenuAlias(null);
-            活动管理.setMenuName("活动管理");
-            活动管理.setMenuAlias("hdgl_" + GroupRoleEnum.ZB.getCode());
-            活动管理.setMenuIcon(null);
-            活动管理.setLinkUrl(null);
-            活动管理.setRoleAlias(GroupRoleEnum.ZB.getCode());
-            活动管理.setSort(3);
-            Menu 活动数据 = new Menu();
-            活动数据.setParentMenuAlias(活动管理.getMenuAlias());
-            活动数据.setMenuName("活动数据");
-            活动数据.setMenuAlias("hdsj_" + GroupRoleEnum.ZB.getCode());
-            活动数据.setMenuIcon(null);
-            活动数据.setLinkUrl("/");
-            活动数据.setRoleAlias(GroupRoleEnum.ZB.getCode());
-            活动数据.setSort(1);
-            Menu 活动报表统计 = new Menu();
-            活动报表统计.setParentMenuAlias(活动管理.getMenuAlias());
-            活动报表统计.setMenuName("活动报表统计");
-            活动报表统计.setMenuAlias("hdbbtj_" + GroupRoleEnum.ZB.getCode());
-            活动报表统计.setMenuIcon(null);
-            活动报表统计.setLinkUrl("/");
-            活动报表统计.setRoleAlias(GroupRoleEnum.ZB.getCode());
-            活动报表统计.setSort(2);
-
-            Menu 分类管理 = new Menu();
-            分类管理.setParentMenuAlias(null);
-            分类管理.setMenuName("分类管理");
-            分类管理.setMenuAlias("flgl_" + GroupRoleEnum.ZB.getCode());
-            分类管理.setMenuIcon(null);
-            分类管理.setLinkUrl(null);
-            分类管理.setRoleAlias(GroupRoleEnum.ZB.getCode());
-            分类管理.setSort(4);
-
-            Menu 商品管理 = new Menu();
-            商品管理.setParentMenuAlias(null);
-            商品管理.setMenuName("商品管理");
-            商品管理.setMenuAlias("spgl_" + GroupRoleEnum.ZB.getCode());
-            商品管理.setMenuIcon(null);
-            商品管理.setLinkUrl(null);
-            商品管理.setRoleAlias(GroupRoleEnum.ZB.getCode());
-            商品管理.setSort(5);
-
-            Menu 订单管理 = new Menu();
-            订单管理.setParentMenuAlias(null);
-            订单管理.setMenuName("订单管理");
-            订单管理.setMenuAlias("ddgl_" + GroupRoleEnum.ZB.getCode());
-            订单管理.setMenuIcon(null);
-            订单管理.setLinkUrl(null);
-            订单管理.setRoleAlias(GroupRoleEnum.ZB.getCode());
-            订单管理.setSort(6);
-
-            Menu banner配置 = new Menu();
-            banner配置.setParentMenuAlias(null);
-            banner配置.setMenuName("banner配置");
-            banner配置.setMenuAlias("bannerpz_" + GroupRoleEnum.ZB.getCode());
-            banner配置.setMenuIcon(null);
-            banner配置.setLinkUrl(null);
-            banner配置.setRoleAlias(GroupRoleEnum.ZB.getCode());
-            banner配置.setSort(7);
-
-            Menu 首页配置 = new Menu();
-            首页配置.setParentMenuAlias(null);
-            首页配置.setMenuName("首页配置");
-            首页配置.setMenuAlias("sypz_" + GroupRoleEnum.ZB.getCode());
-            首页配置.setMenuIcon(null);
-            首页配置.setLinkUrl(null);
-            首页配置.setRoleAlias(GroupRoleEnum.ZB.getCode());
-            首页配置.setSort(8);
-
-            Menu 优惠券管理 = new Menu();
-            优惠券管理.setParentMenuAlias(null);
-            优惠券管理.setMenuName("优惠券管理");
-            优惠券管理.setMenuAlias("yhqgl_" + GroupRoleEnum.ZB.getCode());
-            优惠券管理.setMenuIcon(null);
-            优惠券管理.setLinkUrl(null);
-            优惠券管理.setRoleAlias(GroupRoleEnum.ZB.getCode());
-            优惠券管理.setSort(9);
-
-            Menu 公众号消息模板配置 = new Menu();
-            公众号消息模板配置.setParentMenuAlias(null);
-            公众号消息模板配置.setMenuName("公众号消息模板配置");
-            公众号消息模板配置.setMenuAlias("gzhxxmbpz_" + GroupRoleEnum.ZB.getCode());
-            公众号消息模板配置.setMenuIcon(null);
-            公众号消息模板配置.setLinkUrl(null);
-            公众号消息模板配置.setRoleAlias(GroupRoleEnum.ZB.getCode());
-            公众号消息模板配置.setSort(10);
-
-            List<Menu> list = new ArrayList<>();
-            list.add(商户管理);
-            list.add(网点类型配置);
-            list.add(码源工厂管理);
-
-            list.add(网点码管理);
-            list.add(活动码管理);
-
-            list.add(活动管理);
-            list.add(活动数据);
-            list.add(活动报表统计);
-
-            list.add(分类管理);
-
-            list.add(商品管理);
-
-            list.add(订单管理);
-
-            list.add(banner配置);
-
-            list.add(首页配置);
-
-            list.add(优惠券管理);
-
-            list.add(公众号消息模板配置);
-
-            menuManager.saveBatch(list);
-        }
+        String roleCode = GroupRoleEnum.ZB.getCode();
+        List<Menu> list = new ArrayList<>();
+        // 超管
+        Menu parent商户管理 = new Menu();
+        parent商户管理.setMenuName("商户管理");
+        parent商户管理.setMenuAlias("parent_shgl_" + roleCode);
+        parent商户管理.setMenuIcon(null);
+        parent商户管理.setLinkUrl("/merchantsManagement");
+        parent商户管理.setRoleAlias(roleCode);
+        parent商户管理.setSort(1);
+        parent商户管理.setParentMenuAlias(null);
+        Menu 商户管理 = new Menu();
+        商户管理.setMenuName("商户管理");
+        商户管理.setMenuAlias("shgl_" + roleCode);
+        商户管理.setMenuIcon(null);
+        商户管理.setLinkUrl("/merchantsManagement/merchantsList");
+        商户管理.setRoleAlias(roleCode);
+        商户管理.setSort(1);
+        商户管理.setParentMenuAlias(parent商户管理.getMenuAlias());
+        Menu 网点类型配置 = new Menu();
+        网点类型配置.setParentMenuAlias(parent商户管理.getMenuAlias());
+        网点类型配置.setMenuName("网点类型配置");
+        网点类型配置.setMenuAlias("wdlxpz_" + roleCode);
+        网点类型配置.setMenuIcon(null);
+        网点类型配置.setLinkUrl("/merchantsManagement/netWorkTypeList");
+        网点类型配置.setRoleAlias(roleCode);
+        网点类型配置.setSort(2);
+        Menu 码源工厂管理 = new Menu();
+        码源工厂管理.setParentMenuAlias(parent商户管理.getMenuAlias());
+        码源工厂管理.setMenuName("码源工厂管理");
+        码源工厂管理.setMenuAlias("mygcgl_" + roleCode);
+        码源工厂管理.setMenuIcon(null);
+        码源工厂管理.setLinkUrl("/merchantsManagement/codeFactory");
+        码源工厂管理.setRoleAlias(roleCode);
+        码源工厂管理.setSort(3);
+        list.add(parent商户管理);
+        list.add(商户管理);
+        list.add(网点类型配置);
+        list.add(码源工厂管理);
 
 
+        Menu parent二维码管理 = new Menu();
+        parent二维码管理.setParentMenuAlias(null);
+        parent二维码管理.setMenuName("二维码管理");
+        parent二维码管理.setMenuAlias("parent_ewmgl_" + roleCode);
+        parent二维码管理.setMenuIcon(null);
+        parent二维码管理.setLinkUrl("/networkCodeManagement");
+        parent二维码管理.setRoleAlias(roleCode);
+        parent二维码管理.setSort(2);
+        Menu 网点码管理 = new Menu();
+        网点码管理.setMenuName("网点码管理");
+        网点码管理.setMenuAlias("wdmgl_" + roleCode);
+        网点码管理.setMenuIcon(null);
+        网点码管理.setLinkUrl("/networkCodeManagement/networkCodeList");
+        网点码管理.setRoleAlias(roleCode);
+        网点码管理.setSort(1);
+        网点码管理.setParentMenuAlias(parent二维码管理.getMenuAlias());
+        Menu 活动码管理 = new Menu();
+        活动码管理.setMenuName("活动码管理");
+        活动码管理.setMenuAlias("hdmgl_" + roleCode);
+        活动码管理.setMenuIcon(null);
+        活动码管理.setLinkUrl("/networkCodeManagement/activityCodeList");
+        活动码管理.setRoleAlias(roleCode);
+        活动码管理.setSort(2);
+        活动码管理.setParentMenuAlias(parent二维码管理.getMenuAlias());
+        list.add(parent二维码管理);
+        list.add(网点码管理);
+        list.add(活动码管理);
+
+        Menu parent活动管理 = new Menu();
+        parent活动管理.setParentMenuAlias(null);
+        parent活动管理.setMenuName("活动管理");
+        parent活动管理.setMenuAlias("parent_hdgl_" + roleCode);
+        parent活动管理.setMenuIcon(null);
+        parent活动管理.setLinkUrl("/activitysManagement");
+        parent活动管理.setRoleAlias(roleCode);
+        parent活动管理.setSort(3);
+        Menu 活动管理 = new Menu();
+        活动管理.setParentMenuAlias(parent活动管理.getMenuAlias());
+        活动管理.setMenuName("活动管理");
+        活动管理.setMenuAlias("hdgl_" + roleCode);
+        活动管理.setMenuIcon(null);
+        活动管理.setLinkUrl("/activitysManagement/activitysList");
+        活动管理.setRoleAlias(roleCode);
+        活动管理.setSort(1);
+        Menu 活动数据 = new Menu();
+        活动数据.setParentMenuAlias(parent活动管理.getMenuAlias());
+        活动数据.setMenuName("活动数据");
+        活动数据.setMenuAlias("hdsj_" + roleCode);
+        活动数据.setMenuIcon(null);
+        活动数据.setLinkUrl("/activitysManagement/activitysDataList");
+        活动数据.setRoleAlias(roleCode);
+        活动数据.setSort(2);
+        Menu 活动报表统计 = new Menu();
+        活动报表统计.setParentMenuAlias(parent活动管理.getMenuAlias());
+        活动报表统计.setMenuName("活动报表统计");
+        活动报表统计.setMenuAlias("hdbbtj_" + roleCode);
+        活动报表统计.setMenuIcon(null);
+        活动报表统计.setLinkUrl("/activitysManagement/activitysEcharts");
+        活动报表统计.setRoleAlias(roleCode);
+        活动报表统计.setSort(3);
+        list.add(parent活动管理);
+        list.add(活动管理);
+        list.add(活动数据);
+        list.add(活动报表统计);
+
+
+        Menu parent商城管理 = new Menu();
+        parent商城管理.setParentMenuAlias(null);
+        parent商城管理.setMenuName("商城管理");
+        parent商城管理.setMenuAlias("parent_scgl_" + roleCode);
+        parent商城管理.setMenuIcon(null);
+        parent商城管理.setLinkUrl("/shopManagement");
+        parent商城管理.setRoleAlias(roleCode);
+        parent商城管理.setSort(4);
+        Menu 分类管理 = new Menu();
+        分类管理.setParentMenuAlias(parent商城管理.getMenuAlias());
+        分类管理.setMenuName("分类管理");
+        分类管理.setMenuAlias("flgl_" + roleCode);
+        分类管理.setMenuIcon(null);
+        分类管理.setLinkUrl("/shopManagement/shopTypeList");
+        分类管理.setRoleAlias(roleCode);
+        分类管理.setSort(1);
+        Menu 商品管理 = new Menu();
+        商品管理.setParentMenuAlias(parent商城管理.getMenuAlias());
+        商品管理.setMenuName("商品管理");
+        商品管理.setMenuAlias("spgl_" + roleCode);
+        商品管理.setMenuIcon(null);
+        商品管理.setLinkUrl("/shopManagement/goodsList");
+        商品管理.setRoleAlias(roleCode);
+        商品管理.setSort(2);
+        Menu 订单管理 = new Menu();
+        订单管理.setParentMenuAlias(parent商城管理.getMenuAlias());
+        订单管理.setMenuName("订单管理");
+        订单管理.setMenuAlias("ddgl_" + roleCode);
+        订单管理.setMenuIcon(null);
+        订单管理.setLinkUrl("/shopManagement/orderList");
+        订单管理.setRoleAlias(roleCode);
+        订单管理.setSort(3);
+        Menu banner配置 = new Menu();
+        banner配置.setParentMenuAlias(parent商城管理.getMenuAlias());
+        banner配置.setMenuName("banner配置");
+        banner配置.setMenuAlias("bannerpz_" + roleCode);
+        banner配置.setMenuIcon(null);
+        banner配置.setLinkUrl("/shopManagement/bannerList");
+        banner配置.setRoleAlias(roleCode);
+        banner配置.setSort(4);
+        Menu 首页配置 = new Menu();
+        首页配置.setParentMenuAlias(parent商城管理.getMenuAlias());
+        首页配置.setMenuName("首页配置");
+        首页配置.setMenuAlias("sypz_" + roleCode);
+        首页配置.setMenuIcon(null);
+        首页配置.setLinkUrl("/shopManagement/homepageList");
+        首页配置.setRoleAlias(roleCode);
+        首页配置.setSort(5);
+        Menu 优惠券管理 = new Menu();
+        优惠券管理.setParentMenuAlias(parent商城管理.getMenuAlias());
+        优惠券管理.setMenuName("优惠券管理");
+        优惠券管理.setMenuAlias("yhqgl_" + roleCode);
+        优惠券管理.setMenuIcon(null);
+        优惠券管理.setLinkUrl("/shopManagement/couponList");
+        优惠券管理.setRoleAlias(roleCode);
+        优惠券管理.setSort(6);
+        list.add(parent商城管理);
+        list.add(分类管理);
+        list.add(商品管理);
+        list.add(订单管理);
+        list.add(banner配置);
+        list.add(首页配置);
+        list.add(优惠券管理);
+
+        Menu parent基础配置 = new Menu();
+        parent基础配置.setParentMenuAlias(null);
+        parent基础配置.setMenuName("基础配置");
+        parent基础配置.setMenuAlias("parent_jcpz_" + roleCode);
+        parent基础配置.setMenuIcon(null);
+        parent基础配置.setLinkUrl("/settingManagement");
+        parent基础配置.setRoleAlias(roleCode);
+        parent基础配置.setSort(5);
+        Menu 模板消息网点码报表 = new Menu();
+        模板消息网点码报表.setParentMenuAlias(parent基础配置.getMenuAlias());
+        模板消息网点码报表.setMenuName("模板消息网点码报表");
+        模板消息网点码报表.setMenuAlias("mbxxwdmbb_" + roleCode);
+        模板消息网点码报表.setMenuIcon(null);
+        模板消息网点码报表.setLinkUrl("/settingManagement/messageData");
+        模板消息网点码报表.setRoleAlias(roleCode);
+        模板消息网点码报表.setSort(1);
+        Menu 模板消息优惠券过期 = new Menu();
+        模板消息优惠券过期.setParentMenuAlias(parent基础配置.getMenuAlias());
+        模板消息优惠券过期.setMenuName("模板消息优惠券过期");
+        模板消息优惠券过期.setMenuAlias("mbxxyhqgq_" + roleCode);
+        模板消息优惠券过期.setMenuIcon(null);
+        模板消息优惠券过期.setLinkUrl("/settingManagement/messageTimeout");
+        模板消息优惠券过期.setRoleAlias(roleCode);
+        模板消息优惠券过期.setSort(2);
+        list.add(parent基础配置);
+        list.add(模板消息网点码报表);
+        list.add(模板消息优惠券过期);
+
+        menuManager.saveBatch(list);
     }
 
-    public void createFGSmenus() {
-        /*
+    public void createFGSmenus22222222() {
+       /*
         二级分公司、省区：商户管理（管理自己和下级商户账号）
         三级经销商：商户管理（管理自己和下级商户账号）
         四级业务员 分销商：商户管理（管理自己和下级商户账号）
@@ -712,83 +793,95 @@ public class AdminServiceApplicationTests {
         六级网点：不可登录后台
         物料供应商：网点码管理（物料供应商的网点码管理）
         */
+        String roleCode = GroupRoleEnum.FGS.getCode();
+        List<Menu> list = new ArrayList<>();
+        Menu parent商户管理 = new Menu();
+        parent商户管理.setMenuName("商户管理");
+        parent商户管理.setMenuAlias("parent_shgl_" + roleCode);
+        parent商户管理.setMenuIcon(null);
+        parent商户管理.setLinkUrl("/merchantsManagement");
+        parent商户管理.setRoleAlias(roleCode);
+        parent商户管理.setSort(1);
+        parent商户管理.setParentMenuAlias(null);
+        Menu 商户管理 = new Menu();
+        商户管理.setMenuName("商户管理");
+        商户管理.setMenuAlias("shgl_" + roleCode);
+        商户管理.setMenuIcon(null);
+        商户管理.setLinkUrl("/merchantsManagement/merchantsList");
+        商户管理.setRoleAlias(roleCode);
+        商户管理.setSort(1);
+        商户管理.setParentMenuAlias(parent商户管理.getMenuAlias());
+        Menu 网点类型配置 = new Menu();
+        网点类型配置.setParentMenuAlias(parent商户管理.getMenuAlias());
+        网点类型配置.setMenuName("网点类型配置");
+        网点类型配置.setMenuAlias("wdlxpz_" + roleCode);
+        网点类型配置.setMenuIcon(null);
+        网点类型配置.setLinkUrl("/merchantsManagement/netWorkTypeList");
+        网点类型配置.setRoleAlias(roleCode);
+        网点类型配置.setSort(2);
+        Menu 码源工厂管理 = new Menu();
+        码源工厂管理.setParentMenuAlias(parent商户管理.getMenuAlias());
+        码源工厂管理.setMenuName("码源工厂管理");
+        码源工厂管理.setMenuAlias("mygcgl_" + roleCode);
+        码源工厂管理.setMenuIcon(null);
+        码源工厂管理.setLinkUrl("/merchantsManagement/codeFactory");
+        码源工厂管理.setRoleAlias(roleCode);
+        码源工厂管理.setSort(3);
+        list.add(parent商户管理);
+        list.add(商户管理);
+        list.add(网点类型配置);
+        list.add(码源工厂管理);
 
-        {
-            Menu 商户管理 = new Menu();
-            商户管理.setMenuName("商户管理");
-            商户管理.setMenuAlias("shgl_" + GroupRoleEnum.FGS.getCode());
-            商户管理.setMenuIcon(null);
-            商户管理.setLinkUrl(null);
-            商户管理.setRoleAlias(GroupRoleEnum.FGS.getCode());
-            商户管理.setSort(1);
-            商户管理.setParentMenuAlias(null);
-            Menu 网点类型配置 = new Menu();
-            网点类型配置.setParentMenuAlias(商户管理.getMenuAlias());
-            网点类型配置.setMenuName("网点类型配置");
-            网点类型配置.setMenuAlias("wdlxpz_" + GroupRoleEnum.FGS.getCode());
-            网点类型配置.setMenuIcon(null);
-            网点类型配置.setLinkUrl("/");
-            网点类型配置.setRoleAlias(GroupRoleEnum.FGS.getCode());
-            网点类型配置.setSort(1);
-            Menu 码源工厂管理 = new Menu();
-            码源工厂管理.setParentMenuAlias(商户管理.getMenuAlias());
-            码源工厂管理.setMenuName("码源工厂管理");
-            码源工厂管理.setMenuAlias("mygcgl_" + GroupRoleEnum.FGS.getCode());
-            码源工厂管理.setMenuIcon(null);
-            码源工厂管理.setLinkUrl("/");
-            码源工厂管理.setRoleAlias(GroupRoleEnum.FGS.getCode());
-            码源工厂管理.setSort(2);
-
-            List<Menu> list = new ArrayList<>();
-            list.add(商户管理);
-            list.add(网点类型配置);
-            list.add(码源工厂管理);
-
-            menuManager.saveBatch(list);
-        }
+        menuManager.saveBatch(list);
     }
 
-    public void createSQmenus() {
+    public void createSQmenus22222222() {
         /*
         二级分公司、省区：商户管理（管理自己和下级商户账号）
         */
+        String roleCode = GroupRoleEnum.SQ.getCode();
+        List<Menu> list = new ArrayList<>();
+        Menu parent商户管理 = new Menu();
+        parent商户管理.setMenuName("商户管理");
+        parent商户管理.setMenuAlias("parent_shgl_" + roleCode);
+        parent商户管理.setMenuIcon(null);
+        parent商户管理.setLinkUrl("/merchantsManagement");
+        parent商户管理.setRoleAlias(roleCode);
+        parent商户管理.setSort(1);
+        parent商户管理.setParentMenuAlias(null);
+        Menu 商户管理 = new Menu();
+        商户管理.setMenuName("商户管理");
+        商户管理.setMenuAlias("shgl_" + roleCode);
+        商户管理.setMenuIcon(null);
+        商户管理.setLinkUrl("/merchantsManagement/merchantsList");
+        商户管理.setRoleAlias(roleCode);
+        商户管理.setSort(1);
+        商户管理.setParentMenuAlias(parent商户管理.getMenuAlias());
+        Menu 网点类型配置 = new Menu();
+        网点类型配置.setParentMenuAlias(parent商户管理.getMenuAlias());
+        网点类型配置.setMenuName("网点类型配置");
+        网点类型配置.setMenuAlias("wdlxpz_" + roleCode);
+        网点类型配置.setMenuIcon(null);
+        网点类型配置.setLinkUrl("/merchantsManagement/netWorkTypeList");
+        网点类型配置.setRoleAlias(roleCode);
+        网点类型配置.setSort(2);
+        Menu 码源工厂管理 = new Menu();
+        码源工厂管理.setParentMenuAlias(parent商户管理.getMenuAlias());
+        码源工厂管理.setMenuName("码源工厂管理");
+        码源工厂管理.setMenuAlias("mygcgl_" + roleCode);
+        码源工厂管理.setMenuIcon(null);
+        码源工厂管理.setLinkUrl("/merchantsManagement/codeFactory");
+        码源工厂管理.setRoleAlias(roleCode);
+        码源工厂管理.setSort(3);
+        list.add(parent商户管理);
+        list.add(商户管理);
+        list.add(网点类型配置);
+        list.add(码源工厂管理);
 
-        {
-            Menu 商户管理 = new Menu();
-            商户管理.setMenuName("商户管理");
-            商户管理.setMenuAlias("shgl_" + GroupRoleEnum.SQ.getCode());
-            商户管理.setMenuIcon(null);
-            商户管理.setLinkUrl(null);
-            商户管理.setRoleAlias(GroupRoleEnum.SQ.getCode());
-            商户管理.setSort(1);
-            商户管理.setParentMenuAlias(null);
-            Menu 网点类型配置 = new Menu();
-            网点类型配置.setParentMenuAlias(商户管理.getMenuAlias());
-            网点类型配置.setMenuName("网点类型配置");
-            网点类型配置.setMenuAlias("wdlxpz_" + GroupRoleEnum.SQ.getCode());
-            网点类型配置.setMenuIcon(null);
-            网点类型配置.setLinkUrl("/");
-            网点类型配置.setRoleAlias(GroupRoleEnum.SQ.getCode());
-            网点类型配置.setSort(1);
-            Menu 码源工厂管理 = new Menu();
-            码源工厂管理.setParentMenuAlias(商户管理.getMenuAlias());
-            码源工厂管理.setMenuName("码源工厂管理");
-            码源工厂管理.setMenuAlias("mygcgl_" + GroupRoleEnum.SQ.getCode());
-            码源工厂管理.setMenuIcon(null);
-            码源工厂管理.setLinkUrl("/");
-            码源工厂管理.setRoleAlias(GroupRoleEnum.SQ.getCode());
-            码源工厂管理.setSort(2);
-
-            List<Menu> list = new ArrayList<>();
-            list.add(商户管理);
-            list.add(网点类型配置);
-            list.add(码源工厂管理);
-
-            menuManager.saveBatch(list);
-        }
+        menuManager.saveBatch(list);
     }
 
-    public void createJXSmenus() {
+    public void createJXSmenus22222222() {
         /*
         三级经销商：商户管理（管理自己和下级商户账号）
         四级业务员 分销商：商户管理（管理自己和下级商户账号）
@@ -797,39 +890,46 @@ public class AdminServiceApplicationTests {
         物料供应商：网点码管理（物料供应商的网点码管理）
         */
 
-        {
-            Menu 商户管理 = new Menu();
-            商户管理.setMenuName("商户管理");
-            商户管理.setMenuAlias("shgl_" + GroupRoleEnum.JXS.getCode());
-            商户管理.setMenuIcon(null);
-            商户管理.setLinkUrl(null);
-            商户管理.setRoleAlias(GroupRoleEnum.JXS.getCode());
-            商户管理.setSort(1);
-            商户管理.setParentMenuAlias(null);
-            Menu 网点类型配置 = new Menu();
-            网点类型配置.setParentMenuAlias(商户管理.getMenuAlias());
-            网点类型配置.setMenuName("网点类型配置");
-            网点类型配置.setMenuAlias("wdlxpz_" + GroupRoleEnum.JXS.getCode());
-            网点类型配置.setMenuIcon(null);
-            网点类型配置.setLinkUrl("/");
-            网点类型配置.setRoleAlias(GroupRoleEnum.JXS.getCode());
-            网点类型配置.setSort(1);
-            Menu 码源工厂管理 = new Menu();
-            码源工厂管理.setParentMenuAlias(商户管理.getMenuAlias());
-            码源工厂管理.setMenuName("码源工厂管理");
-            码源工厂管理.setMenuAlias("mygcgl_" + GroupRoleEnum.JXS.getCode());
-            码源工厂管理.setMenuIcon(null);
-            码源工厂管理.setLinkUrl("/");
-            码源工厂管理.setRoleAlias(GroupRoleEnum.JXS.getCode());
-            码源工厂管理.setSort(2);
+        String roleCode = GroupRoleEnum.JXS.getCode();
+        List<Menu> list = new ArrayList<>();
+        Menu parent商户管理 = new Menu();
+        parent商户管理.setMenuName("商户管理");
+        parent商户管理.setMenuAlias("parent_shgl_" + roleCode);
+        parent商户管理.setMenuIcon(null);
+        parent商户管理.setLinkUrl("/merchantsManagement");
+        parent商户管理.setRoleAlias(roleCode);
+        parent商户管理.setSort(1);
+        parent商户管理.setParentMenuAlias(null);
+        Menu 商户管理 = new Menu();
+        商户管理.setMenuName("商户管理");
+        商户管理.setMenuAlias("shgl_" + roleCode);
+        商户管理.setMenuIcon(null);
+        商户管理.setLinkUrl("/merchantsManagement/merchantsList");
+        商户管理.setRoleAlias(roleCode);
+        商户管理.setSort(1);
+        商户管理.setParentMenuAlias(parent商户管理.getMenuAlias());
+        Menu 网点类型配置 = new Menu();
+        网点类型配置.setParentMenuAlias(parent商户管理.getMenuAlias());
+        网点类型配置.setMenuName("网点类型配置");
+        网点类型配置.setMenuAlias("wdlxpz_" + roleCode);
+        网点类型配置.setMenuIcon(null);
+        网点类型配置.setLinkUrl("/merchantsManagement/netWorkTypeList");
+        网点类型配置.setRoleAlias(roleCode);
+        网点类型配置.setSort(2);
+        Menu 码源工厂管理 = new Menu();
+        码源工厂管理.setParentMenuAlias(parent商户管理.getMenuAlias());
+        码源工厂管理.setMenuName("码源工厂管理");
+        码源工厂管理.setMenuAlias("mygcgl_" + roleCode);
+        码源工厂管理.setMenuIcon(null);
+        码源工厂管理.setLinkUrl("/merchantsManagement/codeFactory");
+        码源工厂管理.setRoleAlias(roleCode);
+        码源工厂管理.setSort(3);
+        list.add(parent商户管理);
+        list.add(商户管理);
+        list.add(网点类型配置);
+        list.add(码源工厂管理);
 
-            List<Menu> list = new ArrayList<>();
-            list.add(商户管理);
-            list.add(网点类型配置);
-            list.add(码源工厂管理);
-
-            menuManager.saveBatch(list);
-        }
+        menuManager.saveBatch(list);
     }
 
     public void createYWY_FXS_CXY_menus() {
@@ -839,32 +939,41 @@ public class AdminServiceApplicationTests {
         */
 
         {
+            String roleCode = GroupRoleEnum.YWY.getCode();
+            List<Menu> list = new ArrayList<>();
+            Menu parent商户管理 = new Menu();
+            parent商户管理.setMenuName("商户管理");
+            parent商户管理.setMenuAlias("parent_shgl_" + roleCode);
+            parent商户管理.setMenuIcon(null);
+            parent商户管理.setLinkUrl("/merchantsManagement");
+            parent商户管理.setRoleAlias(roleCode);
+            parent商户管理.setSort(1);
+            parent商户管理.setParentMenuAlias(null);
             Menu 商户管理 = new Menu();
             商户管理.setMenuName("商户管理");
-            商户管理.setMenuAlias("shgl_" + GroupRoleEnum.YWY.getCode());
+            商户管理.setMenuAlias("shgl_" + roleCode);
             商户管理.setMenuIcon(null);
-            商户管理.setLinkUrl(null);
-            商户管理.setRoleAlias(GroupRoleEnum.YWY.getCode());
+            商户管理.setLinkUrl("/merchantsManagement/merchantsList");
+            商户管理.setRoleAlias(roleCode);
             商户管理.setSort(1);
-            商户管理.setParentMenuAlias(null);
+            商户管理.setParentMenuAlias(parent商户管理.getMenuAlias());
             Menu 网点类型配置 = new Menu();
-            网点类型配置.setParentMenuAlias(商户管理.getMenuAlias());
+            网点类型配置.setParentMenuAlias(parent商户管理.getMenuAlias());
             网点类型配置.setMenuName("网点类型配置");
-            网点类型配置.setMenuAlias("wdlxpz_" + GroupRoleEnum.YWY.getCode());
+            网点类型配置.setMenuAlias("wdlxpz_" + roleCode);
             网点类型配置.setMenuIcon(null);
-            网点类型配置.setLinkUrl("/");
-            网点类型配置.setRoleAlias(GroupRoleEnum.YWY.getCode());
-            网点类型配置.setSort(1);
+            网点类型配置.setLinkUrl("/merchantsManagement/netWorkTypeList");
+            网点类型配置.setRoleAlias(roleCode);
+            网点类型配置.setSort(2);
             Menu 码源工厂管理 = new Menu();
-            码源工厂管理.setParentMenuAlias(商户管理.getMenuAlias());
+            码源工厂管理.setParentMenuAlias(parent商户管理.getMenuAlias());
             码源工厂管理.setMenuName("码源工厂管理");
-            码源工厂管理.setMenuAlias("mygcgl_" + GroupRoleEnum.YWY.getCode());
+            码源工厂管理.setMenuAlias("mygcgl_" + roleCode);
             码源工厂管理.setMenuIcon(null);
-            码源工厂管理.setLinkUrl("/");
-            码源工厂管理.setRoleAlias(GroupRoleEnum.YWY.getCode());
-            码源工厂管理.setSort(2);
-
-            List<Menu> list = new ArrayList<>();
+            码源工厂管理.setLinkUrl("/merchantsManagement/codeFactory");
+            码源工厂管理.setRoleAlias(roleCode);
+            码源工厂管理.setSort(3);
+            list.add(parent商户管理);
             list.add(商户管理);
             list.add(网点类型配置);
             list.add(码源工厂管理);
@@ -873,32 +982,41 @@ public class AdminServiceApplicationTests {
         }
 
         {
+            String roleCode = GroupRoleEnum.FXS.getCode();
+            List<Menu> list = new ArrayList<>();
+            Menu parent商户管理 = new Menu();
+            parent商户管理.setMenuName("商户管理");
+            parent商户管理.setMenuAlias("parent_shgl_" + roleCode);
+            parent商户管理.setMenuIcon(null);
+            parent商户管理.setLinkUrl("/merchantsManagement");
+            parent商户管理.setRoleAlias(roleCode);
+            parent商户管理.setSort(1);
+            parent商户管理.setParentMenuAlias(null);
             Menu 商户管理 = new Menu();
             商户管理.setMenuName("商户管理");
-            商户管理.setMenuAlias("shgl_" + GroupRoleEnum.FXS.getCode());
+            商户管理.setMenuAlias("shgl_" + roleCode);
             商户管理.setMenuIcon(null);
-            商户管理.setLinkUrl(null);
-            商户管理.setRoleAlias(GroupRoleEnum.FXS.getCode());
+            商户管理.setLinkUrl("/merchantsManagement/merchantsList");
+            商户管理.setRoleAlias(roleCode);
             商户管理.setSort(1);
-            商户管理.setParentMenuAlias(null);
+            商户管理.setParentMenuAlias(parent商户管理.getMenuAlias());
             Menu 网点类型配置 = new Menu();
-            网点类型配置.setParentMenuAlias(商户管理.getMenuAlias());
+            网点类型配置.setParentMenuAlias(parent商户管理.getMenuAlias());
             网点类型配置.setMenuName("网点类型配置");
-            网点类型配置.setMenuAlias("wdlxpz_" + GroupRoleEnum.FXS.getCode());
+            网点类型配置.setMenuAlias("wdlxpz_" + roleCode);
             网点类型配置.setMenuIcon(null);
-            网点类型配置.setLinkUrl("/");
-            网点类型配置.setRoleAlias(GroupRoleEnum.FXS.getCode());
-            网点类型配置.setSort(1);
+            网点类型配置.setLinkUrl("/merchantsManagement/netWorkTypeList");
+            网点类型配置.setRoleAlias(roleCode);
+            网点类型配置.setSort(2);
             Menu 码源工厂管理 = new Menu();
-            码源工厂管理.setParentMenuAlias(商户管理.getMenuAlias());
+            码源工厂管理.setParentMenuAlias(parent商户管理.getMenuAlias());
             码源工厂管理.setMenuName("码源工厂管理");
-            码源工厂管理.setMenuAlias("mygcgl_" + GroupRoleEnum.FXS.getCode());
+            码源工厂管理.setMenuAlias("mygcgl_" + roleCode);
             码源工厂管理.setMenuIcon(null);
-            码源工厂管理.setLinkUrl("/");
-            码源工厂管理.setRoleAlias(GroupRoleEnum.FXS.getCode());
-            码源工厂管理.setSort(2);
-
-            List<Menu> list = new ArrayList<>();
+            码源工厂管理.setLinkUrl("/merchantsManagement/codeFactory");
+            码源工厂管理.setRoleAlias(roleCode);
+            码源工厂管理.setSort(3);
+            list.add(parent商户管理);
             list.add(商户管理);
             list.add(网点类型配置);
             list.add(码源工厂管理);
@@ -907,47 +1025,46 @@ public class AdminServiceApplicationTests {
         }
 
         {
+            String roleCode = GroupRoleEnum.CXY.getCode();
+            List<Menu> list = new ArrayList<>();
+            Menu parent商户管理 = new Menu();
+            parent商户管理.setMenuName("商户管理");
+            parent商户管理.setMenuAlias("parent_shgl_" + roleCode);
+            parent商户管理.setMenuIcon(null);
+            parent商户管理.setLinkUrl("/merchantsManagement");
+            parent商户管理.setRoleAlias(roleCode);
+            parent商户管理.setSort(1);
+            parent商户管理.setParentMenuAlias(null);
             Menu 商户管理 = new Menu();
             商户管理.setMenuName("商户管理");
-            商户管理.setMenuAlias("shgl_" + GroupRoleEnum.CXY.getCode());
+            商户管理.setMenuAlias("shgl_" + roleCode);
             商户管理.setMenuIcon(null);
-            商户管理.setLinkUrl(null);
-            商户管理.setRoleAlias(GroupRoleEnum.CXY.getCode());
+            商户管理.setLinkUrl("/merchantsManagement/merchantsList");
+            商户管理.setRoleAlias(roleCode);
             商户管理.setSort(1);
-            商户管理.setParentMenuAlias(null);
+            商户管理.setParentMenuAlias(parent商户管理.getMenuAlias());
             Menu 网点类型配置 = new Menu();
-            网点类型配置.setParentMenuAlias(商户管理.getMenuAlias());
+            网点类型配置.setParentMenuAlias(parent商户管理.getMenuAlias());
             网点类型配置.setMenuName("网点类型配置");
-            网点类型配置.setMenuAlias("wdlxpz_" + GroupRoleEnum.CXY.getCode());
+            网点类型配置.setMenuAlias("wdlxpz_" + roleCode);
             网点类型配置.setMenuIcon(null);
-            网点类型配置.setLinkUrl("/");
-            网点类型配置.setRoleAlias(GroupRoleEnum.CXY.getCode());
-            网点类型配置.setSort(1);
+            网点类型配置.setLinkUrl("/merchantsManagement/netWorkTypeList");
+            网点类型配置.setRoleAlias(roleCode);
+            网点类型配置.setSort(2);
             Menu 码源工厂管理 = new Menu();
-            码源工厂管理.setParentMenuAlias(商户管理.getMenuAlias());
+            码源工厂管理.setParentMenuAlias(parent商户管理.getMenuAlias());
             码源工厂管理.setMenuName("码源工厂管理");
-            码源工厂管理.setMenuAlias("mygcgl_" + GroupRoleEnum.CXY.getCode());
+            码源工厂管理.setMenuAlias("mygcgl_" + roleCode);
             码源工厂管理.setMenuIcon(null);
-            码源工厂管理.setLinkUrl("/");
-            码源工厂管理.setRoleAlias(GroupRoleEnum.CXY.getCode());
-            码源工厂管理.setSort(2);
-
-            List<Menu> list = new ArrayList<>();
+            码源工厂管理.setLinkUrl("/merchantsManagement/codeFactory");
+            码源工厂管理.setRoleAlias(roleCode);
+            码源工厂管理.setSort(3);
+            list.add(parent商户管理);
             list.add(商户管理);
             list.add(网点类型配置);
             list.add(码源工厂管理);
 
             menuManager.saveBatch(list);
-        }
-
-        {
-            List<MenuResult> menus = adminMenuManageService.queryMerchantMenus(10359);
-            System.out.println(JSON.toJSONString(menus, true));
-        }
-
-        {
-            List<MenuResult> menus = adminMenuManageService.queryMerchantMenus(10362);
-            System.out.println(JSON.toJSONString(menus, true));
         }
     }
 
@@ -962,24 +1079,29 @@ public class AdminServiceApplicationTests {
             六级网点：不可登录后台
             物料供应商：网点码管理（物料供应商的网点码管理）
         */
-
         {
-            Menu 物料管理 = new Menu();
-            物料管理.setParentMenuAlias(null);
-            物料管理.setMenuName("物料管理");
-            物料管理.setMenuAlias("wlgl_" + GroupRoleEnum.WL.getCode());
-            物料管理.setMenuIcon(null);
-            物料管理.setLinkUrl(null);
-            物料管理.setRoleAlias(GroupRoleEnum.WL.getCode());
-            物料管理.setSort(11);
-
             List<Menu> list = new ArrayList<>();
-            list.add(物料管理);
-
+            String roleCode = GroupRoleEnum.WL.getCode();
+            Menu parent供应商后台 = new Menu();
+            parent供应商后台.setParentMenuAlias(null);
+            parent供应商后台.setMenuName("供应商后台");
+            parent供应商后台.setMenuAlias("parent_gysht_" + roleCode);
+            parent供应商后台.setMenuIcon(null);
+            parent供应商后台.setLinkUrl("/networkCodeManagement");
+            parent供应商后台.setRoleAlias(roleCode);
+            parent供应商后台.setSort(1);
+            Menu 商户码管理 = new Menu();
+            商户码管理.setParentMenuAlias(parent供应商后台.getMenuAlias());
+            商户码管理.setMenuName("商户码管理");
+            商户码管理.setMenuAlias("shmgl_" + roleCode);
+            商户码管理.setMenuIcon(null);
+            商户码管理.setLinkUrl("/networkCodeManagement/networkCodeListForGys");
+            商户码管理.setRoleAlias(roleCode);
+            商户码管理.setSort(1);
+            list.add(parent供应商后台);
+            list.add(商户码管理);
             menuManager.saveBatch(list);
         }
-
-
     }
 
     public void queryMenus() {

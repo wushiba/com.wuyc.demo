@@ -1,11 +1,7 @@
 package com.yfshop.admin.api.website;
 
 import com.yfshop.admin.api.website.result.WebsiteBillDayResult;
-import com.yfshop.admin.api.website.result.WebsiteBillResult;
 import com.yfshop.common.exception.ApiException;
-import io.swagger.models.auth.In;
-
-import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -52,5 +48,13 @@ public interface WebsiteBillService {
      * @return
      */
     Void billAllConfirm(Integer merchantId) throws ApiException;
+
+    /**
+     * 用户自提二等奖成功后，生成网点记账单
+     * @param orderId     用户主订单id
+     * @return Void
+     * @throws ApiException
+     */
+    Void insertWebsiteBill(Long orderId) throws ApiException;
 
 }

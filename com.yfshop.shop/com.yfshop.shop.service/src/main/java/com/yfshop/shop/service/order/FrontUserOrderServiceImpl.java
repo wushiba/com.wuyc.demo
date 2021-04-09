@@ -2,8 +2,13 @@ package com.yfshop.shop.service.order;
 
 import cn.hutool.core.collection.CollectionUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.github.binarywang.wxpay.bean.order.WxPayMpOrderResult;
+import com.github.binarywang.wxpay.bean.request.BaseWxPayRequest;
+import com.github.binarywang.wxpay.bean.request.WxPayUnifiedOrderRequest;
+import com.github.binarywang.wxpay.exception.WxPayException;
 import com.yfshop.code.mapper.*;
 import com.yfshop.code.model.*;
+import com.yfshop.common.enums.PayPrefixEnum;
 import com.yfshop.common.enums.ReceiveWayEnum;
 import com.yfshop.common.enums.UserCouponStatusEnum;
 import com.yfshop.common.enums.UserOrderStatusEnum;
@@ -26,8 +31,12 @@ import com.yfshop.shop.service.order.result.YfUserOrderDetailResult;
 import com.yfshop.shop.service.order.result.YfUserOrderListResult;
 import com.yfshop.shop.service.order.service.FrontUserOrderService;
 import com.yfshop.shop.service.user.service.FrontUserService;
+import com.yfshop.wx.api.service.MpPayService;
+import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.Service;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
@@ -46,26 +55,32 @@ import java.util.stream.Collectors;
 @Service(dynamic = true)
 public class FrontUserOrderServiceImpl implements FrontUserOrderService {
 
+    @Value("${wxPay.notifyUrl}")
+    private String wxPayNotifyUrl;
     @Resource
     private OrderDao orderDao;
+    @Resource
+    private UserMapper userMapper;
     @Resource
     private MallService mallService;
     @Resource
     private OrderMapper orderMapper;
-    @Resource
-    private UserCartMapper userCartMapper;
+    @DubboReference
+    private MpPayService mpPayService;
     @Resource
     private ItemSkuMapper itemSkuMapper;
     @Resource
+    private UserCartMapper userCartMapper;
+    @Resource
     private FrontDrawService frontDrawService;
+    @Resource
+    private FrontUserService frontUserService;
     @Resource
     private UserCouponMapper userCouponMapper;
     @Resource
     private OrderDetailMapper orderDetailMapper;
     @Resource
     private OrderAddressMapper orderAddressMapper;
-    @Resource
-    private FrontUserService frontUserService;
     @Resource
     private FrontMerchantService frontMerchantService;
     @Resource
@@ -237,7 +252,7 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Void submitOrderBySkuId(Integer userId, Integer skuId, Integer num, Long userCouponId, Long addressId) throws ApiException {
+    public Map<String, Object> submitOrderBySkuId(Integer userId, Integer skuId, Integer num, Long userCouponId, Long addressId) throws ApiException {
         // 校验sku以及商品
         ItemSkuResult itemSku = mallService.getItemSkuBySkuId(skuId);
         Asserts.assertFalse(itemSku.getSkuStock() < num, 500, "商品库存不足");
@@ -276,7 +291,10 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
 
         insertUserOrderAddress(orderId, addressInfo.getMobile(), addressInfo.getRealname(), addressInfo.getProvince(), addressInfo.getProvinceId(),
                 addressInfo.getCity(), addressInfo.getCityId(), addressInfo.getDistrict(), addressInfo.getDistrictId(), addressInfo.getAddress());
-        return null;
+        Map<String, Object> resultMap = new HashMap<>(4);
+        resultMap.put("orderId", orderId);
+        resultMap.put("isPay", "N");
+        return resultMap;
     }
 
     /**
@@ -290,7 +308,7 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Void submitOrderByCart(Integer userId, String cartIds, Long userCouponId, Long addressId) throws ApiException {
+    public Map<String, Object> submitOrderByCart(Integer userId, String cartIds, Long userCouponId, Long addressId) throws ApiException {
         List<Integer> cartIdList = Arrays.stream(StringUtils.split(cartIds, ",")).map(Integer::valueOf)
                 .collect(Collectors.toList());
         Asserts.assertCollectionNotEmpty(cartIdList, 500, "购物车id不可以为空");
@@ -361,7 +379,10 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
 
         // 删除购物车id
         userCartMapper.deleteBatchIds(cartIdList);
-        return null;
+        Map<String, Object> resultMap = new HashMap<>(4);
+        resultMap.put("orderId", orderId);
+        resultMap.put("isPay", "N");
+        return resultMap;
     }
 
     /**
@@ -375,7 +396,7 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Void submitOrderByUserCouponIds(Integer userId, String userCouponIds, String userMobile, String websiteCode) throws ApiException {
+    public Map<String, Object> submitOrderByUserCouponIds(Integer userId, String userCouponIds, String userMobile, String websiteCode) throws ApiException {
         // 校验网点码商户
         MerchantResult merchantResult = frontMerchantService.getMerchantByWebsiteCode(websiteCode);
 
@@ -435,7 +456,11 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
         });
         insertUserOrderAddress(orderId, userMobile, userMobile, merchantResult.getProvince(), merchantResult.getProvinceId(), merchantResult.getCity(),
                 merchantResult.getCityId(), merchantResult.getDistrict(), merchantResult.getDistrictId(), merchantResult.getAddress());
-        return null;
+
+        Map<String, Object> resultMap = new HashMap<>(4);
+        resultMap.put("orderId", orderId);
+        resultMap.put("isPay", "N");
+        return resultMap;
     }
 
     /**
@@ -459,6 +484,37 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
         }
         frontMerchantService.insertWebsiteBill(orderId);
         return null;
+    }
+
+    /**
+     * 根据订单号唤起微信支付
+     * @param orderId	用户订单id
+     * @return WxPayMpOrderResult
+     * @throws ApiException
+     */
+    @Override
+    public WxPayMpOrderResult userOrderToPay(Long orderId) throws WxPayException, ApiException {
+        Asserts.assertNonNull(orderId, 500, "主订单id不可以为空");
+        Order order = orderMapper.selectById(orderId);
+        Asserts.assertNonNull(order, 500, "订单不存在");
+        Asserts.assertNotEquals(order.getIsPay(), "Y", 500, "订单已支付");
+        User user = userMapper.selectById(order.getUserId());
+
+        WxPayUnifiedOrderRequest orderRequest = new WxPayUnifiedOrderRequest();
+        orderRequest.setBody("用户订单支付");
+        orderRequest.setTradeType("JSAPI");
+        orderRequest.setOpenid(user.getOpenId());
+        orderRequest.setNotifyUrl(wxPayNotifyUrl + "websiteCodePay");
+        orderRequest.setSpbillCreateIp(order.getUserId() + "-" + orderId);
+        orderRequest.setTotalFee(BaseWxPayRequest.yuanToFen(order.getPayPrice().toString()));
+        orderRequest.setTimeStart(DateFormatUtils.format(new Date(), "yyyyMMddHHmmss"));
+        orderRequest.setOutTradeNo(PayPrefixEnum.USER_ORDER.getBizType() + order.getId() + "_" + order.getPayEntryCount());
+        orderRequest.setTimeExpire(DateFormatUtils.format(new Date(System.currentTimeMillis() + (1000 * 60 * 15)), "yyyyMMddHHmmss"));
+        WxPayMpOrderResult payOrderResult = mpPayService.createPayOrder(orderRequest);
+
+        // 修改订单支付重试次数, 防止唤起支付后不立马支付
+        orderDao.updateOrderPayEntryCount(orderId);
+        return payOrderResult;
     }
 
     //----------------------------------------------------- private method ---------------------------------------------------------------------------------

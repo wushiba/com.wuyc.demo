@@ -7,39 +7,52 @@ package com.yfshop.common.enums;
  */
 public enum PayPrefixEnum {
 
-    WEBSITE_CODE("websiteCode_", "网点码支付前缀"),
+    WEBSITE_CODE("websiteCode-", "websiteCode", "网点码支付前缀"),
 
-    USER_ORDER("userOrder_", "用户订单支付前缀");
+    USER_ORDER("userOrder-", "userOrder", "用户订单支付前缀");
 
-    /**
-     * 枚举编码
-     */
-    private final String code;
+    private final String prefix;
 
-    /**
-     * 枚举描述
-     */
+    private final String bizType;
+
     private final String description;
 
-    PayPrefixEnum(String code, String description) {
-        this.code = code;
+    PayPrefixEnum(String prefix, String bizType, String description) {
+        this.prefix = prefix;
+        this.bizType = bizType;
         this.description = description;
     }
 
-    public static PayPrefixEnum getByCode(String code) {
-        if (code == null) {
+    public static PayPrefixEnum getByCode(String prefix) {
+        if (prefix == null) {
             return null;
         }
         for (PayPrefixEnum value : values()) {
-            if (value.getCode().equals(code)) {
+            if (value.getPrefix().equals(prefix)) {
                 return value;
             }
         }
         return null;
     }
 
-    public String getCode() {
-        return code;
+    public static PayPrefixEnum getByBizType(String bizType) {
+        if (bizType == null) {
+            return null;
+        }
+        for (PayPrefixEnum value : values()) {
+            if (value.getBizType().equals(bizType)) {
+                return value;
+            }
+        }
+        return null;
+    }
+
+    public String getPrefix() {
+        return prefix;
+    }
+
+    public String getBizType() {
+        return bizType;
     }
 
     public String getDescription() {
