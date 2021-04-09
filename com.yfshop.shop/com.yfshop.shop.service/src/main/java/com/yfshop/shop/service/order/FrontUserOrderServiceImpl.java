@@ -1,5 +1,6 @@
 package com.yfshop.shop.service.order;
 
+import cn.hutool.core.collection.CollectionUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.yfshop.code.mapper.*;
 import com.yfshop.code.model.*;
@@ -78,16 +79,16 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
      */
     @Override
     public Boolean checkSubmitOrderIsCanZt(Integer userId, Integer itemId, Integer skuId) {
-        UserCoupon userCoupon = userCouponMapper.selectOne(Wrappers.lambdaQuery(UserCoupon.class)
+        List<UserCoupon> userCouponList = userCouponMapper.selectList(Wrappers.lambdaQuery(UserCoupon.class)
                 .eq(UserCoupon::getUserId, userId)
                 .eq(UserCoupon::getDrawPrizeLevel, 2)
                 .gt(UserCoupon::getValidEndTime, new Date())
                 .eq(UserCoupon::getUseStatus, UserCouponStatusEnum.NO_USE.getCode()));
-        if (userCoupon == null) {
+        if (CollectionUtil.isEmpty(userCouponList)) {
             return false;
         }
 
-        if ("ALL".equalsIgnoreCase(userCoupon.getUseRangeType()) || userCoupon.getCanUseItemIds().contains(itemId + "")) {
+        if ("ALL".equalsIgnoreCase(userCouponList.get(0).getUseRangeType()) || userCouponList.get(0).getCanUseItemIds().contains(itemId + "")) {
             return true;
         } else {
             return false;
