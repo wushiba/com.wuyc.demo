@@ -15,9 +15,7 @@ import java.io.Serializable;
  * @since 2.5.0
  */
 @Data
-@NoArgsConstructor
 public class WxPayOrderNotifyReq implements Serializable {
-    private static final long serialVersionUID = 5389718115223345496L;
 
     private String promotionDetail;
 
