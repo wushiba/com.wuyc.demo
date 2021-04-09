@@ -20,7 +20,7 @@ public class MySaTokenConfig {
         config.setIsShare(true);                    // 在多人登录同一账号时，是否共用一个token (为true时所有登录共用一个token, 为false时每次登录新建一个token)
         config.setTokenStyle("uuid");               // token风格
         config.setTokenSessionCheckLogin(false);
-        config.setCookieDomain("yufan.51jujibao.com");
+        config.setCookieDomain(".yufan.51jujibao.com");
         return config;
     }
 }
