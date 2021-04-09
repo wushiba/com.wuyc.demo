@@ -1,6 +1,10 @@
 package com.yfshop.shop.service.activity.result;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -13,51 +17,75 @@ import java.util.List;
  * @Author:Wuyc
  * @Since:2021-03-24 11:12:29
  * @Version:1.1.0
- * @Copyright:Copyright 
+ * @Copyright:Copyright
  */
 @Data
-public class YfDrawActivityResult implements Serializable{
+public class YfDrawActivityResult implements Serializable {
 
-	private static final long serialVersionUID = -1L;
-	
-    /**  */
+    private static final long serialVersionUID = -1L;
+
+    /**
+     *
+     */
     private Integer id;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", locale = "zh", timezone = "GMT+8")
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
     private LocalDateTime createTime;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", locale = "zh", timezone = "GMT+8")
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
     private LocalDateTime updateTime;
 
-    /** 活动标题 */
+    /**
+     * 活动标题
+     */
     private String actTitle;
-	
-    /** 活动开始时间 */
+
+    /**
+     * 活动开始时间
+     */
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", locale = "zh", timezone = "GMT+8")
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
     private LocalDateTime startTime;
-	
-    /** 活动结束时间 */
+
+    /**
+     * 活动结束时间
+     */
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", locale = "zh", timezone = "GMT+8")
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
     private LocalDateTime endTime;
-	
-    /** 活动banner图地址 */
+
+    /**
+     * 活动banner图地址
+     */
     private String bannerUrl;
-	
-    /** 活动描述 */
+
+    /**
+     * 活动描述
+     */
     private String actDesc;
-	
-    /**  */
+
+    /**
+     *
+     */
     private String jumpUrl;
-	
-    /** 是否可用(Y可用, N不可用) */
+
+    /**
+     * 是否可用(Y可用, N不可用)
+     */
     private String isEnable;
-	
-	// ------------------------------------------------------------ 附加字段 start ---------------------------------------------------------------------
-	
-	private List<YfDrawPrizeResult> prizeList;
-	
+
+    // ------------------------------------------------------------ 附加字段 start ---------------------------------------------------------------------
+
+    private List<YfDrawPrizeResult> prizeList;
+
     private List<YfDrawProvinceResult> drawProvinceList;
 
-	// ------------------------------------------------------------ 附加字段 end ------------------------------------------------------------------------
+    // ------------------------------------------------------------ 附加字段 end ------------------------------------------------------------------------
 
 }

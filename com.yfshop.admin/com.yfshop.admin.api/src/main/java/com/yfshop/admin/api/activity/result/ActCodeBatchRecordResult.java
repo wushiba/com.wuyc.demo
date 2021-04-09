@@ -13,7 +13,8 @@ public class ActCodeBatchRecordResult implements Serializable {
     private static final long serialVersionUID = 1L;
 
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", locale = "zh", timezone = "GMT+8")
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
+@JsonSerialize(using = LocalDateTimeSerializer.class)
     private LocalDateTime createTime;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", locale = "zh", timezone = "GMT+8")
