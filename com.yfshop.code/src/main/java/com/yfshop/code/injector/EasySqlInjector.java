@@ -17,4 +17,5 @@ public class EasySqlInjector extends DefaultSqlInjector {
         methodList.add(new InsertBatchSomeColumn());
         return methodList;
     }
+
 }
