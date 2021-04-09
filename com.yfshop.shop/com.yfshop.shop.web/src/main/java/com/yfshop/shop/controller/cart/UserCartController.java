@@ -12,6 +12,7 @@ import com.yfshop.shop.service.coupon.service.FrontUserCouponService;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.models.auth.In;
 import lombok.SneakyThrows;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
@@ -54,10 +55,11 @@ public class UserCartController implements BaseController {
     @SaCheckLogin
     @SneakyThrows({InterruptedException.class, ExecutionException.class, TimeoutException.class})
     public CommonResult<UserCartPageData> queryUserCartPageData() {
+        Integer userId=getCurrentUserId();
         CompletableFuture<List<UserCartResult>> userCartsFuture = CompletableFuture.supplyAsync(
-                () -> userCartService.queryUserCarts(getCurrentUserId()));
+                () -> userCartService.queryUserCarts(userId));
         QueryUserCouponReq userCouponReq = new QueryUserCouponReq();
-        userCouponReq.setUserId(getCurrentUserId());
+        userCouponReq.setUserId(userId);
         userCouponReq.setIsCanUse("Y");
         CompletableFuture<List<YfUserCouponResult>> userCouponsFuture = CompletableFuture.supplyAsync(
                 () -> userCouponService.findUserCouponList(userCouponReq));
