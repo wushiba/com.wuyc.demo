@@ -55,7 +55,10 @@ public class AdminUserServiceImpl implements AdminUserOrderService {
         orderDetail.setIsPay("Y");
         orderDetailMapper.update(orderDetail, Wrappers.<OrderDetail>lambdaQuery().
                 eq(OrderDetail::getOrderId, orderId));
-        websiteBillService.insertWebsiteBill(orderId);
+
+        if ("PS".equalsIgnoreCase(order.getReceiveWay())) {
+            websiteBillService.insertWebsiteBill(orderId);
+        }
         return null;
     }
 }
