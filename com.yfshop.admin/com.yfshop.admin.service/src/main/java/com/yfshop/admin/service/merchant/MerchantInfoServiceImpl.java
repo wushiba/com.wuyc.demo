@@ -406,7 +406,7 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
         WxPayUnifiedOrderRequest orderRequest = new WxPayUnifiedOrderRequest();
         orderRequest.setBody("网点码申请");
         orderRequest.setOutTradeNo(websiteCode.getOrderNo());
-        orderRequest.setNotifyUrl("http://wx.luckylottery.cloud/pay/notify/order/websiteCodePay");
+        orderRequest.setNotifyUrl("http://prev-wx.yufan.51jujibao.com/pay/notify/order/websiteCodePay");
         orderRequest.setTotalFee(BaseWxPayRequest.yuanToFen(fee));//元转成分
 //        orderRequest.setTotalFee(1);
         orderRequest.setOpenid(websiteCodePayReq.getOpenId());
