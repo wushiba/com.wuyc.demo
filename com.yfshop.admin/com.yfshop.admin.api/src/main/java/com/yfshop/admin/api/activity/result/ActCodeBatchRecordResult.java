@@ -12,9 +12,7 @@ import java.time.LocalDateTime;
 public class ActCodeBatchRecordResult implements Serializable {
     private static final long serialVersionUID = 1L;
 
-
-    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
-@JsonSerialize(using = LocalDateTimeSerializer.class)
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", locale = "zh", timezone = "GMT+8")
     private LocalDateTime createTime;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", locale = "zh", timezone = "GMT+8")
@@ -59,7 +57,6 @@ public class ActCodeBatchRecordResult implements Serializable {
      * 联系人
      */
     private String mobile;
-
 
 
 }
