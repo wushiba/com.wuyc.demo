@@ -50,10 +50,12 @@ public class CustomLogFilter implements Filter {
         // 参数列表
         Object[] args = Optional.ofNullable(invocation.getArguments()).map(Object[]::clone).orElse(null);
 
+        long start = System.currentTimeMillis();
         // invoke the rpc service
         Result result = invoker.invoke(invocation);
 
         VisitorInfo visitorInfo = new VisitorInfo();
+        visitorInfo.setCostMills(System.currentTimeMillis() - start);
         visitorInfo.setInterfaceName(interfaceName);
         visitorInfo.setMethodName(methodName);
         visitorInfo.setParameterTypes(parameterTypes);
@@ -70,5 +72,6 @@ public class CustomLogFilter implements Filter {
         private List<String> parameterTypes;
         private Object args;
         private Object result;
+        private long costMills;
     }
 }
