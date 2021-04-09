@@ -504,11 +504,11 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
         orderRequest.setBody("用户订单支付");
         orderRequest.setTradeType("JSAPI");
         orderRequest.setOpenid(user.getOpenId());
-        orderRequest.setNotifyUrl(wxPayNotifyUrl + "websiteCodePay");
-        orderRequest.setSpbillCreateIp(order.getUserId() + "-" + orderId);
+        orderRequest.setNotifyUrl(wxPayNotifyUrl + PayPrefixEnum.USER_ORDER.getBizType());
+        orderRequest.setSpbillCreateIp("127.0.0.1");
         orderRequest.setTotalFee(BaseWxPayRequest.yuanToFen(order.getPayPrice().toString()));
         orderRequest.setTimeStart(DateFormatUtils.format(new Date(), "yyyyMMddHHmmss"));
-        orderRequest.setOutTradeNo(PayPrefixEnum.USER_ORDER.getBizType() + order.getId() + "_" + order.getPayEntryCount());
+        orderRequest.setOutTradeNo(PayPrefixEnum.USER_ORDER.getBizType() + order.getId() + "-" + order.getPayEntryCount());
         orderRequest.setTimeExpire(DateFormatUtils.format(new Date(System.currentTimeMillis() + (1000 * 60 * 15)), "yyyyMMddHHmmss"));
         WxPayMpOrderResult payOrderResult = mpPayService.createPayOrder(orderRequest);
 
