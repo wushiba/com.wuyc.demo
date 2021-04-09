@@ -96,7 +96,7 @@ public class FrontUserCouponServiceImpl implements FrontUserCouponService {
         if ("Y".equalsIgnoreCase(userCouponReq.getIsCanUse())) {
             queryWrapper.eq(UserCoupon::getUseStatus, UserCouponStatusEnum.NO_USE.getCode())
                     .gt(UserCoupon::getValidEndTime, new Date());
-        } else {
+        } else if ("N".equalsIgnoreCase(userCouponReq.getIsCanUse())) {
             queryWrapper.in(UserCoupon::getUseStatus, UserCouponStatusEnum.IN_USE.getCode()
                     , UserCouponStatusEnum.HAS_USE.getCode())
                     .lt(UserCoupon::getValidEndTime, new Date());
@@ -109,7 +109,7 @@ public class FrontUserCouponServiceImpl implements FrontUserCouponService {
         if (userCouponReq.getDrawPrizeLevel() != null) {
             queryWrapper.eq(UserCoupon::getDrawPrizeLevel, userCouponReq.getDrawPrizeLevel());
         }
-        if (StringUtils.isBlank(userCouponReq.getCouponResource())) {
+        if (StringUtils.isNotBlank(userCouponReq.getCouponResource())) {
             queryWrapper.eq(UserCoupon::getCouponResource, userCouponReq.getCouponResource());
         }
 
