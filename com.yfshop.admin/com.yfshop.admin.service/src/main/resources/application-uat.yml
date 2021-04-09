@@ -105,4 +105,7 @@ actCode:
   targetDir: /home/www/web-deploy/yufan-admin-service/actCode/target/
   url: http://prev-activ.yufan.51jujibao.com/#/LuckDrawPage?actCode=
 
+wxPay:
+  notifyUrl: http://prev-wx.yufan.51jujibao.com/pay/notify/order/
+
 
