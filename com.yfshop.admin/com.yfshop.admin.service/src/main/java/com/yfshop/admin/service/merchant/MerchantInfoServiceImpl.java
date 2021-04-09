@@ -387,7 +387,7 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
         return BeanUtil.convert(websiteCodeMapper.selectById(id), WebsiteCodeResult.class);
     }
 
-    @SneakyThrows
+
     @Override
     @Transactional(rollbackFor = Exception.class)
     public WxPayMpOrderResult applyWebsiteCodePay(WebsiteCodePayReq websiteCodePayReq) throws ApiException {
