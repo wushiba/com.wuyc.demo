@@ -468,6 +468,8 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
     public void websitePayOrderNotify(WxPayOrderNotifyReq notifyResult) throws ApiException {
         WebsiteCode websiteCode = new WebsiteCode();
         websiteCode.setPayMethod("WxPay");
+        websiteCode.setPayTime(LocalDateTime.now());
+        websiteCode.setOrderStatus("WAIT");
         websiteCode.setBillno(notifyResult.getTransactionId());
         int count = websiteCodeMapper.update(websiteCode, Wrappers.<WebsiteCode>lambdaQuery()
                 .eq(WebsiteCode::getOrderNo, notifyResult.getOutTradeNo())
