@@ -399,7 +399,7 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
         //websiteCode.setPayMethod("WxPay");
         websiteCode.setAddress(websiteCodeAddress.getProvince() + websiteCodeAddress.getCity() + websiteCodeAddress.getDistrict() + websiteCodeAddress.getAddress());
         //websiteCode.setOrderStatus("WAIT");
-        websiteCode.setOrderNo(String.format("$s%06d", PayPrefixEnum.WEBSITE_CODE, websiteCodeAddress.getMerchantId()) + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyMMddHHmmssSSS")));
+        websiteCode.setOrderNo(String.format("%s%06d", PayPrefixEnum.WEBSITE_CODE.getPrefix(),websiteCodeAddress.getMerchantId()) + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyMMddHHmmssSSS")));
         int count = websiteCodeMapper.update(websiteCode, Wrappers.<WebsiteCode>lambdaQuery()
                 .in(WebsiteCode::getId, websiteCodePayReq.getIds())
                 .eq(WebsiteCode::getOrderStatus, "PENDING"));
