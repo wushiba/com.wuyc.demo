@@ -47,6 +47,9 @@ public class YfUserCouponResult implements Serializable{
     /** 领取场景: DRAW(抽奖), SHOP(商城) */
     private String couponResource;
 
+    /** 用户扫码抽奖的码，yf_act_code_batch_detail表的actCode */
+    private String actCode;
+
     private Integer drawActivityId;
 
     private Integer drawPrizeLevel;

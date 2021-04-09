@@ -25,9 +25,6 @@ public class YfUserCouponResult implements Serializable {
 
     private static final long serialVersionUID = -1L;
 
-    /**
-     *
-     */
     private Long id;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", locale = "zh", timezone = "GMT+8")
@@ -40,35 +37,23 @@ public class YfUserCouponResult implements Serializable {
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     private LocalDateTime updateTime;
 
-    /**
-     * 用户id编号
-     */
     private Integer userId;
 
-    /**
-     *
-     */
     private Integer merchantId;
 
-    /**
-     *
-     */
     private String pidPath;
 
-    /**
-     *
-     */
     private Integer couponId;
 
-    /**
-     *
-     */
     private String couponTitle;
 
     /**
      * 领取场景: DRAW(抽奖), SHOP(商城)
      */
     private String couponResource;
+
+    /** 用户扫码抽奖的码，yf_act_code_batch_detail表的actCode */
+    private String actCode;
 
     /**
      * 抽奖活动id

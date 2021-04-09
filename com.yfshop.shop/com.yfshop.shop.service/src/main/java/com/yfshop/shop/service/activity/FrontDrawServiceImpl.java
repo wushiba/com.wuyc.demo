@@ -24,7 +24,6 @@ import com.yfshop.shop.service.user.service.FrontUserService;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -49,11 +48,13 @@ public class FrontDrawServiceImpl implements FrontDrawService {
     @Resource
     private DrawPrizeMapper drawPrizeMapper;
     @Resource
-    private DrawActivityMapper drawActivityMapper;
-    @Resource
     private IpAddressMapper ipAddressMapper;
     @Resource
+    private UserCouponMapper userCouponMapper;
+    @Resource
     private FrontUserService frontUserService;
+    @Resource
+    private DrawActivityMapper drawActivityMapper;
     @Resource
     private FrontUserCouponService frontUserCouponService;
     @Resource
@@ -121,7 +122,9 @@ public class FrontDrawServiceImpl implements FrontDrawService {
         Asserts.assertNonNull(actCodeBatchDetail, 500, "请扫描正确的券码");
         Integer drawActivityId = actCodeBatchDetail.getActId();
 
-        // todo 要判断是否使用, 根据actCode查询用户优惠券表
+        // 判断是否使用, 根据actCode查询用户优惠券表
+        UserCoupon userCoupon = userCouponMapper.selectOne(Wrappers.lambdaQuery(UserCoupon.class).eq(UserCoupon::getActCode, actCode));
+        Asserts.assertNull(userCoupon, 500, "请勿重复扫码抽奖");
 
         // 获取奖品，每个奖品登记优惠券id， 可以走缓存
         YfDrawActivityResult yfDrawActivityResult = getDrawActivityDetailById(drawActivityId);
@@ -142,7 +145,7 @@ public class FrontDrawServiceImpl implements FrontDrawService {
         // 根据ip查询地址, 找不到归属地默认抽到三等奖
         Integer provinceId = this.getProvinceByIpStr(ipStr);
         if (provinceId == null) {
-            return frontUserCouponService.createUserCoupon(userId, drawActivityId, prizeLevel, couponId);
+            return frontUserCouponService.createUserCoupon(userId, drawActivityId, prizeLevel, couponId, actCode);
         }
 
         // 判断省份抽奖规则有没有走定制化, 找不到根据活动奖品概率去发奖品, 根据大盒小盒,去抽奖
@@ -164,7 +167,7 @@ public class FrontDrawServiceImpl implements FrontDrawService {
                 couponId = prizeMap.get(prizeLevel).get(0).getCouponId();
             }
         }
-        return frontUserCouponService.createUserCoupon(userId, drawActivityId, prizeLevel, couponId);
+        return frontUserCouponService.createUserCoupon(userId, drawActivityId, prizeLevel, couponId, actCode);
     }
 
     @Override
