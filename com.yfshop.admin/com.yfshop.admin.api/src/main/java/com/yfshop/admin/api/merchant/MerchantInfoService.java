@@ -11,6 +11,7 @@ import com.yfshop.admin.api.website.request.WebsiteCodeBindReq;
 import com.yfshop.admin.api.website.request.WebsiteCodePayReq;
 import com.yfshop.admin.api.website.result.*;
 import com.yfshop.common.exception.ApiException;
+import com.yfshop.wx.api.request.WxPayOrderNotifyReq;
 
 import java.util.Date;
 import java.util.List;
@@ -173,7 +174,7 @@ public interface MerchantInfoService {
      *
      * @param notifyResult
      */
-    void websitePayOrderNotify(WxPayOrderNotifyResult notifyResult) throws ApiException;
+    void websitePayOrderNotify(WxPayOrderNotifyReq notifyResult) throws ApiException;
 
     /**
      * 获取商户层级数据

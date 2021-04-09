@@ -5,6 +5,8 @@ import com.github.binarywang.wxpay.bean.notify.WxPayNotifyResponse;
 import com.github.binarywang.wxpay.bean.notify.WxPayOrderNotifyResult;
 import com.github.binarywang.wxpay.exception.WxPayException;
 import com.github.binarywang.wxpay.service.WxPayService;
+import com.yfshop.common.util.BeanUtil;
+import com.yfshop.wx.api.request.WxPayOrderNotifyReq;
 import com.yfshop.wx.api.service.MpPayNotifyService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -163,7 +165,9 @@ public class WxPayController {
   @PostMapping("/notify/order/{bizType}")
   public String parseOrderNotifyResult(@PathVariable String bizType, @RequestBody String xmlData) throws WxPayException {
     final WxPayOrderNotifyResult notifyResult = this.wxService.parseOrderNotifyResult(xmlData);
-    mpPayService.payOrderNotify(bizType,notifyResult);
+
+    WxPayOrderNotifyReq wxPayOrderNotifyReq=BeanUtil.convert(notifyResult, WxPayOrderNotifyReq.class);
+    mpPayService.payOrderNotify(bizType,wxPayOrderNotifyReq);
     // TODO 根据自己业务场景需要构造返回对象
     return WxPayNotifyResponse.success("成功");
   }

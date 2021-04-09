@@ -30,6 +30,7 @@ import com.yfshop.common.util.AddressUtil;
 import com.yfshop.common.util.BeanUtil;
 import com.yfshop.common.util.DateUtil;
 import com.yfshop.common.util.GeoUtils;
+import com.yfshop.wx.api.request.WxPayOrderNotifyReq;
 import com.yfshop.wx.api.service.MpPayService;
 import lombok.SneakyThrows;
 import org.apache.commons.lang.time.DateFormatUtils;
@@ -463,7 +464,7 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
     }
 
     @Override
-    public void websitePayOrderNotify(WxPayOrderNotifyResult notifyResult) throws ApiException {
+    public void websitePayOrderNotify(WxPayOrderNotifyReq notifyResult) throws ApiException {
         WebsiteCode websiteCode = new WebsiteCode();
         websiteCode.setPayMethod("WxPay");
         websiteCode.setBillno(notifyResult.getTransactionId());
