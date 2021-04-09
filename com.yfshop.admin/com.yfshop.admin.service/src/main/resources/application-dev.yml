@@ -110,4 +110,4 @@ actCode:
   url: http://192.168.11.34:8088/#/LuckDrawPage?actCode=
 
 wxPay:
-  notifyUrl: http://prev-wx.yufan.51jujibao.com/pay/notify/order/
+  notifyUrl: http://prev-wx.yufan.51jujibao.com/wx/pay/notify/order/

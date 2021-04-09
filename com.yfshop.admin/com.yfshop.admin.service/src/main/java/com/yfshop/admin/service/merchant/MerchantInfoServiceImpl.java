@@ -279,6 +279,7 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
     public Integer applyWebsiteCode(Integer merchantId, Integer count, String email) throws ApiException {
         Merchant merchant = merchantMapper.selectById(merchantId);
         WebsiteCode websiteCode = new WebsiteCode();
+        websiteCode.setCreateTime(LocalDateTime.now());
         websiteCode.setEmail(email);
         websiteCode.setMerchantId(merchant.getId());
         websiteCode.setMerchantName(merchant.getMerchantName());
@@ -288,7 +289,7 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
         if (StringUtils.isBlank(email)) {
             websiteCode.setOrderAmount(new BigDecimal("0.35").multiply(new BigDecimal(count)));
             websiteCode.setPostage(new BigDecimal(8));
-            int g = count * 4;
+            int g = count * 4;//每张大约4g
             if (g > 1000) {
                 double amount = Math.ceil((g - 1000) / 1000f) * 2.5d;
                 websiteCode.setPostage(websiteCode.getPostage().add(new BigDecimal(String.valueOf(amount))));
