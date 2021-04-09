@@ -106,6 +106,6 @@ actCode:
   url: http://prev-activ.yufan.51jujibao.com/#/LuckDrawPage?actCode=
 
 wxPay:
-  notifyUrl: http://prev-wx.yufan.51jujibao.com/pay/notify/order/
+  notifyUrl: http://prev-wx.yufan.51jujibao.com/wx/pay/notify/order/
 
 

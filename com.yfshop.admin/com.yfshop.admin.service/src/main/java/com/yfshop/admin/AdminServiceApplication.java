@@ -13,6 +13,7 @@ public class AdminServiceApplication {
         ConfigurableApplicationContext applicationContext = SpringApplication.run(AdminServiceApplication.class, args);
         String property = applicationContext.getEnvironment().getProperty("spring.profiles.active");
         System.out.println("==============启动了=====com.yfshop.admin==================环境==" + property);
+        System.out.println(System.getProperty("user.dir"));
     }
 
 }
