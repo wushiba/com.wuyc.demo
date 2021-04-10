@@ -157,7 +157,7 @@ public class FrontDrawServiceImpl implements FrontDrawService {
         result.setDrawPrizeIcon(thirdPrize.getPrizeIcon());
         if (provinceId == null) {
             logger.info("======抽奖用户userId=" + userId +  ",actCode=" + actCode + ",抽奖结果=" + JSON.toJSONString(result));
-            frontUserCouponService.createUserCoupon(userId, drawActivityId, prizeLevel, couponId, actCode);
+            frontUserCouponService.createUserCouponByPrize(userId, actCode, thirdPrize);
             return result;
         }
 
@@ -166,29 +166,24 @@ public class FrontDrawServiceImpl implements FrontDrawService {
         if (provinceRate == null) {
             if (BoxSpecValEnum.BIG.getCode().equalsIgnoreCase(actCodeBatchDetail.getBoxSpecVal())) {
                 prizeLevel = startDraw(firstPrize.getWinRate(), secondPrize.getWinRate());
-                couponId = prizeMap.get(prizeLevel).get(0).getCouponId();
-                frontUserCouponService.createUserCoupon(userId, drawActivityId, prizeLevel, couponId, actCode);
             } else {
                 prizeLevel = startDraw(firstPrize.getWinRate(), secondPrize.getSmallBoxRate());
-                couponId = prizeMap.get(prizeLevel).get(0).getCouponId();
-                frontUserCouponService.createUserCoupon(userId, drawActivityId, prizeLevel, couponId, actCode);
             }
         } else {
             if (BoxSpecValEnum.BIG.getCode().equalsIgnoreCase(actCodeBatchDetail.getBoxSpecVal())) {
                 prizeLevel = startDraw(provinceRate.getFirstWinRate(), provinceRate.getSecondWinRate());
-                couponId = prizeMap.get(prizeLevel).get(0).getCouponId();
-                frontUserCouponService.createUserCoupon(userId, drawActivityId, prizeLevel, couponId, actCode);
             } else {
-                prizeLevel =startDraw(provinceRate.getFirstWinRate(), provinceRate.getSecondSmallBoxWinRate());
-                couponId = prizeMap.get(prizeLevel).get(0).getCouponId();
-                frontUserCouponService.createUserCoupon(userId, drawActivityId, prizeLevel, couponId, actCode);
+                prizeLevel = startDraw(provinceRate.getFirstWinRate(), provinceRate.getSecondSmallBoxWinRate());
             }
         }
 
+        YfDrawPrizeResult drawPrize = prizeMap.get(prizeLevel).get(0);
         result.setDrawPrizeLevel(prizeLevel);
-        result.setCouponTitle(prizeMap.get(prizeLevel).get(0).getPrizeTitle());
-        result.setDrawPrizeIcon(prizeMap.get(prizeLevel).get(0).getPrizeIcon());
+        result.setCouponTitle(drawPrize.getPrizeTitle());
+        result.setDrawPrizeIcon(drawPrize.getPrizeIcon());
+
         logger.info("======抽奖用户userId=" + userId +  ",actCode=" + actCode + ",抽奖结果=" + JSON.toJSONString(result));
+        frontUserCouponService.createUserCouponByPrize(userId, actCode, drawPrize);
         return result;
     }
 

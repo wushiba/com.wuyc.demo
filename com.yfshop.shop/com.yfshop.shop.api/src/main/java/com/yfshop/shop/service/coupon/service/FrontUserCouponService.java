@@ -1,6 +1,7 @@
 package com.yfshop.shop.service.coupon.service;
 
 import com.yfshop.common.exception.ApiException;
+import com.yfshop.shop.service.activity.result.YfDrawPrizeResult;
 import com.yfshop.shop.service.coupon.request.QueryUserCouponReq;
 import com.yfshop.shop.service.coupon.result.YfCouponResult;
 import com.yfshop.shop.service.coupon.result.YfUserCouponResult;
@@ -47,14 +48,12 @@ public interface FrontUserCouponService {
 
 	/**
 	 * 用户抽中优惠券后生成优惠券
-	 * @param userId			用户id
-	 * @param drawActivityId	抽奖活动
-	 * @param prizeLevel		奖品等级
-	 * @param couponId			优惠券id
-	 * @param actCode			用户扫码抽奖的码，yf_act_code_batch_detail表的actCode
+	 * @param userId				用户id
+	 * @param actCode				用户扫码抽奖的码，yf_act_code_batch_detail表的actCode
+	 * @param drawPrizeResult		奖品信息
 	 * @return
 	 * @throws ApiException
 	 */
-	public YfUserCouponResult createUserCoupon(Integer userId, Integer drawActivityId, Integer prizeLevel, Integer couponId, String actCode) throws ApiException;
+	public YfUserCouponResult createUserCouponByPrize(Integer userId, String actCode, YfDrawPrizeResult drawPrizeResult) throws ApiException;
 
 }
