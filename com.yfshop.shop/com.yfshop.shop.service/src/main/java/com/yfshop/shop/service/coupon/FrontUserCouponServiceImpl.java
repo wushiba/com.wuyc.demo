@@ -190,6 +190,7 @@ public class FrontUserCouponServiceImpl implements FrontUserCouponService {
         userCoupon.setNickname(userResult.getNickname());
         userCoupon.setUseStatus(UserCouponStatusEnum.NO_USE.getCode());
         userCouponMapper.insert(userCoupon);
+        logger.info("======结束创建优惠券用户userId=" + userId +  ",actCode=" + actCode + ",userCoupon=" + JSON.toJSONString(userCoupon));
         return BeanUtil.convert(userCoupon, YfUserCouponResult.class);
     }
 
