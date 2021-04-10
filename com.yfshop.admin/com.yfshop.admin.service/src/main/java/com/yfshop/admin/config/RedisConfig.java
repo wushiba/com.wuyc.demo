@@ -28,11 +28,12 @@ public class RedisConfig extends BaseRedisConfig {
     }
 
     @Bean
-    RedisMessageListenerContainer container(RedisConnectionFactory connectionFactory, MessageListenerAdapter listenerAdapter) {
+    RedisMessageListenerContainer container(RedisConnectionFactory connectionFactory, MessageListenerAdapter listenerAdapter, MessageListenerAdapter listenerFinishAdapter) {
         RedisMessageListenerContainer container = new RedisMessageListenerContainer();
         container.setConnectionFactory(connectionFactory);
         //订阅多个频道
         container.addMessageListener(listenerAdapter, new PatternTopic("actCodeTask"));
+        container.addMessageListener(listenerFinishAdapter, new PatternTopic("actCodeTaskFinish"));
         //序列化对象（特别注意：发布的时候需要设置序列化；订阅方也需要设置序列化）
         Jackson2JsonRedisSerializer seria = new Jackson2JsonRedisSerializer(Object.class);
         ObjectMapper objectMapper = new ObjectMapper();
@@ -49,5 +50,10 @@ public class RedisConfig extends BaseRedisConfig {
         return new MessageListenerAdapter(receiver, "getMessage");
     }
 
+    //表示监听一个频道
+    @Bean
+    MessageListenerAdapter listenerFinishAdapter(ActCodeConsume receiver) {
+        return new MessageListenerAdapter(receiver, "finish");
+    }
 
 }

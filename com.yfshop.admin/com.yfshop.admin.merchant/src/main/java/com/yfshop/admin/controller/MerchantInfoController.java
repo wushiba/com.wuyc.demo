@@ -3,6 +3,10 @@ package com.yfshop.admin.controller;
 import cn.dev33.satoken.annotation.SaCheckLogin;
 import cn.dev33.satoken.stp.StpLogic;
 import cn.dev33.satoken.stp.StpUtil;
+import cn.hutool.Hutool;
+import cn.hutool.core.io.IoUtil;
+import cn.hutool.extra.qrcode.QrCodeUtil;
+import cn.hutool.extra.qrcode.QrConfig;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.github.binarywang.wxpay.bean.order.WxPayMpOrderResult;
 import com.yfshop.admin.api.merchant.*;
@@ -22,12 +26,16 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.net.URLEncoder;
 import java.util.List;
 
 @Validated
@@ -43,6 +51,9 @@ class MerchantInfoController extends AbstractBaseController {
     private UserService userService;
 
     public static StpLogic userLogic = new UserStpLogic();
+
+    @Value("${websiteCode.url}")
+    private String websiteCodeUrl;
 
 
     /**
@@ -174,6 +185,8 @@ class MerchantInfoController extends AbstractBaseController {
         MerchantResult merchantResult = merchantInfoService.websiteCodeBind(websiteReq);
         if (merchantResult != null) {
             StpUtil.setLoginId(merchantResult.getId());
+        } else {
+            logger.info("绑定失败!");
         }
         return CommonResult.success(null);
     }
@@ -290,5 +303,13 @@ class MerchantInfoController extends AbstractBaseController {
         merchantInfoService.deleteWebsiteCodeAddress(id);
         return CommonResult.success(null);
     }
+
+
+    @RequestMapping(value = "/getWebsiteCodeQrCode", method = {RequestMethod.GET})
+    public String getWebsiteCodeQrCode(String websiteCode) {
+        QrConfig qrConfig = new QrConfig(750, 750);
+        return QrCodeUtil.generateAsBase64(websiteCodeUrl + websiteCode, qrConfig, "png");
+    }
+
 
 }
