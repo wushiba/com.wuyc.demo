@@ -70,6 +70,11 @@ public class SaveItemSkuReq implements Serializable {
         @NotNull(message = "市场价不能为空")
         @DecimalMin(value = "0", message = "市场价格不能为负")
         private BigDecimal marketPrice;
+
+        @ApiModelProperty(value = "运费", required = true)
+        @NotNull(message = "运费不能为空")
+        @DecimalMin(value = "0", message = "运费不能为负")
+        private BigDecimal freight = BigDecimal.ZERO;
     }
 
 }

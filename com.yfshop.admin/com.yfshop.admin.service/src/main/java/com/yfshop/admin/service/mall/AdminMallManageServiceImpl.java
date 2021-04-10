@@ -806,6 +806,7 @@ public class AdminMallManageServiceImpl implements AdminMallManageService {
             targetSku.setSkuMarketPrice(candidateSku.getMarketPrice());
             targetSku.setIsEnable(candidateSku.getIsEnable());
             targetSku.setSkuStock(candidateSku.getStock());
+            targetSku.setFreight(candidateSku.getFreight());
         }
         skuManager.saveBatch(targetSkuList);
         return null;
