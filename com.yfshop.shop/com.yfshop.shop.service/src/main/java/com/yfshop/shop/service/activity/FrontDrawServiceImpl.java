@@ -232,7 +232,8 @@ public class FrontDrawServiceImpl implements FrontDrawService {
      */
     private Integer getProvinceByIpStr(String ipStr) {
         if (!"pro".equalsIgnoreCase(SpringUtil.getActiveProfile())) {
-            return ProvinceEnum.SHANDONG.getId();
+            return 15;
+//            return ProvinceEnum.SHANDONG.getId();
         }
 
         IpAddress ipAddress = null;
