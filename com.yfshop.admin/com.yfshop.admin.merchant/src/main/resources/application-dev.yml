@@ -36,3 +36,5 @@ wx:
         secret: 44f813375f7cf549757b846e0d1e6042 # 公众号的appsecret
         token: yufanshop # 接口配置里的Token值
         aesKey: 111 # 接口配置里的EncodingAESKey
+websiteCode:
+  url: http://prev-merchant.yufan.51jujibao.com/#/MerchantRegisterPrep?websiteCode=

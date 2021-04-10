@@ -1,21 +1,23 @@
 package com.yfshop.admin.task;
 
-import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.crypto.SecureUtil;
 import cn.hutool.crypto.digest.DigestUtil;
 import com.qiniu.http.Response;
-import com.yfshop.code.manager.ActCodeBatchManager;
+import com.yfshop.admin.tool.poster.kernal.qiniu.QiniuConfig;
+import com.yfshop.admin.tool.poster.kernal.qiniu.QiniuUploader;
 import com.yfshop.code.mapper.ActCodeBatchDetailMapper;
 import com.yfshop.code.mapper.ActCodeBatchMapper;
 import com.yfshop.code.model.ActCodeBatch;
 import com.yfshop.code.model.ActCodeBatchDetail;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import java.io.File;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -29,20 +31,48 @@ public class ActCodeConsume {
     private ActCodeBatchDetailMapper actCodeBatchDetailMapper;
     @Value("${actCode.url}")
     private String actCodeCodeUrl;
-
-    @Value("${actCode.srcDir}")
-    private String actCodeCodeSrcDir;
-
+    @Autowired
+    QiniuConfig qiniuConfig;
     @Value("${actCode.targetDir}")
     private String actCodeCodeTargetDir;
+
+    @Autowired
+    QiniuUploader qiniuUploader;
 
     private static final Logger logger = LoggerFactory.getLogger(ActCodeConsume.class);
 
     public void getMessage(String message) {
-        String[] data = message.split("-");
-        Integer id = Integer.valueOf(data[0]);
-        List<String> codes = Arrays.asList(data[1].split(","));
-        doTask(id, codes);
+        try {
+            String[] data = message.split("-");
+            Integer id = Integer.valueOf(data[0]);
+            List<String> codes = Arrays.asList(data[1].split(","));
+            doTask(id, codes);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void finish(String id) {
+        try {
+            ActCodeBatch actCodeBatch = actCodeBatchMapper.selectById(id);
+            actCodeBatch.setFileStatus("FAIL");
+            actCodeBatch.setFileStatus("");
+            String filePath = actCodeCodeTargetDir + actCodeBatch.getBatchNo() + ".txt";
+            if (new File(filePath).exists()) {
+                try {
+                    Response response = qiniuUploader.getUploadManager().put(filePath, actCodeBatch.getBatchNo() + ".txt", qiniuUploader.getAuth().uploadToken(qiniuConfig.getBucket()));
+                    if (response.isOK()) {
+                        actCodeBatch.setFileStatus("SUCCESS");
+                        actCodeBatch.setFileUrl("http://" + qiniuConfig.getDomain() + "/" + actCodeBatch.getBatchNo() + ".txt");
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+            actCodeBatchMapper.updateById(actCodeBatch);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public void doTask(Integer id, List<String> codes) {
