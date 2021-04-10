@@ -8,7 +8,6 @@ import com.yfshop.code.mapper.CouponMapper;
 import com.yfshop.code.mapper.UserCouponMapper;
 import com.yfshop.code.mapper.UserMapper;
 import com.yfshop.code.model.Coupon;
-import com.yfshop.code.model.User;
 import com.yfshop.code.model.UserCoupon;
 import com.yfshop.common.constants.CacheConstants;
 import com.yfshop.common.enums.CouponResourceEnum;
@@ -22,6 +21,8 @@ import com.yfshop.shop.service.coupon.request.QueryUserCouponReq;
 import com.yfshop.shop.service.coupon.result.YfCouponResult;
 import com.yfshop.shop.service.coupon.result.YfUserCouponResult;
 import com.yfshop.shop.service.coupon.service.FrontUserCouponService;
+import com.yfshop.shop.service.user.result.UserResult;
+import com.yfshop.shop.service.user.service.FrontUserService;
 import org.apache.dubbo.config.annotation.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,6 +58,8 @@ public class FrontUserCouponServiceImpl implements FrontUserCouponService {
     private UserCouponDao userCouponDao;
     @Resource
     private UserCouponMapper userCouponMapper;
+    @Resource
+    private FrontUserService frontUserService;
 
     /**
      * 根据id查询优惠券信息
@@ -70,14 +73,12 @@ public class FrontUserCouponServiceImpl implements FrontUserCouponService {
         Object couponObject = redisService.get(CacheConstants.COUPON_INFO_DATA + couponId);
         if (couponObject != null) {
             return JSON.parseObject(couponObject.toString(), YfCouponResult.class);
+        } else {
+            Coupon coupon = couponMapper.selectOne(Wrappers.lambdaQuery(Coupon.class).eq(Coupon::getId, couponId));
+            YfCouponResult yfCouponResult = BeanUtil.convert(coupon, YfCouponResult.class);
+            redisService.set(CacheConstants.COUPON_INFO_DATA + couponId, JSON.toJSONString(yfCouponResult), 60 * 60 * 24);
+            return yfCouponResult;
         }
-        Coupon coupon = couponMapper.selectOne(Wrappers.lambdaQuery(Coupon.class).eq(Coupon::getId, couponId));
-
-        Asserts.assertNonNull(coupon, 500, "优惠券不存在");
-
-        YfCouponResult yfCouponResult = BeanUtil.convert(coupon, YfCouponResult.class);
-        redisService.set(CacheConstants.COUPON_INFO_DATA + couponId, JSON.toJSONString(yfCouponResult), 60 * 60 * 24);
-        return yfCouponResult;
     }
 
     /**
@@ -140,10 +141,10 @@ public class FrontUserCouponServiceImpl implements FrontUserCouponService {
 
     @Override
     public YfUserCouponResult createUserCoupon(Integer userId, Integer drawActivityId, Integer prizeLevel, Integer couponId, String actCode) throws ApiException {
-        User user = userMapper.selectById(userId);
-        Asserts.assertNonNull(user, 500, "用户不存在,请先授权关注公众号");
+        UserResult userResult = frontUserService.getUserById(userId);
+        Asserts.assertNonNull(userResult, 500, "用户不存在,请先授权关注公众号");
 
-        Coupon coupon = couponMapper.selectById(couponId);
+        YfCouponResult coupon = getCouponResultById(couponId);
         Asserts.assertNonNull(coupon, 500, "优惠券不存在");
 
         String validType = coupon.getValidType();
@@ -182,8 +183,8 @@ public class FrontUserCouponServiceImpl implements FrontUserCouponService {
         // TODO: 2021/3/23 手机号用户还没有？
         userCoupon.setUseTime(null);
         userCoupon.setOrderId(null);
-        userCoupon.setMobile(user.getMobile());
-        userCoupon.setNickname(user.getNickname());
+        userCoupon.setMobile(userResult.getMobile());
+        userCoupon.setNickname(userResult.getNickname());
         userCoupon.setUseStatus(UserCouponStatusEnum.NO_USE.getCode());
         userCouponMapper.insert(userCoupon);
         return BeanUtil.convert(userCoupon, YfUserCouponResult.class);

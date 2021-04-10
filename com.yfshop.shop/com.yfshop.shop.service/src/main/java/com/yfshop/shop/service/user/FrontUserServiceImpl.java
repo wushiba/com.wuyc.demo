@@ -91,7 +91,7 @@ public class FrontUserServiceImpl implements FrontUserService {
     public UserAddressResult getUserAddressById(Long addressId) throws ApiException {
         Asserts.assertNonNull(addressId, 500, "收货地址id不可以为空");
 
-        Object userAddressObject = redisService.get(CacheConstants.USER_ADDRESS_ID);
+        Object userAddressObject = redisService.get(CacheConstants.USER_ADDRESS_ID + addressId);
         if (userAddressObject != null) {
             return JSON.parseObject(userAddressObject.toString(), UserAddressResult.class);
         }
@@ -99,7 +99,7 @@ public class FrontUserServiceImpl implements FrontUserService {
         UserAddress orderAddress = userAddressMapper.selectOne(Wrappers.lambdaQuery(UserAddress.class)
                 .eq(UserAddress::getId, addressId));
         Asserts.assertNonNull(orderAddress, 500, "收货地址不存在");
-        redisService.set(CacheConstants.USER_ADDRESS_ID, JSON.toJSONString(orderAddress), 60 * 60);
+        redisService.set(CacheConstants.USER_ADDRESS_ID + addressId, JSON.toJSONString(orderAddress), 60 * 60);
         return BeanUtil.convert(orderAddress, UserAddressResult.class);
     }
 

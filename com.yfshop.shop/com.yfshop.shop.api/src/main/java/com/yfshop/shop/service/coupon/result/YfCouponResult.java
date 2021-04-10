@@ -8,6 +8,7 @@ import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Date;
 
@@ -62,7 +63,7 @@ public class YfCouponResult implements Serializable {
     /**
      * 使用条件: 0代表无门槛使用, 其余数字代表到指定数字才可以使用
      */
-    private Double useConditionPrice;
+    private BigDecimal useConditionPrice;
 
     /**
      * 有效日期类型: DATE_RANGE(日期范围), TODAY(领取当天), FIX_DAY(固定天数)
@@ -72,12 +73,12 @@ public class YfCouponResult implements Serializable {
     /**
      *
      */
-    private Date validStartTime;
+    private LocalDateTime validStartTime;
 
     /**
      *
      */
-    private Date validEndTime;
+    private LocalDateTime validEndTime;
 
     /**
      * 领取后有效天数

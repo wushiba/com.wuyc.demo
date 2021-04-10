@@ -513,7 +513,7 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
             orderRequest.setTotalFee(1);
         }
         orderRequest.setTimeStart(DateFormatUtils.format(new Date(), "yyyyMMddHHmmss"));
-        orderRequest.setOutTradeNo(PayPrefixEnum.USER_ORDER.getBizType() + order.getId() + "-" + order.getPayEntryCount());
+        orderRequest.setOutTradeNo(PayPrefixEnum.USER_ORDER.getPrefix() + order.getId() + "-" + order.getPayEntryCount());
         orderRequest.setTimeExpire(DateFormatUtils.format(new Date(System.currentTimeMillis() + (1000 * 60 * 15)), "yyyyMMddHHmmss"));
         WxPayMpOrderResult payOrderResult = mpPayService.createPayOrder(orderRequest);
 

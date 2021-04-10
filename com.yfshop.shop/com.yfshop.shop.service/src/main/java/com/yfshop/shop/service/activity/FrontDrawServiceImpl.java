@@ -22,7 +22,6 @@ import com.yfshop.shop.service.coupon.result.YfUserCouponResult;
 import com.yfshop.shop.service.coupon.service.FrontUserCouponService;
 import com.yfshop.shop.service.user.result.UserResult;
 import com.yfshop.shop.service.user.service.FrontUserService;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -218,6 +217,10 @@ public class FrontDrawServiceImpl implements FrontDrawService {
      * @return  provinceId || null
      */
     private Integer getProvinceByIpStr(String ipStr) {
+        if (!"pro".equalsIgnoreCase(SpringUtil.getActiveProfile())) {
+            return ProvinceEnum.SHANDONG.getId();
+        }
+
         IpAddress ipAddress = null;
         long ipLong = NetUtil.ipv4ToLong(ipStr);
         Object ipStrObject = redisService.get(CacheConstants.USER_REQUEST_IP_STR + ipLong);

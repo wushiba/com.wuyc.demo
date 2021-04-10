@@ -1,10 +1,14 @@
 package com.yfshop.admin.service.order;
 
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.yfshop.admin.api.order.service.AdminUserOrderService;
 import com.yfshop.admin.api.website.WebsiteBillService;
 import com.yfshop.admin.dao.OrderDao;
+import com.yfshop.code.mapper.OrderAddressMapper;
+import com.yfshop.code.mapper.OrderDetailMapper;
 import com.yfshop.code.mapper.OrderMapper;
 import com.yfshop.code.model.Order;
+import com.yfshop.code.model.OrderDetail;
 import com.yfshop.common.exception.ApiException;
 import com.yfshop.common.exception.Asserts;
 import org.apache.dubbo.config.annotation.DubboService;
@@ -25,6 +29,8 @@ public class AdminUserServiceImpl implements AdminUserOrderService {
     private OrderMapper orderMapper;
     @Resource
     private WebsiteBillService websiteBillService;
+    @Resource
+    private OrderDetailMapper orderDetailMapper;
 
     /**
      * 用户付款后修改订单状态
@@ -45,7 +51,14 @@ public class AdminUserServiceImpl implements AdminUserOrderService {
         if (result <= 0) {
             Asserts.assertNotEquals(order.getIsPay(), "Y", 500, "订单不可以重复修改状态");
         }
-        websiteBillService.insertWebsiteBill(orderId);
+        OrderDetail orderDetail = new OrderDetail();
+        orderDetail.setIsPay("Y");
+        orderDetailMapper.update(orderDetail, Wrappers.<OrderDetail>lambdaQuery().
+                eq(OrderDetail::getOrderId, orderId));
+
+        if ("PS".equalsIgnoreCase(order.getReceiveWay())) {
+            websiteBillService.insertWebsiteBill(orderId);
+        }
         return null;
     }
 }
