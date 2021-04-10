@@ -1,33 +1,31 @@
 package com.yfshop.admin.task;
 
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.io.FileUtil;
-import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.ArrayUtil;
-import cn.hutool.core.util.HexUtil;
 import cn.hutool.crypto.SecureUtil;
 import cn.hutool.crypto.digest.DigestUtil;
-import cn.hutool.crypto.symmetric.AES;
 import cn.hutool.http.HttpUtil;
 import com.qiniu.http.Response;
-import com.yfshop.admin.dao.ActCodeDao;
 import com.yfshop.admin.tool.poster.kernal.qiniu.QiniuConfig;
 import com.yfshop.admin.tool.poster.kernal.qiniu.QiniuDownloader;
 import com.yfshop.admin.tool.poster.kernal.qiniu.QiniuUploader;
-import com.yfshop.code.manager.ActCodeBatchDetailManager;
 import com.yfshop.code.manager.ActCodeBatchManager;
+import com.yfshop.code.mapper.ActCodeBatchDetailMapper;
 import com.yfshop.code.mapper.ActCodeBatchMapper;
 import com.yfshop.code.model.ActCodeBatch;
 import com.yfshop.code.model.ActCodeBatchDetail;
 import com.yfshop.common.exception.ApiException;
 import com.yfshop.common.exception.Asserts;
-import com.yfshop.common.util.DateUtil;
-import com.yfshop.common.util.StringUtil;
 import lombok.SneakyThrows;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
@@ -39,13 +37,10 @@ import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import java.io.BufferedReader;
 import java.io.File;
-import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 生成商户码任务
@@ -64,16 +59,19 @@ public class ActCodeTask {
     private String actCodeCodeTargetDir;
 
     @Resource
-    private ActCodeDao actCodeDao;
-
-    @Resource
-    private ActCodeBatchDetailManager actCodeBatchDetailManager;
+    private ActCodeBatchDetailMapper actCodeBatchDetailMapper;
 
     @Resource
     private ActCodeBatchManager actCodeBatchManager;
 
     @Resource
     private ActCodeBatchMapper actCodeBatchMapper;
+
+    @Autowired
+    private StringRedisTemplate stringRedisTemplate;
+
+    @Autowired
+    private ActCodeConsume actCodeConsumeTask;
 
     @Autowired
     QiniuUploader qiniuUploader;
@@ -96,7 +94,6 @@ public class ActCodeTask {
     @SneakyThrows
     @Async
     public void buildActCode(ActCodeBatch actCodeBatch, List<String> sourceCodes) {
-        Date date = DateUtil.getDate(DateUtil.localDateTimeToDate(actCodeBatch.getCreateTime()));
         List<ActCodeBatchDetail> actCodeBatchDetails = new ArrayList<>();
         List<String> codeFile = new ArrayList<>();
         actCodeBatch.setFileStatus("DONGING");
@@ -106,17 +103,21 @@ public class ActCodeTask {
         for (String code : sourceCodes) {
             LocalDateTime now = LocalDateTime.now();
             ActCodeBatchDetail actCodeBatchDetail = new ActCodeBatchDetail();
-            actCodeBatchDetail.setActCode(DigestUtil.md5HexTo16(SecureUtil.md5(code)));
+            actCodeBatchDetail.setActCode(DigestUtil.md5HexTo16(SecureUtil.md5("yf" + code)));
             actCodeBatchDetail.setTraceNo(code);
             actCodeBatchDetail.setActId(actCodeBatch.getActId());
             actCodeBatchDetail.setBatchId(actCodeBatch.getId());
             actCodeBatchDetail.setCreateTime(now);
-            actCodeBatchDetail.setUpdateTime(now);
             actCodeBatchDetails.add(actCodeBatchDetail);
             codeFile.add(String.format("%s,%s%s", code, actCodeCodeUrl, actCodeBatchDetail.getActCode()));
         }
         logger.info("溯源码合成结束");
-        actCodeBatchDetailManager.saveBatch(actCodeBatchDetails, 1000);
+
+        CollectionUtil.split(actCodeBatchDetails, 1000).forEach(item -> {
+            actCodeBatchDetailMapper.insertBatchSomeColumn(item);
+        });
+
+
         String filePath = actCodeCodeTargetDir + actCodeBatch.getBatchNo() + ".txt";
         FileUtil.appendUtf8Lines(codeFile, filePath);
         logger.info("批从号{},{}个溯源码,生成完毕", actCodeBatch.getBatchNo(), actCodeBatch.getQuantity());
@@ -143,12 +144,15 @@ public class ActCodeTask {
         BufferedReader bufferedReader = FileUtil.getUtf8Reader(file);
         List<String> sourceCodes = new ArrayList<>();
         bufferedReader.lines().forEach(item -> {
-            Asserts.assertTrue(item.length() == 16, 500, item + "溯源码格式有误！");
-            sourceCodes.add(item);
+            if (StringUtils.isNotBlank(item)) {
+                sourceCodes.add(item);
+            }
         });
-        actCodeBatch.setQuantity(sourceCodes.size());
-        actCodeBatchMapper.updateById(actCodeBatch);
-        buildActCode(actCodeBatch, sourceCodes);
+        CollectionUtil.split(sourceCodes, 1000).forEach(item -> {
+            String codes = String.format("%d-%s", actCodeBatch.getActId(), StringUtils.join(item));
+            stringRedisTemplate.convertAndSend("actCodeTask", codes);
+        });
+        //buildActCode(actCodeBatch, sourceCodes);
     }
 
     @Async
