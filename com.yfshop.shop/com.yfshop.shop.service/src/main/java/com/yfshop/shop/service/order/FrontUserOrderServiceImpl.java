@@ -207,6 +207,9 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
                 userCouponMapper.updateById(userCoupon);
             }
         });
+        order.setIsCancel("Y");
+        order.setCancelTime(LocalDateTime.now());
+        orderMapper.updateById(order);
         return null;
     }
 
