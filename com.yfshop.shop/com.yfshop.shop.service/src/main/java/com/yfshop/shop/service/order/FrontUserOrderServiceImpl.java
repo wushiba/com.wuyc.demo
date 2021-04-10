@@ -89,8 +89,9 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
 
     /**
      * 校验提交订单的时候是否支持自提
-     * @param userId	用户id
-     * @param itemId	商品id
+     *
+     * @param userId 用户id
+     * @param itemId 商品id
      * @return 支持自提，返回true， 否则返回false
      */
     @Override
@@ -115,8 +116,9 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
      * 查询用户所有订单, 根据订单状态去组装. 因为单个用户不可能会有很多订单
      * 待付款，已取消状态的订单，主订单信息是order里的数据， 子订单是orderDetail
      * 待发货，待收货，已完成的订单，主订单是detail 里的数据， 子订单是orderDetail
-     * @param userId		用户id
-     * @param useStatus		订单状态
+     *
+     * @param userId    用户id
+     * @param useStatus 订单状态
      * @return
      * @throws ApiException
      */
@@ -140,16 +142,17 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
     /**
      * 订单id为空说明查的是子订单详情
      * 订单id不为空代表查的是整个订单的详情，一般用于未支付，订单取消的订单
-     * @param userId		    用户id
-     * @param orderId		    订单id
-     * @param orderDetailId     订单详情id
+     *
+     * @param userId        用户id
+     * @param orderId       订单id
+     * @param orderDetailId 订单详情id
      * @return
      * @throws ApiException
      */
     @Override
     public YfUserOrderDetailResult getUserOrderDetail(Integer userId, Long orderId, Long orderDetailId) throws ApiException {
         // todo 量大的话可以做1分钟秒缓存
-        Asserts.assertFalse(orderId == null && orderDetailId == null , 500, "订单标识不可以为空");
+        Asserts.assertFalse(orderId == null && orderDetailId == null, 500, "订单标识不可以为空");
         YfUserOrderDetailResult userOrderDetailResult;
 
         Order order = orderMapper.selectOne(Wrappers.lambdaQuery(Order.class)
@@ -185,8 +188,9 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
 
     /**
      * 用户取消订单
-     * @param userId	用户id
-     * @param orderId	订单id
+     *
+     * @param userId  用户id
+     * @param orderId 订单id
      * @throws ApiException
      */
     @Override
@@ -212,8 +216,9 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
 
     /**
      * 用户确认订单
-     * @param userId			用户id
-     * @param orderDetailId		订单详情id
+     *
+     * @param userId        用户id
+     * @param orderDetailId 订单详情id
      * @throws ApiException
      */
     @Override
@@ -243,16 +248,17 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
 
     /**
      * 商品单个立即购买
-     * @param userId	    用户id
-     * @param skuId		    skuId
-     * @param num		    购买数量
-     * @param userCouponId	用户优惠券id
-     * @param addressId	    用户地址id
+     *
+     * @param userId       用户id
+     * @param skuId        skuId
+     * @param num          购买数量
+     * @param userCouponId 用户优惠券id
+     * @param addressId    用户地址id
      * @return
      * @throws ApiException
      */
     @Override
-    //@Transactional(rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> submitOrderBySkuId(Integer userId, Integer skuId, Integer num, Long userCouponId, Long addressId) throws ApiException {
         // 校验sku以及商品
         ItemSkuResult itemSku = mallService.getItemSkuBySkuId(skuId);
@@ -300,10 +306,11 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
 
     /**
      * 商品购物车下单购买
-     * @param userId		用户id
-     * @param cartIds		购物车id
-     * @param userCouponId	用户优惠券id
-     * @param addressId		用户地址id
+     *
+     * @param userId       用户id
+     * @param cartIds      购物车id
+     * @param userCouponId 用户优惠券id
+     * @param addressId    用户地址id
      * @return
      * @throws ApiException
      */
@@ -388,10 +395,11 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
 
     /**
      * 优惠券购买商品
-     * @param userId		用户id
-     * @param userCouponIds	用户优惠券ids(只有二等奖可以自提)
-     * @param userMobile	用户手机号
-     * @param websiteCode	商户网点码
+     *
+     * @param userId        用户id
+     * @param userCouponIds 用户优惠券ids(只有二等奖可以自提)
+     * @param userMobile    用户手机号
+     * @param websiteCode   商户网点码
      * @return
      * @throws ApiException
      */
@@ -466,7 +474,8 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
 
     /**
      * 用户付款后修改订单状态
-     * @param orderId   主订单id
+     *
+     * @param orderId 主订单id
      * @return
      * @throws ApiException
      */
@@ -489,7 +498,8 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
 
     /**
      * 根据订单号唤起微信支付
-     * @param orderId	用户订单id
+     *
+     * @param orderId 用户订单id
      * @return WxPayMpOrderResult
      * @throws ApiException
      */
@@ -507,7 +517,7 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
         orderRequest.setOpenid(user.getOpenId());
         orderRequest.setNotifyUrl(wxPayNotifyUrl + PayPrefixEnum.USER_ORDER.getBizType());
         orderRequest.setSpbillCreateIp("127.0.0.1");
-        if ("pro".equalsIgnoreCase(SpringUtil.getActiveProfile())){
+        if ("pro".equalsIgnoreCase(SpringUtil.getActiveProfile())) {
             orderRequest.setTotalFee(BaseWxPayRequest.yuanToFen(order.getPayPrice().toString()));
         } else {
             orderRequest.setTotalFee(1);
@@ -526,8 +536,9 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
 
     /**
      * 组装前台c端用户展示的通用订单数据
-     * @param orderList     订单列表
-     * @param childList     子订单列表
+     *
+     * @param orderList 订单列表
+     * @param childList 子订单列表
      * @return
      */
     private List<YfUserOrderListResult> setUserOrderListResult(List<Order> orderList, List<OrderDetail> childList) {
@@ -565,17 +576,18 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
 
     /**
      * 创建用户订单
-     * @param userId            用户id
-     * @param receiveWay        收货方式 ZT | PS
-     * @param itemCount         商品数量
-     * @param childOrderCount   子订单数量
-     * @param orderPrice        订单金额
-     * @param couponPrice       优惠券金额
-     * @param freight           运费
-     * @param payPrice          实际支付金额
-     * @param isPay             是否支付
+     *
+     * @param userId          用户id
+     * @param receiveWay      收货方式 ZT | PS
+     * @param itemCount       商品数量
+     * @param childOrderCount 子订单数量
+     * @param orderPrice      订单金额
+     * @param couponPrice     优惠券金额
+     * @param freight         运费
+     * @param payPrice        实际支付金额
+     * @param isPay           是否支付
      * @param remark
-     * @return  Order
+     * @return Order
      */
     private Order insertUserOrder(Integer userId, String receiveWay, Integer itemCount, Integer childOrderCount, BigDecimal orderPrice,
                                   BigDecimal couponPrice, BigDecimal freight, BigDecimal payPrice, String isPay, String remark) {
@@ -603,6 +615,7 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
 
     /**
      * 创建订单详情
+     *
      * @param userId            用户id
      * @param orderId           订单id
      * @param merchantId        商户id
@@ -627,7 +640,7 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
      */
     private OrderDetail insertUserOrderDetail(Integer userId, Long orderId, Integer merchantId, String pidPath, String receiveWay,
                                               String isPay, Integer itemCount, Integer itemId, Integer skuId, String itemTitle, BigDecimal skuPrice,
-                                              String itemCover, BigDecimal freight, BigDecimal couponPrice, BigDecimal orderPrice,  BigDecimal payPrice,
+                                              String itemCover, BigDecimal freight, BigDecimal couponPrice, BigDecimal orderPrice, BigDecimal payPrice,
                                               Long userCouponId, String orderStatus, String specValueIdPath, String specNameValueJson) {
         OrderDetail orderDetail = new OrderDetail();
         orderDetail.setCreateTime(LocalDateTime.now());
@@ -663,16 +676,17 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
 
     /**
      * 创建订单收货地址
-     * @param orderId       订单id
-     * @param mobile        手机号
-     * @param realname      收货人姓名
-     * @param province      省份
-     * @param provinceId    省id
-     * @param city          市
-     * @param cityId        市id
-     * @param district      区
-     * @param districtId    区id
-     * @param address       详细地址
+     *
+     * @param orderId    订单id
+     * @param mobile     手机号
+     * @param realname   收货人姓名
+     * @param province   省份
+     * @param provinceId 省id
+     * @param city       市
+     * @param cityId     市id
+     * @param district   区
+     * @param districtId 区id
+     * @param address    详细地址
      * @return OrderAddress
      */
     private OrderAddress insertUserOrderAddress(Long orderId, String mobile, String realname, String province, Integer provinceId,
@@ -695,6 +709,7 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
 
     /**
      * 校验优惠券
+     *
      * @param userCoupon
      * @throws ApiException
      */
