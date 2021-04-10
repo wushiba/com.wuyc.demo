@@ -53,7 +53,7 @@ public interface FrontUserCouponService {
 	 * @param couponId			优惠券id
 	 * @param actCode			用户扫码抽奖的码，yf_act_code_batch_detail表的actCode
 	 * @return
-	 * @throws com.baomidou.mybatisplus.extension.exceptions.ApiException
+	 * @throws ApiException
 	 */
 	public YfUserCouponResult createUserCoupon(Integer userId, Integer drawActivityId, Integer prizeLevel, Integer couponId, String actCode) throws ApiException;
 
