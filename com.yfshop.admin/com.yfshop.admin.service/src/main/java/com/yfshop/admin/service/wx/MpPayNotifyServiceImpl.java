@@ -32,4 +32,11 @@ public class MpPayNotifyServiceImpl implements MpPayNotifyService {
                 break;
         }
     }
+
+    public static void main(String[] args) {
+        String outTradeNo = "userOrder-1095-1";
+        String[] split = outTradeNo.split("-");
+        System.out.println(Long.valueOf(split[1]));
+    }
+
 }

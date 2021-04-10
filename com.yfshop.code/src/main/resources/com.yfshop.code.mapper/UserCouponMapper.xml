@@ -16,6 +16,7 @@
         <result column="act_code" property="actCode" />
         <result column="draw_activity_id" property="drawActivityId" />
         <result column="draw_prize_level" property="drawPrizeLevel" />
+        <result column="draw_prize_icon" property="drawPrizeIcon" />
         <result column="coupon_price" property="couponPrice" />
         <result column="use_condition_price" property="useConditionPrice" />
         <result column="use_range_type" property="useRangeType" />
@@ -32,7 +33,8 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        id, create_time, update_time, user_id, merchant_id, pid_path, coupon_id, coupon_title, coupon_resource, act_code, draw_activity_id, draw_prize_level, coupon_price, use_condition_price, use_range_type, can_use_item_ids, valid_start_time, valid_end_time, nickname, mobile, use_status, coupon_desc, use_time, order_id
+        id, create_time, update_time, user_id, merchant_id, pid_path, coupon_id, coupon_title, coupon_resource, act_code, draw_activity_id, draw_prize_level,
+        draw_prize_icon, coupon_price, use_condition_price, use_range_type, can_use_item_ids, valid_start_time, valid_end_time, nickname, mobile, use_status, coupon_desc, use_time, order_id
     </sql>
 
 </mapper>

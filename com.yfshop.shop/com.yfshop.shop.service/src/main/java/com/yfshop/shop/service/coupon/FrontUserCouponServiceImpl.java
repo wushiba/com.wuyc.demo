@@ -26,6 +26,7 @@ import com.yfshop.shop.service.user.service.FrontUserService;
 import org.apache.dubbo.config.annotation.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
@@ -140,7 +141,9 @@ public class FrontUserCouponServiceImpl implements FrontUserCouponService {
     }
 
     @Override
+    @Async
     public YfUserCouponResult createUserCoupon(Integer userId, Integer drawActivityId, Integer prizeLevel, Integer couponId, String actCode) throws ApiException {
+        logger.info("======开始创建优惠券用户userId=" + userId +  ",actCode=" + actCode + ",开始创建优惠券");
         UserResult userResult = frontUserService.getUserById(userId);
         Asserts.assertNonNull(userResult, 500, "用户不存在,请先授权关注公众号");
 
