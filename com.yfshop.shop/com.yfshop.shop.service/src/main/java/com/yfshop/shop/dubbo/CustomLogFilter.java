@@ -35,6 +35,9 @@ public class CustomLogFilter implements Filter {
 
     @Override
     public Result invoke(Invoker<?> invoker, Invocation invocation) throws RpcException {
+        if (true) {
+            return invoker.invoke(invocation);
+        }
         if (!ArrayUtil.containsAny(SpringUtil.getActiveProfiles(), "dev", "uat")) {
             return invoker.invoke(invocation);
         }
