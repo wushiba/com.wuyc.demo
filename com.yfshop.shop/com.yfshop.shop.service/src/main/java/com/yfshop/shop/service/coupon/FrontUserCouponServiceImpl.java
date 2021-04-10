@@ -186,6 +186,7 @@ public class FrontUserCouponServiceImpl implements FrontUserCouponService {
         userCoupon.setActCode(actCode);
         userCoupon.setDrawPrizeLevel(drawPrizeResult.getPrizeLevel());
         userCoupon.setDrawActivityId(drawPrizeResult.getActId());
+        userCoupon.setDrawPrizeIcon(drawPrizeResult.getPrizeIcon());
         userCoupon.setCouponPrice(coupon.getCouponPrice());
         userCoupon.setUseConditionPrice(coupon.getUseConditionPrice());
         userCoupon.setCouponResource(CouponResourceEnum.DRAW.getCode());
