@@ -25,6 +25,8 @@ import com.yfshop.shop.service.user.service.FrontUserService;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.scheduling.annotation.EnableAsync;
+
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -40,6 +42,7 @@ import java.util.stream.Collectors;
  * @Version:1.1.0
  */
 @DubboService
+@EnableAsync
 public class FrontDrawServiceImpl implements FrontDrawService {
 
     private static final Logger logger = LoggerFactory.getLogger(FrontDrawServiceImpl.class);
@@ -147,8 +150,14 @@ public class FrontDrawServiceImpl implements FrontDrawService {
 
         // 根据ip查询地址, 找不到归属地默认抽到三等奖
         Integer provinceId = this.getProvinceByIpStr(ipStr);
+
+        YfUserCouponResult result = new YfUserCouponResult();
+        result.setCouponTitle(thirdPrize.getPrizeTitle());
+        result.setDrawPrizeIcon(thirdPrize.getPrizeIcon());
         if (provinceId == null) {
-            return frontUserCouponService.createUserCoupon(userId, drawActivityId, prizeLevel, couponId, actCode);
+            logger.info("======抽奖用户userId=" + userId +  ",actCode=" + actCode + ",抽奖结果=" + JSON.toJSONString(result));
+            frontUserCouponService.createUserCoupon(userId, drawActivityId, prizeLevel, couponId, actCode);
+            return result;
         }
 
         // 判断省份抽奖规则有没有走定制化, 找不到根据活动奖品概率去发奖品, 根据大盒小盒,去抽奖
@@ -157,20 +166,28 @@ public class FrontDrawServiceImpl implements FrontDrawService {
             if (BoxSpecValEnum.BIG.getCode().equalsIgnoreCase(actCodeBatchDetail.getBoxSpecVal())) {
                 prizeLevel = startDraw(firstPrize.getWinRate(), secondPrize.getWinRate());
                 couponId = prizeMap.get(prizeLevel).get(0).getCouponId();
+                frontUserCouponService.createUserCoupon(userId, drawActivityId, prizeLevel, couponId, actCode);
             } else {
                 prizeLevel = startDraw(firstPrize.getWinRate(), secondPrize.getSmallBoxRate());
                 couponId = prizeMap.get(prizeLevel).get(0).getCouponId();
+                frontUserCouponService.createUserCoupon(userId, drawActivityId, prizeLevel, couponId, actCode);
             }
         } else {
             if (BoxSpecValEnum.BIG.getCode().equalsIgnoreCase(actCodeBatchDetail.getBoxSpecVal())) {
                 prizeLevel = startDraw(provinceRate.getFirstWinRate(), provinceRate.getSecondWinRate());
                 couponId = prizeMap.get(prizeLevel).get(0).getCouponId();
+                frontUserCouponService.createUserCoupon(userId, drawActivityId, prizeLevel, couponId, actCode);
             } else {
                 prizeLevel =startDraw(provinceRate.getFirstWinRate(), provinceRate.getSecondSmallBoxWinRate());
                 couponId = prizeMap.get(prizeLevel).get(0).getCouponId();
+                frontUserCouponService.createUserCoupon(userId, drawActivityId, prizeLevel, couponId, actCode);
             }
         }
-        return frontUserCouponService.createUserCoupon(userId, drawActivityId, prizeLevel, couponId, actCode);
+
+        result.setCouponTitle(prizeMap.get(prizeLevel).get(0).getPrizeTitle());
+        result.setDrawPrizeIcon(prizeMap.get(prizeLevel).get(0).getPrizeIcon());
+        logger.info("======抽奖用户userId=" + userId +  ",actCode=" + actCode + ",抽奖结果=" + JSON.toJSONString(result));
+        return result;
     }
 
     @Override

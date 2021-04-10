@@ -58,6 +58,9 @@ public class UserCoupon extends Model<UserCoupon> {
     /** 抽奖活动id */
     private Integer drawActivityId;
 
+    /** 抽奖奖品图标 */
+    private String drawPrizeIcon;
+
     /**
      * 优惠券面值，必须是整数
      */
