@@ -3,6 +3,9 @@ package com.yfshop.admin.task;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.crypto.SecureUtil;
 import cn.hutool.crypto.digest.DigestUtil;
+import cn.hutool.json.JSONArray;
+import cn.hutool.json.JSONUtil;
+import com.google.gson.JsonArray;
 import com.qiniu.http.Response;
 import com.yfshop.admin.tool.poster.kernal.qiniu.QiniuConfig;
 import com.yfshop.admin.tool.poster.kernal.qiniu.QiniuUploader;
@@ -45,7 +48,7 @@ public class ActCodeConsume {
         try {
             String[] data = message.split("-");
             Integer id = Integer.valueOf(data[0]);
-            List<String> codes = Arrays.asList(data[1].split(","));
+            List<String> codes = JSONUtil.toList(data[1],String.class);
             doTask(id, codes);
         } catch (Exception e) {
             e.printStackTrace();
@@ -54,7 +57,7 @@ public class ActCodeConsume {
 
     public void finish(String id) {
         try {
-            ActCodeBatch actCodeBatch = actCodeBatchMapper.selectById(id);
+            ActCodeBatch actCodeBatch = actCodeBatchMapper.selectById(Integer.valueOf(id));
             actCodeBatch.setFileStatus("FAIL");
             actCodeBatch.setFileStatus("");
             String filePath = actCodeCodeTargetDir + actCodeBatch.getBatchNo() + ".txt";
@@ -81,7 +84,6 @@ public class ActCodeConsume {
         List<String> codeFile = new ArrayList<>();
         actCodeBatch.setFileStatus("DONGING");
         actCodeBatchMapper.updateById(actCodeBatch);
-        logger.info("批从号{},正在生成{}个溯源码", actCodeBatch.getBatchNo(), actCodeBatch.getQuantity());
         logger.info("开始合成溯源码");
         for (String code : codes) {
             LocalDateTime now = LocalDateTime.now();
@@ -101,6 +103,7 @@ public class ActCodeConsume {
             actCodeBatch.setQuantity(count + codes.size());
             String filePath = actCodeCodeTargetDir + actCodeBatch.getBatchNo() + ".txt";
             FileUtil.appendUtf8Lines(codeFile, filePath);
+            actCodeBatchMapper.updateById(actCodeBatch);
         } catch (Exception e) {
             e.printStackTrace();
             String filePath = actCodeCodeTargetDir + actCodeBatch.getBatchNo() + "-fail.txt";

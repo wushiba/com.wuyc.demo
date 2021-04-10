@@ -149,10 +149,10 @@ public class ActCodeTask {
             }
         });
         CollectionUtil.split(sourceCodes, 1000).forEach(item -> {
-            String codes = String.format("%d-%s", actCodeBatch.getActId(), StringUtils.join(item));
+            String codes = String.format("%d-%s", actCodeBatch.getId(), StringUtils.join(item));
             stringRedisTemplate.convertAndSend("actCodeTask", codes);
         });
-        stringRedisTemplate.convertAndSend("actCodeTaskFinish",actCodeBatch.getActId());
+        stringRedisTemplate.convertAndSend("actCodeTaskFinish",actCodeBatch.getActId()+"");
         //buildActCode(actCodeBatch, sourceCodes);
     }
 
