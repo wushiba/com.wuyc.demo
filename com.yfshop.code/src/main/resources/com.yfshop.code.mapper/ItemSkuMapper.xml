@@ -13,6 +13,7 @@
         <result column="sku_sub_title" property="skuSubTitle" />
         <result column="sku_sale_price" property="skuSalePrice" />
         <result column="sku_market_price" property="skuMarketPrice" />
+        <result column="freight" property="freight" />
         <result column="sku_stock" property="skuStock" />
         <result column="sku_cover" property="skuCover" />
         <result column="spec_value_id_path" property="specValueIdPath" />
@@ -23,7 +24,7 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        id, create_time, update_time, item_id, category_id, sku_title, sku_sub_title, sku_sale_price, sku_market_price, sku_stock, sku_cover, spec_value_id_path, spec_name_value_json, is_enable, sort
+        id, create_time, update_time, item_id, category_id, sku_title, sku_sub_title, sku_sale_price, sku_market_price, freight, sku_stock, sku_cover, spec_value_id_path, spec_name_value_json, is_enable, sort
     </sql>
 
 </mapper>

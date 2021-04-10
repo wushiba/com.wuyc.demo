@@ -9,6 +9,7 @@ import com.yfshop.code.mapper.OrderDetailMapper;
 import com.yfshop.code.mapper.OrderMapper;
 import com.yfshop.code.model.Order;
 import com.yfshop.code.model.OrderDetail;
+import com.yfshop.common.enums.UserOrderStatusEnum;
 import com.yfshop.common.exception.ApiException;
 import com.yfshop.common.exception.Asserts;
 import org.apache.dubbo.config.annotation.DubboService;
@@ -53,7 +54,7 @@ public class AdminUserServiceImpl implements AdminUserOrderService {
         }
         OrderDetail orderDetail = new OrderDetail();
         orderDetail.setIsPay("Y");
-        orderDetail.setOrderStatus("WAIT_DELIVERY");
+        orderDetail.setOrderStatus(UserOrderStatusEnum.WAIT_DELIVERY.getCode());
         orderDetailMapper.update(orderDetail, Wrappers.<OrderDetail>lambdaQuery().
                 eq(OrderDetail::getOrderId, orderId));
 

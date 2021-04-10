@@ -62,6 +62,8 @@ public class ItemSku extends Model<ItemSku> {
      */
     private BigDecimal skuMarketPrice;
 
+    private BigDecimal freight;
+
     /**
      * 库存数量
      */

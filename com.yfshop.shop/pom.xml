@@ -16,7 +16,6 @@
 
     <modules>
         <module>com.yfshop.shop.web</module>
-        <module>com.yfshop.shop.activ</module>
         <module>com.yfshop.shop.api</module>
         <module>com.yfshop.shop.service</module>
     </modules>

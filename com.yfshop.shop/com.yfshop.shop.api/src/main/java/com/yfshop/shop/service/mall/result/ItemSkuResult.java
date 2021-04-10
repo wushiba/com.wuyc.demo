@@ -65,6 +65,8 @@ public class ItemSkuResult implements Serializable {
      */
     private BigDecimal skuMarketPrice;
 
+    private BigDecimal freight;
+
     /**
      * 库存数量
      */

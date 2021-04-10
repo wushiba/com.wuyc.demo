@@ -210,6 +210,10 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
                 userCoupon.setId(orderDetail.getUserCouponId());
                 userCouponMapper.updateById(userCoupon);
             }
+            orderDetail.setIsPay("Y");
+            orderDetail.setOrderStatus(UserOrderStatusEnum.CANCEL.getCode());
+            orderDetailMapper.update(orderDetail, Wrappers.<OrderDetail>lambdaQuery().
+                    eq(OrderDetail::getOrderId, orderId));
         });
         order.setIsCancel("Y");
         order.setCancelTime(LocalDateTime.now());
@@ -263,12 +267,8 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> submitOrderBySkuId(Integer userId, Integer skuId, Integer num, Long userCouponId, Long addressId) throws ApiException {
-        // 校验sku以及商品
         ItemSkuResult itemSku = mallService.getItemSkuBySkuId(skuId);
         Asserts.assertFalse(itemSku.getSkuStock() < num, 500, "商品库存不足");
-        QueryItemDetailReq req = new QueryItemDetailReq();
-        req.setItemId(itemSku.getItemId());
-        ItemResult itemResult = mallService.findItemDetail(req);
 
         UserAddressResult addressInfo = frontUserService.getUserAddressById(addressId);
         Asserts.assertNonNull(addressInfo, 500, "收货地址不存在");
@@ -286,7 +286,7 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
         }
 
         // 下单，创建订单，订单详情，收货地址
-        BigDecimal itemFreight = itemResult.getFreight();
+        BigDecimal itemFreight = itemSku.getFreight();
         BigDecimal orderFreight = new BigDecimal(num).multiply(itemFreight);
         BigDecimal orderPrice = new BigDecimal(num).multiply(itemSku.getSkuSalePrice());
         BigDecimal couponPrice = userCoupon.getCouponPrice() == null ? new BigDecimal("0.00") : new BigDecimal(userCoupon.getCouponPrice());
@@ -295,8 +295,8 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
         Order order = insertUserOrder(userId, ReceiveWayEnum.PS.getCode(), num, 1, orderPrice, couponPrice, orderFreight, payPrice, "N", null);
         Long orderId = order.getId();
 
-        insertUserOrderDetail(userId, orderId, null, null, ReceiveWayEnum.PS.getCode(), "N", 1, itemSku.getItemId(), itemSku.getId(),
-                itemResult.getItemTitle(), itemSku.getSkuSalePrice(), itemSku.getSkuCover(), itemFreight, couponPrice, orderPrice,
+        insertUserOrderDetail(userId, orderId, null, null, ReceiveWayEnum.PS.getCode(), "N", 1, itemSku.getItemId(),
+                itemSku.getId(), itemSku.getSkuTitle(), itemSku.getSkuSalePrice(), itemSku.getSkuCover(), itemFreight, couponPrice, orderPrice,
                 payPrice, userCoupon.getId(), UserOrderStatusEnum.WAIT_PAY.getCode(), itemSku.getSpecValueIdPath(), itemSku.getSpecNameValueJson());
 
         insertUserOrderAddress(orderId, addressInfo.getMobile(), addressInfo.getRealname(), addressInfo.getProvince(), addressInfo.getProvinceId(),
@@ -309,7 +309,6 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
 
     /**
      * 商品购物车下单购买
-     *
      * @param userId       用户id
      * @param cartIds      购物车id
      * @param userCouponId 用户优惠券id
@@ -348,10 +347,9 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
         BigDecimal payPrice = new BigDecimal("0.0");
 
         // 扣库存，这里要做手写SQL，搞乐观锁
-        Map<Integer, ItemSku> itemSkuMap = new HashMap<>();
+        Map<Integer, ItemSkuResult> itemSkuMap = new HashMap<>();
         for (UserCart userCart : userCartList) {
-            ItemSku itemSku = itemSkuMapper.selectOne(Wrappers.lambdaQuery(ItemSku.class).eq(ItemSku::getId, userCart.getSkuId()));
-            Asserts.assertNonNull(itemSku, 500, "商品sku不存在");
+            ItemSkuResult itemSku = mallService.getItemSkuBySkuId(userCart.getSkuId());
             Asserts.assertFalse(itemSku.getSkuStock() < userCart.getNum(), 500, "商品库存不足");
             mallService.updateItemSkuStock(itemSku.getId(), userCart.getNum());
             itemSkuMap.put(itemSku.getId(), itemSku);
@@ -368,15 +366,19 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
             payPrice = payPrice.subtract(couponPrice);
         }
 
+        // 删除购物车id
+        userCartMapper.deleteBatchIds(cartIdList);
+
         Order order = insertUserOrder(userId, ReceiveWayEnum.PS.getCode(), itemCount, childOrderCount, orderPrice, couponPrice, orderFreight, payPrice, "N", null);
         Long orderId = order.getId();
         for (UserCart userCart : userCartList) {
-            ItemSku itemSku = itemSkuMap.get(userCart.getSkuId());
+            ItemSkuResult itemSku = itemSkuMap.get(userCart.getSkuId());
             BigDecimal childCouponPrice = new BigDecimal("0.0");
             if (userCoupon.getId() != null) {
                 childCouponPrice = new BigDecimal(userCoupon.getCouponPrice());
             }
-            BigDecimal childOrderFreight = new BigDecimal(userCart.getNum() * 2);
+
+            BigDecimal childOrderFreight =  new BigDecimal(userCart.getNum()).multiply(itemSku.getFreight());
             BigDecimal childOrderPrice = itemSku.getSkuSalePrice().multiply(new BigDecimal(userCart.getNum()));
             BigDecimal childPayPrice = childOrderPrice.add(childOrderFreight).subtract(childCouponPrice);
 
@@ -388,8 +390,6 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
         insertUserOrderAddress(orderId, addressInfo.getMobile(), addressInfo.getRealname(), addressInfo.getProvince(), addressInfo.getProvinceId(), addressInfo.getCity(),
                 addressInfo.getCityId(), addressInfo.getDistrict(), addressInfo.getDistrictId(), addressInfo.getAddress());
 
-        // 删除购物车id
-        userCartMapper.deleteBatchIds(cartIdList);
         Map<String, Object> resultMap = new HashMap<>(4);
         resultMap.put("orderId", orderId);
         resultMap.put("isPay", "N");
