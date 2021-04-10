@@ -1,6 +1,7 @@
 package com.yfshop.admin.service.merchant;
 
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.crypto.SecureUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -291,7 +292,7 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
         if (StringUtils.isBlank(email)) {
             websiteCode.setOrderAmount(new BigDecimal("0.35").multiply(new BigDecimal(count)));
             websiteCode.setPostage(new BigDecimal(8));
-            int g = count * 4;//每张大约4g
+            float g = new BigDecimal(count).multiply(new BigDecimal("4.3")).floatValue();//每张大约4.3g
             if (g > 1000) {
                 double amount = Math.ceil((g - 1000) / 1000f) * 2.5d;
                 websiteCode.setPostage(websiteCode.getPostage().add(new BigDecimal(String.valueOf(amount))));

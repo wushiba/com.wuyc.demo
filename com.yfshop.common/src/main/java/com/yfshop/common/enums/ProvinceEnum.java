@@ -26,7 +26,7 @@ public enum ProvinceEnum {
     HUNAN(18, "湖南", "湖南"),
     GUANGDONG(19, "广东", "广东"),
     GUANGXI(20, "广西", "广西"),
-    HAINAN(21, "海南", "黑龙海南江"),
+    HAINAN(21, "海南", "海南"),
     CHONGQING(22, "重庆", "重庆"),
     SICHUAN(23, "四川", "四川"),
     GUIZHOU(24, "贵州", "贵州"),

@@ -4,6 +4,7 @@ import cn.hutool.core.net.NetUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
+import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.yfshop.code.mapper.*;
 import com.yfshop.code.model.*;
@@ -22,6 +23,7 @@ import com.yfshop.shop.service.coupon.result.YfUserCouponResult;
 import com.yfshop.shop.service.coupon.service.FrontUserCouponService;
 import com.yfshop.shop.service.user.result.UserResult;
 import com.yfshop.shop.service.user.service.FrontUserService;
+import com.yfshop.shop.utils.Ip2regionUtil;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -146,7 +148,6 @@ public class FrontDrawServiceImpl implements FrontDrawService {
         YfDrawPrizeResult firstPrize = prizeMap.get(1).get(0);
         YfDrawPrizeResult secondPrize = prizeMap.get(2).get(0);
         YfDrawPrizeResult thirdPrize = prizeMap.get(3).get(0);
-        Integer couponId = thirdPrize.getCouponId();
 
         // 根据ip查询地址, 找不到归属地默认抽到三等奖
         Integer provinceId = this.getProvinceByIpStr(ipStr);
@@ -232,34 +233,45 @@ public class FrontDrawServiceImpl implements FrontDrawService {
      */
     private Integer getProvinceByIpStr(String ipStr) {
         if (!"pro".equalsIgnoreCase(SpringUtil.getActiveProfile())) {
-            return ProvinceEnum.SHANDONG.getId();
+            return 15;
         }
 
-        IpAddress ipAddress = null;
-        long ipLong = NetUtil.ipv4ToLong(ipStr);
-        Object ipStrObject = redisService.get(CacheConstants.USER_REQUEST_IP_STR + ipLong);
-        if (ipStrObject != null) {
-            ipAddress = JSON.parseObject(ipStrObject.toString(), IpAddress.class);
-        } else {
-            ipAddress = ipAddressMapper.selectOne(Wrappers.lambdaQuery(IpAddress.class)
-                    .le(IpAddress::getIpStartLong, ipLong).ge(IpAddress::getIpEndLong, ipLong)
-                    .orderByDesc(IpAddress::getId));
-            redisService.set(CacheConstants.USER_REQUEST_IP_STR + ipLong,
-                    JSON.toJSONString(ipAddress), 60 * 30);
-        }
-
-        // 找不到地址默认为三等奖
-        if (ipAddress == null) {
+        String province = Ip2regionUtil.getProvinceByIp(ipStr);
+        if (StringUtils.isBlank(province)) {
             return null;
         }
-
-        // 找不到归属地默认抽到三等奖
-        String provincePrefix = ipAddress.getAddress().substring(0, 2);
-        ProvinceEnum provinceEnum = ProvinceEnum.getByPrefix(provincePrefix);
+        ProvinceEnum provinceEnum = ProvinceEnum.getByPrefix(province);
         if (provinceEnum == null) {
             return null;
         }
         return provinceEnum.getId();
+//
+//
+//        IpAddress ipAddress = null;
+//        long ipLong = NetUtil.ipv4ToLong(ipStr);
+//        Object ipStrObject = redisService.get(CacheConstants.USER_REQUEST_IP_STR + ipLong);
+//        if (ipStrObject != null) {
+//            ipAddress = JSON.parseObject(ipStrObject.toString(), IpAddress.class);
+//        } else {
+//            ipAddress = ipAddressMapper.selectOne(Wrappers.lambdaQuery(IpAddress.class)
+//                    .le(IpAddress::getIpStartLong, ipLong).ge(IpAddress::getIpEndLong, ipLong)
+//                    .orderByDesc(IpAddress::getId));
+//            redisService.set(CacheConstants.USER_REQUEST_IP_STR + ipLong,
+//                    JSON.toJSONString(ipAddress), 60 * 30);
+//        }
+//
+//        // 找不到地址默认为三等奖
+//        if (ipAddress == null) {
+//            return null;
+//        }
+//
+//        // 找不到归属地默认抽到三等奖
+//        String provincePrefix = ipAddress.getAddress().substring(0, 2);
+//        ProvinceEnum provinceEnum = ProvinceEnum.getByPrefix(provincePrefix);
+//        if (provinceEnum == null) {
+//            return null;
+//        }
+//        return provinceEnum.getId();
     }
 
 

@@ -286,8 +286,7 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
         }
 
         // 下单，创建订单，订单详情，收货地址
-        BigDecimal itemFreight = itemSku.getFreight();
-        BigDecimal orderFreight = new BigDecimal(num).multiply(itemFreight);
+        BigDecimal orderFreight = new BigDecimal(num).multiply(itemSku.getFreight());
         BigDecimal orderPrice = new BigDecimal(num).multiply(itemSku.getSkuSalePrice());
         BigDecimal couponPrice = userCoupon.getCouponPrice() == null ? new BigDecimal("0.00") : new BigDecimal(userCoupon.getCouponPrice());
         BigDecimal payPrice = orderPrice.add(orderFreight).subtract(couponPrice);
@@ -295,8 +294,8 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
         Order order = insertUserOrder(userId, ReceiveWayEnum.PS.getCode(), num, 1, orderPrice, couponPrice, orderFreight, payPrice, "N", null);
         Long orderId = order.getId();
 
-        insertUserOrderDetail(userId, orderId, null, null, ReceiveWayEnum.PS.getCode(), "N", 1, itemSku.getItemId(),
-                itemSku.getId(), itemSku.getSkuTitle(), itemSku.getSkuSalePrice(), itemSku.getSkuCover(), itemFreight, couponPrice, orderPrice,
+        insertUserOrderDetail(userId, orderId, null, null, ReceiveWayEnum.PS.getCode(), "N", num, itemSku.getItemId(),
+                itemSku.getId(), itemSku.getSkuTitle(), itemSku.getSkuSalePrice(), itemSku.getSkuCover(), orderFreight, couponPrice, orderPrice,
                 payPrice, userCoupon.getId(), UserOrderStatusEnum.WAIT_PAY.getCode(), itemSku.getSpecValueIdPath(), itemSku.getSpecNameValueJson());
 
         insertUserOrderAddress(orderId, addressInfo.getMobile(), addressInfo.getRealname(), addressInfo.getProvince(), addressInfo.getProvinceId(),

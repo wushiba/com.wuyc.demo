@@ -98,11 +98,12 @@ public class FrontUserCouponServiceImpl implements FrontUserCouponService {
 
         if ("Y".equalsIgnoreCase(userCouponReq.getIsCanUse())) {
             queryWrapper.eq(UserCoupon::getUseStatus, UserCouponStatusEnum.NO_USE.getCode())
-                    .gt(UserCoupon::getValidEndTime, new Date());
+                    .gt(UserCoupon::getValidEndTime, new Date())
+                    .lt(UserCoupon::getValidStartTime, new Date());
         } else if ("N".equalsIgnoreCase(userCouponReq.getIsCanUse())) {
             queryWrapper.in(UserCoupon::getUseStatus, UserCouponStatusEnum.IN_USE.getCode()
                     , UserCouponStatusEnum.HAS_USE.getCode())
-                    .lt(UserCoupon::getValidEndTime, new Date());
+                    .or().lt(UserCoupon::getValidEndTime, new Date());
         }
 
         if (userCouponReq.getCouponId() != null) {
