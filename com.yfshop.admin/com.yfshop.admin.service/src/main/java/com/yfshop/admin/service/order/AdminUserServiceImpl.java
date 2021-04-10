@@ -53,6 +53,7 @@ public class AdminUserServiceImpl implements AdminUserOrderService {
         }
         OrderDetail orderDetail = new OrderDetail();
         orderDetail.setIsPay("Y");
+        orderDetail.setOrderStatus("WAIT_DELIVERY");
         orderDetailMapper.update(orderDetail, Wrappers.<OrderDetail>lambdaQuery().
                 eq(OrderDetail::getOrderId, orderId));
 
