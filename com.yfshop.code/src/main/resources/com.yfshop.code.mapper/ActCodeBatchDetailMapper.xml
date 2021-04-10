@@ -6,7 +6,6 @@
     <resultMap id="BaseResultMap" type="com.yfshop.code.model.ActCodeBatchDetail">
         <id column="id" property="id" />
         <result column="create_time" property="createTime" />
-        <result column="update_time" property="updateTime" />
         <result column="act_code" property="actCode" />
         <result column="trace_no" property="traceNo" />
         <result column="act_id" property="actId" />
@@ -15,7 +14,7 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        id, create_time, update_time, act_code, trace_no, act_id, batch_id
+        id, create_time, act_code, trace_no, act_id, batch_id
     </sql>
 
 </mapper>

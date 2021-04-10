@@ -28,8 +28,6 @@ public class ActCodeBatchDetail extends Model<ActCodeBatchDetail> {
 
     private LocalDateTime createTime;
 
-    private LocalDateTime updateTime;
-
     /**
      * 活动码 4位活动id+6位年月日+6位随机数+2位crc校验位
      */
