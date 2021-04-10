@@ -87,6 +87,8 @@ public class UserCartResult implements Serializable {
      */
     private BigDecimal skuMarketPrice;
 
+    private BigDecimal freight;
+
     /**
      * 商品是否有效的(Y|N)
      */
