@@ -296,8 +296,8 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
         Long orderId = order.getId();
 
         insertUserOrderDetail(userId, orderId, null, null, ReceiveWayEnum.PS.getCode(), "N", 1, itemSku.getItemId(), itemSku.getId(),
-                itemResult.getItemTitle(), itemSku.getSkuSalePrice(), itemSku.getSkuCover(), itemFreight, itemSku.getSkuSalePrice(), itemSku.getSkuSalePrice(),
-                itemFreight, userCoupon.getId(), UserOrderStatusEnum.WAIT_PAY.getCode(), itemSku.getSpecValueIdPath(), itemSku.getSpecNameValueJson());
+                itemResult.getItemTitle(), itemSku.getSkuSalePrice(), itemSku.getSkuCover(), itemFreight, couponPrice, orderPrice,
+                payPrice, userCoupon.getId(), UserOrderStatusEnum.WAIT_PAY.getCode(), itemSku.getSpecValueIdPath(), itemSku.getSpecNameValueJson());
 
         insertUserOrderAddress(orderId, addressInfo.getMobile(), addressInfo.getRealname(), addressInfo.getProvince(), addressInfo.getProvinceId(),
                 addressInfo.getCity(), addressInfo.getCityId(), addressInfo.getDistrict(), addressInfo.getDistrictId(), addressInfo.getAddress());
