@@ -152,6 +152,7 @@ public class FrontDrawServiceImpl implements FrontDrawService {
         Integer provinceId = this.getProvinceByIpStr(ipStr);
 
         YfUserCouponResult result = new YfUserCouponResult();
+        result.setDrawPrizeLevel(prizeLevel);
         result.setCouponTitle(thirdPrize.getPrizeTitle());
         result.setDrawPrizeIcon(thirdPrize.getPrizeIcon());
         if (provinceId == null) {
@@ -184,6 +185,7 @@ public class FrontDrawServiceImpl implements FrontDrawService {
             }
         }
 
+        result.setDrawPrizeLevel(prizeLevel);
         result.setCouponTitle(prizeMap.get(prizeLevel).get(0).getPrizeTitle());
         result.setDrawPrizeIcon(prizeMap.get(prizeLevel).get(0).getPrizeIcon());
         logger.info("======抽奖用户userId=" + userId +  ",actCode=" + actCode + ",抽奖结果=" + JSON.toJSONString(result));
