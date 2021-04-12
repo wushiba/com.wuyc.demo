@@ -189,7 +189,7 @@ public class MallServiceImpl implements MallService {
     @Transactional(rollbackFor = Exception.class)
     public Integer updateItemSkuStock(Integer skuId, Integer num) throws ApiException {
         Asserts.assertNonNull(skuId, 500, "商品skuId不可以为空");
-        Asserts.assertFalse(skuId == null || skuId <= 0 , 500, "请传入正确的数量");
+        Asserts.assertFalse(num == null || num <= 0 , 500, "请传入正确的数量");
 
         int result = itemDao.updateItemSkuStock(skuId, num);
         Asserts.assertFalse(result < 0 , 500, "库存不足，请稍后重试");
