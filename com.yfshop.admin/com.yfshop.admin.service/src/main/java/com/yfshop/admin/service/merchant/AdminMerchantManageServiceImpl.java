@@ -1,6 +1,6 @@
 package com.yfshop.admin.service.merchant;
 
-import cn.hutool.crypto.digest.MD5;
+import cn.hutool.crypto.SecureUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -99,7 +99,6 @@ public class AdminMerchantManageServiceImpl implements AdminMerchantManageServic
         Asserts.assertTrue("N".equalsIgnoreCase(pm.getIsDelete()), 500, "上级商户" + req.getPid() + "已被删除");
 
         // create
-        MD5 md5 = MD5.create();
         Merchant merchant = new Merchant();
         merchant.setCreateTime(LocalDateTime.now());
         merchant.setUpdateTime(LocalDateTime.now());
@@ -108,7 +107,7 @@ public class AdminMerchantManageServiceImpl implements AdminMerchantManageServic
         merchant.setRoleName(createMerchantRole.getDescription());
         merchant.setMerchantName(req.getMerchantName());
         merchant.setMobile(req.getMobile());
-        merchant.setPassword(md5.digestHex(md5.digestHex(req.getPassword())));
+        merchant.setPassword(SecureUtil.md5(req.getPassword()));
         merchant.setContacts(req.getContacts());
         merchant.setProvince(province.getName());
         merchant.setCity(city.getName());
@@ -192,8 +191,7 @@ public class AdminMerchantManageServiceImpl implements AdminMerchantManageServic
         merchant.setMerchantName(req.getMerchantName());
         merchant.setMobile(req.getMobile());
         if (StringUtils.isNotBlank(req.getPassword())) {
-            MD5 md5 = MD5.create();
-            merchant.setPassword(md5.digestHex(md5.digestHex(req.getPassword())));
+            SecureUtil.md5(req.getPassword());
         }
         merchant.setContacts(req.getContacts());
         merchant.setProvince(province.getName());
