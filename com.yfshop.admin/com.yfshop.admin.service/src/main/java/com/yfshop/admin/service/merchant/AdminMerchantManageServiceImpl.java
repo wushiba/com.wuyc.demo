@@ -1,5 +1,6 @@
 package com.yfshop.admin.service.merchant;
 
+import cn.hutool.crypto.SecureUtil;
 import cn.hutool.crypto.digest.MD5;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -108,7 +109,7 @@ public class AdminMerchantManageServiceImpl implements AdminMerchantManageServic
         merchant.setRoleName(createMerchantRole.getDescription());
         merchant.setMerchantName(req.getMerchantName());
         merchant.setMobile(req.getMobile());
-        merchant.setPassword(md5.digestHex(md5.digestHex(req.getPassword())));
+        merchant.setPassword(SecureUtil.md5(req.getPassword()));
         merchant.setContacts(req.getContacts());
         merchant.setProvince(province.getName());
         merchant.setCity(city.getName());
@@ -192,8 +193,7 @@ public class AdminMerchantManageServiceImpl implements AdminMerchantManageServic
         merchant.setMerchantName(req.getMerchantName());
         merchant.setMobile(req.getMobile());
         if (StringUtils.isNotBlank(req.getPassword())) {
-            MD5 md5 = MD5.create();
-            merchant.setPassword(md5.digestHex(md5.digestHex(req.getPassword())));
+            SecureUtil.md5(req.getPassword());
         }
         merchant.setContacts(req.getContacts());
         merchant.setProvince(province.getName());
