@@ -25,8 +25,9 @@ public interface MerchantLoginService {
 
     /**
      * 微信登录
+     *
      * @param openId
      * @return
      */
-    MerchantResult loginByWx(String openId);
+    MerchantResult loginByWx(String openId) throws ApiException;
 }

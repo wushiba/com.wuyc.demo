@@ -56,7 +56,7 @@ public class MerchantLoginServiceImpl implements MerchantLoginService {
     }
 
     @Override
-    public MerchantResult loginByWx(String openId) {
+    public MerchantResult loginByWx(String openId) throws ApiException {
         Merchant merchant = merchantMapper.selectOne(Wrappers.<Merchant>lambdaQuery()
                 .eq(Merchant::getOpenId, openId)
                 .eq(Merchant::getIsEnable, "Y")
