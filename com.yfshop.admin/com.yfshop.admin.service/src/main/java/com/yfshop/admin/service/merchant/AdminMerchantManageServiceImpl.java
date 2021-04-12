@@ -1,7 +1,6 @@
 package com.yfshop.admin.service.merchant;
 
 import cn.hutool.crypto.SecureUtil;
-import cn.hutool.crypto.digest.MD5;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -100,7 +99,6 @@ public class AdminMerchantManageServiceImpl implements AdminMerchantManageServic
         Asserts.assertTrue("N".equalsIgnoreCase(pm.getIsDelete()), 500, "上级商户" + req.getPid() + "已被删除");
 
         // create
-        MD5 md5 = MD5.create();
         Merchant merchant = new Merchant();
         merchant.setCreateTime(LocalDateTime.now());
         merchant.setUpdateTime(LocalDateTime.now());
