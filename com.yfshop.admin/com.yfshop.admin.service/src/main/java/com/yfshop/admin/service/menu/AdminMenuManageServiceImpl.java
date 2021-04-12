@@ -38,6 +38,8 @@ public class AdminMenuManageServiceImpl implements AdminMenuManageService {
         tree.putExtra("id", menu.getId());
         tree.putExtra("linkUrl", menu.getLinkUrl());
         tree.putExtra("menuIcon", menu.getMenuIcon());
+        tree.putExtra("menuAlias", menu.getMenuAlias());
+        tree.putExtra("parentMenuAlias", menu.getParentMenuAlias());
         tree.putExtra("roleAlias", menu.getRoleAlias());
     };
 
