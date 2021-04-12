@@ -13,6 +13,8 @@ import com.yfshop.common.enums.UserOrderStatusEnum;
 import com.yfshop.common.exception.ApiException;
 import com.yfshop.common.exception.Asserts;
 import org.apache.dubbo.config.annotation.DubboService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 
@@ -23,6 +25,8 @@ import javax.annotation.Resource;
  **/
 @DubboService
 public class AdminUserServiceImpl implements AdminUserOrderService {
+
+    private static final Logger logger = LoggerFactory.getLogger(AdminUserServiceImpl.class);
 
     @Resource
     private OrderDao orderDao;
@@ -43,6 +47,7 @@ public class AdminUserServiceImpl implements AdminUserOrderService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Void updateOrderPayStatus(Long orderId, String billNo) throws ApiException {
+        logger.info("====进入订单支付成功通知orderId=" + orderId + ",billNo=" + billNo);
         Asserts.assertNonNull(orderId, 500, "主订单id不可以为空");
         Order order = orderMapper.selectById(orderId);
         Asserts.assertNonNull(order, 500, "订单不存在");
