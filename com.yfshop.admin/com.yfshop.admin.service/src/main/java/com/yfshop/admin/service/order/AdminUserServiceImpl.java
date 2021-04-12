@@ -58,7 +58,7 @@ public class AdminUserServiceImpl implements AdminUserOrderService {
         orderDetailMapper.update(orderDetail, Wrappers.<OrderDetail>lambdaQuery().
                 eq(OrderDetail::getOrderId, orderId));
 
-        if ("PS".equalsIgnoreCase(order.getReceiveWay())) {
+        if ("ZT".equalsIgnoreCase(order.getReceiveWay())) {
             websiteBillService.insertWebsiteBill(orderId);
         }
         return null;

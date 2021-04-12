@@ -35,6 +35,8 @@ public class YfUserOrderListResult implements Serializable {
 
     private Long orderDetailId;
 
+    private String receiveWay;
+
     /**
      * 商品数量
      */
@@ -83,6 +85,8 @@ public class YfUserOrderListResult implements Serializable {
         private static final long serialVersionUID = 1L;
 
         private Integer skuId;
+
+        private String receiveWay;
 
         /**
          * 商品数量
