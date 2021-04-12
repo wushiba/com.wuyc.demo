@@ -15,13 +15,7 @@ import com.yfshop.shop.dao.ItemDao;
 import com.yfshop.shop.service.coupon.result.YfCouponResult;
 import com.yfshop.shop.service.mall.req.QueryItemDetailReq;
 import com.yfshop.shop.service.mall.req.QueryItemReq;
-import com.yfshop.shop.service.mall.result.ItemCategoryResult;
-import com.yfshop.shop.service.mall.result.ItemContentResult;
-import com.yfshop.shop.service.mall.result.ItemImageResult;
-import com.yfshop.shop.service.mall.result.ItemResult;
-import com.yfshop.shop.service.mall.result.ItemSkuResult;
-import com.yfshop.shop.service.mall.result.ItemSpecNameResult;
-import com.yfshop.shop.service.mall.result.ItemSpecValueResult;
+import com.yfshop.shop.service.mall.result.*;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.cache.annotation.Cacheable;
@@ -147,22 +141,24 @@ public class MallServiceImpl implements MallService {
             cacheNames = CacheConstants.MALL_BANNER_CACHE_NAME,
             key = "'" + CacheConstants.MALL_BANNER_CACHE_KEY_PREFIX + "' + #root.methodName")
     @Override
-    public List<String> queryHomeBanners() {
+    public List<BannerResult> queryHomeBannerList() {
         List<Banner> banners = bannerMapper.selectList(Wrappers.lambdaQuery(Banner.class)
                 .eq(Banner::getPositions, BannerPositionsEnum.HOME.getCode())
                 .eq(Banner::getIsEnable, "Y").orderByAsc(Banner::getSort));
-        return banners.stream().map(Banner::getImageUrl).collect(Collectors.toList());
+        return BeanUtil.convertList(banners, BannerResult.class);
+//        return banners.stream().map(Banner::getImageUrl).collect(Collectors.toList());
     }
 
     @Cacheable(cacheManager = CacheConstants.CACHE_MANAGE_NAME,
             cacheNames = CacheConstants.MALL_BANNER_CACHE_NAME,
             key = "'" + CacheConstants.MALL_BANNER_CACHE_KEY_PREFIX + "' + #root.methodName")
     @Override
-    public List<String> queryLoopBanners() {
+    public List<BannerResult> queryLoopBannerList() {
         List<Banner> banners = bannerMapper.selectList(Wrappers.lambdaQuery(Banner.class)
                 .eq(Banner::getPositions, BannerPositionsEnum.BANNER.getCode())
                 .eq(Banner::getIsEnable, "Y").orderByAsc(Banner::getSort));
-        return banners.stream().map(Banner::getImageUrl).collect(Collectors.toList());
+        return BeanUtil.convertList(banners, BannerResult.class);
+//        return banners.stream().map(Banner::getImageUrl).collect(Collectors.toList());
     }
 
 

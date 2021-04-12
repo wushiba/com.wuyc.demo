@@ -171,8 +171,9 @@ public class WebsiteBillServiceImpl implements WebsiteBillService {
         Asserts.assertNonNull(orderId, 500, "主订单id不可以为空");
         Order order = orderMapper.selectById(orderId);
         Asserts.assertNonNull(order, 500, "订单不存在");
-        Asserts.assertNotEquals(order.getReceiveWay(), ReceiveWayEnum.ZT.getCode(), 500, "订单不存在");
-        Asserts.assertNonNull(order, 500, "只有二等奖自提订单才可以生成记账单");
+        if (ReceiveWayEnum.PS.getCode().equalsIgnoreCase(order.getReceiveWay())) {
+            return null;
+        }
 
         OrderAddress orderAddress = orderAddressMapper.selectOne(Wrappers.lambdaQuery(OrderAddress.class)
                 .eq(OrderAddress::getOrderId, orderId));
