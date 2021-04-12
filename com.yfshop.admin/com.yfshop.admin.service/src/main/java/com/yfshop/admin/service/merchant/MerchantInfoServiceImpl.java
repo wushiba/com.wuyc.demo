@@ -155,8 +155,12 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
             merchantId = merchant.getId();
             Asserts.assertEquals(merchant.getRoleAlias(), GroupRoleEnum.WD.getCode(), 500, "只允许网点用户绑定网点码！");
             Asserts.assertEquals(merchant.getMobile(), websiteReq.getMobile(), 500, "手机号不允许被修改！");
+            String openId = merchant.getOpenId();
             merchant = BeanUtil.convert(websiteReq, Merchant.class);
-            merchant.setOpenId(null);//不更新openId
+            if (StringUtils.isNotBlank(openId)) {
+                //只保存第一次的openId,不更新openId
+                merchant.setOpenId(null);
+            }
             merchant.setRoleAlias(GroupRoleEnum.WD.getCode());
             merchant.setRoleName(GroupRoleEnum.WD.getDescription());
             MerchantDetail merchantDetail = merchantDetailMapper.selectOne(Wrappers.<MerchantDetail>lambdaQuery()

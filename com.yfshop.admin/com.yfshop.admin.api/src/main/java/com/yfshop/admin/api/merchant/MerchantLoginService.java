@@ -22,4 +22,11 @@ public interface MerchantLoginService {
      * @return
      */
     MerchantResult loginByCaptcha(String mobile, String captcha) throws ApiException;
+
+    /**
+     * 微信登录
+     * @param openId
+     * @return
+     */
+    MerchantResult loginByWx(String openId);
 }
