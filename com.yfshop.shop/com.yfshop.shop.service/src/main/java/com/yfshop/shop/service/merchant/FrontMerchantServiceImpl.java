@@ -113,19 +113,27 @@ public class FrontMerchantServiceImpl implements FrontMerchantService {
     public MerchantResult getMerchantByWebsiteCode(String websiteCode) throws ApiException {
         Asserts.assertStringNotBlank(websiteCode, 500, "网点码不可以为空");
 
-        WebsiteCodeDetail websiteCodeDetail = websiteCodeDetailMapper.selectOne(Wrappers.lambdaQuery(WebsiteCodeDetail.class)
-                .eq(WebsiteCodeDetail::getAlias, websiteCode));
-        Asserts.assertNonNull(websiteCodeDetail, 500, "请扫描正确的网点码");
+        WebsiteCodeDetail websiteCodeDetail;
+        Object websiteCodeObject = redisService.get(CacheConstants.MERCHANT_WEBSITE_CODE + websiteCode);
+        if (websiteCodeObject != null) {
+            websiteCodeDetail = JSON.parseObject(websiteCodeObject.toString(), WebsiteCodeDetail.class);
+        } else {
+            websiteCodeDetail = websiteCodeDetailMapper.selectOne(Wrappers.lambdaQuery(WebsiteCodeDetail.class)
+                    .eq(WebsiteCodeDetail::getAlias, websiteCode));
+            redisService.set(CacheConstants.MERCHANT_WEBSITE_CODE + websiteCode, JSON.toJSONString(websiteCodeDetail), 60 * 20);
 
-        Object merchantObject = redisService.get(CacheConstants.MERCHANT_WEBSITE_CODE + websiteCode);
+        }
+        Asserts.assertFalse(websiteCodeDetail == null || websiteCodeDetail.getId() == null, 500, "请扫描正确的网点码");
+
+        Object merchantObject = redisService.get(CacheConstants.MERCHANT_INFO_DATA + websiteCodeDetail.getMerchantId());
         if (merchantObject != null) {
             return JSON.parseObject(merchantObject.toString(), MerchantResult.class);
         }
-
         Merchant merchant = merchantMapper.selectOne(Wrappers.lambdaQuery(Merchant.class)
                 .eq(Merchant::getId, websiteCodeDetail.getMerchantId()));
-        redisService.set(CacheConstants.MERCHANT_WEBSITE_CODE + websiteCode, JSON.toJSONString(websiteCodeDetail), 60 * 60 * 24);
-        return BeanUtil.convert(merchant, MerchantResult.class);
+        MerchantResult merchantResult = BeanUtil.convert(merchant, MerchantResult.class);
+        redisService.set(CacheConstants.MERCHANT_INFO_DATA + websiteCodeDetail.getMerchantId(), JSON.toJSONString(merchantResult), 60 * 20);
+        return merchantResult;
     }
 
     /**
