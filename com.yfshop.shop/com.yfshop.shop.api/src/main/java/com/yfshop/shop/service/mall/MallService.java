@@ -3,6 +3,7 @@ package com.yfshop.shop.service.mall;
 import com.yfshop.common.exception.ApiException;
 import com.yfshop.shop.service.mall.req.QueryItemDetailReq;
 import com.yfshop.shop.service.mall.req.QueryItemReq;
+import com.yfshop.shop.service.mall.result.BannerResult;
 import com.yfshop.shop.service.mall.result.ItemCategoryResult;
 import com.yfshop.shop.service.mall.result.ItemResult;
 import com.yfshop.shop.service.mall.result.ItemSkuResult;
@@ -21,9 +22,9 @@ public interface MallService {
 
     ItemResult findItemDetail(QueryItemDetailReq req);
 
-    List<String> queryHomeBanners();
+    List<BannerResult> queryHomeBannerList();
 
-    List<String> queryLoopBanners();
+    List<BannerResult> queryLoopBannerList();
 
     ItemSkuResult getItemSkuBySkuId(Integer skuId) throws ApiException;
 

@@ -7,6 +7,7 @@ import com.yfshop.common.exception.ApiException;
 import com.yfshop.shop.service.mall.MallService;
 import com.yfshop.shop.service.mall.req.QueryItemDetailReq;
 import com.yfshop.shop.service.mall.req.QueryItemReq;
+import com.yfshop.shop.service.mall.result.BannerResult;
 import com.yfshop.shop.service.mall.result.ItemCategoryResult;
 import com.yfshop.shop.service.mall.result.ItemResult;
 import io.swagger.annotations.ApiImplicitParam;
@@ -70,10 +71,10 @@ public class MallController implements BaseController {
     @ApiOperation(value = "查询banner", httpMethod = "GET")
     @RequestMapping(value = "/queryBanners", method = {RequestMethod.GET, RequestMethod.POST})
     @ResponseBody
-    public CommonResult<Map<String, List<String>>> queryBanners() {
-        CompletableFuture<List<String>> homeBannersFuture = CompletableFuture.supplyAsync(() -> mallService.queryHomeBanners());
-        CompletableFuture<List<String>> loopBannersFuture = CompletableFuture.supplyAsync(() -> mallService.queryLoopBanners());
-        Map<String, List<String>> data = new HashMap<>(3);
+    public CommonResult<Map<String, List<BannerResult>>> queryBanners() {
+        CompletableFuture<List<BannerResult>> homeBannersFuture = CompletableFuture.supplyAsync(() -> mallService.queryHomeBannerList());
+        CompletableFuture<List<BannerResult>> loopBannersFuture = CompletableFuture.supplyAsync(() -> mallService.queryLoopBannerList());
+        Map<String, List<BannerResult>> data = new HashMap<>(3);
         try {
             data.put(BannerPositionsEnum.HOME.getCode(), homeBannersFuture.get(10, TimeUnit.SECONDS));
             data.put(BannerPositionsEnum.BANNER.getCode(), loopBannersFuture.get(10, TimeUnit.SECONDS));
