@@ -39,6 +39,8 @@ public class Order extends Model<Order> {
 
     private String receiveWay;
 
+    private String websiteCode;
+
     /**
      * 商品总数量
      */
