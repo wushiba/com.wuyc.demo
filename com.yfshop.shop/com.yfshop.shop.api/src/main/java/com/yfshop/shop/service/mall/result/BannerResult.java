@@ -16,17 +16,10 @@ import java.time.LocalDateTime;
  * @since 2021-03-22
  */
 @Data
-@EqualsAndHashCode(callSuper = false)
 public class BannerResult implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private Integer id;
-
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", locale = "zh", timezone = "GMT+8")
-    private LocalDateTime createTime;
-
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", locale = "zh", timezone = "GMT+8")
-    private LocalDateTime updateTime;
 
     /**
      * banner名称
