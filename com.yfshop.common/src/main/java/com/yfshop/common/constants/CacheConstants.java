@@ -79,5 +79,7 @@ public interface CacheConstants {
 
     /** 优惠券-优惠券单个缓存 */
     String COUPON_INFO_DATA = "coupon_data_id_";
+    /** 抽奖跑马灯缓存 */
+    String ALL_USER_COUPON_RECORD_LIST = "all_user_coupon_record_list";
 
 }

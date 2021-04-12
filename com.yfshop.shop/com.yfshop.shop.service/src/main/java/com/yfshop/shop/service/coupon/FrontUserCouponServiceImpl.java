@@ -4,10 +4,12 @@ import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.yfshop.code.mapper.CouponMapper;
 import com.yfshop.code.mapper.UserCouponMapper;
 import com.yfshop.code.mapper.UserMapper;
 import com.yfshop.code.model.Coupon;
+import com.yfshop.code.model.DrawActivity;
 import com.yfshop.code.model.UserCoupon;
 import com.yfshop.common.constants.CacheConstants;
 import com.yfshop.common.enums.CouponResourceEnum;
@@ -126,6 +128,23 @@ public class FrontUserCouponServiceImpl implements FrontUserCouponService {
         }
         return resultList.stream().filter(data -> "ALL".equalsIgnoreCase(data.getUseRangeType()) ||
                 data.getCanUseItemIds().contains(userCouponReq.getItemId() + "")).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<YfUserCouponResult> findAllUserDrawRecordList(QueryUserCouponReq userCouponReq) throws ApiException {
+        Object couponListObject = redisService.get(CacheConstants.ALL_USER_COUPON_RECORD_LIST);
+        if (couponListObject != null) {
+            return JSON.parseArray(couponListObject.toString(), YfUserCouponResult.class);
+        }
+
+        LambdaQueryWrapper<UserCoupon> queryWrapper = Wrappers.lambdaQuery(UserCoupon.class)
+                .eq(UserCoupon::getCouponResource, userCouponReq.getCouponResource())
+                .orderByDesc(UserCoupon::getId);
+        Page<UserCoupon> userCouponPage = userCouponMapper.selectPage(new Page<>(1, 10), queryWrapper);
+        List<YfUserCouponResult> resultList = BeanUtil.convertList(userCouponPage.getRecords(), YfUserCouponResult.class);
+
+        redisService.set(CacheConstants.ALL_USER_COUPON_RECORD_LIST, JSON.toJSONString(resultList), 60 * 2);
+        return resultList;
     }
 
     @Override
