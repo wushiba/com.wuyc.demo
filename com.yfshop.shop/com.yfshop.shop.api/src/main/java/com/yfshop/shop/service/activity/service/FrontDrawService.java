@@ -1,6 +1,6 @@
 package com.yfshop.shop.service.activity.service;
 
-import com.baomidou.mybatisplus.extension.exceptions.ApiException;
+import com.yfshop.common.exception.ApiException;
 import com.yfshop.shop.service.activity.result.YfActCodeBatchDetailResult;
 import com.yfshop.shop.service.activity.result.YfDrawActivityResult;
 import com.yfshop.shop.service.coupon.result.YfUserCouponResult;
