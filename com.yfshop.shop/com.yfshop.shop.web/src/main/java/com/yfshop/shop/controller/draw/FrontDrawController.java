@@ -51,4 +51,12 @@ public class FrontDrawController implements BaseController {
         return CommonResult.success(frontUserCouponService.findUserCouponList(req));
     }
 
+    @RequestMapping(value = "all/record/findList", method = {RequestMethod.GET, RequestMethod.POST})
+    @ResponseBody
+    public CommonResult<List<YfUserCouponResult>> findAllUserDrawRecordList() {
+        QueryUserCouponReq req = new QueryUserCouponReq();
+        req.setCouponResource(CouponResourceEnum.DRAW.getCode());
+        return CommonResult.success(frontUserCouponService.findAllUserDrawRecordList(req));
+    }
+
 }

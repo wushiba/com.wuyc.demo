@@ -31,6 +31,8 @@ public interface FrontUserCouponService {
 	 */
 	public List<YfUserCouponResult> findUserCouponList(QueryUserCouponReq userCouponReq) throws ApiException;
 
+	public List<YfUserCouponResult> findAllUserDrawRecordList(QueryUserCouponReq userCouponReq) throws ApiException;
+
 	/**
 	 * 用户使用优惠券，修改券状态
 	 * @param userCouponId

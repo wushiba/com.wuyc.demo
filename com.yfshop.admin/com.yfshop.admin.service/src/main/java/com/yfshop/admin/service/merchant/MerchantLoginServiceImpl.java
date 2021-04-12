@@ -37,21 +37,31 @@ public class MerchantLoginServiceImpl implements MerchantLoginService {
     public MerchantResult loginByPwd(String mobile, String pwd) throws ApiException {
         Merchant merchant = merchantMapper.selectOne(Wrappers.<Merchant>lambdaQuery()
                 .eq(Merchant::getMobile, mobile)
-                .eq(Merchant::getPassword, SecureUtil.md5(pwd)));
+                .eq(Merchant::getPassword, SecureUtil.md5(pwd))
+                .eq(Merchant::getIsEnable, "Y")
+                .eq(Merchant::getIsDelete, "N"));
         Asserts.assertNonNull(merchant, 500, "账号或密码输入错误！");
-        MerchantResult merchantResult = new MerchantResult();
-        BeanUtil.copyProperties(merchant, merchantResult);
-        return merchantResult;
+        return BeanUtil.convert(merchant, MerchantResult.class);
     }
 
     @Override
     public MerchantResult loginByCaptcha(String mobile, String captcha) throws ApiException {
         captchaService.checkCaptcha(mobile, captcha, CaptchaSourceEnum.LOGIN_CAPTCHA);
         Merchant merchant = merchantMapper.selectOne(Wrappers.<Merchant>lambdaQuery()
-                .eq(Merchant::getMobile, mobile));
+                .eq(Merchant::getMobile, mobile)
+                .eq(Merchant::getIsEnable, "Y")
+                .eq(Merchant::getIsDelete, "N"));
         Asserts.assertNonNull(merchant, 500, "账号输入错误！");
-        MerchantResult merchantResult = new MerchantResult();
-        BeanUtil.copyProperties(merchant, merchantResult);
-        return merchantResult;
+        return BeanUtil.convert(merchant, MerchantResult.class);
+    }
+
+    @Override
+    public MerchantResult loginByWx(String openId) throws ApiException {
+        Merchant merchant = merchantMapper.selectOne(Wrappers.<Merchant>lambdaQuery()
+                .eq(Merchant::getOpenId, openId)
+                .eq(Merchant::getIsEnable, "Y")
+                .eq(Merchant::getIsDelete, "N"));
+        Asserts.assertNonNull(merchant, 500, "没有商户信息");
+        return BeanUtil.convert(merchant, MerchantResult.class);
     }
 }

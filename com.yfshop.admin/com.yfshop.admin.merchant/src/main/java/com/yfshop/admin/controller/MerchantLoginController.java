@@ -9,6 +9,7 @@ import com.yfshop.admin.api.merchant.result.MerchantResult;
 import com.yfshop.common.api.CommonResult;
 import com.yfshop.common.base.BaseController;
 import com.yfshop.common.enums.CaptchaSourceEnum;
+import com.yfshop.common.exception.Asserts;
 import com.yfshop.common.validate.annotation.Mobile;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.slf4j.Logger;
@@ -23,7 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Validated
 @RestController
 @RequestMapping("merchant/login")
-class MerchantLoginController implements BaseController {
+class MerchantLoginController extends AbstractBaseController {
 
     private static final Logger logger = LoggerFactory.getLogger(MerchantLoginController.class);
 
@@ -58,6 +59,15 @@ class MerchantLoginController implements BaseController {
         return CommonResult.success(merchantResult);
     }
 
+    @RequestMapping(value = "/loginByWx", method = {RequestMethod.POST})
+    @ResponseBody
+    public CommonResult<MerchantResult> loginByWx() {
+        String openId = getCurrentOpenId();
+        Asserts.assertStringNotBlank(openId,500,"微信未授权");
+        MerchantResult merchantResult = merchantLoginService.loginByWx(openId);
+        StpUtil.setLoginId(merchantResult.getId());
+        return CommonResult.success(merchantResult);
+    }
 
     /**
      * 退出登录
