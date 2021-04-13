@@ -58,50 +58,21 @@ public class AdminMerchantManageServiceImpl implements AdminMerchantManageServic
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public Void createMerchant(Integer merchantId, CreateMerchantReq req) throws ApiException {
+    public Void createMerchant(Integer loginedMerchantId, CreateMerchantReq req) throws ApiException {
         Region province = regionMapper.selectById(req.getProvinceId());
         Asserts.assertNonNull(province, 500, "省份信息不存在");
         Region city = regionMapper.selectById(req.getCityId());
         Asserts.assertNonNull(city, 500, "市信息不存在");
         Region district = regionMapper.selectById(req.getDistrictId());
         Asserts.assertNonNull(district, 500, "区信息不存在");
-        Merchant currentLoginMerchant = merchantMapper.selectById(merchantId);
+        Merchant currentLoginMerchant = merchantMapper.selectById(loginedMerchantId);
         Asserts.assertNonNull(currentLoginMerchant, 500, "当前登录商户不存在");
         Asserts.assertTrue("Y".equalsIgnoreCase(currentLoginMerchant.getIsEnable()), 500, "当前登录商户已被禁用");
         Asserts.assertTrue("N".equalsIgnoreCase(currentLoginMerchant.getIsDelete()), 500, "当前登录商户已被删除");
-        GroupRoleEnum currentLoginMerchantRole = GroupRoleEnum.getByCode(currentLoginMerchant.getRoleAlias());
         GroupRoleEnum createMerchantRole = GroupRoleEnum.getByCode(req.getRoleAlias());
 
         // 查询上级
-        Merchant pm;
-        if (currentLoginMerchantRole.getCode().equals(GroupRoleEnum.SYS.getCode())) {
-            Asserts.assertNonNull(req.getPid(), 500, "上级商户不能为空");
-            // 使用pid作为上级
-            pm = this.getParent(req.getPid());
-        } else {
-            if (currentLoginMerchantRole == GroupRoleEnum.ZB && createMerchantRole == GroupRoleEnum.JXS) {
-                Asserts.assertNonNull(req.getPid(), 500, "上级商户不能为空");
-                // 总部建经销商时，必须要有二级
-                LambdaQueryWrapper<Merchant> query = Wrappers.lambdaQuery(Merchant.class)
-                        .eq(Merchant::getPid, merchantId)
-                        .eq(Merchant::getId, req.getPid())
-                        .in(Merchant::getRoleAlias, Arrays.asList(GroupRoleEnum.FGS.getCode(), GroupRoleEnum.SQ.getCode()));
-                pm = merchantMapper.selectOne(query);
-            } else if (req.getPid() != null && !req.getPid().equals(merchantId)) {
-                // 验证选择的pid是否正确，这个上级必须是当前登录商户的下级
-                pm = merchantMapper.selectOne(Wrappers.lambdaQuery(Merchant.class)
-                        .eq(Merchant::getPid, merchantId)
-                        .eq(Merchant::getId, req.getPid()));
-            } else {
-                // 使用当前商户作为上级
-                pm = this.getParent(merchantId);
-            }
-        }
-        Asserts.assertNonNull(pm, 500, "错误的上级pid" + (req.getPid() == null ? merchantId : req.getPid()));
-        // 是否平级或越级创建
-        Asserts.assertTrue(GroupRoleEnum.getByCode(pm.getRoleAlias()).getLevel() < createMerchantRole.getLevel(), 500, "不能越级创建商户");
-        Asserts.assertTrue("Y".equalsIgnoreCase(pm.getIsEnable()), 500, "上级商户" + req.getPid() + "已被禁用");
-        Asserts.assertTrue("N".equalsIgnoreCase(pm.getIsDelete()), 500, "上级商户" + req.getPid() + "已被删除");
+        Merchant pm = getParentMerchantThenCheck(currentLoginMerchant, req.getPid(), req.getRoleAlias());
 
         // create
         Merchant merchant = new Merchant();
@@ -145,39 +116,9 @@ public class AdminMerchantManageServiceImpl implements AdminMerchantManageServic
         Asserts.assertNonNull(currentLoginMerchant, 500, "当前登录商户不存在");
         Asserts.assertTrue("Y".equalsIgnoreCase(currentLoginMerchant.getIsEnable()), 500, "当前登录商户已被禁用");
         Asserts.assertTrue("N".equalsIgnoreCase(currentLoginMerchant.getIsDelete()), 500, "当前登录商户已被删除");
-        GroupRoleEnum currentLoginMerchantRole = GroupRoleEnum.getByCode(currentLoginMerchant.getRoleAlias());
-        GroupRoleEnum createMerchantRole = GroupRoleEnum.getByCode(req.getRoleAlias());
 
         // 查询上级
-        Merchant pm;
-        if (currentLoginMerchantRole.getCode().equals(GroupRoleEnum.SYS.getCode())) {
-            Asserts.assertNonNull(req.getPid(), 500, "上级商户不能为空");
-            // 使用pid作为上级
-            pm = this.getParent(req.getPid());
-        } else {
-            if (currentLoginMerchantRole == GroupRoleEnum.ZB && createMerchantRole == GroupRoleEnum.JXS) {
-                Asserts.assertNonNull(req.getPid(), 500, "上级商户不能为空");
-                // 总部建经销商时，必须要有二级
-                LambdaQueryWrapper<Merchant> query = Wrappers.lambdaQuery(Merchant.class)
-                        .eq(Merchant::getPid, merchantId)
-                        .eq(Merchant::getId, req.getPid())
-                        .in(Merchant::getRoleAlias, Arrays.asList(GroupRoleEnum.FGS.getCode(), GroupRoleEnum.SQ.getCode()));
-                pm = merchantMapper.selectOne(query);
-            } else if (req.getPid() != null && !req.getPid().equals(merchantId)) {
-                // 验证选择的pid是否正确，这个上级必须是当前登录商户的下级
-                pm = merchantMapper.selectOne(Wrappers.lambdaQuery(Merchant.class)
-                        .eq(Merchant::getPid, merchantId)
-                        .eq(Merchant::getId, req.getPid()));
-            } else {
-                // 使用当前商户作为上级
-                pm = this.getParent(merchantId);
-            }
-        }
-        Asserts.assertNonNull(pm, 500, "错误的上级pid" + (req.getPid() == null ? merchantId : req.getPid()));
-        // 是否平级或越级创建
-        Asserts.assertTrue(GroupRoleEnum.getByCode(pm.getRoleAlias()).getLevel() < createMerchantRole.getLevel(), 500, "不能越级创建商户");
-        Asserts.assertTrue("Y".equalsIgnoreCase(pm.getIsEnable()), 500, "上级商户" + req.getPid() + "已被禁用");
-        Asserts.assertTrue("N".equalsIgnoreCase(pm.getIsDelete()), 500, "上级商户" + req.getPid() + "已被删除");
+        Merchant pm = getParentMerchantThenCheck(currentLoginMerchant, req.getPid(), req.getRoleAlias());
 
         // 网点类型的商户
         if (GroupRoleEnum.WD.getCode().equals(req.getRoleAlias())) {
@@ -310,6 +251,47 @@ public class AdminMerchantManageServiceImpl implements AdminMerchantManageServic
     private Merchant getParent(Integer pid) throws ApiException {
         Merchant pm = merchantMapper.selectById(pid);
         Asserts.assertNonNull(pm, 500, "上级商户" + pid + "不存在");
+        Asserts.assertTrue("Y".equalsIgnoreCase(pm.getIsEnable()), 500, "上级商户" + pid + "已被禁用");
+        Asserts.assertTrue("N".equalsIgnoreCase(pm.getIsDelete()), 500, "上级商户" + pid + "已被删除");
+        return pm;
+    }
+
+    private Merchant getParentMerchantThenCheck(Merchant loginMerchant, Integer pid, String roleAlias) {
+        GroupRoleEnum loginMerchantRole = GroupRoleEnum.getByCode(loginMerchant.getRoleAlias());
+        GroupRoleEnum createMerchantRole = GroupRoleEnum.getByCode(roleAlias);
+        // 查上级
+        Merchant pm;
+        if (loginMerchantRole.getCode().equals(GroupRoleEnum.SYS.getCode())) {
+            Asserts.assertNonNull(pid, 500, "上级商户不能为空");
+            pm = getParent(pid);
+            if (GroupRoleEnum.getByCode(pm.getRoleAlias()) == GroupRoleEnum.ZB && createMerchantRole == GroupRoleEnum.JXS) {
+                // 总部建经销商时，必须要有二级
+                boolean bool = pm.getRoleAlias().equals(GroupRoleEnum.FGS.getCode()) || pm.getRoleAlias().equals(GroupRoleEnum.SQ.getCode());
+                Asserts.assertTrue(bool, 500, "经销商的上级必须是分公司或省区");
+            }
+        } else {
+            Integer loginMerchantId = loginMerchant.getId();
+            if (loginMerchantRole == GroupRoleEnum.ZB && createMerchantRole == GroupRoleEnum.JXS) {
+                Asserts.assertNonNull(pid, 500, "上级商户不能为空");
+                // 总部建经销商时，必须要有二级
+                LambdaQueryWrapper<Merchant> query = Wrappers.lambdaQuery(Merchant.class)
+                        .eq(Merchant::getPid, loginMerchantId).eq(Merchant::getId, pid)
+                        .in(Merchant::getRoleAlias, Arrays.asList(GroupRoleEnum.FGS.getCode(), GroupRoleEnum.SQ.getCode()));
+                pm = merchantMapper.selectOne(query);
+                Asserts.assertNonNull(pm, 500, "经销商的上级必须是分公司或省区");
+            } else if (pid != null && !pid.equals(loginMerchantId)) {
+                // 验证选择的pid是否正确，这个上级必须是当前登录商户的下级
+                pm = merchantMapper.selectOne(Wrappers.lambdaQuery(Merchant.class)
+                        .eq(Merchant::getPid, loginMerchant.getId()).eq(Merchant::getId, pid));
+                Asserts.assertNonNull(pm, 500, "错误的上级pid(" + pid + ")");
+            } else {
+                // 使用当前商户作为上级
+                pm = this.getParent(loginMerchantId);
+            }
+        }
+        // 是否平级或越级创建
+        Asserts.assertTrue(GroupRoleEnum.getByCode(pm.getRoleAlias()).getLevel() < createMerchantRole.getLevel(),
+                500, "不能越级创建商户");
         Asserts.assertTrue("Y".equalsIgnoreCase(pm.getIsEnable()), 500, "上级商户" + pid + "已被禁用");
         Asserts.assertTrue("N".equalsIgnoreCase(pm.getIsDelete()), 500, "上级商户" + pid + "已被删除");
         return pm;
