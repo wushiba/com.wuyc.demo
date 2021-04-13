@@ -1,6 +1,5 @@
 package com.yfshop.shop.service.activity;
 
-import cn.hutool.core.net.NetUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
@@ -166,15 +165,15 @@ public class FrontDrawServiceImpl implements FrontDrawService {
         DrawProvinceRate provinceRate = this.getProvinceRateByActIdAndProvince(actCodeBatchDetail.getActId(), provinceId);
         if (provinceRate == null) {
             if (BoxSpecValEnum.BIG.getCode().equalsIgnoreCase(actCodeBatchDetail.getBoxSpecVal())) {
-                prizeLevel = startDraw(firstPrize.getWinRate(), secondPrize.getWinRate());
+                prizeLevel = startDraw(firstPrize.getWinRate(), firstPrize.getPrizeCount(),  secondPrize.getWinRate(), secondPrize.getPrizeCount());
             } else {
-                prizeLevel = startDraw(firstPrize.getWinRate(), secondPrize.getSmallBoxRate());
+                prizeLevel = startDraw(firstPrize.getWinRate(), firstPrize.getPrizeCount(),  secondPrize.getSmallBoxRate(), secondPrize.getPrizeCount());
             }
         } else {
             if (BoxSpecValEnum.BIG.getCode().equalsIgnoreCase(actCodeBatchDetail.getBoxSpecVal())) {
-                prizeLevel = startDraw(provinceRate.getFirstWinRate(), provinceRate.getSecondWinRate());
+                prizeLevel = startDraw(provinceRate.getFirstWinRate(), firstPrize.getPrizeCount(), provinceRate.getSecondWinRate(), secondPrize.getPrizeCount());
             } else {
-                prizeLevel = startDraw(provinceRate.getFirstWinRate(), provinceRate.getSecondSmallBoxWinRate());
+                prizeLevel = startDraw(provinceRate.getFirstWinRate(), firstPrize.getPrizeCount(), provinceRate.getSecondSmallBoxWinRate(), secondPrize.getPrizeCount());
             }
         }
 
@@ -277,18 +276,27 @@ public class FrontDrawServiceImpl implements FrontDrawService {
 
     /**
      * 生成随机字符串抽奖
-     * @param firstRate
-     * @param secondRate
+     * @param firstRate     一等奖中奖概率
+     * @param firstCount    一等奖数量
+     * @param secondRate    二等奖中奖概率
+     * @param secondCount   二等奖数量
      * @return
      */
-    private Integer startDraw(Integer firstRate, Integer secondRate) {
+    private Integer startDraw(Integer firstRate, Integer firstCount, Integer secondRate, Integer secondCount) {
         Integer prizeLevel = 3;
         int random = new Random().nextInt(10000);
+
         if (random <= firstRate) {
             // 校验是否超卖, 超卖的话默认抽中三等奖
-            prizeLevel = 1;
+            Long winCount = redisService.incr(CacheConstants.PRIZE_FIRST_WIN_COUNT, 1);
+            if (winCount <= firstCount) {
+                prizeLevel = 1;
+            }
         } else if (random <= (firstRate + secondRate)) {
-            prizeLevel = 2;
+            Long winCount = redisService.incr(CacheConstants.PRIZE_SECOND_WIN_COUNT, 1);
+            if (winCount <= secondCount) {
+                prizeLevel = 2;
+            }
         }
         logger.info("抽中了" + prizeLevel + "等奖");
         return prizeLevel;
