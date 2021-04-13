@@ -14,7 +14,7 @@ import org.springframework.scheduling.annotation.EnableAsync;
 
 import javax.annotation.Resource;
 
-
+@DubboService
 @EnableAsync
 public class MpPayNotifyServiceImpl implements MpPayNotifyService {
 
