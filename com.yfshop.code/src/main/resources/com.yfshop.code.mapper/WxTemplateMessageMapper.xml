@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yfshop.code.mapper.WxTemplateMessageMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.yfshop.code.model.WxTemplateMessage">
+        <id column="id" property="id" />
+        <result column="create_time" property="createTime" />
+        <result column="template_id" property="templateId" />
+        <result column="open_id" property="openId" />
+        <result column="url" property="url" />
+        <result column="data" property="data" />
+        <result column="status" property="status" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, create_time, template_id, open_id, url, data, status
+    </sql>
+
+</mapper>

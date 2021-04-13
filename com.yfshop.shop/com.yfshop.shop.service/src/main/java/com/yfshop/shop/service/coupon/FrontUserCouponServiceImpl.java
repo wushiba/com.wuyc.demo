@@ -1,5 +1,6 @@
 package com.yfshop.shop.service.coupon;
 
+import cn.hutool.core.date.DateUtil;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
@@ -10,6 +11,7 @@ import com.yfshop.code.mapper.UserCouponMapper;
 import com.yfshop.code.mapper.UserMapper;
 import com.yfshop.code.model.Coupon;
 import com.yfshop.code.model.DrawActivity;
+import com.yfshop.code.model.User;
 import com.yfshop.code.model.UserCoupon;
 import com.yfshop.common.constants.CacheConstants;
 import com.yfshop.common.enums.CouponResourceEnum;
@@ -26,6 +28,12 @@ import com.yfshop.shop.service.coupon.result.YfUserCouponResult;
 import com.yfshop.shop.service.coupon.service.FrontUserCouponService;
 import com.yfshop.shop.service.user.result.UserResult;
 import com.yfshop.shop.service.user.service.FrontUserService;
+import com.yfshop.wx.api.service.MpService;
+import io.swagger.models.auth.In;
+import me.chanjar.weixin.mp.bean.template.WxMpTemplateData;
+import me.chanjar.weixin.mp.bean.template.WxMpTemplateMessage;
+import org.apache.dubbo.config.annotation.DubboReference;
+import org.apache.dubbo.config.annotation.DubboService;
 import org.apache.dubbo.config.annotation.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,6 +44,7 @@ import javax.annotation.Resource;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -47,7 +56,7 @@ import java.util.stream.Collectors;
  * @Since:2021-03-23 16:24:25
  * @Version:1.1.0
  */
-@Service(dynamic = true)
+@DubboService
 public class FrontUserCouponServiceImpl implements FrontUserCouponService {
 
     private static final Logger logger = LoggerFactory.getLogger(FrontUserCouponServiceImpl.class);
@@ -64,10 +73,13 @@ public class FrontUserCouponServiceImpl implements FrontUserCouponService {
     private UserCouponMapper userCouponMapper;
     @Resource
     private FrontUserService frontUserService;
+    @DubboReference
+    MpService mpService;
 
     /**
      * 根据id查询优惠券信息
-     * @param couponId	优惠券id
+     *
+     * @param couponId 优惠券id
      * @return YfCouponResult
      * @throws ApiException
      */
@@ -87,7 +99,8 @@ public class FrontUserCouponServiceImpl implements FrontUserCouponService {
 
     /**
      * 查询用户优惠券YfUserCoupon
-     * @param userCouponReq	查询条件
+     *
+     * @param userCouponReq 查询条件
      * @return
      * @throws ApiException
      */
@@ -164,18 +177,19 @@ public class FrontUserCouponServiceImpl implements FrontUserCouponService {
 
     /**
      * 用户抽中优惠券后生成优惠券
-     * @param userId				用户id
-     * @param actCode				用户扫码抽奖的码，yf_act_code_batch_detail表的actCode
-     * @param drawPrizeResult		奖品信息
+     *
+     * @param userId          用户id
+     * @param actCode         用户扫码抽奖的码，yf_act_code_batch_detail表的actCode
+     * @param drawPrizeResult 奖品信息
      * @return
      * @throws ApiException
      */
     @Async
     @Override
     public YfUserCouponResult createUserCouponByPrize(Integer userId, String actCode, YfDrawPrizeResult drawPrizeResult) throws ApiException {
-        logger.info("======开始创建优惠券用户userId=" + userId +  ",actCode=" + actCode + ",开始创建优惠券");
-        UserResult userResult = frontUserService.getUserById(userId);
-        Asserts.assertNonNull(userResult, 500, "用户不存在,请先授权关注公众号");
+        logger.info("======开始创建优惠券用户userId=" + userId + ",actCode=" + actCode + ",开始创建优惠券");
+        User user = userMapper.selectById(userId);
+        Asserts.assertNonNull(user, 500, "用户不存在,请先授权关注公众号");
 
         YfCouponResult coupon = getCouponResultById(drawPrizeResult.getCouponId());
         Asserts.assertNonNull(coupon, 500, "优惠券不存在");
@@ -217,12 +231,56 @@ public class FrontUserCouponServiceImpl implements FrontUserCouponService {
         // TODO: 2021/3/23 手机号用户还没有？
         userCoupon.setUseTime(null);
         userCoupon.setOrderId(null);
-        userCoupon.setMobile(userResult.getMobile());
-        userCoupon.setNickname(userResult.getNickname());
+        userCoupon.setMobile(user.getMobile());
+        userCoupon.setNickname(user.getNickname());
         userCoupon.setUseStatus(UserCouponStatusEnum.NO_USE.getCode());
         userCouponMapper.insert(userCoupon);
-        logger.info("======结束创建优惠券用户userId=" + userId +  ",actCode=" + actCode + ",userCoupon=" + JSON.toJSONString(userCoupon));
+        logger.info("======结束创建优惠券用户userId=" + userId + ",actCode=" + actCode + ",userCoupon=" + JSON.toJSONString(userCoupon));
+        sendWinningMsg(user.getOpenId(),drawPrizeResult.getPrizeLevel() );
         return BeanUtil.convert(userCoupon, YfUserCouponResult.class);
+    }
+
+
+    /**
+     * 发送用户中奖消息
+     *
+     * @param openId
+     */
+    private void sendWinningMsg(String openId, Integer level) {
+        try {
+            String first = null;
+            String keyword1 = null;
+            switch (level) {
+                case 1:
+                    first = "恭喜您获得2元换购1688元椰岛轻奢鹿龟酒一瓶的资格。";
+                    keyword1 = "1688元椰岛轻奢鹿龟酒";
+                    break;
+                case 2:
+                    first = "恭喜您获得2元换购椰岛135ml鹿龟酒一瓶的资格。";
+                    keyword1 = "椰岛135ml鹿龟酒一瓶";
+                    break;
+                case 3:
+                    first = "恭喜您获得锦炉火锅30元抵扣券。";
+                    keyword1 = "锦炉火锅30元抵扣券";
+                    break;
+            }
+            if (StringUtils.isNotBlank(first) && StringUtils.isNotBlank(keyword1)) {
+                List<WxMpTemplateData> data = new ArrayList<>();
+                data.add(new WxMpTemplateData("first", first));
+                data.add(new WxMpTemplateData("keyword1", keyword1));
+                data.add(new WxMpTemplateData("keyword2", DateUtil.format(new Date(), "yyyy-MM-dd HH:mm:ss")));
+                data.add(new WxMpTemplateData("remark", "请在有效期之前尽快领取哦~"));
+                WxMpTemplateMessage wxMpTemplateMessage = WxMpTemplateMessage.builder()
+                        .templateId("26gbak7X0fBjNlYdtXMUxHVz3N0G4bwq-xMRoe0k2FM")
+                        .toUser(openId)
+                        .data(data)
+                        .url("http://prev-shop.yufan.51jujibao.com/#/CouponList")
+                        .build();
+                mpService.sendWxMpTemplateMsg(wxMpTemplateMessage);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 }

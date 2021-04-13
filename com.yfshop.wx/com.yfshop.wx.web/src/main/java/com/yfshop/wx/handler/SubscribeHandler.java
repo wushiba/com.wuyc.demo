@@ -4,6 +4,7 @@ package com.yfshop.wx.handler;
 import com.yfshop.admin.api.user.UserService;
 import com.yfshop.admin.api.user.request.UserReq;
 import com.yfshop.common.util.BeanUtil;
+import com.yfshop.wx.api.service.MpService;
 import com.yfshop.wx.builder.TextBuilder;
 import me.chanjar.weixin.common.error.WxErrorException;
 import me.chanjar.weixin.common.session.WxSessionManager;
@@ -12,6 +13,7 @@ import me.chanjar.weixin.mp.bean.message.WxMpXmlMessage;
 import me.chanjar.weixin.mp.bean.message.WxMpXmlOutMessage;
 import me.chanjar.weixin.mp.bean.result.WxMpUser;
 import org.apache.dubbo.config.annotation.DubboReference;
+import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
@@ -24,6 +26,9 @@ public class SubscribeHandler extends AbstractHandler {
 
     @DubboReference(check = false)
     UserService userService;
+
+    @DubboReference(check = false)
+    MpService mpService;
 
     @Override
     public WxMpXmlOutMessage handle(WxMpXmlMessage wxMessage,
@@ -39,6 +44,7 @@ public class SubscribeHandler extends AbstractHandler {
             if (userWxInfo != null) {
                 // TODO 可以添加关注用户到本地数据库
                 userService.subscribe(BeanUtil.convert(userWxInfo, UserReq.class));
+                mpService.reSendWxMpTemplateMsg(userWxInfo.getOpenId());
             }
         } catch (WxErrorException e) {
             if (e.getError().getErrorCode() == 48001) {
@@ -61,7 +67,7 @@ public class SubscribeHandler extends AbstractHandler {
         }
 
         try {
-            return new TextBuilder().build("感谢关注", wxMessage, weixinService);
+            return new TextBuilder().build("您好，欢迎来到雨帆健康家", wxMessage, weixinService);
         } catch (Exception e) {
             this.logger.error(e.getMessage(), e);
         }
