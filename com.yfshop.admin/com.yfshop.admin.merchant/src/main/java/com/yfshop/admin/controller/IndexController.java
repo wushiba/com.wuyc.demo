@@ -38,7 +38,7 @@ class IndexController{
         data.add(new WxMpTemplateData("keyword1","2元"));
         data.add(new WxMpTemplateData("remark","请核对好用户信息，避免错拿商品。"));
         WxMpTemplateMessage wxMpTemplateMessage=WxMpTemplateMessage.builder()
-                .templateId("OPENTM411545966")
+                .templateId("kEnXD9LGvWpcWud99dUu_A85vc5w1vT9-rMzqybrQaw")
                 .toUser("o3vDm6TQEJn4BsPB3xi5p4EXvSHo")
                 .data(data)
                 .url("http://prev-merchant.yufan.51jujibao.com/#/MerchantBooking")
