@@ -14,6 +14,7 @@ import me.chanjar.weixin.mp.bean.template.WxMpTemplateData;
 import me.chanjar.weixin.mp.bean.template.WxMpTemplateMessage;
 import me.chanjar.weixin.mp.util.json.WxMpGsonBuilder;
 import org.apache.dubbo.config.annotation.DubboService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.EnableAsync;
 
@@ -23,10 +24,9 @@ import java.util.List;
 
 @DubboService
 @EnableAsync
-@AllArgsConstructor
 public class MpServiceImpl implements MpService {
-
-    private final WxMpService wxMpService;
+    @Autowired
+    private WxMpService wxMpService;
     @Resource
     private WxTemplateMessageMapper wxTemplateMessageMapper;
 
