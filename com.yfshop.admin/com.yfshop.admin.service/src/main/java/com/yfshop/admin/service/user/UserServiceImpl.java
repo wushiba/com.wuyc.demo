@@ -76,6 +76,7 @@ public class UserServiceImpl implements UserService {
         } else {
             user = BeanUtil.convert(userReq, User.class);
             user.setId(userResult.getId());
+            user.setSubscribe(null);
             userMapper.updateById(user);
         }
         return user.getId();
