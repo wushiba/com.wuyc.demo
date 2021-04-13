@@ -34,7 +34,6 @@
             <groupId>com.yfshop.parent</groupId>
             <artifactId>com.yfshop.admin.api</artifactId>
             <version>1.0-SNAPSHOT</version>
-            <scope>compile</scope>
         </dependency>
 
         <dependency>
