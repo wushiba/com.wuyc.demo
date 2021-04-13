@@ -151,7 +151,6 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
      */
     @Override
     public YfUserOrderDetailResult getUserOrderDetail(Integer userId, Long orderId, Long orderDetailId) throws ApiException {
-        // todo 量大的话可以做1分钟秒缓存
         Asserts.assertFalse(orderId == null && orderDetailId == null, 500, "订单标识不可以为空");
         YfUserOrderDetailResult userOrderDetailResult;
 
@@ -162,6 +161,9 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
                 .eq(OrderDetail::getUserId, userId)
                 .eq(OrderDetail::getOrderId, orderId)
                 .orderByDesc(OrderDetail::getId));
+        if (order == null || CollectionUtil.isEmpty(detailList)) {
+            return new YfUserOrderDetailResult();
+        }
 
         if (orderDetailId == null) {
             List<YfUserOrderDetailResult.YfUserOrderItem> itemList = BeanUtil.convertList(detailList, YfUserOrderDetailResult.YfUserOrderItem.class);
