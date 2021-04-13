@@ -91,6 +91,7 @@ public class AdminMerchantManageServiceImpl implements AdminMerchantManageServic
                     .eq(Merchant::getPid, merchantId)
                     .eq(Merchant::getId, req.getPid()));
         } else {
+            Asserts.assertTrue(!currentLoginMerchantRole.getCode().equals(GroupRoleEnum.SYS.getCode()), 500, "错误的上级商户");
             // 使用当前商户作为上级
             pm = this.getParent(merchantId);
         }
@@ -161,6 +162,8 @@ public class AdminMerchantManageServiceImpl implements AdminMerchantManageServic
                     .eq(Merchant::getPid, merchantId)
                     .eq(Merchant::getId, req.getPid()));
         } else {
+            Asserts.assertTrue(!currentLoginMerchantRole.getCode().equals(GroupRoleEnum.SYS.getCode()),
+                    500, "错误的上级商户");
             // 使用当前商户作为上级
             pm = this.getParent(merchantId);
         }
@@ -262,10 +265,23 @@ public class AdminMerchantManageServiceImpl implements AdminMerchantManageServic
         if (merchantId == null || StringUtils.isBlank(roleAlias)) {
             return BeanUtil.emptyPageData(pageIndex, pageSize);
         }
-        Page<Merchant> page = merchantMapper.selectPage(new Page<>(pageIndex, pageSize),
-                Wrappers.lambdaQuery(Merchant.class).eq(Merchant::getPid, merchantId).eq(Merchant::getRoleAlias, roleAlias)
-                        .like(StringUtils.isNotBlank(merchantName), Merchant::getMerchantName, merchantName));
-        return BeanUtil.iPageConvert(page, MerchantResult.class);
+        Merchant merchant = merchantMapper.selectById(merchantId);
+        if (merchant == null) {
+            return BeanUtil.emptyPageData(pageIndex, pageSize);
+        }
+        if (merchant.getRoleAlias().equals(GroupRoleEnum.SYS.getCode())) {
+            Page<Merchant> page = merchantMapper.selectPage(new Page<>(pageIndex, pageSize),
+                    Wrappers.lambdaQuery(Merchant.class).eq(Merchant::getRoleAlias, roleAlias)
+                            .like(StringUtils.isNotBlank(merchantName), Merchant::getMerchantName, merchantName)
+            );
+            return BeanUtil.iPageConvert(page, MerchantResult.class);
+        } else {
+            Page<Merchant> page = merchantMapper.selectPage(new Page<>(pageIndex, pageSize),
+                    Wrappers.lambdaQuery(Merchant.class).eq(Merchant::getPid, merchantId).eq(Merchant::getRoleAlias, roleAlias)
+                            .like(StringUtils.isNotBlank(merchantName), Merchant::getMerchantName, merchantName)
+            );
+            return BeanUtil.iPageConvert(page, MerchantResult.class);
+        }
     }
 
     private String generatePidPath(Integer pid) {
