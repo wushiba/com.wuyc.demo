@@ -193,7 +193,7 @@ public class FrontOrderController implements BaseController {
     @ResponseBody
     @SaCheckLogin
     public CommonResult<WxPayMpOrderResult> orderToPay(Long orderId) throws WxPayException {
-        return CommonResult.success(frontUserOrderService.userOrderToPay(orderId));
+        return CommonResult.success(frontUserOrderService.userOrderToPay(orderId, getRequestIpStr()));
     }
 
 
