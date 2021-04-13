@@ -49,6 +49,8 @@ public class OrderDetail extends Model<OrderDetail> {
      */
     private String pidPath;
 
+    private String websiteCode;
+
     /**
      * 收货方式 ZT(自提) | PS(配送)
      */

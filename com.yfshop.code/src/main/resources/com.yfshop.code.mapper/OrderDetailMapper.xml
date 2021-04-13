@@ -11,6 +11,7 @@
         <result column="order_id" property="orderId" />
         <result column="merchant_id" property="merchantId" />
         <result column="pid_path" property="pidPath" />
+        <result column="website_code" property="websiteCode" />
         <result column="receive_way" property="receiveWay" />
         <result column="is_pay" property="isPay" />
         <result column="item_id" property="itemId" />
@@ -35,7 +36,7 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        id, create_time, update_time, user_id, order_id, merchant_id, pid_path, receive_way, is_pay, item_id, sku_id, item_cover, item_price, item_count, freight,
+        id, create_time, update_time, user_id, order_id, merchant_id, pid_path, website_code, receive_way, is_pay, item_id, sku_id, item_cover, item_price, item_count, freight,
         coupon_price, order_price, pay_price, user_coupon_id, order_status, spec_value_id_path, spec_name_value_json, spec_value_str, confirm_time, ship_time, express_company, express_no
     </sql>
 </mapper>

@@ -291,10 +291,10 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
         BigDecimal couponPrice = userCoupon.getCouponPrice() == null ? new BigDecimal("0.00") : new BigDecimal(userCoupon.getCouponPrice());
         BigDecimal payPrice = orderPrice.add(orderFreight).subtract(couponPrice);
 
-        Order order = insertUserOrder(userId, ReceiveWayEnum.PS.getCode(), num, 1, orderPrice, couponPrice, orderFreight, payPrice, "N", null);
+        Order order = insertUserOrder(userId, null, ReceiveWayEnum.PS.getCode(), num, 1, orderPrice, couponPrice, orderFreight, payPrice, "N", null);
         Long orderId = order.getId();
 
-        insertUserOrderDetail(userId, orderId, null, null, ReceiveWayEnum.PS.getCode(), "N", num, itemSku.getItemId(),
+        insertUserOrderDetail(userId, orderId, null, null, null, ReceiveWayEnum.PS.getCode(), "N", num, itemSku.getItemId(),
                 itemSku.getId(), itemSku.getSkuTitle(), itemSku.getSkuSalePrice(), itemSku.getSkuCover(), orderFreight, couponPrice, orderPrice,
                 payPrice, userCoupon.getId(), UserOrderStatusEnum.WAIT_PAY.getCode(), itemSku.getSpecValueIdPath(), itemSku.getSpecNameValueJson());
 
@@ -368,7 +368,7 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
         // 删除购物车id
         userCartMapper.deleteBatchIds(cartIdList);
 
-        Order order = insertUserOrder(userId, ReceiveWayEnum.PS.getCode(), itemCount, childOrderCount, orderPrice, couponPrice, orderFreight, payPrice, "N", null);
+        Order order = insertUserOrder(userId, null, ReceiveWayEnum.PS.getCode(), itemCount, childOrderCount, orderPrice, couponPrice, orderFreight, payPrice, "N", null);
         Long orderId = order.getId();
         for (UserCart userCart : userCartList) {
             ItemSkuResult itemSku = itemSkuMap.get(userCart.getSkuId());
@@ -381,7 +381,7 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
             BigDecimal childOrderPrice = itemSku.getSkuSalePrice().multiply(new BigDecimal(userCart.getNum()));
             BigDecimal childPayPrice = childOrderPrice.add(childOrderFreight).subtract(childCouponPrice);
 
-            insertUserOrderDetail(userId, orderId, null, null, ReceiveWayEnum.PS.getCode(), "N", userCart.getNum(),
+            insertUserOrderDetail(userId, orderId, null, null, null, ReceiveWayEnum.PS.getCode(), "N", userCart.getNum(),
                     itemSku.getItemId(), itemSku.getId(), itemSku.getSkuTitle(), itemSku.getSkuSalePrice(), itemSku.getSkuCover(), childOrderFreight, childCouponPrice,
                     childOrderPrice, childPayPrice, userCouponId, UserOrderStatusEnum.WAIT_PAY.getCode(), itemSku.getSpecValueIdPath(), itemSku.getSpecNameValueJson());
         }
@@ -458,10 +458,10 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
         BigDecimal orderFreight = new BigDecimal(itemCount).multiply(itemFreight);
         BigDecimal orderPrice = new BigDecimal(itemCount).multiply(itemSku.getSkuSalePrice()).setScale(2, BigDecimal.ROUND_UP);
 
-        Order order = insertUserOrder(userId, ReceiveWayEnum.ZT.getCode(), itemCount, itemCount, orderPrice, orderPrice, orderFreight, orderFreight, "N", null);
+        Order order = insertUserOrder(userId, null, ReceiveWayEnum.ZT.getCode(), itemCount, itemCount, orderPrice, orderPrice, orderFreight, orderFreight, "N", null);
         Long orderId = order.getId();
         userCouponList.forEach(userCoupon -> {
-            insertUserOrderDetail(userId, orderId, merchantResult.getId(), merchantResult.getPidPath(), ReceiveWayEnum.ZT.getCode(), "N", 1,
+            insertUserOrderDetail(userId, orderId, merchantResult.getId(), merchantResult.getPidPath(), websiteCode, ReceiveWayEnum.ZT.getCode(), "N", 1,
                     itemSku.getItemId(), itemSku.getId(), itemDetail.getItemTitle(), itemSku.getSkuSalePrice(), itemSku.getSkuCover(), itemFreight, itemSku.getSkuSalePrice(),
                     itemSku.getSkuSalePrice(), itemFreight, userCoupon.getId(), UserOrderStatusEnum.WAIT_PAY.getCode(), itemSku.getSpecValueIdPath(), itemSku.getSpecNameValueJson());
         });
@@ -591,12 +591,13 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
      * @param remark
      * @return Order
      */
-    private Order insertUserOrder(Integer userId, String receiveWay, Integer itemCount, Integer childOrderCount, BigDecimal orderPrice,
+    private Order insertUserOrder(Integer userId, String webSiteCode, String receiveWay, Integer itemCount, Integer childOrderCount, BigDecimal orderPrice,
                                   BigDecimal couponPrice, BigDecimal freight, BigDecimal payPrice, String isPay, String remark) {
         Order order = new Order();
         order.setCreateTime(LocalDateTime.now());
         order.setUpdateTime(LocalDateTime.now());
         order.setUserId(userId);
+        order.setWebsiteCode(webSiteCode);
         order.setReceiveWay(receiveWay);
         order.setItemCount(itemCount);
         order.setChildOrderCount(childOrderCount);
@@ -640,7 +641,7 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
      * @param specNameValueJson 商品sku的规格名称值json串
      * @return
      */
-    private OrderDetail insertUserOrderDetail(Integer userId, Long orderId, Integer merchantId, String pidPath, String receiveWay,
+    private OrderDetail insertUserOrderDetail(Integer userId, Long orderId, Integer merchantId, String pidPath, String websiteCode, String receiveWay,
                                               String isPay, Integer itemCount, Integer itemId, Integer skuId, String itemTitle, BigDecimal skuPrice,
                                               String itemCover, BigDecimal freight, BigDecimal couponPrice, BigDecimal orderPrice, BigDecimal payPrice,
                                               Long userCouponId, String orderStatus, String specValueIdPath, String specNameValueJson) {
@@ -650,6 +651,7 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
         orderDetail.setOrderId(orderId);
         orderDetail.setMerchantId(merchantId);
         orderDetail.setPidPath(pidPath);
+        orderDetail.setWebsiteCode(websiteCode);
         orderDetail.setReceiveWay(receiveWay);
         orderDetail.setIsPay(isPay);
         orderDetail.setItemId(itemId);
