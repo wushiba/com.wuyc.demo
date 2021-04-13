@@ -53,7 +53,7 @@ public class MpServiceImpl implements MpService {
                 .orderByDesc(WxTemplateMessage::getId));
         if (wxTemplateMessage != null) {
             try {
-                Thread.sleep(3000);
+                Thread.sleep(5000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

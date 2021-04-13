@@ -42,7 +42,7 @@ import java.util.stream.Collectors;
  * @Since:2021-03-24 19:09:17
  * @Version:1.1.0
  */
-@DubboService
+@DubboService(async = true)
 @EnableAsync
 public class FrontDrawServiceImpl implements FrontDrawService {
 
