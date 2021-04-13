@@ -194,7 +194,7 @@ public class WebsiteBillServiceImpl implements WebsiteBillService {
             websiteBill.setPayPrice(detail.getPayPrice());
             websiteBill.setBillNo(order.getBillNo());
             websiteBill.setIsConfirm("N");
-            websiteBill.setWebsiteCode("");
+            websiteBill.setWebsiteCode(detail.getWebsiteCode());
             websiteBillMapper.insert(websiteBill);
         });
         return null;

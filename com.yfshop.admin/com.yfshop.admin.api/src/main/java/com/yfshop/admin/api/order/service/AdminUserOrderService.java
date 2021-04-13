@@ -14,10 +14,11 @@ public interface AdminUserOrderService {
 
 	/**
 	 * 用户付款后修改订单状态
-	 * @param orderId
+	 * @param orderId	订单id
+	 * @param billNo	支付流水号
 	 * @return
 	 * @throws ApiException
 	 */
-	Void updateOrderPayStatus(Long orderId) throws ApiException;
+	Void updateOrderPayStatus(Long orderId, String billNo) throws ApiException;
 
 }

@@ -276,7 +276,7 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
         UserCoupon userCoupon = new UserCoupon();
         if (userCouponId != null) {
             userCoupon = userCouponMapper.selectOne(Wrappers.lambdaQuery(UserCoupon.class).eq(UserCoupon::getId, userCouponId));
-            this.checkUserCoupon(userCoupon);
+            this.checkUserCoupon(userCoupon, itemSku.getItemId());
         }
 
         // 扣库存, 修改优惠券状态
@@ -291,10 +291,10 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
         BigDecimal couponPrice = userCoupon.getCouponPrice() == null ? new BigDecimal("0.00") : new BigDecimal(userCoupon.getCouponPrice());
         BigDecimal payPrice = orderPrice.add(orderFreight).subtract(couponPrice);
 
-        Order order = insertUserOrder(userId, ReceiveWayEnum.PS.getCode(), num, 1, orderPrice, couponPrice, orderFreight, payPrice, "N", null);
+        Order order = insertUserOrder(userId, null, ReceiveWayEnum.PS.getCode(), num, 1, orderPrice, couponPrice, orderFreight, payPrice, "N", null);
         Long orderId = order.getId();
 
-        insertUserOrderDetail(userId, orderId, null, null, ReceiveWayEnum.PS.getCode(), "N", num, itemSku.getItemId(),
+        insertUserOrderDetail(userId, orderId, null, null, null, ReceiveWayEnum.PS.getCode(), "N", num, itemSku.getItemId(),
                 itemSku.getId(), itemSku.getSkuTitle(), itemSku.getSkuSalePrice(), itemSku.getSkuCover(), orderFreight, couponPrice, orderPrice,
                 payPrice, userCoupon.getId(), UserOrderStatusEnum.WAIT_PAY.getCode(), itemSku.getSpecValueIdPath(), itemSku.getSpecNameValueJson());
 
@@ -326,16 +326,16 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
         UserAddressResult addressInfo = frontUserService.getUserAddressById(addressId);
         Asserts.assertNonNull(addressInfo, 500, "收货地址不存在");
 
-        UserCoupon userCoupon = new UserCoupon();
-        if (userCouponId != null) {
-            userCoupon = userCouponMapper.selectOne(Wrappers.lambdaQuery(UserCoupon.class).eq(UserCoupon::getId, userCouponId));
-            this.checkUserCoupon(userCoupon);
-        }
-
         List<UserCart> userCartList = userCartMapper.selectList(Wrappers.lambdaQuery(UserCart.class)
                 .eq(UserCart::getUserId, userId).in(UserCart::getId, cartIdList));
         Asserts.assertCollectionNotEmpty(userCartList, 500, "购物车id不正确");
         Asserts.assertEquals(userCartList.size(), cartIdList.size(), 500, "购物车数据不正确，请刷新重试");
+
+        UserCoupon userCoupon = new UserCoupon();
+        if (userCouponId != null) {
+            userCoupon = userCouponMapper.selectOne(Wrappers.lambdaQuery(UserCoupon.class).eq(UserCoupon::getId, userCouponId));
+            this.checkUserCoupon(userCoupon, userCartList.get(0).getItemId());
+        }
 
         // 运费商品等一些金额
         Integer itemCount = 0;
@@ -368,7 +368,7 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
         // 删除购物车id
         userCartMapper.deleteBatchIds(cartIdList);
 
-        Order order = insertUserOrder(userId, ReceiveWayEnum.PS.getCode(), itemCount, childOrderCount, orderPrice, couponPrice, orderFreight, payPrice, "N", null);
+        Order order = insertUserOrder(userId, null, ReceiveWayEnum.PS.getCode(), itemCount, childOrderCount, orderPrice, couponPrice, orderFreight, payPrice, "N", null);
         Long orderId = order.getId();
         for (UserCart userCart : userCartList) {
             ItemSkuResult itemSku = itemSkuMap.get(userCart.getSkuId());
@@ -381,7 +381,7 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
             BigDecimal childOrderPrice = itemSku.getSkuSalePrice().multiply(new BigDecimal(userCart.getNum()));
             BigDecimal childPayPrice = childOrderPrice.add(childOrderFreight).subtract(childCouponPrice);
 
-            insertUserOrderDetail(userId, orderId, null, null, ReceiveWayEnum.PS.getCode(), "N", userCart.getNum(),
+            insertUserOrderDetail(userId, orderId, null, null, null, ReceiveWayEnum.PS.getCode(), "N", userCart.getNum(),
                     itemSku.getItemId(), itemSku.getId(), itemSku.getSkuTitle(), itemSku.getSkuSalePrice(), itemSku.getSkuCover(), childOrderFreight, childCouponPrice,
                     childOrderPrice, childPayPrice, userCouponId, UserOrderStatusEnum.WAIT_PAY.getCode(), itemSku.getSpecValueIdPath(), itemSku.getSpecNameValueJson());
         }
@@ -417,12 +417,14 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
         Asserts.assertCollectionNotEmpty(userCouponIdList, 500, "用户优惠券id不可以为空");
         List<UserCoupon> userCouponList = userCouponMapper.selectList(Wrappers.lambdaQuery(UserCoupon.class)
                 .in(UserCoupon::getId, userCouponIdList));
+        // 二等奖是一个商品，这个sku必须是单规格
+        List<Integer> itemIdList = userCouponList.stream().map(UserCoupon::getCanUseItemIds).map(Integer::valueOf).collect(Collectors.toList());
         Asserts.assertCollectionNotEmpty(userCouponList, 500, "用户优惠券查询不到");
         Map<Long, List<UserCoupon>> userCouponMap = userCouponList.stream().collect(Collectors.groupingBy(UserCoupon::getId));
         for (Long userCouponId : userCouponIdList) {
             List<UserCoupon> dataList = userCouponMap.get(userCouponId);
             Asserts.assertCollectionNotEmpty(dataList, 500, "用户优惠券不存在");
-            this.checkUserCoupon(dataList.get(0));
+            this.checkUserCoupon(dataList.get(0), itemIdList.get(0));
         }
 
         // 校验抽奖活动,当前有且仅有一个活动进行中
@@ -431,14 +433,12 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
         YfDrawActivityResult drawActivityResult = frontDrawService.getDrawActivityDetailById(actIdSetList.iterator().next());
         Asserts.assertNonNull(drawActivityResult, 500, "此活动不存在,请联系管理员处理");
         Set<Integer> couponIdSetList = userCouponList.stream().map(UserCoupon::getCouponId).collect(Collectors.toSet());
-        Asserts.assertFalse(couponIdSetList.size() > 1, 500, "请传入正确的用户优惠券");
+        Asserts.assertFalse(couponIdSetList.size() > 1, 500, "请传入正确的用户优惠券,自提奖品只支持二等奖");
         YfDrawPrizeResult yfDrawPrizeResult = drawActivityResult.getPrizeList().stream().filter(prize ->
                 prize.getPrizeLevel() == 2).collect(Collectors.toList()).get(0);
         Asserts.assertTrue(userCouponList.get(0).getCouponId().intValue() == yfDrawPrizeResult.getCouponId().intValue(),
                 500, "自提奖品只支持二等奖");
 
-        // 二等奖是一个商品，这个sku必须是单规格
-        List<Integer> itemIdList = userCouponList.stream().map(UserCoupon::getCanUseItemIds).map(Integer::valueOf).collect(Collectors.toList());
         QueryItemDetailReq req = new QueryItemDetailReq();
         req.setItemId(itemIdList.get(0));
         ItemResult itemDetail = mallService.findItemDetail(req);
@@ -458,10 +458,10 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
         BigDecimal orderFreight = new BigDecimal(itemCount).multiply(itemFreight);
         BigDecimal orderPrice = new BigDecimal(itemCount).multiply(itemSku.getSkuSalePrice()).setScale(2, BigDecimal.ROUND_UP);
 
-        Order order = insertUserOrder(userId, ReceiveWayEnum.ZT.getCode(), itemCount, itemCount, orderPrice, orderPrice, orderFreight, orderFreight, "N", null);
+        Order order = insertUserOrder(userId, null, ReceiveWayEnum.ZT.getCode(), itemCount, itemCount, orderPrice, orderPrice, orderFreight, orderFreight, "N", null);
         Long orderId = order.getId();
         userCouponList.forEach(userCoupon -> {
-            insertUserOrderDetail(userId, orderId, merchantResult.getId(), merchantResult.getPidPath(), ReceiveWayEnum.ZT.getCode(), "N", 1,
+            insertUserOrderDetail(userId, orderId, merchantResult.getId(), merchantResult.getPidPath(), websiteCode, ReceiveWayEnum.ZT.getCode(), "N", 1,
                     itemSku.getItemId(), itemSku.getId(), itemDetail.getItemTitle(), itemSku.getSkuSalePrice(), itemSku.getSkuCover(), itemFreight, itemSku.getSkuSalePrice(),
                     itemSku.getSkuSalePrice(), itemFreight, userCoupon.getId(), UserOrderStatusEnum.WAIT_PAY.getCode(), itemSku.getSpecValueIdPath(), itemSku.getSpecNameValueJson());
         });
@@ -591,12 +591,13 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
      * @param remark
      * @return Order
      */
-    private Order insertUserOrder(Integer userId, String receiveWay, Integer itemCount, Integer childOrderCount, BigDecimal orderPrice,
+    private Order insertUserOrder(Integer userId, String webSiteCode, String receiveWay, Integer itemCount, Integer childOrderCount, BigDecimal orderPrice,
                                   BigDecimal couponPrice, BigDecimal freight, BigDecimal payPrice, String isPay, String remark) {
         Order order = new Order();
         order.setCreateTime(LocalDateTime.now());
         order.setUpdateTime(LocalDateTime.now());
         order.setUserId(userId);
+        order.setWebsiteCode(webSiteCode);
         order.setReceiveWay(receiveWay);
         order.setItemCount(itemCount);
         order.setChildOrderCount(childOrderCount);
@@ -640,7 +641,7 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
      * @param specNameValueJson 商品sku的规格名称值json串
      * @return
      */
-    private OrderDetail insertUserOrderDetail(Integer userId, Long orderId, Integer merchantId, String pidPath, String receiveWay,
+    private OrderDetail insertUserOrderDetail(Integer userId, Long orderId, Integer merchantId, String pidPath, String websiteCode, String receiveWay,
                                               String isPay, Integer itemCount, Integer itemId, Integer skuId, String itemTitle, BigDecimal skuPrice,
                                               String itemCover, BigDecimal freight, BigDecimal couponPrice, BigDecimal orderPrice, BigDecimal payPrice,
                                               Long userCouponId, String orderStatus, String specValueIdPath, String specNameValueJson) {
@@ -650,6 +651,7 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
         orderDetail.setOrderId(orderId);
         orderDetail.setMerchantId(merchantId);
         orderDetail.setPidPath(pidPath);
+        orderDetail.setWebsiteCode(websiteCode);
         orderDetail.setReceiveWay(receiveWay);
         orderDetail.setIsPay(isPay);
         orderDetail.setItemId(itemId);
@@ -711,14 +713,15 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
 
     /**
      * 校验优惠券
-     *
      * @param userCoupon
      * @throws ApiException
      */
-    private void checkUserCoupon(UserCoupon userCoupon) throws ApiException {
+    private void checkUserCoupon(UserCoupon userCoupon, Integer itemId) throws ApiException {
         Asserts.assertNonNull(userCoupon, 500, "用户优惠券不存在");
         Asserts.assertFalse(userCoupon.getValidEndTime().isBefore(LocalDateTime.now()), 500, "优惠券已过期");
         Asserts.assertEquals(userCoupon.getUseStatus(), UserCouponStatusEnum.NO_USE.getCode(), 500, "优惠券状态不正确");
+        Asserts.assertTrue("ALL".equalsIgnoreCase(userCoupon.getUseRangeType()) ||
+                userCoupon.getCanUseItemIds().contains(itemId + ""), 500, "请使用正确的优惠券");
     }
 
 }

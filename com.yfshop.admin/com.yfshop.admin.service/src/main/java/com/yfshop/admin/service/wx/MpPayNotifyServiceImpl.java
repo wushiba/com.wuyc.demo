@@ -27,8 +27,9 @@ public class MpPayNotifyServiceImpl implements MpPayNotifyService {
                 break;
             case USER_ORDER:
                 String outTradeNo = notifyResult.getOutTradeNo();
+                String billNo = notifyResult.getTransactionId();
                 String[] split = outTradeNo.split("-");
-                adminUserOrderService.updateOrderPayStatus(Long.valueOf(split[1]));
+                adminUserOrderService.updateOrderPayStatus(Long.valueOf(split[1]), billNo);
                 break;
         }
     }

@@ -13,6 +13,8 @@ import com.yfshop.common.enums.UserOrderStatusEnum;
 import com.yfshop.common.exception.ApiException;
 import com.yfshop.common.exception.Asserts;
 import org.apache.dubbo.config.annotation.DubboService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 
@@ -23,6 +25,8 @@ import javax.annotation.Resource;
  **/
 @DubboService
 public class AdminUserServiceImpl implements AdminUserOrderService {
+
+    private static final Logger logger = LoggerFactory.getLogger(AdminUserServiceImpl.class);
 
     @Resource
     private OrderDao orderDao;
@@ -36,19 +40,21 @@ public class AdminUserServiceImpl implements AdminUserOrderService {
     /**
      * 用户付款后修改订单状态
      * @param orderId   主订单id
+     * @param billNo    支付流水号
      * @return
      * @throws ApiException
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Void updateOrderPayStatus(Long orderId) throws ApiException {
+    public Void updateOrderPayStatus(Long orderId, String billNo) throws ApiException {
+        logger.info("====进入订单支付成功通知orderId=" + orderId + ",billNo=" + billNo);
         Asserts.assertNonNull(orderId, 500, "主订单id不可以为空");
         Order order = orderMapper.selectById(orderId);
         Asserts.assertNonNull(order, 500, "订单不存在");
         Asserts.assertNotEquals(order.getIsPay(), "Y", 500, "订单不可以重复修改状态");
 
         // 修改订单状态，用乐观锁
-        int result = orderDao.updateOrderPayStatus(orderId);
+        int result = orderDao.updateOrderPayStatus(orderId, billNo);
         if (result <= 0) {
             Asserts.assertNotEquals(order.getIsPay(), "Y", 500, "订单不可以重复修改状态");
         }
