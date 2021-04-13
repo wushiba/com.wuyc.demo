@@ -272,7 +272,7 @@ public class AdminMerchantManageServiceImpl implements AdminMerchantManageServic
         } else {
             Integer loginMerchantId = loginMerchant.getId();
             if (loginMerchantRole == GroupRoleEnum.ZB && createMerchantRole == GroupRoleEnum.JXS) {
-                Asserts.assertNonNull(pid, 500, "上级商户不能为空");
+                Asserts.assertNonNull(pid, 500, "上级商户ID不能为空");
                 // 总部建经销商时，必须要有二级
                 LambdaQueryWrapper<Merchant> query = Wrappers.lambdaQuery(Merchant.class)
                         .eq(Merchant::getPid, loginMerchantId).eq(Merchant::getId, pid)
