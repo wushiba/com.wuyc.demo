@@ -210,11 +210,11 @@ public class WebsiteBillServiceImpl implements WebsiteBillService {
                 websiteBill.setIsConfirm("N");
                 websiteBill.setWebsiteCode(detail.getWebsiteCode());
                 websiteBillMapper.insert(websiteBill);
-                if (merchant != null) {
-                    sendConfirmMsg(orderAddress.getRealname(), merchant.getOpenId(), order.getBillNo());
-                }
                 if (user != null) {
                     sendPayMsg(user.getOpenId(), order.getBillNo(), detail.getOrderId().toString(), detail.getId().toString());
+                    if (merchant != null) {
+                        sendConfirmMsg(user.getNickname(), merchant.getOpenId(), order.getBillNo());
+                    }
                 }
 
             });
