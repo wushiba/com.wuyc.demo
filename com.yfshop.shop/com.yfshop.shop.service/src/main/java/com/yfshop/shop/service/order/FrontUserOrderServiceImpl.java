@@ -461,9 +461,10 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
         Long orderId = order.getId();
         for (UserCoupon userCoupon : userCouponList) {
             BigDecimal couponPrice = new BigDecimal(userCoupon.getCouponPrice());
+            BigDecimal payPrice = itemSku.getSkuSalePrice().subtract(couponPrice);
             insertUserOrderDetail(userId, orderId, merchantResult.getId(), merchantResult.getPidPath(), websiteCode, ReceiveWayEnum.ZT.getCode(), "N", 1,
                     itemSku.getItemId(), itemSku.getId(), itemDetail.getItemTitle(), itemSku.getSkuSalePrice(), itemSku.getSkuCover(), orderFreight, couponPrice,
-                    itemSku.getSkuSalePrice(), orderFreight, userCoupon.getId(), UserOrderStatusEnum.WAIT_PAY.getCode(), itemSku.getSpecValueIdPath(), itemSku.getSpecNameValueJson());
+                    itemSku.getSkuSalePrice(), payPrice, userCoupon.getId(), UserOrderStatusEnum.WAIT_PAY.getCode(), itemSku.getSpecValueIdPath(), itemSku.getSpecNameValueJson());
         }
         insertUserOrderAddress(orderId, userMobile, userMobile, merchantResult.getProvince(), merchantResult.getProvinceId(), merchantResult.getCity(),
                 merchantResult.getCityId(), merchantResult.getDistrict(), merchantResult.getDistrictId(), merchantResult.getAddress());
