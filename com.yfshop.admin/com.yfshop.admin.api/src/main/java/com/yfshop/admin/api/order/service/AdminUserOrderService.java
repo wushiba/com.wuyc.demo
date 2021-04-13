@@ -27,6 +27,6 @@ public interface AdminUserOrderService {
 	 * @param orderDetailId		订单详情id
 	 * @throws ApiException
 	 */
-	public Void confirmOrder(Integer userId, Long orderDetailId) throws ApiException;
+	Void confirmOrder(Integer userId, Long orderDetailId) throws ApiException;
 
 }
