@@ -21,4 +21,12 @@ public interface AdminUserOrderService {
 	 */
 	Void updateOrderPayStatus(Long orderId, String billNo) throws ApiException;
 
+	/**
+	 * 用户确认订单
+	 * @param userId			用户id
+	 * @param orderDetailId		订单详情id
+	 * @throws ApiException
+	 */
+	public Void confirmOrder(Integer userId, Long orderDetailId) throws ApiException;
+
 }

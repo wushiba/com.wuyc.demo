@@ -7,8 +7,11 @@ import com.yfshop.admin.dao.OrderDao;
 import com.yfshop.code.mapper.OrderAddressMapper;
 import com.yfshop.code.mapper.OrderDetailMapper;
 import com.yfshop.code.mapper.OrderMapper;
+import com.yfshop.code.mapper.UserCouponMapper;
 import com.yfshop.code.model.Order;
 import com.yfshop.code.model.OrderDetail;
+import com.yfshop.code.model.UserCoupon;
+import com.yfshop.common.enums.UserCouponStatusEnum;
 import com.yfshop.common.enums.UserOrderStatusEnum;
 import com.yfshop.common.exception.ApiException;
 import com.yfshop.common.exception.Asserts;
@@ -32,6 +35,8 @@ public class AdminUserServiceImpl implements AdminUserOrderService {
     private OrderDao orderDao;
     @Resource
     private OrderMapper orderMapper;
+    @Resource
+    private UserCouponMapper userCouponMapper;
     @Resource
     private WebsiteBillService websiteBillService;
     @Resource
@@ -69,4 +74,36 @@ public class AdminUserServiceImpl implements AdminUserOrderService {
         }
         return null;
     }
+
+    /**
+     * 用户确认订单
+     * @param userId        用户id
+     * @param orderDetailId 订单详情id
+     * @throws ApiException
+     */
+    @Override
+    public Void confirmOrder(Integer userId, Long orderDetailId) throws ApiException {
+        OrderDetail orderDetail = orderDetailMapper.selectOne(Wrappers.lambdaQuery(OrderDetail.class)
+                .eq(OrderDetail::getUserId, userId)
+                .eq(OrderDetail::getId, orderDetailId));
+        Asserts.assertNonNull(orderDetail, 500, "子订单信息不存在");
+        Order order = orderMapper.selectOne(Wrappers.lambdaQuery(Order.class)
+                .eq(Order::getUserId, userId)
+                .eq(Order::getId, orderDetail.getOrderId()));
+        Asserts.assertNonNull(order, 500, "主订单信息不存在");
+        Asserts.assertNotEquals("N", order.getIsPay(), 500, "订单状态不正确。");
+
+        orderDetail.setOrderStatus("SUCCESS");
+        orderDetailMapper.updateById(orderDetail);
+
+        // 优惠券改成已使用
+        if (orderDetail.getUserCouponId() != null) {
+            UserCoupon userCoupon = new UserCoupon();
+            userCoupon.setId(orderDetail.getUserCouponId());
+            userCoupon.setUseStatus(UserCouponStatusEnum.HAS_USE.getCode());
+            userCouponMapper.updateById(userCoupon);
+        }
+        return null;
+    }
+
 }
