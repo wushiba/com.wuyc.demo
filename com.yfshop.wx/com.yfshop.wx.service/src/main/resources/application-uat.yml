@@ -27,6 +27,29 @@ logging:
     com.yfshop.admin: DEBUG
     me.chanjar.weixin: DEBUG
     com.github.binarywang.wxpay: DEBUG
+
+spring:
+  datasource:
+    connectionProperties: druid.stat.mergeSql=true;druid.stat.slowSqlMillis=5000
+    minIdle: 3
+    validationQuery: select 'x'
+    initialSize: 1
+    maxWait: 60000
+    filters: stat,wall,slf4j
+    poolPreparedStatements: true
+    type: com.alibaba.druid.pool.DruidDataSource
+    url: jdbc:mysql://10.10.204.28:3306/yf_shop?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
+    username: youshenghui
+    password: SbaFqsJr4mbt5STZ4Ja
+    maxPoolPreparedStatementPerConnectionSize: 20
+    testOnBorrow: false
+    testWhileIdle: true
+    minEvictableIdleTimeMillis: 30000
+    timeBetweenEvictionRunsMillis: 60000
+    testOnReturn: false
+    driverClassName: com.mysql.cj.jdbc.Driver
+    maxActive: 20
+
 wx:
   mp:
     useRedis: false

@@ -29,14 +29,14 @@ public class Generator {
     //作者
     private static String authorName="yoush";
     //要生成的表名
-    private static String[] tables= {"yf_act_code_batch_detail"};
+    private static String[] tables= {"yf_wx_pay_notify"};
     private static String prefix="yf_";
 
     //数据库配置四要素
     private static String driverName = "com.mysql.cj.jdbc.Driver";
-    private static String url = "jdbc:mysql://121.40.70.203:3306/yf_shop?useUnicode=true&characterEncoding=UTF-8&zeroDateTimeBehavior=convertToNull&serverTimezone=UTC";
-    private static String username = "root";
-    private static String password = "Wuyc521125!";
+    private static String url = "jdbc:mysql://10.10.204.28:3306/yf_shop?useUnicode=true&characterEncoding=UTF-8&zeroDateTimeBehavior=convertToNull&serverTimezone=UTC";
+    private static String username = "youshenghui";
+    private static String password = "SbaFqsJr4mbt5STZ4Ja";
 
 
     public static void main(String[] args) {

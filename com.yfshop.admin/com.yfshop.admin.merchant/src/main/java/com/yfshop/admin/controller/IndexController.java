@@ -15,7 +15,7 @@ import java.util.List;
 
 @Controller
 class IndexController{
-    
+
     @RequestMapping("/")
     public ModelAndView index() {
         ModelAndView mav = new ModelAndView("index");

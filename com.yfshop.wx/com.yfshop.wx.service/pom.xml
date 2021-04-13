@@ -72,6 +72,15 @@
             <artifactId>commons-pool2</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>com.yfshop.parent</groupId>
+            <artifactId>com.yfshop.code</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.yfshop.parent</groupId>
+            <artifactId>com.yfshop.common</artifactId>
+        </dependency>
+
     </dependencies>
 
 
