@@ -223,7 +223,6 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
 
     /**
      * 用户确认订单
-     *
      * @param userId        用户id
      * @param orderDetailId 订单详情id
      * @throws ApiException
@@ -454,17 +453,18 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
 
         // 根据优惠券计算订单金额，创建订单,子订单, 收货地址 一个优惠券对应一个子订单，一个子订单运费2块钱
         Integer itemCount = userCouponIdList.size();
-        BigDecimal itemFreight = new BigDecimal("2");
-        BigDecimal orderFreight = new BigDecimal(itemCount).multiply(itemFreight);
+        BigDecimal orderFreight = new BigDecimal("0");
+        BigDecimal orderCouponPrice = new BigDecimal(userCouponList.get(0).getCouponPrice() * userCouponList.size());
         BigDecimal orderPrice = new BigDecimal(itemCount).multiply(itemSku.getSkuSalePrice()).setScale(2, BigDecimal.ROUND_UP);
 
-        Order order = insertUserOrder(userId, null, ReceiveWayEnum.ZT.getCode(), itemCount, itemCount, orderPrice, orderPrice, orderFreight, orderFreight, "N", null);
+        Order order = insertUserOrder(userId, websiteCode, ReceiveWayEnum.ZT.getCode(), itemCount, itemCount, orderPrice, orderCouponPrice, orderFreight, orderFreight, "N", null);
         Long orderId = order.getId();
-        userCouponList.forEach(userCoupon -> {
+        for (UserCoupon userCoupon : userCouponList) {
+            BigDecimal couponPrice = new BigDecimal(userCoupon.getCouponPrice());
             insertUserOrderDetail(userId, orderId, merchantResult.getId(), merchantResult.getPidPath(), websiteCode, ReceiveWayEnum.ZT.getCode(), "N", 1,
-                    itemSku.getItemId(), itemSku.getId(), itemDetail.getItemTitle(), itemSku.getSkuSalePrice(), itemSku.getSkuCover(), itemFreight, itemSku.getSkuSalePrice(),
-                    itemSku.getSkuSalePrice(), itemFreight, userCoupon.getId(), UserOrderStatusEnum.WAIT_PAY.getCode(), itemSku.getSpecValueIdPath(), itemSku.getSpecNameValueJson());
-        });
+                    itemSku.getItemId(), itemSku.getId(), itemDetail.getItemTitle(), itemSku.getSkuSalePrice(), itemSku.getSkuCover(), orderFreight, couponPrice,
+                    itemSku.getSkuSalePrice(), orderFreight, userCoupon.getId(), UserOrderStatusEnum.WAIT_PAY.getCode(), itemSku.getSpecValueIdPath(), itemSku.getSpecNameValueJson());
+        }
         insertUserOrderAddress(orderId, userMobile, userMobile, merchantResult.getProvince(), merchantResult.getProvinceId(), merchantResult.getCity(),
                 merchantResult.getCityId(), merchantResult.getDistrict(), merchantResult.getDistrictId(), merchantResult.getAddress());
 
@@ -500,13 +500,13 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
 
     /**
      * 根据订单号唤起微信支付
-     *
-     * @param orderId 用户订单id
+     * @param orderId   用户订单id
+     * @param ipStr		请求ip地址
      * @return WxPayMpOrderResult
      * @throws ApiException
      */
     @Override
-    public WxPayMpOrderResult userOrderToPay(Long orderId) throws WxPayException, ApiException {
+    public WxPayMpOrderResult userOrderToPay(Long orderId, String ipStr) throws WxPayException, ApiException {
         Asserts.assertNonNull(orderId, 500, "主订单id不可以为空");
         Order order = orderMapper.selectById(orderId);
         Asserts.assertNonNull(order, 500, "订单不存在");
@@ -517,8 +517,8 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
         orderRequest.setBody("用户订单支付");
         orderRequest.setTradeType("JSAPI");
         orderRequest.setOpenid(user.getOpenId());
+        orderRequest.setSpbillCreateIp(ipStr);
         orderRequest.setNotifyUrl(wxPayNotifyUrl + PayPrefixEnum.USER_ORDER.getBizType());
-        orderRequest.setSpbillCreateIp("127.0.0.1");
         if ("pro".equalsIgnoreCase(SpringUtil.getActiveProfile())) {
             orderRequest.setTotalFee(BaseWxPayRequest.yuanToFen(order.getPayPrice().toString()));
         } else {

@@ -3,6 +3,7 @@ package com.yfshop.admin.service.website;
 import cn.hutool.core.collection.CollectionUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.yfshop.admin.api.order.service.AdminUserOrderService;
 import com.yfshop.admin.api.website.WebsiteBillService;
 import com.yfshop.admin.api.website.result.WebsiteBillDayResult;
 import com.yfshop.admin.api.website.result.WebsiteBillResult;
@@ -56,9 +57,11 @@ public class WebsiteBillServiceImpl implements WebsiteBillService {
     @DubboReference
     MpService mpService;
 
+    @Resource
+    private AdminUserOrderService adminUserOrderService;
+
     /**
      * 获取网店记账列表
-     *
      * @param merchantId
      * @param dateTime
      * @param status
@@ -134,12 +137,14 @@ public class WebsiteBillServiceImpl implements WebsiteBillService {
                 .eq(WebsiteBill::getMerchantId, merchantId)
                 .in(WebsiteBill::getId, billIds)
                 .eq(WebsiteBill::getIsConfirm, "N");
-        List<WebsiteBill> websiteBills = websiteBillMapper.selectList(lambdaQueryWrapper);
         WebsiteBill updateWebsiteBill = new WebsiteBill();
         updateWebsiteBill.setIsConfirm("Y");
         websiteBillMapper.update(updateWebsiteBill, lambdaQueryWrapper);
-        List<Long> orderIds = websiteBills.stream().map(WebsiteBill::getOrderId).collect(Collectors.toList());
-        orderConfirm(orderIds);
+
+        List<WebsiteBill> billList = websiteBillMapper.selectList(lambdaQueryWrapper);
+        for (WebsiteBill websiteBill : billList) {
+            adminUserOrderService.confirmOrder(websiteBill.getUserId(), websiteBill.getOrderId());
+        }
         return null;
     }
 
@@ -155,19 +160,20 @@ public class WebsiteBillServiceImpl implements WebsiteBillService {
         LambdaQueryWrapper<WebsiteBill> lambdaQueryWrapper = Wrappers.<WebsiteBill>lambdaQuery()
                 .eq(WebsiteBill::getMerchantId, merchantId)
                 .eq(WebsiteBill::getIsConfirm, "N");
-        List<WebsiteBill> websiteBills = websiteBillMapper.selectList(lambdaQueryWrapper);
         WebsiteBill updateWebsiteBill = new WebsiteBill();
         updateWebsiteBill.setIsConfirm("Y");
         websiteBillMapper.update(updateWebsiteBill, lambdaQueryWrapper);
-        List<Long> orderIds = websiteBills.stream().map(WebsiteBill::getOrderId).collect(Collectors.toList());
-        orderConfirm(orderIds);
+
+        List<WebsiteBill> billList = websiteBillMapper.selectList(lambdaQueryWrapper);
+        for (WebsiteBill websiteBill : billList) {
+            adminUserOrderService.confirmOrder(websiteBill.getUserId(), websiteBill.getOrderId());
+        }
         return null;
     }
 
     /**
      * 用户自提二等奖成功后，生成网点记账单
      *
-     * @param orderId 用户主订单id
      * @return
      * @throws ApiException
      */
@@ -214,22 +220,6 @@ public class WebsiteBillServiceImpl implements WebsiteBillService {
             });
         }
         return null;
-    }
-
-
-    /**
-     * 更新订单状态为已完成
-     *
-     * @param orderIds
-     */
-    private void orderConfirm(List<Long> orderIds) {
-        if (!CollectionUtil.isEmpty(orderIds)) {
-            LambdaQueryWrapper<OrderDetail> lambdaQueryWrapper = Wrappers.<OrderDetail>lambdaQuery()
-                    .in(OrderDetail::getOrderId, orderIds);
-            OrderDetail orderDetail = new OrderDetail();
-            orderDetail.setOrderStatus("YWC");
-            orderDetailMapper.update(orderDetail, lambdaQueryWrapper);
-        }
     }
 
     /**

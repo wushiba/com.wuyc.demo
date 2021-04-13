@@ -106,9 +106,10 @@ public interface FrontUserOrderService {
 	/**
 	 * 根据订单号唤起微信支付
 	 * @param orderId	用户订单id
+	 * @param ipStr		请求ip地址
 	 * @return
 	 * @throws ApiException
 	 */
-	WxPayMpOrderResult userOrderToPay(Long orderId) throws WxPayException, ApiException;
+	WxPayMpOrderResult userOrderToPay(Long orderId, String ipStr) throws WxPayException, ApiException;
 
 }

@@ -140,7 +140,6 @@ public class ActCodeTask {
             logger.info("载溯源码文件下载完成");
             Asserts.assertEquals(md5, SecureUtil.md5(file), 500, "下载文件md5不匹配");
         }
-        FileUtil.getInputStream(file);
         BufferedReader bufferedReader = FileUtil.getUtf8Reader(file);
         List<String> sourceCodes = new ArrayList<>();
         bufferedReader.lines().forEach(item -> {
@@ -152,7 +151,7 @@ public class ActCodeTask {
             String codes = String.format("%d-%s", actCodeBatch.getId(), StringUtils.join(item));
             stringRedisTemplate.convertAndSend("actCodeTask", codes);
         });
-        stringRedisTemplate.convertAndSend("actCodeTaskFinish",actCodeBatch.getActId()+"");
+        stringRedisTemplate.convertAndSend("actCodeTaskFinish", actCodeBatch.getActId() + "");
         //buildActCode(actCodeBatch, sourceCodes);
     }
 
@@ -173,4 +172,19 @@ public class ActCodeTask {
         mailSender.send(message);
     }
 
+    public static void main(String[] args) {
+        File file = new File("C:\\Users\\Administrator\\Desktop\\huodong\\1.txt");
+        File targetFile = new File("C:\\Users\\Administrator\\Desktop\\huodong\\1(合成).txt");
+        BufferedReader bufferedReader = FileUtil.getUtf8Reader(file);
+        String actCodeCodeUrl="https://m.yufanlook.com/#/LuckDrawPage?actCode=";
+        List<String>codeFile=new ArrayList<>();
+        bufferedReader.lines().forEach(item -> {
+            if (StringUtils.isNotBlank(item)) {
+                String actCode=DigestUtil.md5HexTo16(SecureUtil.md5("yf" + item));
+                codeFile.add(String.format("%s,%s%s", item, actCodeCodeUrl, actCode));
+            }
+        });
+        FileUtil.appendUtf8Lines(codeFile, targetFile);
+
+    }
 }
