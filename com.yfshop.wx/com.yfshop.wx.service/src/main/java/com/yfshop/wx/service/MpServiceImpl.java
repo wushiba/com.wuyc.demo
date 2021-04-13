@@ -22,7 +22,7 @@ import javax.annotation.Resource;
 import java.util.Date;
 import java.util.List;
 
-@DubboService(async = true)
+@DubboService
 @EnableAsync
 public class MpServiceImpl implements MpService {
     @Autowired
