@@ -24,7 +24,6 @@ import java.util.List;
 
 @DubboService
 @EnableAsync
-
 public class MpServiceImpl implements MpService {
     @Autowired
     private WxMpService wxMpService;
