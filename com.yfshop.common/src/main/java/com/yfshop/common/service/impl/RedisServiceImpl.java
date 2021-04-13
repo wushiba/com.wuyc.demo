@@ -230,8 +230,6 @@ public class RedisServiceImpl implements RedisService {
         Circle circle = new Circle(new Point(longitude, latitude), new Distance(distance, unit));
         RedisGeoCommands.GeoRadiusCommandArgs args = RedisGeoCommands.GeoRadiusCommandArgs.newGeoRadiusArgs()
                 .includeCoordinates().includeDistance().sortAscending().limit(100);
-
-
         return redisTemplate.opsForGeo().radius(key, circle, args);
     }
 

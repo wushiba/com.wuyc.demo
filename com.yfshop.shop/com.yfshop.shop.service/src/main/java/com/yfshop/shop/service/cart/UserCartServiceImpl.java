@@ -242,17 +242,17 @@ public class UserCartServiceImpl implements UserCartService {
             List<Integer> skuIdList = userCartList.stream().map(UserCart::getSkuId).collect(Collectors.toList());
             Map<Integer, ItemSku> skuIndexMap = skuMapper.selectBatchIds(skuIdList).stream().collect(Collectors.toMap(ItemSku::getId, s -> s));
             resultList.forEach(data -> {
-                data.setFreight(data.getFreight());
-                data.setSkuSalePrice(skuIndexMap.get(data.getSkuId()).getSkuSalePrice());
+                ItemSku itemSku = skuIndexMap.get(data.getSkuId());
+                if (itemSku != null) {
+                    data.setFreight(itemSku.getFreight());
+                    data.setSkuSalePrice(itemSku.getSkuSalePrice());
+                }
             });
         } else {
             ItemSku itemSku = skuMapper.selectById(skuId);
             UserCartResult userCartResult = BeanUtil.convert(itemSku, UserCartResult.class);
-            userCartResult.setSkuId(skuId);
             userCartResult.setNum(num);
-            userCartResult.setFreight(itemSku.getFreight());
-            Item item = itemMapper.selectById(itemSku.getItemId());
-            userCartResult.setSkuTitle(item.getItemTitle());
+            userCartResult.setSkuId(skuId);
             resultList.add(userCartResult);
         }
         return resultList;
