@@ -17,6 +17,7 @@ import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.EnableAsync;
 
+import javax.annotation.Resource;
 import java.util.Date;
 import java.util.List;
 
@@ -26,6 +27,7 @@ import java.util.List;
 public class MpServiceImpl implements MpService {
 
     private final WxMpService wxMpService;
+    @Resource
     private WxTemplateMessageMapper wxTemplateMessageMapper;
 
     @Async
