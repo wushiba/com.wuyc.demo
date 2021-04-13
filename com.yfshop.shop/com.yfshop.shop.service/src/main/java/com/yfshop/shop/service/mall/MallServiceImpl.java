@@ -108,7 +108,7 @@ public class MallServiceImpl implements MallService {
         }
         // item images
         List<ItemImage> itemImages = itemImageMapper.selectList(Wrappers.lambdaQuery(ItemImage.class)
-                .eq(ItemImage::getItemId, req.getItemId()));
+                .eq(ItemImage::getItemId, req.getItemId()).orderByAsc(ItemImage::getSort));
         if (itemImages != null) {
             itemResult.setItemImages(BeanUtil.convertList(itemImages, ItemImageResult.class));
         }
@@ -192,7 +192,7 @@ public class MallServiceImpl implements MallService {
         Asserts.assertFalse(num == null || num <= 0 , 500, "请传入正确的数量");
 
         int result = itemDao.updateItemSkuStock(skuId, num);
-        Asserts.assertFalse(result < 0 , 500, "库存不足，请稍后重试");
+        Asserts.assertFalse(result <= 0 , 500, "库存不足，请稍后重试");
         return result;
     }
 
