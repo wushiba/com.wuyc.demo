@@ -108,7 +108,7 @@ public class MallServiceImpl implements MallService {
         }
         // item images
         List<ItemImage> itemImages = itemImageMapper.selectList(Wrappers.lambdaQuery(ItemImage.class)
-                .eq(ItemImage::getItemId, req.getItemId()));
+                .eq(ItemImage::getItemId, req.getItemId()).orderByAsc(ItemImage::getSort));
         if (itemImages != null) {
             itemResult.setItemImages(BeanUtil.convertList(itemImages, ItemImageResult.class));
         }
