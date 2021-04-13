@@ -1,6 +1,7 @@
 package com.yfshop.admin.controller;
 
 import cn.dev33.satoken.stp.StpUtil;
+import com.yfshop.admin.api.merchant.MerchantInfoService;
 import com.yfshop.admin.api.service.CaptchaService;
 import com.yfshop.admin.api.merchant.MerchantLoginService;
 import com.yfshop.admin.api.merchant.request.MerchantCaptchaReq;
@@ -30,6 +31,9 @@ class MerchantLoginController extends AbstractBaseController {
 
     @DubboReference(check = false)
     private MerchantLoginService merchantLoginService;
+
+    @DubboReference(check = false)
+    private MerchantInfoService merchantService;
 
     @DubboReference(check = false)
     private CaptchaService captchaService;
@@ -62,11 +66,17 @@ class MerchantLoginController extends AbstractBaseController {
     @RequestMapping(value = "/loginByWx", method = {RequestMethod.POST})
     @ResponseBody
     public CommonResult<MerchantResult> loginByWx() {
-        String openId = getCurrentOpenId();
-        Asserts.assertStringNotBlank(openId,500,"微信未授权");
-        MerchantResult merchantResult = merchantLoginService.loginByWx(openId);
-        StpUtil.setLoginId(merchantResult.getId());
-        return CommonResult.success(merchantResult);
+        if (StpUtil.isLogin()) {
+            MerchantResult merchantResult = merchantService.getWebsiteInfo(getCurrentAdminUserId());
+            StpUtil.setLoginId(merchantResult.getId());
+            return CommonResult.success(merchantResult);
+        } else {
+            String openId = getCurrentOpenId();
+            Asserts.assertStringNotBlank(openId, 500, "微信未授权");
+            MerchantResult merchantResult = merchantLoginService.loginByWx(openId);
+            StpUtil.setLoginId(merchantResult.getId());
+            return CommonResult.success(merchantResult);
+        }
     }
 
     /**
