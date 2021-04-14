@@ -26,9 +26,6 @@ public class UploadController {
 
     private static Logger logger = LoggerFactory.getLogger(UploadController.class);
 
-    @Value("${wx.mp.redisConfig.host}")
-    private String redisConfig;
-
     @Value("${upload.server.domain}")
     private String path;
 
@@ -38,6 +35,7 @@ public class UploadController {
     @RequestMapping("/image/file")
     @ResponseBody
     public CommonResult upload(@RequestParam("file") MultipartFile file) throws IOException {
+        logger.info("============进入上传文件");
         if (file.isEmpty()) {
         	return CommonResult.failed(ResultCode.FAILED, "请选择文件!");
         }
