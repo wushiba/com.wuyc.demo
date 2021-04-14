@@ -182,15 +182,17 @@ public class WebsiteBillServiceImpl implements WebsiteBillService {
     public Void insertWebsiteBill(Long orderId) throws ApiException {
         Asserts.assertNonNull(orderId, 500, "主订单id不可以为空");
         Order order = orderMapper.selectById(orderId);
-        Asserts.assertNonNull(order, 500, "订单不存在");
-        if (ReceiveWayEnum.PS.getCode().equalsIgnoreCase(order.getReceiveWay())) {
+        if (order == null || ReceiveWayEnum.PS.getCode().equalsIgnoreCase(order.getReceiveWay())) {
             return null;
         }
+
         List<OrderDetail> detailList = orderDetailMapper.selectList(Wrappers.lambdaQuery(OrderDetail.class)
                 .eq(OrderDetail::getOrderId, orderId));
+        if (CollectionUtil.isEmpty(detailList)) return null;
+
+        User user = userMapper.selectById(detailList.get(0).getUserId());
         if (CollectionUtil.isNotEmpty(detailList)) {
             Merchant merchant = merchantMapper.selectById(detailList.get(0).getMerchantId());
-            User user = userMapper.selectById(detailList.get(0).getUserId());
             detailList.forEach(detail -> {
                 WebsiteBill websiteBill = new WebsiteBill();
                 websiteBill.setCreateTime(LocalDateTime.now());
