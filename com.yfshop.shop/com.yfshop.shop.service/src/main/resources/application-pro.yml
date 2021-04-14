@@ -1,4 +1,9 @@
 ---
+logging:
+  level:
+    org.springframework.web: debug
+    com.yfshop.code.mapper: debug
+    com.yfshop: debug
 server:
   port: 9093
 spring:
@@ -11,9 +16,9 @@ spring:
     filters: stat,wall,slf4j
     poolPreparedStatements: true
     type: com.alibaba.druid.pool.DruidDataSource
-    url: jdbc:mysql://m1.mysql.lb.hello.com:3306/db_online_jf?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
-    username: jjbJfSaas
-    password: YfqkSLmoyJSEZn7PWAJ
+    url: jdbc:mysql://10.10.204.28:3306/yf_shop?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
+    username: youshenghui
+    password: SbaFqsJr4mbt5STZ4Ja
     maxPoolPreparedStatementPerConnectionSize: 20
     testOnBorrow: false
     testWhileIdle: true
@@ -23,15 +28,21 @@ spring:
     driverClassName: com.mysql.cj.jdbc.Driver
     maxActive: 20
 
+  redis:
+    host: yf-sz-redis01.redis.rds.aliyuncs.com
+    port: 6379
+    password: redis01:N72BcGB2FUs3ZRA29gL
+
 dubbo:
   registry:
-    address: zookeeper://10.10.3.35:2181
+    address: zookeeper://10.11.3.97:2181?backup=10.11.3.99:2181,10.11.3.99:2182
+    dynamic: true
   metadataReport:
-    address: zookeeper://10.10.3.35:2181
+    address: zookeeper://10.11.3.97:2181?backup=10.11.3.99:2181,10.11.3.99:2182
   configcenter:
-    address: zookeeper://10.10.3.35:2181
+    address: zookeeper://10.11.3.97:2181?backup=10.11.3.99:2181,10.11.3.99:2182
   protocol:
-    port: 20952
+    port: 20881
     name: dubbo
   scan:
     base-packages: com.yfshop.shop.service
@@ -39,3 +50,8 @@ dubbo:
     dynamic: true
     timeout: 30000
     retries: 0
+  consumer:
+    check: false
+
+wxPay:
+  notifyUrl: http://wx.yufanlook.com/wx/pay/notify/order/

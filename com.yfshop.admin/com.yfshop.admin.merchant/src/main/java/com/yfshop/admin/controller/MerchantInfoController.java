@@ -22,10 +22,12 @@ import com.yfshop.admin.config.WxStpLogic;
 import com.yfshop.common.api.CommonResult;
 import com.yfshop.common.enums.GroupRoleEnum;
 import com.yfshop.common.exception.Asserts;
+import me.chanjar.weixin.mp.api.WxMpService;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -54,6 +56,8 @@ class MerchantInfoController extends AbstractBaseController {
 
     @Value("${websiteCode.url}")
     private String websiteCodeUrl;
+    @Autowired
+    WxMpService wxService;
 
 
     /**

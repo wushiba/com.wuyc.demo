@@ -1,14 +1,15 @@
 ---
 server:
   port: 9094
+
 dubbo:
   registry:
-    address: zookeeper://10.10.3.35:2181
+    address: zookeeper://10.11.3.97:2181?backup=10.11.3.99:2181,10.11.3.99:2182
     dynamic: true
   metadataReport:
-    address: zookeeper://10.10.3.35:2181
+    address: zookeeper://10.11.3.97:2181?backup=10.11.3.99:2181,10.11.3.99:2182
   configcenter:
-    address: zookeeper://10.10.3.35:2181
+    address: zookeeper://10.11.3.97:2181?backup=10.11.3.99:2181,10.11.3.99:2182
   application:
     name: yfshop-admin-web
   consumer:
@@ -18,3 +19,52 @@ dubbo:
   scan:
     base-packages: com.yfshop.admin
 
+
+spring:
+  thymeleaf:
+    # 页面模板页地址
+    prefix: file:///home/www/web-deploy/html/merchant.yufanlook.com/
+    suffix: .html
+    mode: HTML
+    encoding: UTF-8
+    cache: false
+    servlet:
+      content-type: text/html
+  web:
+    resources:
+      static-locations: classpath:/META-INF/resources/,classpath:/resources/,classpath:/static/,${spring.thymeleaf.prefix}
+  mvc:
+    static-path-pattern: /**
+  sa-token:
+    # 写入Cookie时显式指定的作用域, 用于单点登录二级域名共享Cookie
+    cookie-domain: yufanlook.com
+    # token名称 (同时也是cookie名称)
+    token-name: merchant
+    # token有效期，单位s 默认30天
+    timeout: 2592000
+    # token风格
+    token-style: uuid
+    # 是否允许同一账号并发登录 (为true时允许一起登录, 为false时新登录挤掉旧登录)
+    allow-concurrent-login: true
+    token-session-check-login: true
+    # token临时有效期 (指定时间内无操作就视为token过期) 单位: 秒
+    activity-timeout: -1
+    # 在多人登录同一账号时，是否共用一个token (为true时所有登录共用一个token, 为false时每次登录新建一个token)
+    is-share: true
+
+logging:
+  level:
+    org.springframework.web: INFO
+    com.yfshop.admin: DEBUG
+    me.chanjar.weixin: DEBUG
+    com.github.binarywang.wxpay: DEBUG
+wx:
+  mp:
+    useRedis: false
+    configs:
+      - appId: wxfe620617eec2f4b0 # 第一个公众号的appid
+        secret: 64a61d9e95094f1e974861b62ec4dce8 # 公众号的appsecret
+        token: yufanshop # 接口配置里的Token值
+        aesKey: U2ztwhpnvy5SNDiICGloZA0Pgi2WdgDmsO4abHCEtvz # 接口配置里的EncodingAESKey
+websiteCode:
+  url: http://merchant.yufanlook.com/#/MerchantRegisterPrep?websiteCode=

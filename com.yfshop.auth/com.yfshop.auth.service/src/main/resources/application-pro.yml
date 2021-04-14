@@ -1,42 +1,47 @@
 ---
 server:
   port: 9999
-spring:
-  datasource:
-    connectionProperties: druid.stat.mergeSql=true;druid.stat.slowSqlMillis=5000
-    minIdle: 3
-    validationQuery: select 'x'
-    initialSize: 1
-    maxWait: 60000
-    filters: stat,wall,slf4j
-    poolPreparedStatements: true
-    type: com.alibaba.druid.pool.DruidDataSource
-    url: jdbc:mysql://m1.mysql.lb.hello.com:3306/db_online_jf?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
-    username: jjbJfSaas
-    password: YfqkSLmoyJSEZn7PWAJ
-    maxPoolPreparedStatementPerConnectionSize: 20
-    testOnBorrow: false
-    testWhileIdle: true
-    minEvictableIdleTimeMillis: 30000
-    timeBetweenEvictionRunsMillis: 60000
-    testOnReturn: false
-    driverClassName: com.mysql.cj.jdbc.Driver
-    maxActive: 20
-  
-  
+
 dubbo:
   registry:
-    address: zookeeper://10.10.3.35:2181
+    address: zookeeper://10.11.3.97:2181?backup=10.11.3.99:2181,10.11.3.99:2182
+    dynamic: true
   metadataReport:
-    address: zookeeper://10.10.3.35:2181
+    address: zookeeper://10.11.3.97:2181?backup=10.11.3.99:2181,10.11.3.99:2182
   configcenter:
-    address: zookeeper://10.10.3.35:2181
+    address: zookeeper://10.11.3.97:2181?backup=10.11.3.99:2181,10.11.3.99:2182
   protocol:
-    port: 20951
+    port: 20889
     name: dubbo
   scan:
-    base-packages: com.yfshop.open
+    base-packages: com.yfshop.auth
   provider:
     dynamic: true
     timeout: 30000
     retries: 0
+  consumer:
+    check: false
+
+spring:
+  # redis配置
+  redis:
+    # Redis数据库索引（默认为0）
+    database: 1
+    # Redis服务器地址
+    host: yf-sz-redis01.redis.rds.aliyuncs.com
+    # Redis服务器连接端口
+    port: 6379
+    # Redis服务器连接密码（默认为空）
+    password: redis01:N72BcGB2FUs3ZRA29gL
+    # 连接超时时间（毫秒）
+    timeout: 1000ms
+    lettuce:
+      pool:
+        # 连接池最大连接数
+        max-active: 200
+        # 连接池最大阻塞等待时间（使用负值表示没有限制）
+        max-wait: -1ms
+        # 连接池中的最大空闲连接
+        max-idle: 10
+        # 连接池中的最小空闲连接
+        min-idle: 0

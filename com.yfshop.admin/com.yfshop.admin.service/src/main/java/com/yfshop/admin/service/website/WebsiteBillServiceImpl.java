@@ -186,10 +186,6 @@ public class WebsiteBillServiceImpl implements WebsiteBillService {
         if (ReceiveWayEnum.PS.getCode().equalsIgnoreCase(order.getReceiveWay())) {
             return null;
         }
-
-        OrderAddress orderAddress = orderAddressMapper.selectOne(Wrappers.lambdaQuery(OrderAddress.class)
-                .eq(OrderAddress::getOrderId, orderId));
-
         List<OrderDetail> detailList = orderDetailMapper.selectList(Wrappers.lambdaQuery(OrderDetail.class)
                 .eq(OrderDetail::getOrderId, orderId));
         if (CollectionUtil.isNotEmpty(detailList)) {

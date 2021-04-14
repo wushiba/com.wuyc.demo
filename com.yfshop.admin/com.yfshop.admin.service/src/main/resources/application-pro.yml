@@ -1,6 +1,12 @@
 ---
 server:
   port: 9097
+logging:
+  level:
+    com.yfshop.code.mapper: debug
+    com.yfshop: debug
+    me.chanjar.weixin: DEBUG
+    com.github.binarywang.wxpay: DEBUG
 spring:
   datasource:
     connectionProperties: druid.stat.mergeSql=true;druid.stat.slowSqlMillis=5000
@@ -11,9 +17,9 @@ spring:
     filters: stat,wall,slf4j
     poolPreparedStatements: true
     type: com.alibaba.druid.pool.DruidDataSource
-    url: jdbc:mysql://m1.mysql.lb.hello.com:3306/db_online_jf?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
-    username: jjbJfSaas
-    password: YfqkSLmoyJSEZn7PWAJ
+    url: jdbc:mysql://yf-rdspro.mysql.rds.aliyuncs.com:3306/db_yf_shop?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
+    username: yfshop
+    password: 3GqpenFm9GqveeFM4VS
     maxPoolPreparedStatementPerConnectionSize: 20
     testOnBorrow: false
     testWhileIdle: true
@@ -22,21 +28,85 @@ spring:
     testOnReturn: false
     driverClassName: com.mysql.cj.jdbc.Driver
     maxActive: 20
-  
-  
+
+  redis:
+    host: yf-sz-redis01.redis.rds.aliyuncs.com
+    port: 6379
+    password: redis01:N72BcGB2FUs3ZRA29gL
+
+  mail:
+    host: smtp.sina.cn
+    port: 465
+    username: yflook@sina.cn
+    password: 558eac7a98baacf4
+    protocol: smtp
+    test-connection: true
+    default-encoding: UTF-8
+    properties:
+      mail.smtp.auth: true
+      mail.smtp.starttls.enable: true
+      mail.smtp.starttls.required: true
+      mail.smtp.ssl.enable: true
+      mail.display.sendmail: 雨帆健康家
+
 dubbo:
   registry:
-    address: zookeeper://10.10.3.35:2181
+    address: zookeeper://10.11.3.97:2181?backup=10.11.3.99:2181,10.11.3.99:2182
+    dynamic: true
   metadataReport:
-    address: zookeeper://10.10.3.35:2181
+    address: zookeeper://10.11.3.97:2181?backup=10.11.3.99:2181,10.11.3.99:2182
   configcenter:
-    address: zookeeper://10.10.3.35:2181
+    address: zookeeper://10.11.3.97:2181?backup=10.11.3.99:2181,10.11.3.99:2182
   protocol:
-    port: 20951
+    port: 20882
     name: dubbo
   scan:
-    base-packages: com.yfshop.admin.service
+    base-packages: com.yfshop.admin
   provider:
     dynamic: true
     timeout: 30000
     retries: 0
+  consumer:
+    check: false
+
+qiniu:
+  domain: qqjyvi051.hn-bkt.clouddn.com
+  bucket: yufanshop
+  access: DSM_E9p8v4nikrb0W6ovHkzxH_2uRtz8c5-nx8y6
+  secret: QFrGQnxFdOzz-iNKQmilWQGdnrzy-3ScVGYGVQG7
+  prefix: /yufanshop
+
+xxl:
+  job:
+    admin:
+      ### xxl-job admin address list, such as "http://address" or "http://address01,http://address02"
+      addresses: http://10.11.3.97:8780/xxl-job-admin
+      ### xxl-job, access token
+    accessToken:
+    ### xxl-job executor appname
+    executor:
+      appname: yufshop-admin-executor-task
+      ### xxl-job executor registry-address: default use address to registry , otherwise use ip:port if address is null
+      address=:
+      ### xxl-job executor server-info
+      ip=:
+      port: 19999
+      ### xxl-job executor log-path
+      logpath: /home/www/web-deploy/xxl-job/jobhandler
+      ### xxl-job executor log-retention-days
+      logretentiondays: 30
+
+
+websiteCode:
+  dir: /home/www/web-deploy/yufan-admin-service/websiteCode/
+  url: http://merchant.yufanlook.com/#/MerchantRegisterPrep?websiteCode=
+
+actCode:
+  srcDir: /home/www/web-deploy/yufan-admin-service/actCode/src/
+  targetDir: /home/www/web-deploy/yufan-admin-service/actCode/target/
+  url: http://m.yufanlook.com/#/LuckDrawPage?actCode=
+
+wxPay:
+  notifyUrl: http://wx.yufanlook.com/wx/pay/notify/order/
+
+

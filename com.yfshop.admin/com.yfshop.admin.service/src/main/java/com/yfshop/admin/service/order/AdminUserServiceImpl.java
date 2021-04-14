@@ -65,7 +65,7 @@ public class AdminUserServiceImpl implements AdminUserOrderService {
         }
         OrderDetail orderDetail = new OrderDetail();
         orderDetail.setIsPay("Y");
-        orderDetail.setOrderStatus(UserOrderStatusEnum.WAIT_DELIVERY.getCode());
+        orderDetail.setOrderStatus("ZT".equalsIgnoreCase(order.getReceiveWay())?UserOrderStatusEnum.SUCCESS.getCode():UserOrderStatusEnum.WAIT_DELIVERY.getCode());
         orderDetailMapper.update(orderDetail, Wrappers.<OrderDetail>lambdaQuery().
                 eq(OrderDetail::getOrderId, orderId));
 
