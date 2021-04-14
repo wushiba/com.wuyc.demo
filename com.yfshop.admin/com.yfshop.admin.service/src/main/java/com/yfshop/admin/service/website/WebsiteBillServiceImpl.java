@@ -202,7 +202,7 @@ public class WebsiteBillServiceImpl implements WebsiteBillService {
                 websiteBill.setMerchantId(detail.getMerchantId());
                 websiteBill.setPidPath(detail.getPidPath());
                 websiteBill.setUserId(detail.getUserId());
-                websiteBill.setNickname(orderAddress.getRealname());
+                websiteBill.setNickname(user == null ? "" : user.getNickname());
                 websiteBill.setOrderId(orderId);
                 websiteBill.setItemTitle(detail.getItemTitle());
                 websiteBill.setPayPrice(detail.getPayPrice());
@@ -232,7 +232,7 @@ public class WebsiteBillServiceImpl implements WebsiteBillService {
     private void sendConfirmMsg(String userName, String openId, String billId) {
         try {
             List<WxMpTemplateData> data = new ArrayList<>();
-            data.add(new WxMpTemplateData("first", String.format("您有来自%s新的门店自取订单，请及时处理~", userName)));
+            data.add(new WxMpTemplateData("first", String.format("您有来自%s的门店自取订单，请及时处理~", userName)));
             data.add(new WxMpTemplateData("keyword1", billId));
             data.add(new WxMpTemplateData("keyword2", "2元"));
             data.add(new WxMpTemplateData("remark", "请核对好用户信息，避免错拿商品。"));

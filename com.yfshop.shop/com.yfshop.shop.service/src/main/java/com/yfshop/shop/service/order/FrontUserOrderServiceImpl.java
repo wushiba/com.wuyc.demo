@@ -151,7 +151,6 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
      */
     @Override
     public YfUserOrderDetailResult getUserOrderDetail(Integer userId, Long orderId, Long orderDetailId) throws ApiException {
-        // todo 量大的话可以做1分钟秒缓存
         Asserts.assertFalse(orderId == null && orderDetailId == null, 500, "订单标识不可以为空");
         YfUserOrderDetailResult userOrderDetailResult;
 
@@ -162,6 +161,9 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
                 .eq(OrderDetail::getUserId, userId)
                 .eq(OrderDetail::getOrderId, orderId)
                 .orderByDesc(OrderDetail::getId));
+        if (order == null || CollectionUtil.isEmpty(detailList)) {
+            return new YfUserOrderDetailResult();
+        }
 
         if (orderDetailId == null) {
             List<YfUserOrderDetailResult.YfUserOrderItem> itemList = BeanUtil.convertList(detailList, YfUserOrderDetailResult.YfUserOrderItem.class);
@@ -461,9 +463,10 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
         Long orderId = order.getId();
         for (UserCoupon userCoupon : userCouponList) {
             BigDecimal couponPrice = new BigDecimal(userCoupon.getCouponPrice());
+            BigDecimal payPrice = itemSku.getSkuSalePrice().subtract(couponPrice);
             insertUserOrderDetail(userId, orderId, merchantResult.getId(), merchantResult.getPidPath(), websiteCode, ReceiveWayEnum.ZT.getCode(), "N", 1,
                     itemSku.getItemId(), itemSku.getId(), itemDetail.getItemTitle(), itemSku.getSkuSalePrice(), itemSku.getSkuCover(), orderFreight, couponPrice,
-                    itemSku.getSkuSalePrice(), orderFreight, userCoupon.getId(), UserOrderStatusEnum.WAIT_PAY.getCode(), itemSku.getSpecValueIdPath(), itemSku.getSpecNameValueJson());
+                    itemSku.getSkuSalePrice(), payPrice, userCoupon.getId(), UserOrderStatusEnum.WAIT_PAY.getCode(), itemSku.getSpecValueIdPath(), itemSku.getSpecNameValueJson());
         }
         insertUserOrderAddress(orderId, userMobile, userMobile, merchantResult.getProvince(), merchantResult.getProvinceId(), merchantResult.getCity(),
                 merchantResult.getCityId(), merchantResult.getDistrict(), merchantResult.getDistrictId(), merchantResult.getAddress());
