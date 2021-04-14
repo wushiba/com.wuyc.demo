@@ -46,7 +46,6 @@ import java.util.concurrent.TimeUnit;
  * 生成商户码任务
  */
 @Component
-@EnableAsync
 public class ActCodeTask {
 
     @Value("${actCode.url}")

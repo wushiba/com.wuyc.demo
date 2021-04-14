@@ -51,7 +51,6 @@ import java.util.zip.ZipFile;
  * 生成商户码任务
  */
 @Component
-@EnableAsync
 public class WebsiteCodeTask {
 
     @Value("${websiteCode.dir}")

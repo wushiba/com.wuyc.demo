@@ -43,7 +43,6 @@ import java.util.stream.Collectors;
  * @Version:1.1.0
  */
 @DubboService
-@EnableAsync
 public class FrontDrawServiceImpl implements FrontDrawService {
 
     private static final Logger logger = LoggerFactory.getLogger(FrontDrawServiceImpl.class);

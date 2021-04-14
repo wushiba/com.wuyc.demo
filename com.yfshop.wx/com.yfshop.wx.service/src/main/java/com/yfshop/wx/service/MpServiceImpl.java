@@ -23,7 +23,6 @@ import java.util.Date;
 import java.util.List;
 
 @DubboService
-@EnableAsync
 public class MpServiceImpl implements MpService {
     @Autowired
     private WxMpService wxMpService;
@@ -49,7 +48,8 @@ public class MpServiceImpl implements MpService {
     public void reSendWxMpTemplateMsg(String openId) {
         WxTemplateMessage wxTemplateMessage = wxTemplateMessageMapper.selectOne(Wrappers.<WxTemplateMessage>lambdaQuery()
                 .eq(WxTemplateMessage::getOpenId, openId)
-                .ne(WxTemplateMessage::getCreateTime, DateUtil.getDate(new Date()))
+                .ge(WxTemplateMessage::getCreateTime, DateUtil.getDate(new Date()))
+                .eq(WxTemplateMessage::getStatus,"FAIL")
                 .orderByDesc(WxTemplateMessage::getId));
         if (wxTemplateMessage != null) {
             try {
@@ -68,6 +68,8 @@ public class MpServiceImpl implements MpService {
                     .build();
             try {
                 wxMpService.getTemplateMsgService().sendTemplateMsg(wxMpTemplateMessage);
+                wxTemplateMessage.setStatus("SUCCESS");
+                wxTemplateMessageMapper.updateById(wxTemplateMessage);
             } catch (WxErrorException e) {
                 e.printStackTrace();
             }
