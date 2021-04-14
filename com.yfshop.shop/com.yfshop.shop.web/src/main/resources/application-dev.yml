@@ -17,7 +17,6 @@ dubbo:
     check: false
   scan:
     base-packages: com.yfshop.shop.controller
-    
 
 wx:
   mp:
@@ -30,3 +29,10 @@ wx:
         secret: 44f813375f7cf549757b846e0d1e6042 # 公众号的appsecret
         token: yufanshop # 接口配置里的Token值
         aesKey: 111 # 接口配置里的EncodingAESKey
+
+  # 文件上传服务器配置
+upload:
+  server:
+    domain: http://prev-s.yufanlook.com/
+    imagePath: /mnt/static/prev-s.yufanlook.com/image/yf-shop
+    excelPath: /mnt/static/prev-s.yufanlook.com/excel/yf-shop
