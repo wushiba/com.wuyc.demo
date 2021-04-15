@@ -20,6 +20,7 @@ import me.chanjar.weixin.mp.bean.template.WxMpTemplateData;
 import me.chanjar.weixin.mp.bean.template.WxMpTemplateMessage;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
@@ -55,10 +56,15 @@ public class WebsiteBillServiceImpl implements WebsiteBillService {
     @Resource
     private OrderAddressMapper orderAddressMapper;
     @DubboReference
-    MpService mpService;
-
+    private MpService mpService;
     @Resource
     private AdminUserOrderService adminUserOrderService;
+
+    @Value("${merchant.url}")
+    private String merchantUrl;
+
+    @Value("${shop.url}")
+    private String shopUrl;
 
     /**
      * 获取网店记账列表
@@ -73,6 +79,9 @@ public class WebsiteBillServiceImpl implements WebsiteBillService {
         if (dateTime != null) {
             nextDate = DateUtil.plusDays(dateTime, 1);
         }
+        Integer count=websiteBillMapper.selectCount(Wrappers.<WebsiteBill>lambdaQuery()
+                        .eq(WebsiteBill::getMerchantId, merchantId)
+                        .eq(WebsiteBill::getIsConfirm, status));
         List<WebsiteBill> websiteBills = websiteBillMapper.selectList(Wrappers.<WebsiteBill>lambdaQuery()
                 .eq(WebsiteBill::getMerchantId, merchantId)
                 .ge(dateTime != null, WebsiteBill::getCreateTime, dateTime)
@@ -90,7 +99,7 @@ public class WebsiteBillServiceImpl implements WebsiteBillService {
             totalAmount.set(websiteBillResult.getPayPrice().add(totalAmount.get()));
         });
         websiteBillDayResult.setWebSiteBillList(websiteBillResults);
-        websiteBillDayResult.setTotalAmount(totalAmount.get().doubleValue());
+        websiteBillDayResult.setTotalAmount(count);
         websiteBillDayResult.setTotalQuantity(totalQuantity);
         return websiteBillDayResult;
     }
@@ -101,6 +110,8 @@ public class WebsiteBillServiceImpl implements WebsiteBillService {
         if (dateTime != null) {
             nextDate = DateUtil.plusDays(dateTime, 1);
         }
+        Integer count=websiteBillMapper.selectCount(Wrappers.<WebsiteBill>lambdaQuery()
+                .eq(WebsiteBill::getWebsiteCode, websiteCode));
         List<WebsiteBill> websiteBills = websiteBillMapper.selectList(Wrappers.<WebsiteBill>lambdaQuery()
                 .eq(WebsiteBill::getWebsiteCode, websiteCode)
                 .ge(dateTime != null, WebsiteBill::getCreateTime, dateTime)
@@ -109,16 +120,14 @@ public class WebsiteBillServiceImpl implements WebsiteBillService {
                 .orderByDesc(WebsiteBill::getCreateTime));
         WebsiteBillDayResult websiteBillDayResult = new WebsiteBillDayResult();
         List<WebsiteBillResult> websiteBillResults = new ArrayList<>();
-        AtomicReference<BigDecimal> totalAmount = new AtomicReference<>(new BigDecimal("0"));
         Integer totalQuantity = websiteBills.size();
         websiteBills.forEach(item -> {
             WebsiteBillResult websiteBillResult = new WebsiteBillResult();
             BeanUtil.copyProperties(item, websiteBillResult);
             websiteBillResults.add(websiteBillResult);
-            totalAmount.set(websiteBillResult.getPayPrice().add(totalAmount.get()));
         });
         websiteBillDayResult.setWebSiteBillList(websiteBillResults);
-        websiteBillDayResult.setTotalAmount(totalAmount.get().doubleValue());
+        websiteBillDayResult.setTotalAmount(count);
         websiteBillDayResult.setTotalQuantity(totalQuantity);
         return websiteBillDayResult;
     }
@@ -238,7 +247,7 @@ public class WebsiteBillServiceImpl implements WebsiteBillService {
                     .templateId("kEnXD9LGvWpcWud99dUu_A85vc5w1vT9-rMzqybrQaw")
                     .toUser(openId)
                     .data(data)
-                    .url("http://prev-merchant.yufan.51jujibao.com/#/MerchantBooking")
+                    .url(String.format("%s#/MerchantBooking",merchantUrl))
                     .build();
             mpService.sendWxMpTemplateMsg(wxMpTemplateMessage);
         } catch (Exception e) {
@@ -266,7 +275,7 @@ public class WebsiteBillServiceImpl implements WebsiteBillService {
                     .templateId("kEnXD9LGvWpcWud99dUu_A85vc5w1vT9-rMzqybrQaw")
                     .toUser(openId)
                     .data(data)
-                    .url(String.format("http://prev-shop.yufan.51jujibao.com/#/MyOrderDetail?orderId=%s&orderDetailId=%s&receiveWay=ZT", orderId, orderDetailId))
+                    .url(String.format("%s#/MyOrderDetail?orderId=%s&orderDetailId=%s&receiveWay=ZT",shopUrl, orderId, orderDetailId))
                     .build();
             mpService.sendWxMpTemplateMsg(wxMpTemplateMessage);
         } catch (Exception e) {

@@ -100,14 +100,18 @@ xxl:
 
 websiteCode:
   dir: /home/www/web-deploy/yufan-admin-service/websiteCode/
-  url: http://merchant.yufanlook.com/#/MerchantRegisterPrep?websiteCode=
+  url: https://merchant.yufanlook.com/#/MerchantRegisterPrep?websiteCode=
 
 actCode:
   srcDir: /home/www/web-deploy/yufan-admin-service/actCode/src/
   targetDir: /home/www/web-deploy/yufan-admin-service/actCode/target/
-  url: http://m.yufanlook.com/#/LuckDrawPage?actCode=
+  url: https://m.yufanlook.com/#/LuckDrawPage?actCode=
 
 wxPay:
-  notifyUrl: http://wx.yufanlook.com/wx/pay/notify/order/
+  notifyUrl: https://wx.yufanlook.com/wx/pay/notify/order/
 
+shop:
+  url: https://m.yufanlook.com/
 
+merchant:
+  url: https://merchant.yufanlook.com/

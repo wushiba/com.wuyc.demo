@@ -57,17 +57,17 @@ public class WxMenuController {
         WxMenuButton introduce = new WxMenuButton();//跳转
         introduce.setType(MenuButtonType.VIEW);
         introduce.setName("进入商城");
-        introduce.setUrl("http://prev-shop.yufan.51jujibao.com/#/HomePage");
+        introduce.setUrl("https://m.yufanlook.com/#/HomePage");
 
         WxMenuButton bindPhone = new WxMenuButton();
         bindPhone.setType(MenuButtonType.VIEW);
         bindPhone.setName("个人中心");
-        bindPhone.setUrl("http://prev-shop.yufan.51jujibao.com/#/MyPage");
+        bindPhone.setUrl("https://m.yufanlook.com/#/MyPage");
 
         WxMenuButton caseBut = new WxMenuButton();
         caseBut.setType(MenuButtonType.VIEW);
         caseBut.setName("我是商户");
-        caseBut.setUrl("http://prev-merchant.yufan.51jujibao.com/#/MerchantLogin");
+        caseBut.setUrl("https://merchant.yufanlook.com/#/MerchantLogin");
 
         shop.getSubButtons().add(introduce);
         shop.getSubButtons().add(bindPhone);

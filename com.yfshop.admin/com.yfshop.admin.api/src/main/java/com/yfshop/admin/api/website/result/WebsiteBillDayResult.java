@@ -13,7 +13,7 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = false)
 public class WebsiteBillDayResult implements Serializable {
 
-    private Double totalAmount;
+    private Integer totalAmount;
     private Integer totalQuantity;
     private List<WebsiteBillResult> webSiteBillList;
 

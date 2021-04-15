@@ -108,4 +108,9 @@ actCode:
 wxPay:
   notifyUrl: http://prev-wx.yufan.51jujibao.com/wx/pay/notify/order/
 
+shop:
+  url: http://prev-shop.yufan.51jujibao.com/
+
+merchant:
+  url: http://prev-merchant.yufan.51jujibao.com/
 

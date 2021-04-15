@@ -37,6 +37,7 @@ import org.apache.dubbo.config.annotation.DubboService;
 import org.apache.dubbo.config.annotation.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -74,7 +75,9 @@ public class FrontUserCouponServiceImpl implements FrontUserCouponService {
     @Resource
     private FrontUserService frontUserService;
     @DubboReference
-    MpService mpService;
+    private MpService mpService;
+    @Value("${shop.url}")
+    private String shopUrl;
 
     /**
      * 根据id查询优惠券信息
@@ -274,7 +277,7 @@ public class FrontUserCouponServiceImpl implements FrontUserCouponService {
                         .templateId("26gbak7X0fBjNlYdtXMUxHVz3N0G4bwq-xMRoe0k2FM")
                         .toUser(openId)
                         .data(data)
-                        .url("http://prev-shop.yufan.51jujibao.com/#/CouponList")
+                        .url(String.format("%s#/CouponList",shopUrl))
                         .build();
                 mpService.sendWxMpTemplateMsg(wxMpTemplateMessage);
             }

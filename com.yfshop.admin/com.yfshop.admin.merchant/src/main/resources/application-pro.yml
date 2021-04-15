@@ -67,4 +67,4 @@ wx:
         token: yufanshop # 接口配置里的Token值
         aesKey: U2ztwhpnvy5SNDiICGloZA0Pgi2WdgDmsO4abHCEtvz # 接口配置里的EncodingAESKey
 websiteCode:
-  url: http://merchant.yufanlook.com/#/MerchantRegisterPrep?websiteCode=
+  url: https://merchant.yufanlook.com/#/MerchantRegisterPrep?websiteCode=
