@@ -16,9 +16,9 @@ spring:
     filters: stat,wall,slf4j
     poolPreparedStatements: true
     type: com.alibaba.druid.pool.DruidDataSource
-    url: jdbc:mysql://10.10.204.28:3306/yf_shop?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
-    username: youshenghui
-    password: SbaFqsJr4mbt5STZ4Ja
+    url: jdbc:mysql://yf-rdspro.mysql.rds.aliyuncs.com:3306/db_yf_shop?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
+    username: yfshop
+    password: 3GqpenFm9GqveeFM4VS
     maxPoolPreparedStatementPerConnectionSize: 20
     testOnBorrow: false
     testWhileIdle: true
