@@ -118,8 +118,10 @@ public class WebsiteCodeTask {
                     websiteCode.setFileStatus("SUCCESS");
                     websiteCode.setFileUrl(response.getUrl());
                     String msg = "<p>您好!</p>\n" +
-                            "<p>&nbsp;&nbsp;此邮件内含光明网点码，请妥善保管。</p>\n" +
-                            "<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;雨帆</p>";
+                            "<p>&nbsp;&nbsp;&nbsp;&nbsp;此邮件内含光明网点码，请妥善保管。</p>\n" +
+                            "<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" +
+                            "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" +
+                            "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;雨帆</p>";
                     if (StringUtils.isNotBlank(websiteCode.getEmail())) {
                         sendAttachmentsMail(websiteCode.getEmail(), "光明网点码", msg, fileZip.getPath());
                     }
@@ -175,7 +177,7 @@ public class WebsiteCodeTask {
         images.add(background);
         Image qrCode = new Image();
         qrCode.setX(272);
-        qrCode.setY(330);
+        qrCode.setY(360);
         qrCode.setHeight(540);
         qrCode.setWidth(540);
         qrCode.setQrCode(true);
@@ -189,7 +191,7 @@ public class WebsiteCodeTask {
         text.setFontSize(48);
         text.setColor("#333333");
         text.setX(254);
-        text.setY(978);
+        text.setY(1008);
         text.setText(websiteCode);
         texts.add(text);
         try {

@@ -37,7 +37,7 @@ spring:
 
   sa-token:
     # 写入Cookie时显式指定的作用域, 用于单点登录二级域名共享Cookie
-    cookie-domain: yufan.51jujibao.com
+#    cookie-domain: yufan.51jujibao.com
     # token名称 (同时也是cookie名称)
     token-name: user
     # token有效期，单位s 默认30天

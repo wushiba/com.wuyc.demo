@@ -37,7 +37,7 @@ spring:
     static-path-pattern: /**
   sa-token:
     # 写入Cookie时显式指定的作用域, 用于单点登录二级域名共享Cookie
-    cookie-domain: yufanlook.com
+#    cookie-domain: yufanlook.com
     # token名称 (同时也是cookie名称)
     token-name: merchant
     # token有效期，单位s 默认30天
