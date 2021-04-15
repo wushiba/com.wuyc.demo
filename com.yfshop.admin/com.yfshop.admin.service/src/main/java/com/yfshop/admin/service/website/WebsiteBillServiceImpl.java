@@ -90,13 +90,11 @@ public class WebsiteBillServiceImpl implements WebsiteBillService {
                 .orderByDesc(WebsiteBill::getCreateTime));
         WebsiteBillDayResult websiteBillDayResult = new WebsiteBillDayResult();
         List<WebsiteBillResult> websiteBillResults = new ArrayList<>();
-        AtomicReference<BigDecimal> totalAmount = new AtomicReference<>(new BigDecimal("0"));
         Integer totalQuantity = websiteBills.size();
         websiteBills.forEach(item -> {
             WebsiteBillResult websiteBillResult = new WebsiteBillResult();
             BeanUtil.copyProperties(item, websiteBillResult);
             websiteBillResults.add(websiteBillResult);
-            totalAmount.set(websiteBillResult.getPayPrice().add(totalAmount.get()));
         });
         websiteBillDayResult.setWebSiteBillList(websiteBillResults);
         websiteBillDayResult.setTotalAmount(count);
@@ -111,7 +109,8 @@ public class WebsiteBillServiceImpl implements WebsiteBillService {
             nextDate = DateUtil.plusDays(dateTime, 1);
         }
         Integer count=websiteBillMapper.selectCount(Wrappers.<WebsiteBill>lambdaQuery()
-                .eq(WebsiteBill::getWebsiteCode, websiteCode));
+                .eq(WebsiteBill::getWebsiteCode, websiteCode)
+                .eq(WebsiteBill::getIsConfirm, 'Y'));
         List<WebsiteBill> websiteBills = websiteBillMapper.selectList(Wrappers.<WebsiteBill>lambdaQuery()
                 .eq(WebsiteBill::getWebsiteCode, websiteCode)
                 .ge(dateTime != null, WebsiteBill::getCreateTime, dateTime)
