@@ -39,3 +39,11 @@ spring:
       multipart:
         max-file-size: 100MB
         max-request-size: 100MB
+
+oss:
+  endpoint: oss-cn-shenzhen-internal.aliyuncs.com
+  domain: yf-oss-prev-open.oss-cn-shenzhen-internal.aliyuncs.com
+  bucket: yf-oss-prev-open
+  access: oss@yufan.onaliyun.com
+  secret: LTAI5tSnQKpNY8rGRDYBH8es
+  oprefix: /yufan

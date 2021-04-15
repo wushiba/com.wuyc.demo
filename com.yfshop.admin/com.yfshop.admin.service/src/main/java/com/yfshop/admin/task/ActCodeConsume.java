@@ -3,12 +3,10 @@ package com.yfshop.admin.task;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.crypto.SecureUtil;
 import cn.hutool.crypto.digest.DigestUtil;
-import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONUtil;
-import com.google.gson.JsonArray;
-import com.qiniu.http.Response;
-import com.yfshop.admin.tool.poster.kernal.qiniu.QiniuConfig;
-import com.yfshop.admin.tool.poster.kernal.qiniu.QiniuUploader;
+import com.yfshop.admin.tool.poster.kernal.UploadResult;
+import com.yfshop.admin.tool.poster.kernal.oss.OssConfig;
+import com.yfshop.admin.tool.poster.kernal.oss.OssUploader;
 import com.yfshop.code.mapper.ActCodeBatchDetailMapper;
 import com.yfshop.code.mapper.ActCodeBatchMapper;
 import com.yfshop.code.model.ActCodeBatch;
@@ -23,7 +21,6 @@ import javax.annotation.Resource;
 import java.io.File;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 @Component
@@ -35,12 +32,11 @@ public class ActCodeConsume {
     @Value("${actCode.url}")
     private String actCodeCodeUrl;
     @Autowired
-    QiniuConfig qiniuConfig;
+    OssConfig ossConfig;
     @Value("${actCode.targetDir}")
     private String actCodeCodeTargetDir;
-
     @Autowired
-    QiniuUploader qiniuUploader;
+    OssUploader ossUploader;
 
     private static final Logger logger = LoggerFactory.getLogger(ActCodeConsume.class);
 
@@ -48,7 +44,7 @@ public class ActCodeConsume {
         try {
             String[] data = message.split("-");
             Integer id = Integer.valueOf(data[0]);
-            List<String> codes = JSONUtil.toList(data[1],String.class);
+            List<String> codes = JSONUtil.toList(data[1], String.class);
             doTask(id, codes);
         } catch (Exception e) {
             e.printStackTrace();
@@ -63,10 +59,10 @@ public class ActCodeConsume {
             String filePath = actCodeCodeTargetDir + actCodeBatch.getBatchNo() + ".txt";
             if (new File(filePath).exists()) {
                 try {
-                    Response response = qiniuUploader.getUploadManager().put(filePath, actCodeBatch.getBatchNo() + ".txt", qiniuUploader.getAuth().uploadToken(qiniuConfig.getBucket()));
-                    if (response.isOK()) {
+                    UploadResult response = ossUploader.upload(new File(filePath),actCodeBatch.getBatchNo() + ".txt");
+                    if (response.isSuccessful()) {
                         actCodeBatch.setFileStatus("SUCCESS");
-                        actCodeBatch.setFileUrl("http://" + qiniuConfig.getDomain() + "/" + actCodeBatch.getBatchNo() + ".txt");
+                        actCodeBatch.setFileUrl(response.getUrl());
                     }
                 } catch (Exception e) {
                     e.printStackTrace();

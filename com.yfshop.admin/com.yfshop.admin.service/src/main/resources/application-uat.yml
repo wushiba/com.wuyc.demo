@@ -68,13 +68,13 @@ dubbo:
   consumer:
     check: false
 
-qiniu:
-  domain: qqjyvi051.hn-bkt.clouddn.com
-  bucket: yufanshop
-  access: DSM_E9p8v4nikrb0W6ovHkzxH_2uRtz8c5-nx8y6
-  secret: QFrGQnxFdOzz-iNKQmilWQGdnrzy-3ScVGYGVQG7
-  prefix: /yufanshop
-
+oss:
+  endpoint: oss-cn-shenzhen-internal.aliyuncs.com
+  domain: yf-oss-prev.oss-cn-shenzhen-internal.aliyuncs.com
+  bucket: yf-oss-prev
+  access: oss@yufan.onaliyun.com
+  secret: LTAI5tSnQKpNY8rGRDYBH8es
+  oprefix: /yufan
 xxl:
   job:
     admin:

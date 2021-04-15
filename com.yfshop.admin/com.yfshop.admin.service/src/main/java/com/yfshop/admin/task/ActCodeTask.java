@@ -6,10 +6,9 @@ import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.crypto.SecureUtil;
 import cn.hutool.crypto.digest.DigestUtil;
 import cn.hutool.http.HttpUtil;
-import com.qiniu.http.Response;
-import com.yfshop.admin.tool.poster.kernal.qiniu.QiniuConfig;
-import com.yfshop.admin.tool.poster.kernal.qiniu.QiniuDownloader;
-import com.yfshop.admin.tool.poster.kernal.qiniu.QiniuUploader;
+import com.yfshop.admin.tool.poster.kernal.UploadResult;
+import com.yfshop.admin.tool.poster.kernal.oss.OssDownloader;
+import com.yfshop.admin.tool.poster.kernal.oss.OssUploader;
 import com.yfshop.code.manager.ActCodeBatchManager;
 import com.yfshop.code.mapper.ActCodeBatchDetailMapper;
 import com.yfshop.code.mapper.ActCodeBatchMapper;
@@ -21,7 +20,6 @@ import lombok.SneakyThrows;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
@@ -29,7 +27,6 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
-import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -40,7 +37,6 @@ import java.io.File;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 /**
  * 生成商户码任务
@@ -72,14 +68,13 @@ public class ActCodeTask {
     @Autowired
     private ActCodeConsume actCodeConsumeTask;
 
-    @Autowired
-    QiniuUploader qiniuUploader;
 
     @Autowired
-    QiniuDownloader qiniuDownloader;
+    OssUploader ossUploader;
 
     @Autowired
-    QiniuConfig qiniuConfig;
+    OssDownloader ossDownloader;
+
 
     @Autowired
     private JavaMailSender mailSender;
@@ -121,10 +116,10 @@ public class ActCodeTask {
         FileUtil.appendUtf8Lines(codeFile, filePath);
         logger.info("批从号{},{}个溯源码,生成完毕", actCodeBatch.getBatchNo(), actCodeBatch.getQuantity());
         actCodeBatch.setFileStatus("FAIL");
-        Response response = qiniuUploader.getUploadManager().put(filePath, actCodeBatch.getBatchNo() + ".txt", qiniuUploader.getAuth().uploadToken(qiniuConfig.getBucket()));
-        if (response.isOK()) {
+        UploadResult response = ossUploader.upload(new File(filePath),actCodeBatch.getBatchNo() + ".txt");
+        if (response.isSuccessful()) {
             actCodeBatch.setFileStatus("SUCCESS");
-            actCodeBatch.setFileUrl("http://" + qiniuConfig.getDomain() + "/" + actCodeBatch.getBatchNo() + ".txt");
+            actCodeBatch.setFileUrl(response.getUrl());
         }
         actCodeBatchManager.updateById(actCodeBatch);
     }
@@ -134,7 +129,7 @@ public class ActCodeTask {
         File file = new File(actCodeCodeSrcDir + actCodeBatch.getBatchNo() + ".txt");
         if (!file.exists()) {
             logger.info("正则下载溯源码文件");
-            fileUrl = qiniuDownloader.privateDownloadUrl(fileUrl, 60);
+            fileUrl = ossDownloader.privateDownloadUrl(fileUrl, 60);
             file = HttpUtil.downloadFileFromUrl(fileUrl, file);
             logger.info("载溯源码文件下载完成");
             Asserts.assertEquals(md5, SecureUtil.md5(file), 500, "下载文件md5不匹配");

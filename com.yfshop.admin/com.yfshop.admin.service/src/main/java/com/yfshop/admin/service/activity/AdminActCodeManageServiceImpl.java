@@ -1,8 +1,6 @@
 package com.yfshop.admin.service.activity;
 
 import cn.hutool.core.date.DateUtil;
-import cn.hutool.core.io.FileUtil;
-import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.RandomUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -16,7 +14,7 @@ import com.yfshop.admin.api.activity.result.ActCodeResult;
 import com.yfshop.admin.api.activity.service.AdminActCodeManageService;
 import com.yfshop.admin.dao.ActCodeDao;
 import com.yfshop.admin.task.ActCodeTask;
-import com.yfshop.admin.tool.poster.kernal.qiniu.QiniuDownloader;
+import com.yfshop.admin.tool.poster.kernal.oss.OssDownloader;
 import com.yfshop.code.mapper.ActCodeBatchDetailMapper;
 import com.yfshop.code.mapper.ActCodeBatchMapper;
 import com.yfshop.code.mapper.ActCodeBatchRecordMapper;
@@ -33,15 +31,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.FileSystemResource;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import javax.mail.MessagingException;
-import javax.mail.internet.MimeMessage;
-import java.io.File;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
@@ -72,7 +64,7 @@ public class AdminActCodeManageServiceImpl implements AdminActCodeManageService 
 
 
     @Autowired
-    private QiniuDownloader qiniuDownloader;
+    private OssDownloader ossDownloader;
 
     @Autowired
     private ActCodeTask actCodeTask;
@@ -138,7 +130,7 @@ public class AdminActCodeManageServiceImpl implements AdminActCodeManageService 
         actCodeBatchRecord.setMerchantId(merchantId);
         actCodeBatchRecord.setType("DOWNLOAD");
         actCodeBatchRecordMapper.insert(actCodeBatchRecord);
-        return qiniuDownloader.privateDownloadUrl(actCodeBatch.getFileUrl(), 60);
+        return ossDownloader.privateDownloadUrl(actCodeBatch.getFileUrl(), 60);
     }
 
     @SneakyThrows
@@ -150,9 +142,9 @@ public class AdminActCodeManageServiceImpl implements AdminActCodeManageService 
         Asserts.assertStringNotBlank(actCodeBatch.getFileUrl(), 500, "文件不存在！");
         SourceFactory sourceFactory = sourceFactoryMapper.selectById(factoryId);
         String filePath = actCodeCodeDirs + actCodeBatch.getBatchNo() + ".txt";
-        String msg = "您好：\n" +
-                "此邮件内含光明活动码（溯源码+抽奖活动码），请妥善保管，切勿外传。\n" +
-                "                                                                                                雨帆 ";
+        String msg = "<p>您好!</p>\n" +
+                "<p>       此邮件内含光明活动码（溯源码+抽奖活动码），请妥善保管，切勿外传。</p>\n" +
+                "<p>                                                                                                              雨帆</p>";
         actCodeTask.sendAttachmentsMail(sourceFactory.getEmail(), "光明活动码（溯源码+抽奖活动码）", msg, filePath);
         actCodeBatch.setIsSend("Y");
         actCodeBatchMapper.updateById(actCodeBatch);

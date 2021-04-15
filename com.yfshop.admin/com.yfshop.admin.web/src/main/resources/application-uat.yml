@@ -54,3 +54,10 @@ spring:
     activity-timeout: -1
     # 在多人登录同一账号时，是否共用一个token (为true时所有登录共用一个token, 为false时每次登录新建一个token)
     is-share: true
+oss:
+  endpoint: oss-cn-shenzhen-internal.aliyuncs.com
+  domain: yf-oss-prev-open.oss-cn-shenzhen-internal.aliyuncs.com
+  bucket: yf-oss-prev-open
+  access: oss@yufan.onaliyun.com
+  secret: LTAI5tSnQKpNY8rGRDYBH8es
+  oprefix: /yufan

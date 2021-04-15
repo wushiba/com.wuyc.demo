@@ -4,13 +4,12 @@ import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.CharsetUtil;
 import cn.hutool.core.util.ZipUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
-import com.qiniu.http.Response;
 import com.yfshop.admin.dao.WebsiteCodeDao;
 import com.yfshop.admin.tool.poster.drawable.Image;
 import com.yfshop.admin.tool.poster.drawable.Poster;
 import com.yfshop.admin.tool.poster.drawable.Text;
-import com.yfshop.admin.tool.poster.kernal.qiniu.QiniuConfig;
-import com.yfshop.admin.tool.poster.kernal.qiniu.QiniuUploader;
+import com.yfshop.admin.tool.poster.kernal.UploadResult;
+import com.yfshop.admin.tool.poster.kernal.oss.OssUploader;
 import com.yfshop.code.manager.WebsiteCodeDetailManager;
 import com.yfshop.code.mapper.MerchantMapper;
 import com.yfshop.code.mapper.RegionMapper;
@@ -31,7 +30,6 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
-import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -39,13 +37,10 @@ import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import java.io.File;
 import java.io.IOException;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
-import java.util.zip.ZipFile;
 
 /**
  * 生成商户码任务
@@ -70,9 +65,7 @@ public class WebsiteCodeTask {
     @Resource
     private WebsiteCodeDao websiteCodeDao;
     @Autowired
-    private QiniuUploader qiniuUploader;
-    @Autowired
-    private QiniuConfig qiniuConfig;
+    private OssUploader ossUploader;
     @Autowired
     private JavaMailSender mailSender;
 
@@ -119,16 +112,19 @@ public class WebsiteCodeTask {
             }
             websiteCode.setFileStatus("FAIL");
             if (fileZip.exists()) {
-                Response response = qiniuUploader.getUploadManager().put(fileZip, fileZip.getName(), qiniuUploader.getAuth().uploadToken(qiniuConfig.getBucket()));
-                if (response.isOK()) {
+                UploadResult response = ossUploader.upload(fileZip, fileZip.getName());
+                if (response.isSuccessful()) {
+                    logger.info("上传文件成功！");
                     websiteCode.setFileStatus("SUCCESS");
-                    websiteCode.setFileUrl("http://" + qiniuConfig.getDomain() +"/"+ websiteCode.getBatchNo() + ".zip");
-                    String msg = "您好：\n" +
-                            "此邮件内含光明网点码，请妥善保管。\n" +
-                            "                                                                     雨帆";
+                    websiteCode.setFileUrl(response.getUrl());
+                    String msg = "<p>您好!</p>\n" +
+                            "<p>此邮件内含光明网点码，请妥善保管</p>\n" +
+                            "<p>                                                雨帆</p>";
                     if (StringUtils.isNotBlank(websiteCode.getEmail())) {
                         sendAttachmentsMail(websiteCode.getEmail(), "光明网点码", msg, fileZip.getPath());
                     }
+                }else{
+                    logger.info("上传文件失败！");
                 }
             }
             websiteCodeMapper.updateById(websiteCode);
@@ -223,5 +219,6 @@ public class WebsiteCodeTask {
         helper.addAttachment(file.getName(), fileResource);
         mailSender.send(message);
     }
+
 
 }

@@ -5,17 +5,16 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.yfshop.admin.api.website.AdminWebsiteCodeManageService;
-import com.yfshop.admin.api.website.request.WebsiteCodeQueryDetailsReq;
 import com.yfshop.admin.api.website.request.WebsiteCodeExpressReq;
+import com.yfshop.admin.api.website.request.WebsiteCodeQueryDetailsReq;
 import com.yfshop.admin.api.website.request.WebsiteCodeQueryReq;
 import com.yfshop.admin.api.website.result.WebsiteCodeDetailExport;
 import com.yfshop.admin.api.website.result.WebsiteCodeDetailResult;
 import com.yfshop.admin.api.website.result.WebsiteCodeResult;
 import com.yfshop.admin.dao.WebsiteCodeDao;
-import com.yfshop.admin.tool.poster.kernal.qiniu.QiniuDownloader;
+import com.yfshop.admin.tool.poster.kernal.oss.OssDownloader;
 import com.yfshop.code.mapper.WebsiteCodeDetailMapper;
 import com.yfshop.code.mapper.WebsiteCodeMapper;
-import com.yfshop.code.model.Item;
 import com.yfshop.code.model.WebsiteCode;
 import com.yfshop.code.model.WebsiteCodeDetail;
 import com.yfshop.common.exception.ApiException;
@@ -40,7 +39,7 @@ public class AdminWebsiteCodeManageServiceImpl implements AdminWebsiteCodeManage
     @Resource
     private WebsiteCodeDetailMapper websiteCodeDetailMapper;
     @Autowired
-    private QiniuDownloader qiniuDownloader;
+    private OssDownloader ossDownloader;
 
     @Override
     public IPage<WebsiteCodeResult> queryWebsiteCodeList(WebsiteCodeQueryReq req) throws ApiException {
@@ -104,6 +103,6 @@ public class AdminWebsiteCodeManageServiceImpl implements AdminWebsiteCodeManage
     public String getWebsiteCodeUrl(Integer id) throws ApiException {
         WebsiteCode websiteCode = websiteCodeMapper.selectById(id);
         Asserts.assertStringNotBlank(websiteCode.getFileUrl(), 500, "文件不存在！");
-        return qiniuDownloader.privateDownloadUrl(websiteCode.getFileUrl(), 60);
+        return ossDownloader.privateDownloadUrl(websiteCode.getFileUrl(), 60);
     }
 }
