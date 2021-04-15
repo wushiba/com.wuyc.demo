@@ -59,4 +59,16 @@ public class FrontDrawController implements BaseController {
         return CommonResult.success(frontUserCouponService.findAllUserDrawRecordList(req));
     }
 
+    @RequestMapping(value = "user/white/add", method = {RequestMethod.POST})
+    @ResponseBody
+    public CommonResult<Long> addDrawUserWhite(Integer userId) {
+        return CommonResult.success(frontDrawService.addDrawUserWhite(userId));
+    }
+
+    @RequestMapping(value = "user/white/delete", method = {RequestMethod.POST})
+    @ResponseBody
+    public CommonResult<Long> deleteDrawUserWhite(Integer userId) {
+        return CommonResult.success(frontDrawService.addDrawUserWhite(userId));
+    }
+
 }

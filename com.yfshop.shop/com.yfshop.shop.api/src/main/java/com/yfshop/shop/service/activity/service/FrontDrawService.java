@@ -48,4 +48,20 @@ public interface FrontDrawService {
 	 */
 	public YfActCodeBatchDetailResult getYfActCodeBatchDetailByActCode(String actCode) throws ApiException;
 
+	/**
+	 * 添加用户抽奖白名单
+	 * @param userId	用户白名单
+	 * @return
+	 * @throws ApiException
+	 */
+	public Long addDrawUserWhite(Integer userId) throws ApiException;
+
+	/**
+	 * 删除用户抽奖白名单
+	 * @param userId	用户白名单
+	 * @return
+	 * @throws ApiException
+	 */
+	public Long deleteDrawUserWhite(Integer userId) throws ApiException;
+
 }
