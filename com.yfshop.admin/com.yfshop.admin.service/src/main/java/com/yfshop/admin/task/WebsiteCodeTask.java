@@ -118,8 +118,8 @@ public class WebsiteCodeTask {
                     websiteCode.setFileStatus("SUCCESS");
                     websiteCode.setFileUrl(response.getUrl());
                     String msg = "<p>您好!</p>\n" +
-                            "<p>此邮件内含光明网点码，请妥善保管</p>\n" +
-                            "<p>                                                雨帆</p>";
+                            "<p>&nbsp;&nbsp;此邮件内含光明网点码，请妥善保管。</p>\n" +
+                            "<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;雨帆</p>";
                     if (StringUtils.isNotBlank(websiteCode.getEmail())) {
                         sendAttachmentsMail(websiteCode.getEmail(), "光明网点码", msg, fileZip.getPath());
                     }

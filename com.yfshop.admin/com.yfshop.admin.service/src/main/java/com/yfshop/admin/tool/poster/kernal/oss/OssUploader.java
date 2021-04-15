@@ -1,5 +1,7 @@
 package com.yfshop.admin.tool.poster.kernal.oss;
 
+import cn.hutool.core.util.ArrayUtil;
+import cn.hutool.extra.spring.SpringUtil;
 import com.aliyun.oss.OSS;
 import com.aliyun.oss.OSSClientBuilder;
 import com.aliyun.oss.model.PutObjectResult;
@@ -22,6 +24,7 @@ public class OssUploader implements Uploader {
 
     OSS ossClient;
 
+
     public OSS getOssClient() {
         return ossClient;
     }
@@ -33,15 +36,21 @@ public class OssUploader implements Uploader {
 
     @Override
     public UploadResult upload(File file) throws IOException {
+        if (ArrayUtil.containsAny(SpringUtil.getActiveProfiles(), "dev")) {
+            return new UploadResult("");
+        }
         String filepath = DigestUtils.md5DigestAsHex(new FileInputStream(file));
         PutObjectResult result = ossClient.putObject(config.getBucket(), filepath, file);
-        return new UploadResult("http://" + config.getDomain() + filepath);
+        return new UploadResult("http://" + config.getDomain() + "/" + filepath);
     }
 
 
     public UploadResult upload(File file, String name) throws IOException {
+        if (ArrayUtil.containsAny(SpringUtil.getActiveProfiles(), "dev")) {
+            return new UploadResult("");
+        }
         String filepath = name;
         PutObjectResult result = ossClient.putObject(config.getBucket(), filepath, file);
-        return new UploadResult("http://" + config.getDomain() + filepath);
+        return new UploadResult("http://" + config.getDomain() + "/" + filepath);
     }
 }

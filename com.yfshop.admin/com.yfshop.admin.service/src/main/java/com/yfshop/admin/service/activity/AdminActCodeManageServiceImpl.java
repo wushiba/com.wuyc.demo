@@ -143,8 +143,8 @@ public class AdminActCodeManageServiceImpl implements AdminActCodeManageService 
         SourceFactory sourceFactory = sourceFactoryMapper.selectById(factoryId);
         String filePath = actCodeCodeDirs + actCodeBatch.getBatchNo() + ".txt";
         String msg = "<p>您好!</p>\n" +
-                "<p>       此邮件内含光明活动码（溯源码+抽奖活动码），请妥善保管，切勿外传。</p>\n" +
-                "<p>                                                                                                              雨帆</p>";
+                "<p>&nbsp;&nbsp;此邮件内含光明活动码（溯源码+抽奖活动码），请妥善保管，切勿外传。</p>\n" +
+                "<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;雨帆</p>";
         actCodeTask.sendAttachmentsMail(sourceFactory.getEmail(), "光明活动码（溯源码+抽奖活动码）", msg, filePath);
         actCodeBatch.setIsSend("Y");
         actCodeBatchMapper.updateById(actCodeBatch);
