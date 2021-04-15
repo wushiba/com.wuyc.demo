@@ -81,7 +81,7 @@ public class WxMenuController {
         WxMenuButton order = new WxMenuButton();
         order.setType(MenuButtonType.VIEW);
         order.setName("噜鹿相遇");
-        order.setUrl("https://c9.51jujibao.com/upload/2021/04/12/202104121751309001");
+        order.setUrl("http://prev01.s1.51jujibao.com/images/20210415/51f06cc0dfd34fe0accb10c1ea3f7ebf.jpg");
 
         button3.getSubButtons().add(order);
         menu.getButtons().add(button3);
