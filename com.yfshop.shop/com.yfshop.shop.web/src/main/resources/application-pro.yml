@@ -66,3 +66,10 @@ wx:
         secret: 64a61d9e95094f1e974861b62ec4dce8 # 公众号的appsecret
         token: yufanshop # 接口配置里的Token值
         aesKey: U2ztwhpnvy5SNDiICGloZA0Pgi2WdgDmsO4abHCEtvz # 接口配置里的EncodingAESKey
+
+# 文件上传服务器配置
+upload:
+  server:
+    domain: http://s.yufanlook.com/
+    imagePath: /mnt/static/s.yufanlook.com/image/yf-shop
+    excelPath: /mnt/static/s.yufanlook.com/excel/yf-shop
