@@ -50,7 +50,7 @@ public class WebsiteCodeDetailResult implements Serializable {
     private String isActivate;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", locale = "zh", timezone = "GMT+8")
-    private LocalDateTime activateTime;
+    private LocalDateTime activityTime;
 
     /**
      * 商户id
