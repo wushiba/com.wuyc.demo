@@ -36,9 +36,9 @@ public class OssUploader implements Uploader {
 
     @Override
     public UploadResult upload(File file) throws IOException {
-        if (ArrayUtil.containsAny(SpringUtil.getActiveProfiles(), "dev")) {
-            return new UploadResult("");
-        }
+//        if (ArrayUtil.containsAny(SpringUtil.getActiveProfiles(), "dev")) {
+//            return new UploadResult("");
+//        }
         String filepath = DigestUtils.md5DigestAsHex(new FileInputStream(file));
         PutObjectResult result = ossClient.putObject(config.getBucket(), filepath, file);
         return new UploadResult("http://" + config.getDomain() + "/" + filepath);
@@ -46,9 +46,9 @@ public class OssUploader implements Uploader {
 
 
     public UploadResult upload(File file, String name) throws IOException {
-        if (ArrayUtil.containsAny(SpringUtil.getActiveProfiles(), "dev")) {
-            return new UploadResult("");
-        }
+//        if (ArrayUtil.containsAny(SpringUtil.getActiveProfiles(), "dev")) {
+//            return new UploadResult("");
+//        }
         String filepath = name;
         PutObjectResult result = ossClient.putObject(config.getBucket(), filepath, file);
         return new UploadResult("http://" + config.getDomain() + "/" + filepath);

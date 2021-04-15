@@ -73,8 +73,8 @@ dubbo:
     check: false
 
 oss:
-  endpoint: oss-cn-shenzhen-internal.aliyuncs.com
-  domain: yf-oss-prev.oss-cn-shenzhen-internal.aliyuncs.com
+  endpoint: oss-cn-shenzhen.aliyuncs.com
+  domain: yf-oss-prev.oss-cn-shenzhen.aliyuncs.com
   bucket: yf-oss-prev
   access: LTAI5tSnQKpNY8rGRDYBH8es
   secret: h9jlsJITV88Yaey82tF9qHSQo9RiiE
@@ -112,3 +112,9 @@ actCode:
 
 wxPay:
   notifyUrl: http://prev-wx.yufan.51jujibao.com/wx/pay/notify/order/
+
+shop:
+  url: http://prev-shop.yufan.51jujibao.com/
+
+merchant:
+  url: http://prev-merchant.yufan.51jujibao.com/

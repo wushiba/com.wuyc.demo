@@ -56,8 +56,8 @@ spring:
     is-share: true
 
 oss:
-  endpoint: oss-cn-shenzhen-internal.aliyuncs.com
-  domain: yf-oss-pro-open.oss-cn-shenzhen-internal.aliyuncs.com
+  endpoint: oss-cn-shenzhen.aliyuncs.com
+  domain: yf-oss-pro-open.oss-cn-shenzhen.aliyuncs.com
   bucket: yf-oss-pro-open
   access: oss@yufan.onaliyun.com
   secret: LTAI5tSnQKpNY8rGRDYBH8es
