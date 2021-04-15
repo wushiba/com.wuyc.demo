@@ -33,15 +33,15 @@ public class OssUploader implements Uploader {
 
     @Override
     public UploadResult upload(File file) throws IOException {
-        String filepath = config.getPrefix() + "/" + DigestUtils.md5DigestAsHex(new FileInputStream(file));
+        String filepath = DigestUtils.md5DigestAsHex(new FileInputStream(file));
         PutObjectResult result = ossClient.putObject(config.getBucket(), filepath, file);
-        return new UploadResult(config.getDomain() + filepath);
+        return new UploadResult("http://" + config.getDomain() + filepath);
     }
 
 
-    public UploadResult upload(File file,String name) throws IOException {
-        String filepath = config.getPrefix() + "/" + name;
+    public UploadResult upload(File file, String name) throws IOException {
+        String filepath = name;
         PutObjectResult result = ossClient.putObject(config.getBucket(), filepath, file);
-        return new UploadResult(config.getDomain() + filepath);
+        return new UploadResult("http://" + config.getDomain() + filepath);
     }
 }
