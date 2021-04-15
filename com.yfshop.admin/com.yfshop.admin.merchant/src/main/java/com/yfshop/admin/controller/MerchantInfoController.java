@@ -63,6 +63,7 @@ class MerchantInfoController extends AbstractBaseController {
     /**
      * @return
      */
+    @SaCheckLogin
     @RequestMapping(value = "/checkSubscribe", method = {RequestMethod.POST})
     public CommonResult<Integer> checkSubscribe() {
         Integer result = userService.checkSubscribe(getCurrentOpenId());
@@ -212,6 +213,7 @@ class MerchantInfoController extends AbstractBaseController {
      *
      * @return
      */
+    @SaCheckLogin
     @RequestMapping(value = "/applyWebsiteCodeStatus", method = {RequestMethod.POST})
     public CommonResult<IPage<WebsiteCodeResult>> applyWebsiteCodeStatus(WebsiteCodeApplyStatusReq websiteCodeApplyReq) {
         IPage<WebsiteCodeResult> websiteTypeResults = merchantInfoService.applyWebsiteCodeStatus(getCurrentAdminUserId(), websiteCodeApplyReq.getStatus(), websiteCodeApplyReq.getPageIndex(), websiteCodeApplyReq.getPageSize());
@@ -224,6 +226,7 @@ class MerchantInfoController extends AbstractBaseController {
      *
      * @return
      */
+    @SaCheckLogin
     @RequestMapping(value = "/applyWebsiteCodeDetails", method = {RequestMethod.POST})
     public CommonResult<WebsiteCodeResult> applyWebsiteCodeDetails(Integer id) {
         WebsiteCodeResult websiteTypeResult = merchantInfoService.applyWebsiteCodeDetails(id);
@@ -236,6 +239,7 @@ class MerchantInfoController extends AbstractBaseController {
      *
      * @return
      */
+    @SaCheckLogin
     @RequestMapping(value = "/updateApplyWebsiteCode", method = {RequestMethod.POST})
     public CommonResult<Void> updateApplyWebsiteCode(WebsiteCodeApplyStatusReq websiteCodeApplyReq) {
         merchantInfoService.updateApplyWebsiteCode(websiteCodeApplyReq.getId(), websiteCodeApplyReq.getStatus());
@@ -248,20 +252,21 @@ class MerchantInfoController extends AbstractBaseController {
      *
      * @return
      */
+    @SaCheckLogin
     @RequestMapping(value = "/applyWebsiteCode", method = {RequestMethod.POST})
     public CommonResult<Integer> applyWebsiteCode(WebsiteCodeApplyReq websiteCodeApplyReq) {
         Integer id = merchantInfoService.applyWebsiteCode(getCurrentAdminUserId(), websiteCodeApplyReq.getCount(), websiteCodeApplyReq.getEmail());
         return CommonResult.success(id);
     }
 
-
+    @SaCheckLogin
     @RequestMapping(value = "/applyWebsiteCodeAmount", method = {RequestMethod.POST})
     public CommonResult<WebsiteCodeAmountResult> applyWebsiteCodeAmount(@RequestBody List<Integer> ids) {
         WebsiteCodeAmountResult websiteCodeAmountResult = merchantInfoService.applyWebsiteCodeAmount(ids);
         return CommonResult.success(websiteCodeAmountResult);
     }
 
-
+    @SaCheckLogin
     @RequestMapping(value = "/applyWebsiteCodePay", method = {RequestMethod.POST})
     public CommonResult<WxPayMpOrderResult> applyWebsiteCodePay(@RequestBody WebsiteCodePayReq websiteCodePayReq) {
         String openId = getCurrentOpenId();
@@ -277,6 +282,7 @@ class MerchantInfoController extends AbstractBaseController {
      *
      * @return
      */
+    @SaCheckLogin
     @RequestMapping(value = "/websiteCodeAddress", method = {RequestMethod.POST})
     public CommonResult<Void> websiteCodeAddress(WebsiteCodeAddressReq websiteCodeAddressReq) {
         websiteCodeAddressReq.setMerchantId(getCurrentAdminUserId());
@@ -290,6 +296,7 @@ class MerchantInfoController extends AbstractBaseController {
      *
      * @return
      */
+    @SaCheckLogin
     @RequestMapping(value = "/getWebsiteCodeAddress", method = {RequestMethod.POST})
     public CommonResult<List<WebsiteCodeAddressResult>> getWebsiteCodeAddress() {
         List<WebsiteCodeAddressResult> list = merchantInfoService.getWebsiteCodeAddress(getCurrentAdminUserId());
@@ -302,13 +309,14 @@ class MerchantInfoController extends AbstractBaseController {
      *
      * @return
      */
+    @SaCheckLogin
     @RequestMapping(value = "/deleteWebsiteCodeAddress", method = {RequestMethod.POST})
     public CommonResult<Void> deleteWebsiteCodeAddress(Integer id) {
         merchantInfoService.deleteWebsiteCodeAddress(id);
         return CommonResult.success(null);
     }
 
-
+    @SaCheckLogin
     @RequestMapping(value = "/getWebsiteCodeQrCode", method = {RequestMethod.GET})
     public String getWebsiteCodeQrCode(String websiteCode) {
         QrConfig qrConfig = new QrConfig(750, 750);

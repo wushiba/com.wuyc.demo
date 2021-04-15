@@ -2,6 +2,7 @@ package com.yfshop.admin.controller.website;
 
 import cn.afterturn.easypoi.excel.ExcelExportUtil;
 import cn.afterturn.easypoi.excel.entity.ExportParams;
+import cn.dev33.satoken.annotation.SaCheckLogin;
 import cn.hutool.core.io.IoUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.yfshop.admin.api.website.AdminWebsiteCodeManageService;
@@ -38,7 +39,7 @@ public class AdminWebsiteManageController implements BaseController {
     @DubboReference(check = false)
     private AdminWebsiteCodeManageService adminWebsiteCodeManageService;
 
-
+    @SaCheckLogin
     @ApiOperation(value = "查询网点码", httpMethod = "POST")
     @RequestMapping(value = "/queryWebsiteCode", method = {RequestMethod.GET, RequestMethod.POST})
     @ResponseBody
@@ -47,7 +48,7 @@ public class AdminWebsiteManageController implements BaseController {
         return CommonResult.success(adminWebsiteCodeManageService.queryWebsiteCodeList(websiteCodeQueryReq));
     }
 
-
+    @SaCheckLogin
     @ApiOperation(value = "查询全部的网点码", httpMethod = "POST")
     @RequestMapping(value = "/queryAllWebsiteCode", method = {RequestMethod.GET, RequestMethod.POST})
     @ResponseBody
@@ -56,6 +57,7 @@ public class AdminWebsiteManageController implements BaseController {
     }
 
 
+    @SaCheckLogin
     @ApiOperation(value = "查询网点码详情", httpMethod = "POST")
     @RequestMapping(value = "/queryWebsiteCodeDetails", method = {RequestMethod.GET, RequestMethod.POST})
     @ResponseBody
@@ -63,6 +65,7 @@ public class AdminWebsiteManageController implements BaseController {
         return CommonResult.success(adminWebsiteCodeManageService.queryWebsiteCodeDetailsList(websiteCodeQueryDetailsReq));
     }
 
+    @SaCheckLogin
     @ApiOperation(value = "获取网点码文件", httpMethod = "POST")
     @RequestMapping(value = "/getWebsiteCodeUrl", method = {RequestMethod.GET, RequestMethod.POST})
     @ResponseBody
@@ -70,6 +73,7 @@ public class AdminWebsiteManageController implements BaseController {
         return CommonResult.success(adminWebsiteCodeManageService.getWebsiteCodeUrl(id));
     }
 
+    @SaCheckLogin
     @ApiOperation(value = "更新网点码更新物流", httpMethod = "POST")
     @RequestMapping(value = "/updateWebsiteCodeExpress", method = {RequestMethod.GET, RequestMethod.POST})
     @ResponseBody
@@ -77,7 +81,7 @@ public class AdminWebsiteManageController implements BaseController {
         return CommonResult.success(adminWebsiteCodeManageService.updateWebsiteCodeExpress(websiteCodeQueryExpressReq));
     }
 
-
+    @SaCheckLogin
     @SneakyThrows
     @ApiOperation(value = "导出网点码详情", httpMethod = "POST")
     @RequestMapping(value = "/exportWebsiteCodeDetails", method = {RequestMethod.GET, RequestMethod.POST})

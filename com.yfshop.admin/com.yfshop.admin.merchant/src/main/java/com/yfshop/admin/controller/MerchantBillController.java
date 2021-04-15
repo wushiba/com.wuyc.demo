@@ -1,6 +1,7 @@
 package com.yfshop.admin.controller;
 
 
+import cn.dev33.satoken.annotation.SaCheckLogin;
 import com.yfshop.admin.api.website.WebsiteBillService;
 import com.yfshop.admin.api.website.request.WebsiteCodeReq;
 import com.yfshop.admin.api.website.result.WebsiteBillDayResult;
@@ -26,21 +27,25 @@ class MerchantBillController implements BaseController {
     @DubboReference(check = false)
     private WebsiteBillService websiteBillService;
 
+    @SaCheckLogin
     @RequestMapping(value = "/getBillByDay", method = {RequestMethod.POST})
     public CommonResult<WebsiteBillDayResult> getBillByDay(WebsiteCodeReq websiteReq) {
         return CommonResult.success(websiteBillService.getBillListByMerchantId(getCurrentAdminUserId(), websiteReq.getDateTime(), websiteReq.getStatus()));
     }
 
+    @SaCheckLogin
     @RequestMapping(value = "/getBillByWebsiteCode", method = {RequestMethod.POST})
     public CommonResult<WebsiteBillDayResult> getBillByWebsiteCode(WebsiteCodeReq websiteReq) {
         return CommonResult.success(websiteBillService.getBillByWebsiteCode(websiteReq.getWebsiteCode(), websiteReq.getDateTime()));
     }
 
+    @SaCheckLogin
     @RequestMapping(value = "/billConfirm", method = {RequestMethod.POST})
     public CommonResult<Void> billConfirm(@RequestBody List<Long> ids) {
         return CommonResult.success(websiteBillService.billConfirm(getCurrentAdminUserId(), ids));
     }
 
+    @SaCheckLogin
     @RequestMapping(value = "/billAllConfirm", method = {RequestMethod.POST})
     public CommonResult<Void> billAllConfirm() {
         return CommonResult.success(websiteBillService.billAllConfirm(getCurrentAdminUserId()));

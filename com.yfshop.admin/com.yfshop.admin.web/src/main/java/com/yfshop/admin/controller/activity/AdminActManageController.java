@@ -1,5 +1,6 @@
 package com.yfshop.admin.controller.activity;
 
+import cn.dev33.satoken.annotation.SaCheckLogin;
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.crypto.SecureUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -38,7 +39,7 @@ public class AdminActManageController implements BaseController {
     @DubboReference(check = false)
     private AdminActCodeManageService adminActCodeManageService;
 
-
+    @SaCheckLogin
     @ApiOperation(value = "查询活动码", httpMethod = "POST")
     @RequestMapping(value = "/queryActCode", method = {RequestMethod.GET, RequestMethod.POST})
     @ResponseBody
@@ -46,7 +47,7 @@ public class AdminActManageController implements BaseController {
         return CommonResult.success(adminActCodeManageService.queryActCodeList(actCodeQueryReq));
     }
 
-
+    @SaCheckLogin
     @CrossOrigin
     @SneakyThrows
     @ApiOperation(value = "导入溯源码文件", httpMethod = "POST")
@@ -69,7 +70,7 @@ public class AdminActManageController implements BaseController {
         return CommonResult.success(adminActCodeManageService.actCodeImport(actId, md5, sourceCodes));
     }
 
-
+    @SaCheckLogin
     @CrossOrigin
     @SneakyThrows
     @ApiOperation(value = "导入溯源码文件", httpMethod = "POST")
@@ -80,7 +81,7 @@ public class AdminActManageController implements BaseController {
         return CommonResult.success(adminActCodeManageService.actCodeImport(importReq.getActId(), importReq.getMd5(), importReq.getUrl()));
     }
 
-
+    @SaCheckLogin
     @ApiOperation(value = "获取网点码文件", httpMethod = "POST")
     @RequestMapping(value = "/actCodeUrl", method = {RequestMethod.GET, RequestMethod.POST})
     @ResponseBody
@@ -88,6 +89,7 @@ public class AdminActManageController implements BaseController {
         return CommonResult.success(adminActCodeManageService.actCodeUrl(getCurrentAdminUserId(), id));
     }
 
+    @SaCheckLogin
     @ApiOperation(value = "发送网点码文件", httpMethod = "POST")
     @RequestMapping(value = "/sendEmailActCode", method = {RequestMethod.GET, RequestMethod.POST})
     @ResponseBody
@@ -95,7 +97,7 @@ public class AdminActManageController implements BaseController {
         return CommonResult.success(adminActCodeManageService.sendEmailActCode(getCurrentAdminUserId(), id, factoryId));
     }
 
-
+    @SaCheckLogin
     @ApiOperation(value = "查询活动码", httpMethod = "POST")
     @RequestMapping(value = "/queryActCodeDetails", method = {RequestMethod.GET, RequestMethod.POST})
     @ResponseBody
@@ -103,6 +105,7 @@ public class AdminActManageController implements BaseController {
         return CommonResult.success(adminActCodeManageService.queryActCodeDetails(actCodeQueryReq));
     }
 
+    @SaCheckLogin
     @ApiOperation(value = "查询活动码记录", httpMethod = "POST")
     @RequestMapping(value = "/queryActCodeDownloadRecord", method = {RequestMethod.GET, RequestMethod.POST})
     @ResponseBody
