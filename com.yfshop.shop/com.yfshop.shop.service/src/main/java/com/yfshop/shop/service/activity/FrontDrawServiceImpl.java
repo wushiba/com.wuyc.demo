@@ -26,8 +26,6 @@ import com.yfshop.shop.utils.Ip2regionUtil;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.scheduling.annotation.EnableAsync;
-
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -51,8 +49,6 @@ public class FrontDrawServiceImpl implements FrontDrawService {
     private RedisService redisService;
     @Resource
     private DrawPrizeMapper drawPrizeMapper;
-    @Resource
-    private IpAddressMapper ipAddressMapper;
     @Resource
     private UserCouponMapper userCouponMapper;
     @Resource
@@ -164,15 +160,15 @@ public class FrontDrawServiceImpl implements FrontDrawService {
         DrawProvinceRate provinceRate = this.getProvinceRateByActIdAndProvince(actCodeBatchDetail.getActId(), provinceId);
         if (provinceRate == null) {
             if (BoxSpecValEnum.BIG.getCode().equalsIgnoreCase(actCodeBatchDetail.getBoxSpecVal())) {
-                prizeLevel = startDraw(firstPrize.getWinRate(), firstPrize.getPrizeCount(),  secondPrize.getWinRate(), secondPrize.getPrizeCount());
+                prizeLevel = startDraw(userId, firstPrize.getWinRate(), firstPrize.getPrizeCount(),  secondPrize.getWinRate(), secondPrize.getPrizeCount());
             } else {
-                prizeLevel = startDraw(firstPrize.getWinRate(), firstPrize.getPrizeCount(),  secondPrize.getSmallBoxRate(), secondPrize.getPrizeCount());
+                prizeLevel = startDraw(userId, firstPrize.getWinRate(), firstPrize.getPrizeCount(),  secondPrize.getSmallBoxRate(), secondPrize.getPrizeCount());
             }
         } else {
             if (BoxSpecValEnum.BIG.getCode().equalsIgnoreCase(actCodeBatchDetail.getBoxSpecVal())) {
-                prizeLevel = startDraw(provinceRate.getFirstWinRate(), firstPrize.getPrizeCount(), provinceRate.getSecondWinRate(), secondPrize.getPrizeCount());
+                prizeLevel = startDraw(userId, provinceRate.getFirstWinRate(), firstPrize.getPrizeCount(), provinceRate.getSecondWinRate(), secondPrize.getPrizeCount());
             } else {
-                prizeLevel = startDraw(provinceRate.getFirstWinRate(), firstPrize.getPrizeCount(), provinceRate.getSecondSmallBoxWinRate(), secondPrize.getPrizeCount());
+                prizeLevel = startDraw(userId, provinceRate.getFirstWinRate(), firstPrize.getPrizeCount(), provinceRate.getSecondSmallBoxWinRate(), secondPrize.getPrizeCount());
             }
         }
 
@@ -203,6 +199,17 @@ public class FrontDrawServiceImpl implements FrontDrawService {
         return actCodeBatchDetail == null ? null : BeanUtil.convert(actCodeBatchDetail, YfActCodeBatchDetailResult.class) ;
     }
 
+    @Override
+    public Long addDrawUserWhite(Integer userId) throws ApiException {
+        Asserts.assertNonNull(userId, 500, "用户id不可以为空");
+        return redisService.sAdd(CacheConstants.DRAW_WHITE_USER_DATA, userId);
+    }
+
+    @Override
+    public Long deleteDrawUserWhite(Integer userId) throws ApiException {
+        Asserts.assertNonNull(userId, 500, "用户id不可以为空");
+        return redisService.sRemove(CacheConstants.DRAW_WHITE_USER_DATA, userId);
+    }
 
     private DrawProvinceRate getProvinceRateByActIdAndProvince(Integer actId, Integer provinceId) {
         List<DrawProvinceRate> provinceList = null;
@@ -276,14 +283,20 @@ public class FrontDrawServiceImpl implements FrontDrawService {
     /**
      * 生成随机字符串抽奖
      * @param firstRate     一等奖中奖概率
+     * @param firstRate     一等奖中奖概率
      * @param firstCount    一等奖数量
      * @param secondRate    二等奖中奖概率
      * @param secondCount   二等奖数量
      * @return
      */
-    private Integer startDraw(Integer firstRate, Integer firstCount, Integer secondRate, Integer secondCount) {
-        Integer prizeLevel = 3;
-        int random = new Random().nextInt(10000);
+    private Integer startDraw(Integer userId, Integer firstRate, Integer firstCount, Integer secondRate, Integer secondCount) {
+        Integer prizeLevel = 3, random = 1;
+        Long userIsWhite = redisService.sRemove(CacheConstants.DRAW_WHITE_USER_DATA, userId);
+        if (userIsWhite < 1) {
+            random = new Random().nextInt(10000);
+        } else {
+            logger.info("====抽奖白名单userId=" + userId);
+        }
 
         if (random <= firstRate) {
             // 校验是否超卖, 超卖的话默认抽中三等奖

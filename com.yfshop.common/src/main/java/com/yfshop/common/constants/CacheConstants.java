@@ -25,6 +25,7 @@ public interface CacheConstants {
 
     /** 一等奖中奖数量 */
     String PRIZE_FIRST_WIN_COUNT = "draw_first_win_count";
+    String DRAW_WHITE_USER_DATA = "draw_white_user_data";
     /** 二等奖中奖数量 */
     String PRIZE_SECOND_WIN_COUNT = "draw_second_win_count";
     /** 抽奖活动缓存 */
