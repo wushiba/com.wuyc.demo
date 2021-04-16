@@ -32,15 +32,15 @@ public class MpServiceImpl implements MpService {
     @Async
     @Override
     public void sendWxMpTemplateMsg(WxMpTemplateMessage wxMpTemplateMessage) {
-//        try {
-//            wxMpService.getTemplateMsgService().sendTemplateMsg(wxMpTemplateMessage);
-//            saveWxTemplateMessage(wxMpTemplateMessage, "SUCCESS");
-//        } catch (WxErrorException e) {
-//            saveWxTemplateMessage(wxMpTemplateMessage, "FAIL");
-//            e.printStackTrace();
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
+        try {
+            wxMpService.getTemplateMsgService().sendTemplateMsg(wxMpTemplateMessage);
+            saveWxTemplateMessage(wxMpTemplateMessage, "SUCCESS");
+        } catch (WxErrorException e) {
+            saveWxTemplateMessage(wxMpTemplateMessage, "FAIL");
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Async
