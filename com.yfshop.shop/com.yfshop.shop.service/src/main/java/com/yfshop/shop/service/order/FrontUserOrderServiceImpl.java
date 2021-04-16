@@ -354,7 +354,7 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
             mallService.updateItemSkuStock(itemSku.getId(), userCart.getNum());
             itemSkuMap.put(itemSku.getId(), itemSku);
             itemCount += userCart.getNum();
-            orderFreight = orderFreight.add(new BigDecimal(userCart.getNum() * 2));
+            orderFreight = orderFreight.add(itemSku.getFreight().multiply(new BigDecimal(userCart.getNum())));
             orderPrice = orderPrice.add((itemSku.getSkuSalePrice().multiply(new BigDecimal(userCart.getNum()))));
             payPrice = orderFreight.add(orderPrice);
         }
