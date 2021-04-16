@@ -213,7 +213,7 @@ public class FrontMerchantServiceImpl implements FrontMerchantService {
         });
 
         // 将商户信息存入redis
-        redisService.set(CacheConstants.MERCHANT_LIST_INFO_DATA, JSON.toJSONString(merchantResultList), 60 * 60 * 24);
+        redisService.set(CacheConstants.MERCHANT_LIST_INFO_DATA, JSON.toJSONString(merchantResultList), 60 * 10);
 
         // 更新缓存中的商户经纬度，先删除后更新
         detailList.forEach(merchantDetail -> {
