@@ -22,7 +22,7 @@ dubbo:
 spring:
   thymeleaf:
     # 页面模板页地址
-    prefix: file:///home/www/web-deploy/html/shop.yufan.51jujibao.com/
+    prefix: file:///home/www/web-deploy/template/yf-shop/
     suffix: .html
     mode: HTML
     encoding: UTF-8
