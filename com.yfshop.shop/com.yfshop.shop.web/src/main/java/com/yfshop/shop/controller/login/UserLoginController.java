@@ -51,6 +51,8 @@ public class UserLoginController extends AbstractBaseController {
         String openId = getCurrentOpenId();
         Asserts.assertNonNull(openId, 500, "微信未授权!");
         WxMpUser wxMpUser = wxMpService.getUserService().userInfo(openId);
+        UserResult userResult = frontUserService.getUserByOpenId(openId);
+        StpUtil.setLoginId(userResult.getId());
         return CommonResult.success(wxMpUser.getSubscribe() ? 1 : 0);
     }
 }
