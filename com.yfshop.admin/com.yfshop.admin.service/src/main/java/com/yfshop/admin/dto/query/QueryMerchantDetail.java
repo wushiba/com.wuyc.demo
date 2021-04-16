@@ -25,4 +25,5 @@ public class QueryMerchantDetail implements Serializable {
     private String pMerchantName;
     private String isEnable;
     private String isRefrigerator;
+    private Integer pid;
 }

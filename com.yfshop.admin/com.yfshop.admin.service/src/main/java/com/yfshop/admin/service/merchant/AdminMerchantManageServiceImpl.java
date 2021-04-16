@@ -170,7 +170,11 @@ public class AdminMerchantManageServiceImpl implements AdminMerchantManageServic
     }
 
     @Override
-    public IPage<MerchantResult> pageQueryMerchants(QueryMerchantReq req) {
+    public IPage<MerchantResult> pageQueryMerchants(Integer merchantId, QueryMerchantReq req) {
+        Merchant loginMerchant = merchantMapper.selectById(merchantId);
+        if (loginMerchant == null) {
+            return BeanUtil.emptyPageData(req.getPageIndex(), req.getPageSize());
+        }
         QueryMerchantDetail query = new QueryMerchantDetail();
         query.setStartCreateTime(req.getStartCreateTime());
         query.setEndCreateTime(req.getEndCreateTime());
@@ -185,6 +189,9 @@ public class AdminMerchantManageServiceImpl implements AdminMerchantManageServic
         query.setPMerchantName(StringUtils.isBlank(req.getPMerchantName()) ? null : req.getPMerchantName());
         query.setIsEnable(StringUtils.isBlank(req.getIsEnable()) ? null : req.getIsEnable());
         query.setIsRefrigerator(StringUtils.isBlank(req.getIsRefrigerator()) ? null : req.getIsRefrigerator());
+        if (!loginMerchant.getRoleAlias().equals(GroupRoleEnum.SYS.getCode())) {
+            query.setPid(loginMerchant.getId());
+        }
         int count = customMerchantMapper.countMerchantInfo(query);
         if (count <= 0) {
             return BeanUtil.emptyPageData(req.getPageIndex(), req.getPageSize());
