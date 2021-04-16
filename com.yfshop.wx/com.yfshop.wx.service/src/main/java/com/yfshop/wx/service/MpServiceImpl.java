@@ -49,11 +49,10 @@ public class MpServiceImpl implements MpService {
         WxTemplateMessage wxTemplateMessage = wxTemplateMessageMapper.selectOne(Wrappers.<WxTemplateMessage>lambdaQuery()
                 .eq(WxTemplateMessage::getOpenId, openId)
                 .ge(WxTemplateMessage::getCreateTime, DateUtil.getDate(new Date()))
-                .eq(WxTemplateMessage::getStatus,"FAIL")
                 .orderByDesc(WxTemplateMessage::getId));
-        if (wxTemplateMessage != null) {
+        if (wxTemplateMessage != null&&"FAIL".equals(wxTemplateMessage.getStatus())) {
             try {
-                Thread.sleep(2000);
+                Thread.sleep(500);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
