@@ -21,6 +21,7 @@ import com.yfshop.shop.service.activity.result.YfDrawActivityResult;
 import com.yfshop.shop.service.activity.result.YfDrawPrizeResult;
 import com.yfshop.shop.service.activity.service.FrontDrawService;
 import com.yfshop.shop.service.address.result.UserAddressResult;
+import com.yfshop.shop.service.cart.UserCartService;
 import com.yfshop.shop.service.coupon.service.FrontUserCouponService;
 import com.yfshop.shop.service.mall.MallService;
 import com.yfshop.shop.service.mall.req.QueryItemDetailReq;
@@ -36,6 +37,7 @@ import com.yfshop.wx.api.service.MpPayService;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
+import org.apache.dubbo.config.annotation.DubboService;
 import org.apache.dubbo.config.annotation.Service;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.transaction.annotation.Transactional;
@@ -69,7 +71,7 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
     @DubboReference
     private MpPayService mpPayService;
     @Resource
-    private ItemSkuMapper itemSkuMapper;
+    private UserCartService userCartService;
     @Resource
     private UserCartMapper userCartMapper;
     @Resource
@@ -365,8 +367,10 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
         }
 
         // 删除购物车id
-        userCartMapper.deleteBatchIds(cartIdList);
+        List<Integer> skuIdList = userCartList.stream().map(UserCart::getSkuId).collect(Collectors.toList());
+        userCartService.deleteUserCarts(userId, skuIdList);
 
+        // 创建订单
         Order order = insertUserOrder(userId, null, ReceiveWayEnum.PS.getCode(), itemCount, childOrderCount, orderPrice, couponPrice, orderFreight, payPrice, "N", null);
         Long orderId = order.getId();
         for (UserCart userCart : userCartList) {
