@@ -96,8 +96,9 @@ public class AdminMerchantManageServiceImpl implements AdminMerchantManageServic
         merchant.setIsDelete("N");
         merchant.setPid(pm.getId());
         merchant.setPMerchantName(pm.getMerchantName());
-        merchant.setPidPath(this.generatePidPath(pm.getId()));
         merchantMapper.insert(merchant);
+        merchant.setPidPath(this.generatePidPath(pm.getId(),merchant.getId()));
+        merchantMapper.updateById(merchant);
         return null;
     }
 
@@ -155,7 +156,7 @@ public class AdminMerchantManageServiceImpl implements AdminMerchantManageServic
         merchant.setAddress(req.getAddress());
         merchant.setPid(pm.getId());
         merchant.setPMerchantName(pm.getMerchantName());
-        merchant.setPidPath(this.generatePidPath(pm.getId()));
+        merchant.setPidPath(this.generatePidPath(pm.getId(),merchant.getId()));
         int rows = merchantMapper.updateById(merchant);
         Asserts.assertTrue(rows > 0, 500, "编辑商户信息失败");
 
@@ -240,7 +241,7 @@ public class AdminMerchantManageServiceImpl implements AdminMerchantManageServic
         }
     }
 
-    private String generatePidPath(Integer pid) {
+    private String generatePidPath(Integer pid,Integer id) {
         if (pid == null || pid == 0) {
             return null;
         }
@@ -251,8 +252,8 @@ public class AdminMerchantManageServiceImpl implements AdminMerchantManageServic
             path.addFirst(parent.getId());
             parent = this.getParent(parent.getPid());
         }
-        path.addFirst(parent.getId());
-        return StringUtils.join(path, ",");
+        path.addFirst(id);
+        return StringUtils.join(path, ".")+id+".";
     }
 
     private Merchant getParent(Integer pid) throws ApiException {

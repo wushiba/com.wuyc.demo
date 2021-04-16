@@ -9,6 +9,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.github.binarywang.wxpay.bean.order.WxPayMpOrderResult;
 import com.yfshop.admin.api.merchant.MerchantInfoService;
 import com.yfshop.admin.api.merchant.request.MerchantGroupReq;
+import com.yfshop.admin.api.merchant.request.MerchantReq;
 import com.yfshop.admin.api.merchant.result.MerchantGroupResult;
 import com.yfshop.admin.api.merchant.result.MerchantResult;
 import com.yfshop.admin.api.user.UserService;
@@ -51,6 +52,22 @@ class MerchantInfoController extends AbstractBaseController {
     private String websiteCodeUrl;
     @Autowired
     WxMpService wxService;
+
+
+    @SaCheckLogin
+    @RequestMapping(value = "/saveMerchant", method = {RequestMethod.GET, RequestMethod.POST})
+    @ResponseBody
+    public CommonResult<Void> saveMerchant(MerchantReq merchantReq) {
+        merchantReq.setPId(getCurrentAdminUserId());
+        return CommonResult.success(merchantInfoService.save(merchantReq));
+    }
+
+    @SaCheckLogin
+    @RequestMapping(value = "/getChildMerchant", method = {RequestMethod.GET, RequestMethod.POST})
+    @ResponseBody
+    public CommonResult<List<MerchantResult>> getChildMerchant() {
+        return CommonResult.success(merchantInfoService.getChildMerchant(getCurrentAdminUserId()));
+    }
 
     @RequestMapping(value = "/checkSubscribe", method = {RequestMethod.GET, RequestMethod.POST})
     @ResponseBody

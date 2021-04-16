@@ -15,6 +15,7 @@ import com.github.binarywang.wxpay.bean.request.BaseWxPayRequest;
 import com.github.binarywang.wxpay.bean.request.WxPayUnifiedOrderRequest;
 import com.yfshop.admin.api.merchant.MerchantInfoService;
 import com.yfshop.admin.api.merchant.request.MerchantGroupReq;
+import com.yfshop.admin.api.merchant.request.MerchantReq;
 import com.yfshop.admin.api.merchant.result.MerchantGroupResult;
 import com.yfshop.admin.api.merchant.result.MerchantResult;
 import com.yfshop.admin.api.website.request.WebsiteCodeAddressReq;
@@ -164,7 +165,7 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
         } else {
             merchantId = merchant.getId();
             merchant.setHeadImgUrl(headImageUrl);
-            Asserts.assertEquals(merchant.getRoleAlias(), GroupRoleEnum.WD.getCode(), 500, "只允许网点用户绑定网点码！");
+            Asserts.assertEquals(merchant.getRoleAlias(), GroupRoleEnum.WD.getCode(), 500, "改手机号已经存在其他身份，请更换网点对应手机号！");
             Asserts.assertEquals(merchant.getMobile(), websiteReq.getMobile(), 500, "手机号不允许被修改！");
             String openId = merchant.getOpenId();
             merchant = BeanUtil.convert(websiteReq, Merchant.class);
@@ -508,7 +509,8 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
         LambdaQueryWrapper lambdaQueryWrapper = Wrappers.<Merchant>lambdaQuery()
                 .eq(Merchant::getPid, merchantGroupReq.getMerchantId())
                 .ne(Merchant::getRoleAlias, "wd")
-                .eq(Merchant::getIsEnable, "Y");
+                .eq(Merchant::getIsEnable, "Y")
+                .eq(Merchant::getIsDelete, "N");
         List<Merchant> merchantList = merchantMapper.selectList(lambdaQueryWrapper);
         List<MerchantGroupResult> merchantGroupResults = new ArrayList<>();
         if (myselfCount > 0) {
@@ -531,11 +533,63 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
         return merchantGroupResult;
     }
 
+    @Override
+    public Void save(MerchantReq merchantReq) throws ApiException {
+        Merchant m = merchantMapper.selectOne(Wrappers.<Merchant>lambdaQuery().eq(Merchant::getMobile, merchantReq.getMobile()));
+        if (merchantReq.getMerchantId() == null) {
+            Asserts.assertNull(m, 500, "手机号已经被注册！");
+            Merchant pMerchant = merchantMapper.selectById(merchantReq.getPId());
+            Merchant merchant = new Merchant();
+            merchant.setPid(merchantReq.getPId());
+            merchant.setPMerchantName(pMerchant.getMerchantName());
+            merchant.setRoleAlias(merchantReq.getRoleAlias());
+            merchant.setRoleName(GroupRoleEnum.getByCode(merchantReq.getRoleAlias()).name());
+            merchant.setMerchantName(merchantReq.getMerchantName());
+            merchant.setMobile(merchantReq.getMobile());
+            merchant.setPassword(SecureUtil.md5(merchantReq.getPassword()));
+            merchant.setContacts(merchantReq.getContacts());
+            merchant.setProvince(pMerchant.getProvince());
+            merchant.setCity(pMerchant.getCity());
+            merchant.setDistrict(pMerchant.getDistrict());
+            merchant.setProvinceId(pMerchant.getProvinceId());
+            merchant.setCityId(pMerchant.getCityId());
+            merchant.setDistrictId(pMerchant.getDistrictId());
+            merchantMapper.insert(merchant);
+            merchant.setPidPath(pMerchant.getPidPath() + merchant.getId() + ".");
+            merchantMapper.updateById(merchant);
+        } else {
+            Asserts.assertEquals(m.getMobile(), merchantReq.getMobile(), 500, "手机号不能被修改！");
+            Merchant merchant = new Merchant();
+            merchant.setId(merchantReq.getMerchantId());
+            merchant.setRoleAlias(merchantReq.getRoleAlias());
+            merchant.setRoleName(GroupRoleEnum.getByCode(merchantReq.getRoleAlias()).name());
+            merchant.setMerchantName(merchantReq.getMerchantName());
+            merchant.setPassword(SecureUtil.md5(merchantReq.getPassword()));
+            merchant.setContacts(merchantReq.getContacts());
+            merchant.setIsEnable("Y");
+            merchant.setIsDelete("N");
+            merchantMapper.updateById(merchant);
+        }
+        return null;
+    }
+
+    @Override
+    public List<MerchantResult> getChildMerchant(Integer merchantId) throws ApiException {
+        LambdaQueryWrapper lambdaQueryWrapper = Wrappers.<Merchant>lambdaQuery()
+                .eq(Merchant::getPid, merchantId)
+                .eq(Merchant::getIsEnable, "Y")
+                .eq(Merchant::getIsDelete, "N")
+                .orderByDesc(Merchant::getId);
+        List<Merchant> list=merchantMapper.selectList(lambdaQueryWrapper);
+        return BeanUtil.convertList(list,MerchantResult.class);
+    }
+
     private Integer getCurrentWebsiteCount(Integer merchantId, Date startCreateTime, Date endCreateTime) {
         LambdaQueryWrapper lambdaQueryWrapper = Wrappers.<Merchant>lambdaQuery()
                 .eq(Merchant::getPid, merchantId)
                 .eq(Merchant::getRoleAlias, "wd")
                 .eq(Merchant::getIsEnable, "Y")
+                .eq(Merchant::getIsDelete, "N")
                 .ge(startCreateTime != null, Merchant::getCreateTime, startCreateTime)
                 .lt(endCreateTime != null, Merchant::getCreateTime, endCreateTime != null ? DateUtil.plusDays(endCreateTime, 1) : null);
         return merchantMapper.selectCount(lambdaQueryWrapper);
@@ -546,6 +600,7 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
                 .like(Merchant::getPidPath, merchantId + ".")
                 .eq(Merchant::getRoleAlias, "wd")
                 .eq(Merchant::getIsEnable, "Y")
+                .eq(Merchant::getIsDelete, "N")
                 .ge(startCreateTime != null, Merchant::getCreateTime, startCreateTime)
                 .lt(endCreateTime != null, Merchant::getCreateTime, endCreateTime != null ? DateUtil.plusDays(endCreateTime, 1) : null);
         return merchantMapper.selectCount(lambdaQueryWrapper);
