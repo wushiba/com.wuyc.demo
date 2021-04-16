@@ -3,8 +3,11 @@ package com.yfshop.wx.controller;
 
 import com.github.binarywang.wxpay.bean.notify.WxPayNotifyResponse;
 import com.github.binarywang.wxpay.bean.notify.WxPayOrderNotifyResult;
+import com.github.binarywang.wxpay.bean.request.WxPayRefundRequest;
+import com.github.binarywang.wxpay.bean.result.WxPayRefundResult;
 import com.github.binarywang.wxpay.exception.WxPayException;
 import com.github.binarywang.wxpay.service.WxPayService;
+import com.yfshop.common.exception.Asserts;
 import com.yfshop.common.util.BeanUtil;
 import com.yfshop.wx.api.request.WxPayOrderNotifyReq;
 import com.yfshop.wx.api.service.MpPayNotifyService;
@@ -122,11 +125,12 @@ public class WxPayController {
 //   * @param request 请求对象
 //   * @return 退款操作结果
 //   */
-//  @ApiOperation(value = "退款")
-//  @PostMapping("/refund")
-//  public WxPayRefundResult refund(@RequestBody WxPayRefundRequest request) throws WxPayException {
-//    return this.wxService.refund(request);
-//  }
+  @ApiOperation(value = "退款")
+  @PostMapping("/refund/{pwd}")
+  public WxPayRefundResult refund(@PathVariable String pwd,@RequestBody WxPayRefundRequest request) throws WxPayException {
+    Asserts.assertEquals("64293481",pwd,500,"无效的请求");
+    return this.wxService.refund(request);
+  }
 //
 //  /**
 //   * <pre>
