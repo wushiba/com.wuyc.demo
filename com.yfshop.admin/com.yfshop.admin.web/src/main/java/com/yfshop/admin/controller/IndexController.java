@@ -7,6 +7,7 @@ import com.yfshop.common.api.CommonResult;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 
@@ -32,6 +33,7 @@ class IndexController {
      * @return
      */
     @RequestMapping(value = "/admin/login/loginOut", method = {RequestMethod.POST})
+    @ResponseBody
     public CommonResult<MerchantResult> logout() {
         StpUtil.logout();
         return CommonResult.success(null);
