@@ -46,9 +46,9 @@ public class AdminMerchantManageController implements BaseController {
     @RequestMapping(value = "/createMerchant", method = {RequestMethod.GET, RequestMethod.POST})
     @ResponseBody
     @SaCheckLogin
-    @SaCheckRole(value = {"zb", "fgs", "sq", "jxs", "ywy", "fxs",},mode= SaMode.OR)
+    @SaCheckRole(value = {"zb", "fgs", "sq", "jxs", "ywy", "fxs",}, mode = SaMode.OR)
     public CommonResult<Void> createMerchant(@Valid @NotNull(message = "创建商户信息不能为空") CreateMerchantReq req) {
-   
+
         return CommonResult.success(adminMerchantManageService.createMerchant(getCurrentAdminUserId(), req));
     }
 
@@ -56,7 +56,7 @@ public class AdminMerchantManageController implements BaseController {
     @RequestMapping(value = "/updateMerchant", method = {RequestMethod.GET, RequestMethod.POST})
     @ResponseBody
     @SaCheckLogin
-    @SaCheckRole(value = {"zb", "fgs", "sq", "jxs", "ywy", "fxs",},mode= SaMode.OR)
+    @SaCheckRole(value = {"zb", "fgs", "sq", "jxs", "ywy", "fxs",}, mode = SaMode.OR)
     public CommonResult<Void> updateMerchant(@Valid @NotNull(message = "编辑商户信息不能为空") UpdateMerchantReq req) {
         return CommonResult.success(adminMerchantManageService.updateMerchant(getCurrentAdminUserId(), req));
     }
@@ -65,19 +65,19 @@ public class AdminMerchantManageController implements BaseController {
     @RequestMapping(value = "/pageQueryMerchants", method = {RequestMethod.GET, RequestMethod.POST})
     @ResponseBody
     @SaCheckLogin
-    @SaCheckRole(value = {"zb", "fgs", "sq", "jxs", "ywy", "fxs",},mode= SaMode.OR)
+    @SaCheckRole(value = {"zb", "fgs", "sq", "jxs", "ywy", "fxs",}, mode = SaMode.OR)
     public CommonResult<IPage<MerchantResult>> pageQueryMerchants(QueryMerchantReq req) {
-        return CommonResult.success(adminMerchantManageService.pageQueryMerchants(req));
+        return CommonResult.success(adminMerchantManageService.pageQueryMerchants(getCurrentAdminUserId(), req));
     }
 
     @ApiOperation(value = "条件导出商户列表", httpMethod = "GET")
     @RequestMapping(value = "/downloadMerchants", method = {RequestMethod.GET, RequestMethod.POST})
     @ResponseBody
     @SaCheckLogin
-    @SaCheckRole(value = {"zb", "fgs", "sq", "jxs", "ywy", "fxs",},mode= SaMode.OR)
+    @SaCheckRole(value = {"zb", "fgs", "sq", "jxs", "ywy", "fxs",}, mode = SaMode.OR)
     public void downloadMerchants(QueryMerchantReq req) {
         req.setPageSize(Integer.MAX_VALUE);
-        IPage<MerchantResult> page = adminMerchantManageService.pageQueryMerchants(req);
+        IPage<MerchantResult> page = adminMerchantManageService.pageQueryMerchants(getCurrentAdminUserId(), req);
         List<MerchantExcel> data = page.getRecords().stream().map(m -> BeanUtil.convert(m, MerchantExcel.class))
                 .collect(Collectors.toList());
         ExcelUtils.exportExcel(data, "商户信息", "商户信息",
@@ -91,7 +91,7 @@ public class AdminMerchantManageController implements BaseController {
     @RequestMapping(value = "/disableMerchant", method = {RequestMethod.GET, RequestMethod.POST})
     @ResponseBody
     @SaCheckLogin
-    @SaCheckRole(value = {"zb", "fgs", "sq", "jxs", "ywy", "fxs",},mode= SaMode.OR)
+    @SaCheckRole(value = {"zb", "fgs", "sq", "jxs", "ywy", "fxs",}, mode = SaMode.OR)
     public CommonResult<Void> disableMerchant(@NotNull(message = "商户ID不能为空") Integer merchantId) {
         return CommonResult.success(adminMerchantManageService.updateMerchantIsEnable(merchantId, false));
     }
@@ -103,7 +103,7 @@ public class AdminMerchantManageController implements BaseController {
     @RequestMapping(value = "/enableMerchant", method = {RequestMethod.GET, RequestMethod.POST})
     @ResponseBody
     @SaCheckLogin
-    @SaCheckRole(value = {"zb", "fgs", "sq", "jxs", "ywy", "fxs",},mode= SaMode.OR)
+    @SaCheckRole(value = {"zb", "fgs", "sq", "jxs", "ywy", "fxs",}, mode = SaMode.OR)
     public CommonResult<Void> enableMerchant(@NotNull(message = "商户ID不能为空") Integer merchantId) {
         return CommonResult.success(adminMerchantManageService.updateMerchantIsEnable(merchantId, true));
     }
@@ -118,7 +118,7 @@ public class AdminMerchantManageController implements BaseController {
     @RequestMapping(value = "/pageQueryMerchantsByPidAndRoleAlias", method = {RequestMethod.GET, RequestMethod.POST})
     @ResponseBody
     @SaCheckLogin
-    @SaCheckRole(value = {"zb", "fgs", "sq", "jxs", "ywy", "fxs",},mode= SaMode.OR)
+    @SaCheckRole(value = {"zb", "fgs", "sq", "jxs", "ywy", "fxs",}, mode = SaMode.OR)
     public CommonResult<IPage<MerchantResult>> pageQueryMerchantsByPidAndRoleAlias(@RequestParam(name = "pageIndex", required = false, defaultValue = "1") Integer pageIndex,
                                                                                    @RequestParam(name = "pageSize", required = false, defaultValue = "10") Integer pageSize,
                                                                                    String roleAlias, String merchantName) {
