@@ -3,7 +3,6 @@ server:
   port: 9999
 logging:
   level:
-    org.springframework: debug
     com.yfshop: debug
 
 dubbo:
