@@ -66,6 +66,9 @@
             <if test="param.isRefrigerator!=null">
                 and b.is_refrigerator = #{param.isRefrigerator}
             </if>
+            <if test="param.pid!=null">
+                and a.pid = #{param.pid}
+            </if>
         </where>
     </sql>
 </mapper>
