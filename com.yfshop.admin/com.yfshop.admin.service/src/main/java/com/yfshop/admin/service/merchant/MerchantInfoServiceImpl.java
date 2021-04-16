@@ -543,7 +543,7 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
             merchant.setPid(merchantReq.getPId());
             merchant.setPMerchantName(pMerchant.getMerchantName());
             merchant.setRoleAlias(merchantReq.getRoleAlias());
-            merchant.setRoleName(GroupRoleEnum.getByCode(merchantReq.getRoleAlias()).name());
+            merchant.setRoleName(GroupRoleEnum.getByCode(merchantReq.getRoleAlias()).getDescription());
             merchant.setMerchantName(merchantReq.getMerchantName());
             merchant.setMobile(merchantReq.getMobile());
             merchant.setPassword(SecureUtil.md5(merchantReq.getPassword()));
@@ -562,7 +562,7 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
             Merchant merchant = new Merchant();
             merchant.setId(merchantReq.getMerchantId());
             merchant.setRoleAlias(merchantReq.getRoleAlias());
-            merchant.setRoleName(GroupRoleEnum.getByCode(merchantReq.getRoleAlias()).name());
+            merchant.setRoleName(GroupRoleEnum.getByCode(merchantReq.getRoleAlias()).getDescription());
             merchant.setMerchantName(merchantReq.getMerchantName());
             merchant.setPassword(SecureUtil.md5(merchantReq.getPassword()));
             merchant.setContacts(merchantReq.getContacts());

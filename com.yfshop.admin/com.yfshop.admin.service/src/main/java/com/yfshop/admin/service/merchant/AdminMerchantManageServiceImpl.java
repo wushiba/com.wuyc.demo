@@ -246,14 +246,14 @@ public class AdminMerchantManageServiceImpl implements AdminMerchantManageServic
             return null;
         }
         LinkedList<Integer> path = new LinkedList<>();
-        path.addFirst(pid);
+        path.addFirst(id);
         Merchant parent = this.getParent(pid);
         while (parent.getPid() != null && parent.getPid() != 0) {
             path.addFirst(parent.getId());
             parent = this.getParent(parent.getPid());
         }
-        path.addFirst(id);
-        return StringUtils.join(path, ".")+id+".";
+        path.addFirst(parent.getId());
+        return StringUtils.join(path, ".")+".";
     }
 
     private Merchant getParent(Integer pid) throws ApiException {
