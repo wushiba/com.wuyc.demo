@@ -40,10 +40,11 @@ public interface AdminMerchantManageService {
     /**
      * 分页查询商户列表
      *
-     * @param req the req
+     * @param merchantId the merchant id
+     * @param req        the req
      * @return the page data
      */
-    IPage<MerchantResult> pageQueryMerchants(QueryMerchantReq req);
+    IPage<MerchantResult> pageQueryMerchants(Integer merchantId, QueryMerchantReq req);
 
     /**
      * 启用|禁用商户

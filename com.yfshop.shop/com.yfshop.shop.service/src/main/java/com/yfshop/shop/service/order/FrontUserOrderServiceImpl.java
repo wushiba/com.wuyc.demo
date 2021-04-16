@@ -89,6 +89,8 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
     @Resource
     private FrontUserCouponService frontUserCouponService;
 
+    private final static String drawCanUseRegion = "湖南,湖北,江西,四川,重庆,江苏,浙江,安徽,福建,广东,广西,河南,云南,贵州,山东,陕西,海南,山西,上海";
+
     /**
      * 校验提交订单的时候是否支持自提
      *
@@ -273,6 +275,7 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
 
         UserAddressResult addressInfo = frontUserService.getUserAddressById(addressId);
         Asserts.assertNonNull(addressInfo, 500, "收货地址不存在");
+        checkPrizeAddress(skuId, addressInfo.getProvince());
 
         UserCoupon userCoupon = new UserCoupon();
         if (userCouponId != null) {
@@ -351,6 +354,7 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
         for (UserCart userCart : userCartList) {
             ItemSkuResult itemSku = mallService.getItemSkuBySkuId(userCart.getSkuId());
             Asserts.assertFalse(itemSku.getSkuStock() < userCart.getNum(), 500, "商品库存不足");
+            checkPrizeAddress(userCart.getSkuId(), addressInfo.getProvince());
             mallService.updateItemSkuStock(itemSku.getId(), userCart.getNum());
             itemSkuMap.put(itemSku.getId(), itemSku);
             itemCount += userCart.getNum();
@@ -728,6 +732,14 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
         Asserts.assertEquals(userCoupon.getUseStatus(), UserCouponStatusEnum.NO_USE.getCode(), 500, "优惠券状态不正确");
         Asserts.assertTrue("ALL".equalsIgnoreCase(userCoupon.getUseRangeType()) ||
                 userCoupon.getCanUseItemIds().contains(itemId + ""), 500, "请使用正确的优惠券");
+    }
+
+    private void checkPrizeAddress(Integer skuId, String provinceName) throws ApiException {
+        if (skuId == 20068 || skuId == 200770) {
+            if (drawCanUseRegion.contains(provinceName.substring(0, 2))) {
+                throw new ApiException(500, provinceName + "暂不支持配送一等奖或二等奖");
+            }
+        }
     }
 
 }
