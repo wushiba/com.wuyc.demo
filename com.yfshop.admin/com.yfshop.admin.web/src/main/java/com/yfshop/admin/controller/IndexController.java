@@ -1,8 +1,12 @@
 package com.yfshop.admin.controller;
 
 import cn.dev33.satoken.dao.SaTokenDao;
+import cn.dev33.satoken.stp.StpUtil;
+import com.yfshop.admin.api.merchant.result.MerchantResult;
+import com.yfshop.common.api.CommonResult;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 
 
@@ -22,5 +26,15 @@ class IndexController {
         return mav;
     }
 
+    /**
+     * 退出登录
+     *
+     * @return
+     */
+    @RequestMapping(value = "/admin/login/loginOut", method = {RequestMethod.POST})
+    public CommonResult<MerchantResult> logout() {
+        StpUtil.logout();
+        return CommonResult.success(null);
+    }
 
 }
