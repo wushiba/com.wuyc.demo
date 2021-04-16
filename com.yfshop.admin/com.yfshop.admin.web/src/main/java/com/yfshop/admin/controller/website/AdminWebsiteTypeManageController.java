@@ -2,6 +2,7 @@ package com.yfshop.admin.controller.website;
 
 import cn.dev33.satoken.annotation.SaCheckLogin;
 import cn.dev33.satoken.annotation.SaCheckRole;
+import cn.dev33.satoken.annotation.SaMode;
 import com.yfshop.admin.api.website.AdminWebsiteTypeManageService;
 import com.yfshop.admin.api.website.result.WebsiteTypeResult;
 import com.yfshop.common.api.CommonResult;
@@ -38,7 +39,7 @@ public class AdminWebsiteTypeManageController implements BaseController {
     @RequestMapping(value = "/createWebsiteType", method = {RequestMethod.GET, RequestMethod.POST})
     @ResponseBody
     @SaCheckLogin
-    @SaCheckRole(value = "sys")
+    @SaCheckRole(value = {"zb", "fgs", "sq", "jxs", "ywy", "fxs",}, mode = SaMode.OR)
     public CommonResult<Void> createWebsiteType(@NotBlank(message = "网点类型不能为空") String typeName) {
         return CommonResult.success(adminWebsiteTypeManageService.createWebsiteType(typeName));
     }
@@ -47,7 +48,7 @@ public class AdminWebsiteTypeManageController implements BaseController {
     @RequestMapping(value = "/queryWebsiteTypes", method = {RequestMethod.GET, RequestMethod.POST})
     @ResponseBody
     @SaCheckLogin
-    @SaCheckRole(value = "sys")
+    @SaCheckRole(value = {"zb", "fgs", "sq", "jxs", "ywy", "fxs",}, mode = SaMode.OR)
     public CommonResult<List<WebsiteTypeResult>> queryWebsiteTypes() {
         return CommonResult.success(adminWebsiteTypeManageService.queryWebsiteTypes());
     }
