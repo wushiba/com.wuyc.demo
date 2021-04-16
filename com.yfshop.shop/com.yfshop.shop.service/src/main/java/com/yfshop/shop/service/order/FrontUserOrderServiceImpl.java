@@ -354,7 +354,7 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
             mallService.updateItemSkuStock(itemSku.getId(), userCart.getNum());
             itemSkuMap.put(itemSku.getId(), itemSku);
             itemCount += userCart.getNum();
-            orderFreight = orderFreight.add(new BigDecimal(userCart.getNum() * 2));
+            orderFreight = orderFreight.add(itemSku.getFreight().multiply(new BigDecimal(userCart.getNum())));
             orderPrice = orderPrice.add((itemSku.getSkuSalePrice().multiply(new BigDecimal(userCart.getNum()))));
             payPrice = orderFreight.add(orderPrice);
         }
@@ -457,9 +457,10 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
         Integer itemCount = userCouponIdList.size();
         BigDecimal orderFreight = new BigDecimal("0");
         BigDecimal orderCouponPrice = new BigDecimal(userCouponList.get(0).getCouponPrice() * userCouponList.size());
+        BigDecimal orderPayPrice = new BigDecimal(itemCount).multiply(new BigDecimal("2"));
         BigDecimal orderPrice = new BigDecimal(itemCount).multiply(itemSku.getSkuSalePrice()).setScale(2, BigDecimal.ROUND_UP);
 
-        Order order = insertUserOrder(userId, websiteCode, ReceiveWayEnum.ZT.getCode(), itemCount, itemCount, orderPrice, orderCouponPrice, orderFreight, orderFreight, "N", null);
+        Order order = insertUserOrder(userId, websiteCode, ReceiveWayEnum.ZT.getCode(), itemCount, itemCount, orderPrice, orderCouponPrice, orderFreight, orderPayPrice, "N", null);
         Long orderId = order.getId();
         for (UserCoupon userCoupon : userCouponList) {
             BigDecimal couponPrice = new BigDecimal(userCoupon.getCouponPrice());
