@@ -3,13 +3,11 @@ package com.yfshop.admin.controller;
 import cn.dev33.satoken.annotation.SaCheckLogin;
 import cn.dev33.satoken.stp.StpLogic;
 import cn.dev33.satoken.stp.StpUtil;
-import cn.hutool.Hutool;
-import cn.hutool.core.io.IoUtil;
 import cn.hutool.extra.qrcode.QrCodeUtil;
 import cn.hutool.extra.qrcode.QrConfig;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.github.binarywang.wxpay.bean.order.WxPayMpOrderResult;
-import com.yfshop.admin.api.merchant.*;
+import com.yfshop.admin.api.merchant.MerchantInfoService;
 import com.yfshop.admin.api.merchant.request.MerchantGroupReq;
 import com.yfshop.admin.api.merchant.result.MerchantGroupResult;
 import com.yfshop.admin.api.merchant.result.MerchantResult;
@@ -18,11 +16,12 @@ import com.yfshop.admin.api.user.result.UserResult;
 import com.yfshop.admin.api.website.request.*;
 import com.yfshop.admin.api.website.result.*;
 import com.yfshop.admin.config.UserStpLogic;
-import com.yfshop.admin.config.WxStpLogic;
 import com.yfshop.common.api.CommonResult;
 import com.yfshop.common.enums.GroupRoleEnum;
 import com.yfshop.common.exception.Asserts;
+import me.chanjar.weixin.common.error.WxErrorException;
 import me.chanjar.weixin.mp.api.WxMpService;
+import me.chanjar.weixin.mp.bean.result.WxMpUser;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.slf4j.Logger;
@@ -30,14 +29,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.net.URLEncoder;
 import java.util.List;
 
 @Validated
@@ -59,17 +52,14 @@ class MerchantInfoController extends AbstractBaseController {
     @Autowired
     WxMpService wxService;
 
-
-    /**
-     * @return
-     */
-    @SaCheckLogin
-    @RequestMapping(value = "/checkSubscribe", method = {RequestMethod.POST})
-    public CommonResult<Integer> checkSubscribe() {
-        Integer result = userService.checkSubscribe(getCurrentOpenId());
-        return CommonResult.success(result);
+    @RequestMapping(value = "/checkSubscribe", method = {RequestMethod.GET, RequestMethod.POST})
+    @ResponseBody
+    public CommonResult<Integer> checkSubscribe() throws WxErrorException {
+        String openId = getCurrentOpenId();
+        Asserts.assertNonNull(openId, 500, "微信未授权!");
+        WxMpUser wxMpUser = wxService.getUserService().userInfo(openId);
+        return CommonResult.success(wxMpUser.getSubscribe() ? 1 : 0);
     }
-
 
     /**
      * 获取网点用户信息
@@ -80,7 +70,10 @@ class MerchantInfoController extends AbstractBaseController {
     @RequestMapping(value = "/websiteInfo", method = {RequestMethod.POST})
     public CommonResult<MerchantResult> getWebsiteInfo() {
         MerchantResult merchantResult = merchantInfoService.getWebsiteInfo(getCurrentAdminUserId());
-        String openId = getCurrentOpenId();
+        String openId = merchantResult.getOpenId();
+        if (StringUtils.isBlank(openId)) {
+            openId = getCurrentOpenId();
+        }
         if (StringUtils.isBlank(merchantResult.getHeadImgUrl()) && StringUtils.isNotBlank(openId)) {
             UserResult userResult = userService.getUserByOpenId(openId);
             if (userResult != null) {

@@ -141,11 +141,20 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
             merchant = merchantMapper.selectById(websiteReq.getId());
         }
         Integer merchantId;
+        String headImageUrl = null;
+        if (StringUtils.isNotBlank(websiteReq.getOpenId())) {
+            User user = userMapper.selectOne(Wrappers.<User>lambdaQuery()
+                    .eq(User::getOpenId, websiteReq.getOpenId()));
+            if (user != null) {
+                headImageUrl = user.getHeadImgUrl();
+            }
+        }
         if (merchant == null) {
             merchant = BeanUtil.convert(websiteReq, Merchant.class);
             merchant.setRoleAlias(GroupRoleEnum.WD.getCode());
             merchant.setRoleName(GroupRoleEnum.WD.getDescription());
             merchant.setPassword(SecureUtil.md5(SecureUtil.md5("123456")));
+            merchant.setHeadImgUrl(headImageUrl);
             merchantMapper.insert(merchant);
             merchantId = merchant.getId();
             MerchantDetail merchantDetail = BeanUtil.convert(websiteReq, MerchantDetail.class);
@@ -154,6 +163,7 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
             merchantDetailMapper.insert(merchantDetail);
         } else {
             merchantId = merchant.getId();
+            merchant.setHeadImgUrl(headImageUrl);
             Asserts.assertEquals(merchant.getRoleAlias(), GroupRoleEnum.WD.getCode(), 500, "只允许网点用户绑定网点码！");
             Asserts.assertEquals(merchant.getMobile(), websiteReq.getMobile(), 500, "手机号不允许被修改！");
             String openId = merchant.getOpenId();
