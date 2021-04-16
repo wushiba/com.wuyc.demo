@@ -89,7 +89,7 @@ public class WxMenuController {
 
         WxMenuButton shdl = new WxMenuButton();
         shdl.setType(MenuButtonType.VIEW);
-        shdl.setName("我是商户");
+        shdl.setName("商户登录");
         shdl.setUrl("https://merchant.yufanlook.com/#/MerchantLogin");
 
         zc.getSubButtons().add(kfdh);
