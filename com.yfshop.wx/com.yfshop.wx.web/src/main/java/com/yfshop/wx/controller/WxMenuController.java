@@ -64,14 +64,8 @@ public class WxMenuController {
         bindPhone.setName("个人中心");
         bindPhone.setUrl("https://m.yufanlook.com/#/MyPage");
 
-        WxMenuButton caseBut = new WxMenuButton();
-        caseBut.setType(MenuButtonType.VIEW);
-        caseBut.setName("我是商户");
-        caseBut.setUrl("https://merchant.yufanlook.com/#/MerchantLogin");
-
         shop.getSubButtons().add(introduce);
         shop.getSubButtons().add(bindPhone);
-        shop.getSubButtons().add(caseBut);
         menu.getButtons().add(shop);
 
 
@@ -81,18 +75,26 @@ public class WxMenuController {
         WxMenuButton order = new WxMenuButton();
         order.setType(MenuButtonType.VIEW);
         order.setName("噜鹿相遇");
-        order.setUrl("http://prev01.s1.51jujibao.com/images/20210415/51f06cc0dfd34fe0accb10c1ea3f7ebf.jpg");
+        order.setUrl("https://c.yufanlook.com/banner.png");
 
         button3.getSubButtons().add(order);
         menu.getButtons().add(button3);
 
-        WxMenuButton person = new WxMenuButton();
-        person.setType(MenuButtonType.CLICK);
-        person.setKey("lxwm");
-        person.setName("联系我们");
+        WxMenuButton zc = new WxMenuButton();
+        zc.setName("联系我们");
 
-        menu.getButtons().add(person);
+        WxMenuButton kfdh = new WxMenuButton();//跳转
+        kfdh.setType(MenuButtonType.CLICK);
+        kfdh.setKey("lxwm");
 
+        WxMenuButton shdl = new WxMenuButton();
+        shdl.setType(MenuButtonType.VIEW);
+        shdl.setName("我是商户");
+        shdl.setUrl("https://merchant.yufanlook.com/#/MerchantLogin");
+
+        zc.getSubButtons().add(kfdh);
+        zc.getSubButtons().add(shdl);
+        menu.getButtons().add(zc);
 
         this.wxService.switchover(appid);
         return this.wxService.getMenuService().menuCreate(menu);
