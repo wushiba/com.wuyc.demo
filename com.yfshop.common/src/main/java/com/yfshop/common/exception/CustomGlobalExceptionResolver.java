@@ -161,7 +161,7 @@ public class CustomGlobalExceptionResolver implements HandlerExceptionResolver, 
         if (true) {
             if (t instanceof ApiException) {
                 ApiException apiException = (ApiException) t;
-                if (apiException.getErrorCode().getCode() == 505) {
+                if (apiException.getErrorCode().getCode() == 1005) {
                     CodeAndMessage codeAndMessage = new CodeAndMessage();
                     codeAndMessage.setCode(apiException.getErrorCode().getCode());
                     codeAndMessage.setMessage(apiException.getErrorCode().getMessage());
