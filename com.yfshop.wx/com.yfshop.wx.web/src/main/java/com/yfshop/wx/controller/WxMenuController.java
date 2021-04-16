@@ -85,6 +85,7 @@ public class WxMenuController {
 
         WxMenuButton kfdh = new WxMenuButton();//跳转
         kfdh.setType(MenuButtonType.CLICK);
+        kfdh.setName("客服电话");
         kfdh.setKey("lxwm");
 
         WxMenuButton shdl = new WxMenuButton();
