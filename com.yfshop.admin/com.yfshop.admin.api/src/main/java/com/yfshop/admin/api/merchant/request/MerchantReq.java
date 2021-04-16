@@ -30,7 +30,6 @@ public class MerchantReq implements Serializable {
     private String roleAlias;
 
     @ApiModelProperty(value = "商户名称", required = true)
-    @NotBlank(message = "商户名称不能为空")
     private String merchantName;
 
     @ApiModelProperty(value = "联系人", required = true)
