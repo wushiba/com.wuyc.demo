@@ -75,7 +75,7 @@ public class WxMenuController {
         WxMenuButton order = new WxMenuButton();
         order.setType(MenuButtonType.VIEW);
         order.setName("噜鹿相遇");
-        order.setUrl("https://c.yufanlook.com/banner.png");
+        order.setUrl("https://m.yufanlook.com/#/LuckDrawPageForWx");
 
         button3.getSubButtons().add(order);
         menu.getButtons().add(button3);
