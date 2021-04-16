@@ -161,10 +161,14 @@ public class CustomGlobalExceptionResolver implements HandlerExceptionResolver, 
         if (true) {
             if (t instanceof ApiException) {
                 ApiException apiException = (ApiException) t;
-                CodeAndMessage codeAndMessage = new CodeAndMessage();
-                codeAndMessage.setCode(apiException.getErrorCode().getCode());
-                codeAndMessage.setMessage(apiException.getErrorCode().getMessage());
-                return codeAndMessage;
+                if (apiException.getErrorCode().getCode() == 505) {
+                    CodeAndMessage codeAndMessage = new CodeAndMessage();
+                    codeAndMessage.setCode(apiException.getErrorCode().getCode());
+                    codeAndMessage.setMessage(apiException.getErrorCode().getMessage());
+                    return codeAndMessage;
+                } else {
+                    return new CodeAndMessage(500, "您当前的网络不稳定，请稍后再试！");
+                }
             } else {
                 return new CodeAndMessage(500, "您当前的网络不稳定，请稍后再试！");
             }
