@@ -43,7 +43,6 @@ public class MerchantReq implements Serializable {
     private String mobile;
 
     @ApiModelProperty(value = "登录密码", required = true)
-    @NotBlank(message = "登录密码不能为空")
     private String password;
 
 

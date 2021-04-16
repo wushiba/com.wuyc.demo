@@ -546,7 +546,7 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
             merchant.setRoleName(GroupRoleEnum.getByCode(merchantReq.getRoleAlias()).getDescription());
             merchant.setMerchantName(merchantReq.getMerchantName());
             merchant.setMobile(merchantReq.getMobile());
-            merchant.setPassword(SecureUtil.md5(merchantReq.getPassword()));
+            merchant.setPassword(SecureUtil.md5(StringUtils.isBlank(merchantReq.getPassword())?"123456":merchantReq.getPassword()));
             merchant.setContacts(merchantReq.getContacts());
             merchant.setProvince(pMerchant.getProvince());
             merchant.setCity(pMerchant.getCity());
@@ -564,7 +564,9 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
             merchant.setRoleAlias(merchantReq.getRoleAlias());
             merchant.setRoleName(GroupRoleEnum.getByCode(merchantReq.getRoleAlias()).getDescription());
             merchant.setMerchantName(merchantReq.getMerchantName());
-            merchant.setPassword(SecureUtil.md5(merchantReq.getPassword()));
+            if (StringUtils.isNotBlank(merchantReq.getPassword())) {
+                merchant.setPassword(SecureUtil.md5(merchantReq.getPassword()));
+            }
             merchant.setContacts(merchantReq.getContacts());
             merchant.setIsEnable("Y");
             merchant.setIsDelete("N");
