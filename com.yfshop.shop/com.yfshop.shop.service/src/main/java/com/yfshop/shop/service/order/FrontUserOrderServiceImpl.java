@@ -212,10 +212,8 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
                 userCoupon.setId(orderDetail.getUserCouponId());
                 userCouponMapper.updateById(userCoupon);
             }
-            orderDetail.setIsPay("Y");
             orderDetail.setOrderStatus(UserOrderStatusEnum.CANCEL.getCode());
-            orderDetailMapper.update(orderDetail, Wrappers.<OrderDetail>lambdaQuery().
-                    eq(OrderDetail::getOrderId, orderId));
+            orderDetailMapper.updateById(orderDetail);
         });
         order.setIsCancel("Y");
         order.setCancelTime(LocalDateTime.now());
