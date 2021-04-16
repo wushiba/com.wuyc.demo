@@ -24,23 +24,6 @@ public class AuthServiceApplication {
         System.out.println("==============启动了=====com.yfshop.auth==================环境==" + property);
     }
 
-    @Bean
-    public ApplicationRunner applicationRunner(RedisConnectionFactory redisConnectionFactory) {
-        return new ApplicationRunner() {
-            @Override
-            public void run(ApplicationArguments args) {
-                try (RedisConnection connection = redisConnectionFactory.getConnection()) {
-                    logger.info("==================" + connection.ping());
-                    Set<byte[]> keys = connection.keys("*".getBytes());
-                    if (keys != null) {
-                        for (byte[] bytes : keys) {
-                            logger.info(new String(bytes));
-                        }
-                    }
-                }
-            }
-        };
-    }
 }
 
 

@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.crypto.SecureUtil;
+import cn.hutool.extra.spring.SpringUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -420,8 +421,11 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
         orderRequest.setBody("网点码申请");
         orderRequest.setOutTradeNo(websiteCode.getOrderNo());
         orderRequest.setNotifyUrl(wxPayNotifyUrl + PayPrefixEnum.WEBSITE_CODE.getBizType());
-//        orderRequest.setTotalFee(BaseWxPayRequest.yuanToFen(fee));//元转成分
-        orderRequest.setTotalFee(1);
+        if ("pro".equalsIgnoreCase(SpringUtil.getActiveProfile())) {
+            orderRequest.setTotalFee(BaseWxPayRequest.yuanToFen(fee));
+        } else {
+            orderRequest.setTotalFee(1);
+        }
         orderRequest.setOpenid(websiteCodePayReq.getOpenId());
         orderRequest.setTradeType("JSAPI");
         orderRequest.setSpbillCreateIp(websiteCodePayReq.getUserId());
