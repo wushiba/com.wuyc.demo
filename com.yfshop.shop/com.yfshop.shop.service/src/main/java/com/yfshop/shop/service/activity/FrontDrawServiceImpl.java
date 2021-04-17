@@ -140,13 +140,14 @@ public class FrontDrawServiceImpl implements FrontDrawService {
 
         // 一个用户只能抽奖一次
         Long canDrawCount = redisService.incr("DAY_CAN_DRAW_COUNT", 0);
+        logger.info("======缓存可抽奖次数" + canDrawCount);
         if (canDrawCount == null || canDrawCount <= 0) {
             canDrawCount = 1L;
         }
         String dataStr = DateUtil.format(LocalDateTime.now(), "yyyyMMdd");
         Long drawCount = redisService.incr(CacheConstants.DRAW_DATE_COUNT + dataStr + userId, 1);
         logger.info("======抽奖用户次数userId=" + userId + "，抽奖" + drawCount);
-        Asserts.assertFalse(drawCount > canDrawCount, 500, "您每天只能抽奖10次，请明天再继续抽奖");
+        Asserts.assertFalse(drawCount > canDrawCount, 502, "您每天只能抽奖" + canDrawCount + "次，请明天再继续抽奖");
         redisService.expire(CacheConstants.DRAW_DATE_COUNT + dataStr + userId, 60 * 60 * 24);
 
         Map<Integer, List<YfDrawPrizeResult>> prizeMap = prizeList.stream().collect(Collectors
