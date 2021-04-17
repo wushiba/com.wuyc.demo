@@ -1,15 +1,19 @@
 package com.yfshop.common.exception;
 
+import cn.dev33.satoken.cookie.SaTokenCookieUtil;
 import cn.dev33.satoken.exception.NotLoginException;
 import cn.dev33.satoken.exception.NotPermissionException;
 import cn.dev33.satoken.exception.NotRoleException;
 import cn.dev33.satoken.exception.SaTokenException;
 import cn.dev33.satoken.stp.StpUtil;
+import cn.hutool.crypto.SecureUtil;
+import cn.hutool.extra.servlet.ServletUtil;
 import com.alibaba.fastjson.JSON;
 import com.yfshop.common.api.CommonResult;
 import com.yfshop.common.api.ErrorCode;
 import com.yfshop.common.api.IErrorCode;
 import com.yfshop.common.api.ResultCode;
+import io.swagger.annotations.Api;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -83,6 +87,13 @@ public class CustomGlobalExceptionResolver implements HandlerExceptionResolver, 
         }
         if (e instanceof NotLoginException) {
             StpUtil.logout();
+        }
+
+        if (e instanceof ApiException) {
+            ApiException apiException = (ApiException) e;
+            if ("微信未授权".equals(apiException.getMessage())) {
+                SaTokenCookieUtil.delCookie(request, response, "yfopen");
+            }
         }
         HandlerMethod handlerMethod = (HandlerMethod) handler;
         // Ajax请求
@@ -170,9 +181,10 @@ public class CustomGlobalExceptionResolver implements HandlerExceptionResolver, 
                 codeAndMessage.setMessage(apiException.getErrorCode().getMessage());
                 return codeAndMessage;
 
-            } if (t instanceof NotLoginException){
+            }
+            if (t instanceof NotLoginException) {
                 return new CodeAndMessage(605, "当前状态未登录！");
-            }else {
+            } else {
                 return new CodeAndMessage(500, "您当前的网络不稳定，请稍后再试！");
             }
         }
