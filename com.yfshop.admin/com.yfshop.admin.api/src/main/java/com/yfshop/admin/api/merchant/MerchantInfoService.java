@@ -189,4 +189,6 @@ public interface MerchantInfoService {
     Void save(MerchantReq merchantReq) throws ApiException;
 
     List<MerchantResult> getChildMerchant(Integer merchantId) throws ApiException;
+
+    Integer checkActivate(String websiteCode);
 }

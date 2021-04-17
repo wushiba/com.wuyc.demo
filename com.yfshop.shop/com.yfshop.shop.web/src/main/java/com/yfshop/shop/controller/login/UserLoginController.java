@@ -32,7 +32,7 @@ public class UserLoginController extends AbstractBaseController {
     @ResponseBody
     public CommonResult<UserResult> loginByWx() {
         String openId = getCurrentOpenId();
-        Asserts.assertNonNull(openId, 500, "微信未授权!");
+        Asserts.assertNonNull(openId, 605, "微信未授权!");
         UserResult userResult = frontUserService.getUserByOpenId(openId);
         StpUtil.setLoginId(userResult.getId());
         return CommonResult.success(userResult);
@@ -49,7 +49,7 @@ public class UserLoginController extends AbstractBaseController {
     @ResponseBody
     public CommonResult<Integer> checkSubscribe() throws WxErrorException {
         String openId = getCurrentOpenId();
-        Asserts.assertNonNull(openId, 500, "微信未授权!");
+        Asserts.assertNonNull(openId, 605, "微信未授权!");
         WxMpUser wxMpUser = wxMpService.getUserService().userInfo(openId);
         UserResult userResult = frontUserService.getUserByOpenId(openId);
         StpUtil.setLoginId(userResult.getId());

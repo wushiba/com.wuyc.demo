@@ -586,6 +586,14 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
         return BeanUtil.convertList(list,MerchantResult.class);
     }
 
+    @Override
+    public Integer checkActivate(String websiteCode) {
+        WebsiteCodeDetail websiteCodeDetail = websiteCodeDetailMapper.selectOne(Wrappers.<WebsiteCodeDetail>lambdaQuery()
+                .eq(WebsiteCodeDetail::getAlias, websiteCode)
+                .eq(WebsiteCodeDetail::getIsActivate, "Y"));
+        return websiteCodeDetail == null ? 0 : 1;
+    }
+
     private Integer getCurrentWebsiteCount(Integer merchantId, Date startCreateTime, Date endCreateTime) {
         LambdaQueryWrapper lambdaQueryWrapper = Wrappers.<Merchant>lambdaQuery()
                 .eq(Merchant::getPid, merchantId)
