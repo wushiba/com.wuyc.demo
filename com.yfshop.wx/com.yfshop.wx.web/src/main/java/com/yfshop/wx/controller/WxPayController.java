@@ -1,6 +1,7 @@
 package com.yfshop.wx.controller;
 
 
+import cn.hutool.core.date.DateUtil;
 import com.github.binarywang.wxpay.bean.notify.WxPayNotifyResponse;
 import com.github.binarywang.wxpay.bean.notify.WxPayOrderNotifyResult;
 import com.github.binarywang.wxpay.bean.request.WxPayRefundRequest;
@@ -141,10 +142,10 @@ public class WxPayController {
 
 
     @PostMapping("/refund/all/{pwd}")
-    public Void refundAll(@PathVariable String pwd, Date startTime, Date endTime) throws WxPayException {
+    public Void refundAll(@PathVariable String pwd, String startTime, String endTime) throws WxPayException {
         Asserts.assertEquals("64293481", pwd, 500, "无效的请求");
 
-        return mpService.refundAll(startTime, endTime);
+        return mpService.refundAll(DateUtil.parse(startTime), DateUtil.parse(endTime));
     }
 //
 //  /**
