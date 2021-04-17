@@ -98,12 +98,11 @@ public class UserAddressServiceImpl implements UserAddressService {
         return null;
     }
 
-    @CacheEvict(cacheManager = CacheConstants.CACHE_MANAGE_NAME,
-            cacheNames = CacheConstants.MALL_USER_ADDRESS_CACHE_NAME,
-            key = "'" + CacheConstants.MALL_USER_ADDRESS_CACHE_KEY_PREFIX + "' + #root.args[0]")
+    @CacheEvict(key = "'" + CacheConstants.MALL_USER_ADDRESS_CACHE_KEY_PREFIX + "' + #userId")
     @Transactional(rollbackFor = Exception.class)
     @Override
     public Void updateUserAddress(@NotNull(message = "用户ID不能为空") Integer userId, @Valid @NotNull UpdateUserAddressReq req) throws ApiException {
+
         assertUserExist(userId);
         UserAddress existUserAddress = userAddressMapper.selectById(req.getUserAddressId());
         Asserts.assertNonNull(existUserAddress, 500, "地址信息不存在");
@@ -136,12 +135,11 @@ public class UserAddressServiceImpl implements UserAddressService {
         return null;
     }
 
-    @CacheEvict(cacheManager = CacheConstants.CACHE_MANAGE_NAME,
-            cacheNames = CacheConstants.MALL_USER_ADDRESS_CACHE_NAME,
-            key = "'" + CacheConstants.MALL_USER_ADDRESS_CACHE_KEY_PREFIX + "' + #root.args[0]")
+    @CacheEvict(key = "'" + CacheConstants.MALL_USER_ADDRESS_CACHE_KEY_PREFIX + "' + #userId")
     @Transactional(rollbackFor = Exception.class)
     @Override
     public Void deleteUserAddress(@NotNull(message = "用户ID不能为空") Integer userId, List<Integer> userAddressIds) throws ApiException {
+
         if (CollectionUtil.isEmpty(userAddressIds)) {
             return null;
         }
@@ -157,9 +155,7 @@ public class UserAddressServiceImpl implements UserAddressService {
         return null;
     }
 
-    @CacheEvict(cacheManager = CacheConstants.CACHE_MANAGE_NAME,
-            cacheNames = CacheConstants.MALL_USER_ADDRESS_CACHE_NAME,
-            key = "'" + CacheConstants.MALL_USER_ADDRESS_CACHE_KEY_PREFIX + "' + #root.args[0]")
+    @CacheEvict(key = "'" + CacheConstants.MALL_USER_ADDRESS_CACHE_KEY_PREFIX + "' + #userId")
     @Transactional(rollbackFor = Exception.class)
     @Override
     public Void configDefaultUserAddress(@NotNull(message = "用户ID不能为空") Integer userId,
