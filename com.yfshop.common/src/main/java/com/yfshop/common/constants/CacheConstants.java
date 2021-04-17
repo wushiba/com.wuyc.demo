@@ -23,8 +23,13 @@ public interface CacheConstants {
     String USER_CART_CACHE_NAME = "UserCartCacheName";
     String USER_CART_CACHE_KEY_PREFIX = "user_cart_";
 
+    /** 用户每日抽奖次数 */
+    String DRAW_DATE_COUNT = "draw_date_user_";
+    /** 用户每日抽奖次数 */
+    String DAY_CAN_DRAW_COUNT = "day_can_draw_count";
     /** 一等奖中奖数量 */
     String PRIZE_FIRST_WIN_COUNT = "draw_first_win_count";
+    /** 抽奖白名单数据 */
     String DRAW_WHITE_USER_DATA = "draw_white_user_data";
     /** 二等奖中奖数量 */
     String PRIZE_SECOND_WIN_COUNT = "draw_second_win_count";

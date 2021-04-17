@@ -1,5 +1,6 @@
 package com.yfshop.shop.service.activity;
 
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
@@ -136,6 +137,18 @@ public class FrontDrawServiceImpl implements FrontDrawService {
         Asserts.assertFalse(yfDrawActivityResult.getEndTime().isBefore(LocalDateTime.now()), 501, "活动暂已结束,请稍后再试");
         List<YfDrawPrizeResult> prizeList = yfDrawActivityResult.getPrizeList();
         Asserts.assertCollectionNotEmpty(prizeList, 500, "活动暂未配置奖品，请稍微再试");
+
+        // 一个用户只能抽奖一次
+        Long canDrawCount = redisService.incr("DAY_CAN_DRAW_COUNT", 0);
+        if (canDrawCount == null || canDrawCount <= 0) {
+            canDrawCount = 1L;
+        }
+        String dataStr = DateUtil.format(LocalDateTime.now(), "yyyyMMdd");
+        Long drawCount = redisService.incr(CacheConstants.DRAW_DATE_COUNT + dataStr + userId, 1);
+        logger.info("======抽奖用户次数userId=" + userId + "，抽奖" + drawCount);
+        Asserts.assertFalse(drawCount > canDrawCount, 500, "您每天只能抽奖10次，请明天再继续抽奖");
+        redisService.expire(CacheConstants.DRAW_DATE_COUNT + dataStr + userId, 60 * 60 * 24);
+
         Map<Integer, List<YfDrawPrizeResult>> prizeMap = prizeList.stream().collect(Collectors
                 .groupingBy(YfDrawPrizeResult::getPrizeLevel));
         Integer prizeLevel = 3;
@@ -144,12 +157,11 @@ public class FrontDrawServiceImpl implements FrontDrawService {
         YfDrawPrizeResult thirdPrize = prizeMap.get(3).get(0);
 
         // 根据ip查询地址, 找不到归属地默认抽到三等奖
-        Integer provinceId = this.getProvinceByIpStr(ipStr);
-
         YfUserCouponResult result = new YfUserCouponResult();
         result.setDrawPrizeLevel(prizeLevel);
         result.setCouponTitle(thirdPrize.getPrizeTitle());
         result.setDrawPrizeIcon(thirdPrize.getPrizeIcon());
+        Integer provinceId = this.getProvinceByIpStr(ipStr);
         if (provinceId == null) {
             logger.info("======抽奖用户userId=" + userId +  ",actCode=" + actCode + ",抽奖结果=" + JSON.toJSONString(result));
             frontUserCouponService.createUserCouponByPrize(userId, actCode, thirdPrize);

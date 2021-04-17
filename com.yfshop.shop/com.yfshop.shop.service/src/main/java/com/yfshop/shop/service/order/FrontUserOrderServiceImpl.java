@@ -20,6 +20,7 @@ import com.yfshop.shop.dao.OrderDao;
 import com.yfshop.shop.service.activity.result.YfDrawActivityResult;
 import com.yfshop.shop.service.activity.result.YfDrawPrizeResult;
 import com.yfshop.shop.service.activity.service.FrontDrawService;
+import com.yfshop.shop.service.address.UserAddressService;
 import com.yfshop.shop.service.address.result.UserAddressResult;
 import com.yfshop.shop.service.cart.UserCartService;
 import com.yfshop.shop.service.coupon.service.FrontUserCouponService;
@@ -78,6 +79,8 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
     private FrontDrawService frontDrawService;
     @Resource
     private FrontUserService frontUserService;
+    @Resource
+    private UserAddressService userAddressService;
     @Resource
     private UserCouponMapper userCouponMapper;
     @Resource
@@ -273,7 +276,8 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
         ItemSkuResult itemSku = mallService.getItemSkuBySkuId(skuId);
         Asserts.assertFalse(itemSku.getSkuStock() < num, 500, "商品库存不足");
 
-        UserAddressResult addressInfo = frontUserService.getUserAddressById(addressId);
+        UserAddressResult addressInfo = userAddressService.queryUserAddresses(userId).stream()
+                .filter(data -> data.getId().intValue() == addressId).findFirst().orElse(null);
         Asserts.assertNonNull(addressInfo, 500, "收货地址不存在");
         checkPrizeAddress(skuId, addressInfo.getProvince());
 
@@ -327,7 +331,8 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
         Asserts.assertCollectionNotEmpty(cartIdList, 500, "购物车id不可以为空");
         Asserts.assertFalse(cartIdList.size() > 1 && userCouponId != null, 500, "您不能使用优惠券");
 
-        UserAddressResult addressInfo = frontUserService.getUserAddressById(addressId);
+        UserAddressResult addressInfo = userAddressService.queryUserAddresses(userId).stream()
+                .filter(data -> data.getId().intValue() == addressId).findFirst().orElse(null);
         Asserts.assertNonNull(addressInfo, 500, "收货地址不存在");
 
         List<UserCart> userCartList = userCartMapper.selectList(Wrappers.lambdaQuery(UserCart.class)
@@ -736,7 +741,7 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
 
     private void checkPrizeAddress(Integer skuId, String provinceName) throws ApiException {
         if (skuId == 20068 || skuId == 200770) {
-            if (drawCanUseRegion.contains(provinceName.substring(0, 2))) {
+            if (!drawCanUseRegion.contains(provinceName.substring(0, 2))) {
                 throw new ApiException(500, provinceName + "暂不支持配送一等奖或二等奖");
             }
         }
