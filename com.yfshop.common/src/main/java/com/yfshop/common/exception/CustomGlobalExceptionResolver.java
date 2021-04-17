@@ -81,7 +81,7 @@ public class CustomGlobalExceptionResolver implements HandlerExceptionResolver, 
             throw new IllegalArgumentException(MessageFormat.format(
                     "handler can not cast to {0}", HandlerMethod.class.getName()));
         }
-        if (handler instanceof NotLoginException) {
+        if (e instanceof NotLoginException) {
             StpUtil.logout();
         }
         HandlerMethod handlerMethod = (HandlerMethod) handler;
@@ -171,7 +171,7 @@ public class CustomGlobalExceptionResolver implements HandlerExceptionResolver, 
                 return codeAndMessage;
 
             } if (t instanceof NotLoginException){
-                return new CodeAndMessage(500, "当前状态未登录！");
+                return new CodeAndMessage(605, "当前状态未登录！");
             }else {
                 return new CodeAndMessage(500, "您当前的网络不稳定，请稍后再试！");
             }
@@ -307,6 +307,9 @@ public class CustomGlobalExceptionResolver implements HandlerExceptionResolver, 
                         message = "当前会话未登录";
                         break;
                 }
+                codeAndMessage.setCode(605);
+                codeAndMessage.setMessage("当前状态未登录");
+                return codeAndMessage;
             } else if (t instanceof NotRoleException) {
                 // 如果是角色异常
                 NotRoleException notRoleException = (NotRoleException) t;
