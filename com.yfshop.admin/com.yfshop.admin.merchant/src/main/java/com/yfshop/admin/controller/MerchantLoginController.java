@@ -72,7 +72,7 @@ class MerchantLoginController extends AbstractBaseController {
             return CommonResult.success(merchantResult);
         } else {
             String openId = getCurrentOpenId();
-            Asserts.assertStringNotBlank(openId, 500, "微信未授权");
+            Asserts.assertStringNotBlank(openId, 605, "微信未授权");
             MerchantResult merchantResult = merchantLoginService.loginByWx(openId);
             StpUtil.setLoginId(merchantResult.getId());
             return CommonResult.success(merchantResult);

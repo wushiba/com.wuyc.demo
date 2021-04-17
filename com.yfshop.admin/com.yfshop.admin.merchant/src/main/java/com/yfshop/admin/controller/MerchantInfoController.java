@@ -73,7 +73,7 @@ class MerchantInfoController extends AbstractBaseController {
     @ResponseBody
     public CommonResult<Integer> checkSubscribe() throws WxErrorException {
         String openId = getCurrentOpenId();
-        Asserts.assertNonNull(openId, 500, "微信未授权!");
+        Asserts.assertNonNull(openId, 605, "微信未授权!");
         WxMpUser wxMpUser = wxService.getUserService().userInfo(openId);
         return CommonResult.success(wxMpUser.getSubscribe() ? 1 : 0);
     }
@@ -280,7 +280,7 @@ class MerchantInfoController extends AbstractBaseController {
     @RequestMapping(value = "/applyWebsiteCodePay", method = {RequestMethod.POST})
     public CommonResult<WxPayMpOrderResult> applyWebsiteCodePay(@RequestBody WebsiteCodePayReq websiteCodePayReq) {
         String openId = getCurrentOpenId();
-        Asserts.assertNonNull(openId, 500, "需要微信授权");
+        Asserts.assertNonNull(openId, 605, "微信未授权");
         websiteCodePayReq.setOpenId(getCurrentOpenId());
         websiteCodePayReq.setUserId(getRequestIpStr());
         WxPayMpOrderResult wxPayMpOrderResult = merchantInfoService.applyWebsiteCodePay(websiteCodePayReq);
