@@ -170,7 +170,9 @@ public class CustomGlobalExceptionResolver implements HandlerExceptionResolver, 
                 codeAndMessage.setMessage(apiException.getErrorCode().getMessage());
                 return codeAndMessage;
 
-            } else {
+            } if (t instanceof NotLoginException){
+                return new CodeAndMessage(500, "当前状态未登录！");
+            }else {
                 return new CodeAndMessage(500, "您当前的网络不稳定，请稍后再试！");
             }
         }
