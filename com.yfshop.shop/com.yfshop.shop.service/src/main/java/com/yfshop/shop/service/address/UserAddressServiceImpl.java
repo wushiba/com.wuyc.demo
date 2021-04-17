@@ -11,6 +11,7 @@ import com.yfshop.code.model.UserAddress;
 import com.yfshop.common.constants.CacheConstants;
 import com.yfshop.common.exception.ApiException;
 import com.yfshop.common.exception.Asserts;
+import com.yfshop.common.service.RedisService;
 import com.yfshop.common.util.BeanUtil;
 import com.yfshop.shop.dao.UserAddressDao;
 import com.yfshop.shop.service.address.request.CreateUserAddressReq;
@@ -46,6 +47,9 @@ public class UserAddressServiceImpl implements UserAddressService {
     private UserAddressDao customUserAddressMapper;
     @Resource
     private RegionMapper regionMapper;
+
+    @Resource
+    private RedisService redisService;
 
     @Cacheable(cacheManager = CacheConstants.CACHE_MANAGE_NAME,
             cacheNames = CacheConstants.MALL_USER_ADDRESS_CACHE_NAME,
@@ -98,11 +102,12 @@ public class UserAddressServiceImpl implements UserAddressService {
         return null;
     }
 
-    @CacheEvict(key = "'" + CacheConstants.MALL_USER_ADDRESS_CACHE_KEY_PREFIX + "' + #userId")
+    @CacheEvict(cacheManager = CacheConstants.CACHE_MANAGE_NAME,
+            cacheNames = CacheConstants.MALL_USER_ADDRESS_CACHE_NAME,
+            key = "'" + CacheConstants.MALL_USER_ADDRESS_CACHE_KEY_PREFIX + "' + #root.args[0]")
     @Transactional(rollbackFor = Exception.class)
     @Override
     public Void updateUserAddress(@NotNull(message = "用户ID不能为空") Integer userId, @Valid @NotNull UpdateUserAddressReq req) throws ApiException {
-
         assertUserExist(userId);
         UserAddress existUserAddress = userAddressMapper.selectById(req.getUserAddressId());
         Asserts.assertNonNull(existUserAddress, 500, "地址信息不存在");
@@ -132,14 +137,16 @@ public class UserAddressServiceImpl implements UserAddressService {
         userAddress.setCity(city.getName());
         userAddress.setDistrict(district.getName());
         userAddressMapper.updateById(userAddress);
+        redisService.del(CacheConstants.USER_ADDRESS_ID + req.getUserAddressId());
         return null;
     }
 
-    @CacheEvict(key = "'" + CacheConstants.MALL_USER_ADDRESS_CACHE_KEY_PREFIX + "' + #userId")
+    @CacheEvict(cacheManager = CacheConstants.CACHE_MANAGE_NAME,
+            cacheNames = CacheConstants.MALL_USER_ADDRESS_CACHE_NAME,
+            key = "'" + CacheConstants.MALL_USER_ADDRESS_CACHE_KEY_PREFIX + "' + #root.args[0]")
     @Transactional(rollbackFor = Exception.class)
     @Override
     public Void deleteUserAddress(@NotNull(message = "用户ID不能为空") Integer userId, List<Integer> userAddressIds) throws ApiException {
-
         if (CollectionUtil.isEmpty(userAddressIds)) {
             return null;
         }
@@ -152,10 +159,15 @@ public class UserAddressServiceImpl implements UserAddressService {
                 .allMatch(userAddress -> userAddress.getUserId().equals(userId));
         Asserts.assertTrue(allMatch, 500, "非法操作");
         userAddressMapper.deleteBatchIds(userAddressIds);
+        userAddressIds.forEach(id -> {
+            redisService.del(CacheConstants.USER_ADDRESS_ID + id);
+        });
         return null;
     }
 
-    @CacheEvict(key = "'" + CacheConstants.MALL_USER_ADDRESS_CACHE_KEY_PREFIX + "' + #userId")
+    @CacheEvict(cacheManager = CacheConstants.CACHE_MANAGE_NAME,
+            cacheNames = CacheConstants.MALL_USER_ADDRESS_CACHE_NAME,
+            key = "'" + CacheConstants.MALL_USER_ADDRESS_CACHE_KEY_PREFIX + "' + #root.args[0]")
     @Transactional(rollbackFor = Exception.class)
     @Override
     public Void configDefaultUserAddress(@NotNull(message = "用户ID不能为空") Integer userId,
@@ -169,6 +181,7 @@ public class UserAddressServiceImpl implements UserAddressService {
         bean.setId(userAddressId);
         bean.setIsDefault("Y");
         userAddressMapper.updateById(bean);
+        redisService.del(CacheConstants.USER_ADDRESS_ID + userAddressId);
         return null;
     }
 
