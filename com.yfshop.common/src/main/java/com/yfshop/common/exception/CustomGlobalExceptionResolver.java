@@ -91,7 +91,7 @@ public class CustomGlobalExceptionResolver implements HandlerExceptionResolver, 
 
         if (e instanceof ApiException) {
             ApiException apiException = (ApiException) e;
-            if ("微信未授权".equals(apiException.getMessage())) {
+            if (apiException.getErrorCode().getCode() == 605 && apiException.getMessage().contains("微信")) {
                 SaTokenCookieUtil.delCookie(request, response, "yfopen");
             }
         }
