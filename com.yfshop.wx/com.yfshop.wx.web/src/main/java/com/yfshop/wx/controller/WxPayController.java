@@ -141,7 +141,7 @@ public class WxPayController {
 
 
     @PostMapping("/refund/all/{pwd}")
-    public Void refund(@PathVariable String pwd, Date startTime, Date endTime) throws WxPayException {
+    public Void refundAll(@PathVariable String pwd, Date startTime, Date endTime) throws WxPayException {
         Asserts.assertEquals("64293481", pwd, 500, "无效的请求");
 
         return mpService.refundAll(startTime, endTime);
