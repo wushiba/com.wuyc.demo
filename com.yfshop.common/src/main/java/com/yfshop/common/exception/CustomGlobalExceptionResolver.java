@@ -4,6 +4,7 @@ import cn.dev33.satoken.exception.NotLoginException;
 import cn.dev33.satoken.exception.NotPermissionException;
 import cn.dev33.satoken.exception.NotRoleException;
 import cn.dev33.satoken.exception.SaTokenException;
+import cn.dev33.satoken.stp.StpUtil;
 import com.alibaba.fastjson.JSON;
 import com.yfshop.common.api.CommonResult;
 import com.yfshop.common.api.ErrorCode;
@@ -79,6 +80,9 @@ public class CustomGlobalExceptionResolver implements HandlerExceptionResolver, 
         if (!HandlerMethod.class.isAssignableFrom(handler.getClass())) {
             throw new IllegalArgumentException(MessageFormat.format(
                     "handler can not cast to {0}", HandlerMethod.class.getName()));
+        }
+        if (handler instanceof NotLoginException) {
+            StpUtil.logout();
         }
         HandlerMethod handlerMethod = (HandlerMethod) handler;
         // Ajax请求
