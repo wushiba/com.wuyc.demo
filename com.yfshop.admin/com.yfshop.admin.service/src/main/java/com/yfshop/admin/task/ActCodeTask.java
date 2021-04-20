@@ -29,6 +29,7 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PreDestroy;
 import javax.annotation.Resource;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
@@ -37,6 +38,7 @@ import java.io.File;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 生成商户码任务
@@ -116,7 +118,7 @@ public class ActCodeTask {
         FileUtil.appendUtf8Lines(codeFile, filePath);
         logger.info("批从号{},{}个溯源码,生成完毕", actCodeBatch.getBatchNo(), actCodeBatch.getQuantity());
         actCodeBatch.setFileStatus("FAIL");
-        UploadResult response = ossUploader.upload(new File(filePath),actCodeBatch.getBatchNo() + ".txt");
+        UploadResult response = ossUploader.upload(new File(filePath), actCodeBatch.getBatchNo() + ".txt");
         if (response.isSuccessful()) {
             actCodeBatch.setFileStatus("SUCCESS");
             actCodeBatch.setFileUrl(response.getUrl());
@@ -126,27 +128,41 @@ public class ActCodeTask {
 
     @Async
     public void downLoadFile(ActCodeBatch actCodeBatch, String md5, String fileUrl) throws ApiException {
-        File file = new File(actCodeCodeSrcDir + actCodeBatch.getBatchNo() + ".txt");
-        if (!file.exists()) {
-            logger.info("正则下载溯源码文件");
-            fileUrl = ossDownloader.privateDownloadUrl(fileUrl, 60);
-            file = HttpUtil.downloadFileFromUrl(fileUrl, file);
-            logger.info("载溯源码文件下载完成");
-            Asserts.assertEquals(md5, SecureUtil.md5(file), 500, "下载文件md5不匹配");
-        }
-        BufferedReader bufferedReader = FileUtil.getUtf8Reader(file);
-        List<String> sourceCodes = new ArrayList<>();
-        bufferedReader.lines().forEach(item -> {
-            if (StringUtils.isNotBlank(item)) {
-                sourceCodes.add(item);
+        try {
+            actCodeConsumeTask.setFlag(true);
+            File file = new File(actCodeCodeSrcDir + md5 + ".txt");
+            if (!file.exists()) {
+                logger.info("正则下载溯源码文件");
+                fileUrl = ossDownloader.privateDownloadUrl(fileUrl, 60);
+                file = HttpUtil.downloadFileFromUrl(fileUrl, file);
+                logger.info("载溯源码文件下载完成");
+                Asserts.assertEquals(md5, SecureUtil.md5(file), 500, "下载文件md5不匹配");
             }
-        });
-        CollectionUtil.split(sourceCodes, 1000).forEach(item -> {
-            String codes = String.format("%d-%s", actCodeBatch.getId(), StringUtils.join(item));
-            stringRedisTemplate.convertAndSend("actCodeTask", codes);
-        });
-        stringRedisTemplate.convertAndSend("actCodeTaskFinish", actCodeBatch.getActId() + "");
+            BufferedReader bufferedReader = FileUtil.getUtf8Reader(file);
+            List<String> sourceCodes = new ArrayList<>();
+            bufferedReader.lines().forEach(item -> {
+                if (StringUtils.isNotBlank(item)) {
+                    sourceCodes.add(item);
+                }
+            });
+            String actCodeId = "actCode:" + actCodeBatch.getId();
+            CollectionUtil.split(sourceCodes, 50000).forEach(item -> {
+                String codes = StringUtils.join(item);
+                stringRedisTemplate.opsForList().leftPush(actCodeId, codes);
+            });
+            stringRedisTemplate.expire(actCodeId, 1, TimeUnit.DAYS);
+            actCodeConsumeTask.doWork(actCodeId);
+        } catch (Exception e) {
+            e.printStackTrace();
+            actCodeBatch.setFileStatus("FAIL");
+            actCodeBatchMapper.updateById(actCodeBatch);
+            actCodeConsumeTask.setFlag(false);
+        }
         //buildActCode(actCodeBatch, sourceCodes);
+    }
+
+    public boolean isFlag() {
+        return actCodeConsumeTask.isFlag();
     }
 
     @Async
@@ -170,11 +186,11 @@ public class ActCodeTask {
         File file = new File("C:\\Users\\Administrator\\Desktop\\huodong\\1.txt");
         File targetFile = new File("C:\\Users\\Administrator\\Desktop\\huodong\\1(合成).txt");
         BufferedReader bufferedReader = FileUtil.getUtf8Reader(file);
-        String actCodeCodeUrl="https://m.yufanlook.com/#/LuckDrawPage?actCode=";
-        List<String>codeFile=new ArrayList<>();
+        String actCodeCodeUrl = "https://m.yufanlook.com/#/LuckDrawPage?actCode=";
+        List<String> codeFile = new ArrayList<>();
         bufferedReader.lines().forEach(item -> {
             if (StringUtils.isNotBlank(item)) {
-                String actCode=DigestUtil.md5HexTo16(SecureUtil.md5("yf" + item));
+                String actCode = DigestUtil.md5HexTo16(SecureUtil.md5("yf" + item));
                 codeFile.add(String.format("%s,%s%s", item, actCodeCodeUrl, actCode));
             }
         });

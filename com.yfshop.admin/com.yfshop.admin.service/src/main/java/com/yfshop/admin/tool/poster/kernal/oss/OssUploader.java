@@ -3,6 +3,7 @@ package com.yfshop.admin.tool.poster.kernal.oss;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import com.aliyun.oss.OSS;
+import com.aliyun.oss.OSSClient;
 import com.aliyun.oss.OSSClientBuilder;
 import com.aliyun.oss.model.PutObjectResult;
 import com.aliyuncs.DefaultAcsClient;
@@ -53,4 +54,13 @@ public class OssUploader implements Uploader {
         PutObjectResult result = ossClient.putObject(config.getBucket(), filepath, file);
         return new UploadResult("http://" + config.getDomain() + "/" + filepath);
     }
+
+    public  static void main(String args[]){
+        OSS ossClient = new OSSClientBuilder().build("oss-cn-shenzhen.aliyuncs.com", "LTAI5tSnQKpNY8rGRDYBH8es", "h9jlsJITV88Yaey82tF9qHSQo9RiiE");
+        PutObjectResult result = ossClient.putObject("yf-oss-prev", "1.txt", new File("F:\\1.txt"));
+
+    }
+
+
+
 }

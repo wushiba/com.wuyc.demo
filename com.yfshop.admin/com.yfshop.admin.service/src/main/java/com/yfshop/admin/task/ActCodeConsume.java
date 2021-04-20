@@ -1,6 +1,7 @@
 package com.yfshop.admin.task;
 
 import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.thread.ThreadUtil;
 import cn.hutool.crypto.SecureUtil;
 import cn.hutool.crypto.digest.DigestUtil;
 import cn.hutool.json.JSONUtil;
@@ -11,17 +12,25 @@ import com.yfshop.code.mapper.ActCodeBatchDetailMapper;
 import com.yfshop.code.mapper.ActCodeBatchMapper;
 import com.yfshop.code.model.ActCodeBatch;
 import com.yfshop.code.model.ActCodeBatchDetail;
+import io.swagger.models.auth.In;
+import lombok.SneakyThrows;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PreDestroy;
 import javax.annotation.Resource;
 import java.io.File;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
 
 @Component
 public class ActCodeConsume {
@@ -38,28 +47,42 @@ public class ActCodeConsume {
     @Autowired
     OssUploader ossUploader;
 
+    @Autowired
+    StringRedisTemplate stringRedisTemplate;
+
+    private boolean flag = false;
+
     private static final Logger logger = LoggerFactory.getLogger(ActCodeConsume.class);
 
-    public void getMessage(String message) {
-        try {
-            String[] data = message.split("-");
-            Integer id = Integer.valueOf(data[0]);
-            List<String> codes = JSONUtil.toList(data[1], String.class);
-            doTask(id, codes);
-        } catch (Exception e) {
-            e.printStackTrace();
+    @Async
+    public void doWork(String key) {
+        flag = true;
+        while (true) {
+            String value = stringRedisTemplate.opsForList().rightPop(key);
+            String[] data = key.split(":");
+            Integer id = Integer.valueOf(data[1]);
+            if (StringUtils.isBlank(value)) {
+                finish(id);
+                break;
+            }
+            try {
+                List<String> codes = JSONUtil.toList(value, String.class);
+                doTask(id, codes);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
+        flag = false;
     }
 
-    public void finish(String id) {
+    private void finish(Integer id) {
+        ActCodeBatch actCodeBatch = actCodeBatchMapper.selectById(id);
         try {
-            ActCodeBatch actCodeBatch = actCodeBatchMapper.selectById(Integer.valueOf(id));
             actCodeBatch.setFileStatus("FAIL");
-            actCodeBatch.setFileStatus("");
             String filePath = actCodeCodeTargetDir + actCodeBatch.getBatchNo() + ".txt";
             if (new File(filePath).exists()) {
                 try {
-                    UploadResult response = ossUploader.upload(new File(filePath),actCodeBatch.getBatchNo() + ".txt");
+                    UploadResult response = ossUploader.upload(new File(filePath), actCodeBatch.getBatchNo() + ".txt");
                     if (response.isSuccessful()) {
                         actCodeBatch.setFileStatus("SUCCESS");
                         actCodeBatch.setFileUrl(response.getUrl());
@@ -70,11 +93,15 @@ public class ActCodeConsume {
             }
             actCodeBatchMapper.updateById(actCodeBatch);
         } catch (Exception e) {
+            actCodeBatch.setFileStatus("FAIL");
+            actCodeBatchMapper.updateById(actCodeBatch);
             e.printStackTrace();
+        } finally {
+            flag = false;
         }
     }
 
-    public void doTask(Integer id, List<String> codes) {
+    private void doTask(Integer id, List<String> codes) {
         ActCodeBatch actCodeBatch = actCodeBatchMapper.selectById(id);
         List<ActCodeBatchDetail> actCodeBatchDetails = new ArrayList<>();
         List<String> codeFile = new ArrayList<>();
@@ -106,6 +133,19 @@ public class ActCodeConsume {
             FileUtil.appendUtf8Lines(codes, filePath);
         }
 
+    }
+
+    public boolean isFlag() {
+        return flag;
+    }
+
+    public void setFlag(boolean flag) {
+        this.flag = flag;
+    }
+
+    @PreDestroy
+    public void onDestroy() {
+        flag = false;
     }
 
 }

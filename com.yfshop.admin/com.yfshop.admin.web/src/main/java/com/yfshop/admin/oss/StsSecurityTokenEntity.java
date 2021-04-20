@@ -17,4 +17,7 @@ import java.io.Serializable;
 		private String securityToken;
 	    private String expiration;
 	    private String requestId;
+	    private String bucketName;
+	    private String region;
+
 	}

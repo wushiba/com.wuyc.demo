@@ -89,7 +89,7 @@ public class WebLogAspect {
         logMap.put("parameter", webLog.getParameter());
         logMap.put("spendTime", webLog.getSpendTime());
         logMap.put("description", webLog.getDescription());
-        LOGGER.info("", JSONUtil.parse(webLog).toString());
+        LOGGER.info("请求参数->{}", JSONUtil.parse(webLog).toString());
         return result;
     }
 
