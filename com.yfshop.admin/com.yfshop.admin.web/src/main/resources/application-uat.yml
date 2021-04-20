@@ -58,6 +58,6 @@ oss:
   endpoint: oss-cn-shenzhen.aliyuncs.com
   domain: yf-oss-prev-open.oss-cn-shenzhen.aliyuncs.com
   bucket: yf-oss-prev-open
-  access: LTAI5tSnQKpNY8rGRDYBH8es
-  secret: h9jlsJITV88Yaey82tF9qHSQo9RiiE
+  access: LTAI5tR27BbR5u1pmvBtvY8j
+  secret: rkqXDsJR4Z98Wdtu4xaIv5gxqaJZ7d
   oprefix: /yufan
