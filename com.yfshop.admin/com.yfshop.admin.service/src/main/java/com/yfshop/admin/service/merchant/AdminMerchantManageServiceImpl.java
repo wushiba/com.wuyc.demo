@@ -144,7 +144,7 @@ public class AdminMerchantManageServiceImpl implements AdminMerchantManageServic
         merchant.setMerchantName(req.getMerchantName());
         merchant.setMobile(req.getMobile());
         if (StringUtils.isNotBlank(req.getPassword())) {
-            SecureUtil.md5(req.getPassword());
+            merchant.setPassword(SecureUtil.md5(req.getPassword()));
         }
         merchant.setContacts(req.getContacts());
         merchant.setProvince(province.getName());

@@ -27,21 +27,21 @@ public class UploadController {
     private static Logger logger = LoggerFactory.getLogger(UploadController.class);
 
     @Value("${upload.server.domain}")
-    private String path;
+    private String host;
 
     @Value("${upload.server.imagePath}")
     private String imagePath;
 
-    @RequestMapping("/image/file")
+    @RequestMapping("/image")
     @ResponseBody
-    public CommonResult upload(@RequestParam("file") MultipartFile file) throws IOException {
-        logger.info("============进入上传文件");
+    public CommonResult uploadImage(@RequestParam("file") MultipartFile file) throws IOException {
+        logger.info("======================================进入上传文件uploadImage");
         if (file.isEmpty()) {
         	return CommonResult.failed(ResultCode.FAILED, "请选择文件!");
         }
         String dest = UUID.randomUUID().toString().replace("-", "") + ".jpg";
         String date = DateUtil.format(LocalDateTime.now(), "yyyyMMdd");
-        String dirStr = path + File.separator + date;
+        String dirStr = imagePath + File.separator + date;
         File dir = new File(dirStr);
         if (!dir.exists() && !dir.isDirectory()) {
             dir.mkdir();
@@ -49,7 +49,7 @@ public class UploadController {
         String name = dir + File.separator + dest;
         File newFile = new File(name);
         file.transferTo(newFile);
-        String url = imagePath + "/images/" + date + "/" + dest;
+        String url = host + "/image/yf-shop/" + date + "/" + dest;
         return CommonResult.success(url);
     }
 }
