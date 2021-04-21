@@ -104,3 +104,12 @@ shop:
 merchant:
   url: https://prev-merchant.yufanlook.com/
 
+websiteCode:
+  dir: /home/www/web-deploy/yufan-admin-report/websiteCode/
+  url: https://prev-merchant.yufanlook.com/#/MerchantRegisterPrep?websiteCode=
+
+actCode:
+  srcDir: /home/www/web-deploy/yufan-admin-report/actCode/src/
+  targetDir: /home/www/web-deploy/yufan-admin-report/actCode/target/
+  url: https://prev-m.yufanlook.com/#/LuckDrawPage?actCode=
+

@@ -105,3 +105,12 @@ shop:
 
 merchant:
   url: https://merchant.yufanlook.com/
+
+websiteCode:
+  dir: /home/www/web-deploy/yufan-admin-report/websiteCode/
+  url: https://merchant.yufanlook.com/#/MerchantRegisterPrep?websiteCode=
+
+actCode:
+  srcDir: /home/www/web-deploy/yufan-admin-report/actCode/src/
+  targetDir: /home/www/web-deploy/yufan-admin-report/actCode/target/
+  url: https://m.yufanlook.com/#/LuckDrawPage?actCode=
