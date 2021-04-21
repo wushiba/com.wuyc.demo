@@ -32,10 +32,10 @@ public class UploadController {
     @Value("${upload.server.imagePath}")
     private String imagePath;
 
-    @RequestMapping("/image/file")
+    @RequestMapping("/image")
     @ResponseBody
-    public CommonResult upload(@RequestParam("file") MultipartFile file) throws IOException {
-        logger.info("============进入上传文件");
+    public CommonResult uploadImage(@RequestParam("file") MultipartFile file) throws IOException {
+        logger.info("======================================进入上传文件uploadImage");
         if (file.isEmpty()) {
         	return CommonResult.failed(ResultCode.FAILED, "请选择文件!");
         }
@@ -49,7 +49,7 @@ public class UploadController {
         String name = dir + File.separator + dest;
         File newFile = new File(name);
         file.transferTo(newFile);
-        String url = host + "/images/" + date + "/" + dest;
+        String url = host + "/image/yf-shop/" + date + "/" + dest;
         return CommonResult.success(url);
     }
 }
