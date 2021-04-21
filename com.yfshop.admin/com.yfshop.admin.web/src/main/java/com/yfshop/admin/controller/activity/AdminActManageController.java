@@ -47,29 +47,7 @@ public class AdminActManageController implements BaseController {
         return CommonResult.success(adminActCodeManageService.queryActCodeList(actCodeQueryReq));
     }
 
-    @SaCheckLogin
-    @CrossOrigin
-    @SneakyThrows
-    @ApiOperation(value = "导入溯源码文件", httpMethod = "POST")
-    @RequestMapping(value = "/actCodeImport", method = {RequestMethod.GET, RequestMethod.POST})
-    @ResponseBody
-    public CommonResult<Void> actCodeImport(Integer actId, @RequestParam("file") MultipartFile file) {
-        Asserts.assertNonNull(file, 500, "请选择你要上传的溯源码文件");
-        String type = file.getContentType();
-        String name = file.getName();
-        logger.info("文件名{}，文件类型{}", type, name);
-        String md5 = SecureUtil.md5(file.getInputStream());
-        adminActCodeManageService.checkFile(md5);
-        BufferedReader bufferedReader = IoUtil.getUtf8Reader(file.getInputStream());
-        List<String> sourceCodes = new ArrayList<>();
-        bufferedReader.lines().forEach(item -> {
-            Asserts.assertTrue(item.length() == 16, 500, item + "溯源码格式有误！");
-            sourceCodes.add(item);
-
-        });
-        return CommonResult.success(adminActCodeManageService.actCodeImport(actId, md5, sourceCodes));
-    }
-
+    
     @SaCheckLogin
     @CrossOrigin
     @SneakyThrows
