@@ -47,7 +47,7 @@ public class AdminActManageController implements BaseController {
         return CommonResult.success(adminActCodeManageService.queryActCodeList(actCodeQueryReq));
     }
 
-    
+
     @SaCheckLogin
     @CrossOrigin
     @SneakyThrows

@@ -91,7 +91,7 @@ xxl:
       ip=:
       port: 19998
       ### xxl-job executor log-path
-      logpath: /home/www/web-deploy/xxl-job/jobhandler
+      logpath: /home/www/web-deploy/yufan-admin-report/xxl-job/
       ### xxl-job executor log-retention-days
       logretentiondays: 30
 
