@@ -27,7 +27,7 @@ public class UploadController {
     private static Logger logger = LoggerFactory.getLogger(UploadController.class);
 
     @Value("${upload.server.domain}")
-    private String path;
+    private String host;
 
     @Value("${upload.server.imagePath}")
     private String imagePath;
@@ -41,7 +41,7 @@ public class UploadController {
         }
         String dest = UUID.randomUUID().toString().replace("-", "") + ".jpg";
         String date = DateUtil.format(LocalDateTime.now(), "yyyyMMdd");
-        String dirStr = path + File.separator + date;
+        String dirStr = imagePath + File.separator + date;
         File dir = new File(dirStr);
         if (!dir.exists() && !dir.isDirectory()) {
             dir.mkdir();
@@ -49,7 +49,7 @@ public class UploadController {
         String name = dir + File.separator + dest;
         File newFile = new File(name);
         file.transferTo(newFile);
-        String url = imagePath + "/images/" + date + "/" + dest;
+        String url = host + "/images/" + date + "/" + dest;
         return CommonResult.success(url);
     }
 }
