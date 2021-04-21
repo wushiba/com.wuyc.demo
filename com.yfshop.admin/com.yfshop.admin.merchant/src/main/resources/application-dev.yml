@@ -37,4 +37,4 @@ wx:
         token: yufanshop # 接口配置里的Token值
         aesKey: 111 # 接口配置里的EncodingAESKey
 websiteCode:
-  url: http://prev-merchant.yufan.51jujibao.com/#/MerchantRegisterPrep?websiteCode=
+  url: https://prev-merchant.yufanlook.com/#/MerchantRegisterPrep?websiteCode=

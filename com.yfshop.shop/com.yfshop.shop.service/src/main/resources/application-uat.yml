@@ -56,4 +56,4 @@ wxPay:
   notifyUrl: http://prev-wx.yufan.51jujibao.com/wx/pay/notify/order/
 
 shop:
-  url: http://prev-shop.yufan.51jujibao.com/
+  url: https://prev-m.yufanlook.com/

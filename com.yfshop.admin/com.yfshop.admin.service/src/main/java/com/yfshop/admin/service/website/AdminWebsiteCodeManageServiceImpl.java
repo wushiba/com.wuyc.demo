@@ -12,7 +12,7 @@ import com.yfshop.admin.api.website.result.WebsiteCodeDetailExport;
 import com.yfshop.admin.api.website.result.WebsiteCodeDetailResult;
 import com.yfshop.admin.api.website.result.WebsiteCodeResult;
 import com.yfshop.admin.dao.WebsiteCodeDao;
-import com.yfshop.admin.tool.poster.kernal.oss.OssDownloader;
+import com.yfshop.admin.task.OssDownloader;
 import com.yfshop.code.mapper.WebsiteCodeDetailMapper;
 import com.yfshop.code.mapper.WebsiteCodeMapper;
 import com.yfshop.code.model.WebsiteCode;

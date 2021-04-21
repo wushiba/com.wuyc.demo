@@ -97,16 +97,6 @@ xxl:
       ### xxl-job executor log-retention-days
       logretentiondays: 30
 
-
-websiteCode:
-  dir: /home/www/web-deploy/yufan-admin-service/websiteCode/
-  url: https://merchant.yufanlook.com/#/MerchantRegisterPrep?websiteCode=
-
-actCode:
-  srcDir: /home/www/web-deploy/yufan-admin-service/actCode/src/
-  targetDir: /home/www/web-deploy/yufan-admin-service/actCode/target/
-  url: https://m.yufanlook.com/#/LuckDrawPage?actCode=
-
 wxPay:
   notifyUrl: https://wx.yufanlook.com/wx/pay/notify/order/
 

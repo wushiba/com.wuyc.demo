@@ -13,8 +13,8 @@ import com.yfshop.admin.api.activity.result.ActCodeDetailsResult;
 import com.yfshop.admin.api.activity.result.ActCodeResult;
 import com.yfshop.admin.api.activity.service.AdminActCodeManageService;
 import com.yfshop.admin.dao.ActCodeDao;
-import com.yfshop.admin.task.ActCodeTask;
-import com.yfshop.admin.tool.poster.kernal.oss.OssDownloader;
+import com.yfshop.admin.task.EmailTask;
+import com.yfshop.admin.task.OssDownloader;
 import com.yfshop.code.mapper.ActCodeBatchDetailMapper;
 import com.yfshop.code.mapper.ActCodeBatchMapper;
 import com.yfshop.code.mapper.ActCodeBatchRecordMapper;
@@ -67,7 +67,7 @@ public class AdminActCodeManageServiceImpl implements AdminActCodeManageService 
     private OssDownloader ossDownloader;
 
     @Autowired
-    private ActCodeTask actCodeTask;
+    private EmailTask emailTask;
 
 
     @Override
@@ -79,21 +79,6 @@ public class AdminActCodeManageServiceImpl implements AdminActCodeManageService 
                 .eq(StringUtils.isNotBlank(req.getBatchNo()), ActCodeBatch::getBatchNo, req.getBatchNo())));
         iPage.setRecords(list);
         return iPage;
-    }
-
-    @Override
-    public Void actCodeImport(Integer actId, String md5, List<String> sourceCodes) throws ApiException {
-        Asserts.assertTrue(sourceCodes.size() < 99999999, 500, "溯源码超出当次的最大数量99999999");
-        checkFile(md5);
-        ActCodeBatch actCodeBatch = new ActCodeBatch();
-        actCodeBatch.setBatchNo(DateUtil.format(new Date(), "yyMMddHHmmssSSS") + RandomUtil.randomNumbers(4));
-        actCodeBatch.setActId(actId);
-        actCodeBatch.setFileMd5(md5);
-        actCodeBatch.setQuantity(sourceCodes.size());
-        actCodeBatch.setCreateTime(LocalDateTime.now());
-        actCodeBatchMapper.insert(actCodeBatch);
-        actCodeTask.buildActCode(actCodeBatch, sourceCodes);
-        return null;
     }
 
     @Override
@@ -144,7 +129,7 @@ public class AdminActCodeManageServiceImpl implements AdminActCodeManageService 
         String filePath = actCodeCodeDirs + actCodeBatch.getBatchNo() + ".txt";
         String msg = "<p>您好!</p>\n" +
                 "<p>&nbsp;&nbsp;&nbsp;&nbsp;此邮件内含光明活动码（溯源码+抽奖活动码），请妥善保管，切勿外传。雨帆</p>";
-        actCodeTask.sendAttachmentsMail(sourceFactory.getEmail(), "光明活动码（溯源码+抽奖活动码）", msg, filePath);
+        emailTask.sendAttachmentsMail(sourceFactory.getEmail(), "光明活动码（溯源码+抽奖活动码）", msg, filePath);
         actCodeBatch.setIsSend("Y");
         actCodeBatchMapper.updateById(actCodeBatch);
         ActCodeBatchRecord actCodeBatchRecord = new ActCodeBatchRecord();

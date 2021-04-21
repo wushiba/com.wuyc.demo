@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yfshop.admin.dao.ActCodeDao">
+
+    <select id="queryActCodeList" resultType="com.yfshop.admin.api.activity.result.ActCodeResult">
+        select b.*,b.is_download as isDownload,b.is_send as isSend,a.act_title as act_title
+        from yf_act_code_batch b left join yf_draw_activity a on a.id = b.act_id
+        where 1=1
+        <if test="req.startTime!=null">
+            and b.create_time &gt;= #{req.startTime}
+        </if>
+        <if test="req.endTime!=null">
+            and b.create_time &lt; #{req.endTime}
+        </if>
+        <if test="req.batchNo!=null and req.batchNo!=''">
+            and b.batch_no = #{req.batchNo}
+        </if>
+        <if test="req.actId!=null and req.actId!=''">
+            and b.act_id = #{req.actId}
+        </if>
+        order by b.id desc
+    </select>
+
+    <select id="sumActCodeByBeforeId" resultType="java.lang.Integer">
+        select IFNULL(sum(b.quantity),0)
+        from yf_act_code_batch b  where b.create_time &gt;= #{startDate} and b.id &lt; #{id}
+    </select>
+</mapper>

@@ -1,7 +1,6 @@
 package com.yfshop.admin.service.merchant;
 
 import cn.hutool.core.collection.CollectionUtil;
-import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.crypto.SecureUtil;
 import cn.hutool.extra.spring.SpringUtil;
@@ -9,7 +8,6 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.github.binarywang.wxpay.bean.notify.WxPayOrderNotifyResult;
 import com.github.binarywang.wxpay.bean.order.WxPayMpOrderResult;
 import com.github.binarywang.wxpay.bean.request.BaseWxPayRequest;
 import com.github.binarywang.wxpay.bean.request.WxPayUnifiedOrderRequest;
@@ -18,11 +16,11 @@ import com.yfshop.admin.api.merchant.request.MerchantGroupReq;
 import com.yfshop.admin.api.merchant.request.MerchantReq;
 import com.yfshop.admin.api.merchant.result.MerchantGroupResult;
 import com.yfshop.admin.api.merchant.result.MerchantResult;
+import com.yfshop.admin.api.website.WebsiteCodeTaskService;
 import com.yfshop.admin.api.website.request.WebsiteCodeAddressReq;
 import com.yfshop.admin.api.website.request.WebsiteCodeBindReq;
 import com.yfshop.admin.api.website.request.WebsiteCodePayReq;
 import com.yfshop.admin.api.website.result.*;
-import com.yfshop.admin.task.WebsiteCodeTask;
 import com.yfshop.code.mapper.*;
 import com.yfshop.code.model.*;
 import com.yfshop.common.enums.GroupRoleEnum;
@@ -88,8 +86,8 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
     @Resource
     private UserMapper userMapper;
 
-    @Autowired
-    private WebsiteCodeTask websiteCodeTask;
+    @DubboReference
+    private WebsiteCodeTaskService websiteCodeTask;
 
     @DubboReference
     private MpPayService mpPayService;
@@ -319,7 +317,7 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
         websiteCode.setBatchNo(cn.hutool.core.date.DateUtil.format(new Date(), "yyMMddHHmmssSSS") + RandomUtil.randomNumbers(4));
         websiteCodeMapper.insert(websiteCode);
         if (StringUtils.isNotBlank(email)) {
-            websiteCodeTask.buildWebSiteCode(websiteCode);
+            websiteCodeTask.buildWebSiteCode(websiteCode.getId());
         }
         return websiteCode.getId();
     }

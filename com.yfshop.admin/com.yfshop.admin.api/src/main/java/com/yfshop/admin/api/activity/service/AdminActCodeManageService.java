@@ -14,8 +14,6 @@ public interface AdminActCodeManageService {
 
     IPage<ActCodeResult> queryActCodeList(ActCodeQueryReq actCodeQueryReq) throws ApiException;
 
-    Void actCodeImport(Integer actId, String md5, List<String> sourceCodes) throws ApiException;
-
     Void actCodeImport(Integer actId, String md5, String fileUrl) throws ApiException;
 
     Void checkFile(String md5) throws ApiException;

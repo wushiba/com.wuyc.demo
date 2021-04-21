@@ -100,21 +100,11 @@ xxl:
       ### xxl-job executor log-retention-days
       logretentiondays: 30
 
-
-websiteCode:
-  dir: F://websiteCode/
-  url: http://192.168.11.34:8088/#/MerchantRegisterPrep?websiteCode=
-
-actCode:
-  srcDir: F://actCode/src/
-  targetDir: F://actCode/target/
-  url: http://192.168.11.34:8088/#/LuckDrawPage?actCode=
-
 wxPay:
   notifyUrl: http://prev-wx.yufan.51jujibao.com/wx/pay/notify/order/
 
 shop:
-  url: http://prev-shop.yufan.51jujibao.com/
+  url: https://prev-m.yufanlook.com/
 
 merchant:
-  url: http://prev-merchant.yufan.51jujibao.com/
+  url: https://prev-merchant.yufanlook.com/
