@@ -2,10 +2,11 @@ package com.yfshop.open.api.blpshop.result;
 
 import lombok.Data;
 
+import java.io.Serializable;
 import java.util.List;
 
 @Data
-public class RefundResult {
+public class RefundResult implements Serializable {
     private Integer totalCount;
     private List<Refunds> refunds;
     private Boolean isSuccess;
@@ -13,7 +14,7 @@ public class RefundResult {
     private String code;
 
     @Data
-    public static class Refunds {
+    public static class Refunds implements Serializable {
         /**
          * 退款单号
          */
@@ -43,7 +44,7 @@ public class RefundResult {
     }
 
     @Data
-    public static class RefundGoods {
+    public static class RefundGoods implements Serializable {
         private String platProductId;
         private String outerID;
         private String sku;

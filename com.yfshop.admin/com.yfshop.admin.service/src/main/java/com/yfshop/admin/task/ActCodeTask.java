@@ -76,11 +76,8 @@ public class ActCodeTask {
 
     @Autowired
     OssDownloader ossDownloader;
-
-
     @Autowired
     private JavaMailSender mailSender;
-
     @Value("${spring.mail.username}")
     private String from;
 
@@ -114,11 +111,11 @@ public class ActCodeTask {
         });
 
 
-        String filePath = actCodeCodeTargetDir + actCodeBatch.getBatchNo() + ".txt";
-        FileUtil.appendUtf8Lines(codeFile, filePath);
+        String name = actCodeBatch.getBatchNo() + ".txt";
+        FileUtil.appendUtf8Lines(codeFile, actCodeCodeTargetDir+name);
         logger.info("批从号{},{}个溯源码,生成完毕", actCodeBatch.getBatchNo(), actCodeBatch.getQuantity());
         actCodeBatch.setFileStatus("FAIL");
-        UploadResult response = ossUploader.upload(new File(filePath), actCodeBatch.getBatchNo() + ".txt");
+        UploadResult response = ossUploader.upload(new File(actCodeCodeTargetDir,name), name);
         if (response.isSuccessful()) {
             actCodeBatch.setFileStatus("SUCCESS");
             actCodeBatch.setFileUrl(response.getUrl());
@@ -127,16 +124,17 @@ public class ActCodeTask {
     }
 
     @Async
-    public void downLoadFile(ActCodeBatch actCodeBatch, String md5, String fileUrl) throws ApiException {
+    public void downLoadFile(ActCodeBatch actCodeBatch) throws ApiException {
         try {
             actCodeConsumeTask.setFlag(true);
-            File file = new File(actCodeCodeSrcDir + md5 + ".txt");
+            File file = new File(actCodeCodeSrcDir + actCodeBatch.getFileMd5() + ".txt");
+            String fileUrl;
             if (!file.exists()) {
                 logger.info("正则下载溯源码文件");
-                fileUrl = ossDownloader.privateDownloadUrl(fileUrl, 60);
+                fileUrl = ossDownloader.privateDownloadUrl(actCodeBatch.getFileSrcUrl(), 60);
                 file = HttpUtil.downloadFileFromUrl(fileUrl, file);
                 logger.info("载溯源码文件下载完成");
-                Asserts.assertEquals(md5, SecureUtil.md5(file), 500, "下载文件md5不匹配");
+                Asserts.assertEquals(actCodeBatch.getFileMd5(), SecureUtil.md5(file), 500, "下载文件md5不匹配");
             }
             BufferedReader bufferedReader = FileUtil.getUtf8Reader(file);
             List<String> sourceCodes = new ArrayList<>();
@@ -146,7 +144,7 @@ public class ActCodeTask {
                 }
             });
             String actCodeId = "actCode:" + actCodeBatch.getId();
-            CollectionUtil.split(sourceCodes, 50000).forEach(item -> {
+            CollectionUtil.split(sourceCodes, 10000).forEach(item -> {
                 String codes = StringUtils.join(item);
                 stringRedisTemplate.opsForList().leftPush(actCodeId, codes);
             });
@@ -183,18 +181,33 @@ public class ActCodeTask {
     }
 
     public static void main(String[] args) {
-        File file = new File("C:\\Users\\Administrator\\Desktop\\huodong\\1.txt");
-        File targetFile = new File("C:\\Users\\Administrator\\Desktop\\huodong\\1(合成).txt");
-        BufferedReader bufferedReader = FileUtil.getUtf8Reader(file);
-        String actCodeCodeUrl = "https://m.yufanlook.com/#/LuckDrawPage?actCode=";
-        List<String> codeFile = new ArrayList<>();
-        bufferedReader.lines().forEach(item -> {
-            if (StringUtils.isNotBlank(item)) {
-                String actCode = DigestUtil.md5HexTo16(SecureUtil.md5("yf" + item));
-                codeFile.add(String.format("%s,%s%s", item, actCodeCodeUrl, actCode));
-            }
-        });
-        FileUtil.appendUtf8Lines(codeFile, targetFile);
+//        File file = new File("C:\\Users\\Administrator\\Desktop\\huodong\\1.txt");
+//        File targetFile = new File("C:\\Users\\Administrator\\Desktop\\huodong\\1(合成).txt");
+//        BufferedReader bufferedReader = FileUtil.getUtf8Reader(file);
+//        String actCodeCodeUrl = "https://m.yufanlook.com/#/LuckDrawPage?actCode=";
+//        List<String> codeFile = new ArrayList<>();
+//        bufferedReader.lines().forEach(item -> {
+//            if (StringUtils.isNotBlank(item)) {
+//                String actCode = DigestUtil.md5HexTo16(SecureUtil.md5("yf" + item));
+//                codeFile.add(String.format("%s,%s%s", item, actCodeCodeUrl, actCode));
+//            }
+//        });
+//        FileUtil.appendUtf8Lines(codeFile, targetFile);
 
+
+
+
+        List<String> codes =new ArrayList<>();
+        for (int i=0;i<500000;i++){
+            codes.add(String.format("%016d",i));
+        }
+        CollectionUtil.split(codes, 100000).forEach(item -> {
+            int i=0;
+            File file = new File(String.format("F:\\temp\\%s.txt",++i));
+            FileUtil.appendUtf8Lines(item, file);
+            String md5=SecureUtil.md5(file)+".txt";
+            FileUtil.rename(file,md5,true);
+            file.delete();
+        });
     }
 }

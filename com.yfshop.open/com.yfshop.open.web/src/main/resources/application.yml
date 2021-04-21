@@ -1,9 +1,6 @@
 ---
 spring:
   application:
-    name: yfshop-shop-web
-  main:
-    web-application-type: none
+    name: yfshop-open-web
   profiles:
     active: @profiles.active@
-

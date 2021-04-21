@@ -19,8 +19,13 @@ public class DownloadProductReq implements Serializable {
      */
     private String status;
 
-    private Integer pageIndex;
-
-    private Integer pageSize;
+    /**
+     * 页码 1
+     */
+    private Integer pageIndex = 1;
+    /**
+     * 每页条数 20
+     */
+    private Integer pageSize = 20;
 
 }

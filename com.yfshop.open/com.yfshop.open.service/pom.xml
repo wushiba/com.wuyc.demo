@@ -14,11 +14,11 @@
     <description>开放业务模块</description>
 
     <dependencies>
-        <dependency>
-            <groupId>com.yfshop.parent</groupId>
-            <artifactId>com.yfshop.common</artifactId>
-        </dependency>
 
+        <dependency>
+            <groupId>com.baomidou</groupId>
+            <artifactId>mybatis-plus-extension</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>

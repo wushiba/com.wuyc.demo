@@ -104,6 +104,7 @@ public class AdminActCodeManageServiceImpl implements AdminActCodeManageService 
         actCodeBatch.setActId(actId);
         actCodeBatch.setFileMd5(md5);
         actCodeBatch.setCreateTime(LocalDateTime.now());
+        actCodeBatch.setFileSrcUrl(fileUrl);
         actCodeBatchMapper.insert(actCodeBatch);
         return null;
     }

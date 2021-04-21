@@ -10,6 +10,7 @@
         <result column="batch_no" property="batchNo" />
         <result column="quantity" property="quantity" />
         <result column="act_id" property="actId" />
+        <result column="file_src_url" property="fileSrcUrl" />
         <result column="file_url" property="fileUrl" />
         <result column="file_md5" property="fileMd5" />
         <result column="file_status" property="fileStatus" />
@@ -19,7 +20,7 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        id, create_time, update_time, batch_no, quantity, act_id, file_url, file_md5, file_status, is_download, is_send
+        id, create_time, update_time, batch_no, quantity, act_id, file_src_url, file_url, file_md5, file_status, is_download, is_send
     </sql>
 
 </mapper>

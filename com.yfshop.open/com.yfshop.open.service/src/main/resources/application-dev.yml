@@ -16,9 +16,9 @@ spring:
     filters: stat,wall,slf4j
     poolPreparedStatements: true
     type: com.alibaba.druid.pool.DruidDataSource
-    url: jdbc:mysql://121.40.70.203:3306/yf_shop?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
+    url: jdbc:mysql://127.0.0.1:3306/yfshop?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
     username: root
-    password: Wuyc521125!
+    password: root
 #    url: jdbc:mysql://10.10.204.28:3306/db_online_jf?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
 #    username: jjbJfSaas
 #    password: onlineJfsaas
@@ -43,7 +43,7 @@ dubbo:
   configcenter:
     address: zookeeper://127.0.0.1:2181
   protocol:
-    port: 20981
+    port: 20989
     name: dubbo
   scan:
     base-packages: com.yfshop.open

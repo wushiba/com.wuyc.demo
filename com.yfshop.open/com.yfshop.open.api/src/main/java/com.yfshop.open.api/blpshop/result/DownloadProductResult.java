@@ -14,7 +14,7 @@ public class DownloadProductResult implements Serializable {
     private List<Goods> goodsList;
 
     @Data
-    public static class Goods {
+    public static class Goods implements Serializable {
         /**
          * 平台商品ID（此为平台自动生成的编码或者序号）
          */
@@ -48,7 +48,7 @@ public class DownloadProductResult implements Serializable {
     }
 
     @Data
-    public static class Sku {
+    public static class Sku implements Serializable {
         private String skuId;
         /**
          * 子规格编码，能够对应到某主商品下的子规格的编码。此为编码 一般为商家自己填写。

@@ -15,7 +15,7 @@ import lombok.EqualsAndHashCode;
  * </p>
  *
  * @author yoush
- * @since 2021-03-30
+ * @since 2021-04-20
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -45,6 +45,11 @@ public class ActCodeBatch extends Model<ActCodeBatch> {
      * 活动id
      */
     private Integer actId;
+
+    /**
+     * 文件源地址
+     */
+    private String fileSrcUrl;
 
     /**
      * 文件地址

@@ -1,12 +1,8 @@
 package com.yfshop.admin.tool.poster.kernal.oss;
 
-import cn.hutool.core.util.ArrayUtil;
-import cn.hutool.extra.spring.SpringUtil;
 import com.aliyun.oss.OSS;
-import com.aliyun.oss.OSSClient;
 import com.aliyun.oss.OSSClientBuilder;
 import com.aliyun.oss.model.PutObjectResult;
-import com.aliyuncs.DefaultAcsClient;
 import com.yfshop.admin.tool.poster.contracts.Uploader;
 import com.yfshop.admin.tool.poster.kernal.UploadResult;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,7 +53,7 @@ public class OssUploader implements Uploader {
 
     public  static void main(String args[]){
         OSS ossClient = new OSSClientBuilder().build("oss-cn-shenzhen.aliyuncs.com", "LTAI5tSnQKpNY8rGRDYBH8es", "h9jlsJITV88Yaey82tF9qHSQo9RiiE");
-        PutObjectResult result = ossClient.putObject("yf-oss-prev", "1.txt", new File("F:\\1.txt"));
+        PutObjectResult result = ossClient.putObject("yf-oss-prev", "e60936d641c0ae14b22a9588555b11c0.txt", new File("F:\\temp\\e60936d641c0ae14b22a9588555b11c0.txt"));
 
     }
 

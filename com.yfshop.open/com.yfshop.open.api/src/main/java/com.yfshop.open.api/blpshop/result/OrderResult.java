@@ -4,7 +4,6 @@ import lombok.Data;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.util.Date;
 import java.util.List;
 
 @Data
@@ -15,7 +14,7 @@ public class OrderResult implements Serializable {
     private List<Order> orders;
 
     @Data
-    public static class Order {
+    public static class Order implements Serializable {
         /**
          * 订单号
          */
@@ -32,7 +31,7 @@ public class OrderResult implements Serializable {
         /**
          * 交易时间(格式:yyyy-MM-dd HH:mm:ss) 起始时间格式不可以为0000-00-00
          */
-        private Date tradeTime;
+        private String tradeTime;
         /**
          * 支付单号（跨境场景必填，申报海关用的支付流水号
          */
@@ -106,7 +105,7 @@ public class OrderResult implements Serializable {
         /**
          * 支付时间(格式:yyyy-MM-dd HH:mm:ss)
          */
-        private Date payTime;
+        private String payTime;
         /**
          * 收货人姓名
          */
@@ -128,7 +127,7 @@ public class OrderResult implements Serializable {
     }
 
     @Data
-    public static class GoodInfo {
+    public static class GoodInfo implements Serializable {
         /**
          * 平台商品ID或SKUID(SKUID优先)（此为平台自动生成的编码或者序号）
          */

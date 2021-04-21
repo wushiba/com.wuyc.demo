@@ -56,7 +56,7 @@ public class BlpShopController {
         return orderService.downloadProduct(downloadProductReq);
     }
 
-    @RequestMapping(value = "/getRefund", method = {RequestMethod.POST})
+    @RequestMapping(value = "/syncStock", method = {RequestMethod.POST})
     public SyncStockResult syncStock(@RequestBody SyncStockReq syncStockReq) {
         return orderService.syncStock(syncStockReq);
     }
