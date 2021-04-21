@@ -71,5 +71,5 @@ wx:
 upload:
   server:
     domain: http://c.yufanlook.com/
-    imagePath: /mnt/static/c.yufanlook.com/image/yf-shop
-    excelPath: /mnt/static/c.yufanlook.com/excel/yf-shop
+    imagePath: /mnt/static/prev-s.yufanlook.com/image/yf-shop
+    excelPath: /mnt/static/prev-s.yufanlook.com/excel/yf-shop
