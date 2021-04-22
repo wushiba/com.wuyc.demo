@@ -103,3 +103,5 @@ actCode:
   targetDir: /home/www/web-deploy/yufan-admin-report/actCode/target/
   url: https://prev-m.yufanlook.com/#/LuckDrawPage?actCode=
 
+shop:
+  url: https://prev-m.yufanlook.com/
