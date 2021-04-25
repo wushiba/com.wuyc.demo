@@ -84,7 +84,7 @@ xxl:
     accessToken:
     ### xxl-job executor appname
     executor:
-      appname: yufshop-admin-executor-task
+      appname: yufshop-admin-service-executor-task
       ### xxl-job executor registry-address: default use address to registry , otherwise use ip:port if address is null
       address=:
       ### xxl-job executor server-info
