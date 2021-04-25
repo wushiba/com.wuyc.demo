@@ -10,6 +10,7 @@ import com.yfshop.common.exception.ApiException;
 import com.yfshop.common.exception.Asserts;
 import com.yfshop.common.service.RedisService;
 import com.yfshop.common.util.DateUtil;
+import com.yfshop.common.util.YuexinSmsHelper;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,7 +59,9 @@ public class CaptchaServiceImpl implements CaptchaService {
         c.setSmsTemplate(captchaSourceEnum.getSmsTemplate());
         c.setExpireTime(LocalDateTime.now().plusMinutes(captchaSourceEnum.getExpireDuration()));
         captchaMapper.insert(c);
-        logger.debug(String.format(captchaSourceEnum.getSmsTemplate(), captcha));
+//        logger.debug(String.format(captchaSourceEnum.getSmsTemplate(), captcha));
+        String msg = YuexinSmsHelper.sendSms(String.format(captchaSourceEnum.getSmsTemplate(),captcha), mobile);
+        logger.info("====ZddSmsCodeService  发送短信返回消息：mobile=" + mobile + ",ret=" + msg);
         return null;
     }
 
