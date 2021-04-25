@@ -63,7 +63,7 @@ public class UploadController {
             request.setRoleArn(roleArn);
             request.setRoleSessionName(roleSessionName);
             //request.setPolicy(policy); // 若policy为空，则用户将获得该角色下所有权限
-            request.setDurationSeconds(60 * 5L); // 设置凭证有效时间，我设置了30分钟，单位是秒
+            request.setDurationSeconds(60 * 15L); // 设置凭证有效时间，我设置了30分钟，单位是秒
             final AssumeRoleResponse response = client.getAcsResponse(request);
             stsSecurityTokenEntity.setExpiration(response.getCredentials().getExpiration());
             stsSecurityTokenEntity.setAccessKeyId(response.getCredentials().getAccessKeyId());
