@@ -12,4 +12,5 @@ public interface OrderDao {
 
     int updateOrderPayEntryCount(@Param("orderId") Long orderId);
 
+    void orderCancelPay(@Param("orderId") Long orderId);
 }

@@ -271,6 +271,10 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
             allStatus.add("DELIVERY");
             allStatus.add("SUCCESS");
         }
+        if ("PENDING".equals(status)) {
+            allStatus.add("PENDING");
+            allStatus.add("PAYING");
+        }
         LambdaQueryWrapper<WebsiteCode> lambdaQueryWrapper = Wrappers.<WebsiteCode>lambdaQuery()
                 .and(itemWrapper -> itemWrapper
                         .eq(WebsiteCode::getMerchantId, merchantId)
@@ -403,7 +407,6 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
     }
 
 
-    @SneakyThrows
     @Override
     @Transactional(rollbackFor = Exception.class)
     public WxPayMpOrderResult applyWebsiteCodePay(WebsiteCodePayReq websiteCodePayReq) throws ApiException {
@@ -411,21 +414,15 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
         WebsiteCode websiteCode = new WebsiteCode();
         websiteCode.setMobile(websiteCodeAddress.getMobile());
         websiteCode.setContracts(websiteCodeAddress.getContracts());
-        //websiteCode.setPayMethod("WxPay");
         websiteCode.setAddress(websiteCodeAddress.getProvince() + websiteCodeAddress.getCity() + websiteCodeAddress.getDistrict() + websiteCodeAddress.getAddress());
-        //websiteCode.setOrderStatus("WAIT");
         websiteCode.setOrderNo(String.format("%06d", websiteCodeAddress.getMerchantId()) + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyMMddHHmmssSSS")));
+        websiteCode.setOrderStatus("PAYING");
         int count = websiteCodeMapper.update(websiteCode, Wrappers.<WebsiteCode>lambdaQuery()
                 .in(WebsiteCode::getId, websiteCodePayReq.getIds())
                 .eq(WebsiteCode::getOrderStatus, "PENDING"));
         Asserts.assertTrue(count > 0, 500, "没有要支付的订单！");
         WebsiteCodeAmountResult websiteCodeAmountResult = applyWebsiteCodeAmount(websiteCodePayReq.getIds());
         String fee = websiteCodeAmountResult.getAmount().add(websiteCodeAmountResult.getPostage()).toPlainString();
-//        WebsiteCodePayResult websiteCodePayResult = new WebsiteCodePayResult();
-//        websiteCodePayResult.setAmount(websiteCodeAmountResult.getAmount().add(websiteCodeAmountResult.getPostage()));
-//        websiteCodePayResult.setOrderNo(websiteCode.getOrderNo());
-        //websiteCodeTask.doWorkWebsiteCodeFile(websiteCode.getOrderNo());
-
         WxPayUnifiedOrderRequest orderRequest = new WxPayUnifiedOrderRequest();
         orderRequest.setBody("网点码申请");
         orderRequest.setOutTradeNo(websiteCode.getOrderNo());
@@ -440,8 +437,13 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
         orderRequest.setSpbillCreateIp(websiteCodePayReq.getUserId());
         orderRequest.setTimeStart(DateFormatUtils.format(new Date(), "yyyyMMddHHmmss"));
         orderRequest.setTimeExpire(DateFormatUtils.format(new Date(System.currentTimeMillis() + (1000 * 60 * 15)), "yyyyMMddHHmmss"));
-
-        return mpPayService.createPayOrder(orderRequest);
+        try {
+            return mpPayService.createPayOrder(orderRequest);
+        } catch (Exception e) {
+            e.printStackTrace();
+            Asserts.fail(500, "调用支付接口失败！");
+        }
+        return null;
     }
 
     @Override
@@ -491,7 +493,7 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
         websiteCode.setBillno(notifyResult.getTransactionId());
         int count = websiteCodeMapper.update(websiteCode, Wrappers.<WebsiteCode>lambdaQuery()
                 .eq(WebsiteCode::getOrderNo, notifyResult.getOutTradeNo())
-                .eq(WebsiteCode::getOrderStatus, "PENDING"));
+                .eq(WebsiteCode::getOrderStatus, "PAYING"));
         if (count > 0) {
             websiteCodeTask.doWorkWebsiteCodeFile(notifyResult.getOutTradeNo());
         }
@@ -544,7 +546,7 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
             merchant.setRoleName(GroupRoleEnum.getByCode(merchantReq.getRoleAlias()).getDescription());
             merchant.setMerchantName(merchantReq.getMerchantName());
             merchant.setMobile(merchantReq.getMobile());
-            merchant.setPassword(SecureUtil.md5(StringUtils.isBlank(merchantReq.getPassword())?"123456":merchantReq.getPassword()));
+            merchant.setPassword(SecureUtil.md5(StringUtils.isBlank(merchantReq.getPassword()) ? "123456" : merchantReq.getPassword()));
             merchant.setContacts(merchantReq.getContacts());
             merchant.setProvince(pMerchant.getProvince());
             merchant.setCity(pMerchant.getCity());
@@ -580,8 +582,8 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
                 .eq(Merchant::getIsEnable, "Y")
                 .eq(Merchant::getIsDelete, "N")
                 .orderByDesc(Merchant::getId);
-        List<Merchant> list=merchantMapper.selectList(lambdaQueryWrapper);
-        return BeanUtil.convertList(list,MerchantResult.class);
+        List<Merchant> list = merchantMapper.selectList(lambdaQueryWrapper);
+        return BeanUtil.convertList(list, MerchantResult.class);
     }
 
     @Override
@@ -590,6 +592,16 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
                 .eq(WebsiteCodeDetail::getAlias, websiteCode)
                 .eq(WebsiteCodeDetail::getIsActivate, "Y"));
         return websiteCodeDetail == null ? 0 : 1;
+    }
+
+    @Override
+    public void cancelWebsiteCodePay(WebsiteCodePayReq websiteCodePayReq) {
+        WebsiteCode websiteCode = new WebsiteCode();
+        websiteCode.setOrderStatus("PENDING");
+        websiteCodeMapper.update(websiteCode, Wrappers.<WebsiteCode>lambdaQuery()
+                .in(WebsiteCode::getId, websiteCodePayReq.getIds())
+                .eq(WebsiteCode::getOrderStatus, "PAYING"));
+
     }
 
     private Integer getCurrentWebsiteCount(Integer merchantId, Date startCreateTime, Date endCreateTime) {

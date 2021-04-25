@@ -197,5 +197,13 @@ public class FrontOrderController implements BaseController {
     }
 
 
+    @RequestMapping(value = "/order/cancelPay", method = {RequestMethod.GET, RequestMethod.POST})
+    @ResponseBody
+    @SaCheckLogin
+    public CommonResult<Void> cancelPay(Long orderId) throws WxPayException {
+        return CommonResult.success(frontUserOrderService.userOrderCancelPay(orderId));
+    }
+
+
 
 }

@@ -56,7 +56,7 @@ import java.util.stream.Collectors;
  * @Since:2021-03-31 16:16:25
  * @Version:1.1.0
  */
-@Service(dynamic = true)
+@DubboService
 public class FrontUserOrderServiceImpl implements FrontUserOrderService {
 
     @Value("${wxPay.notifyUrl}")
@@ -549,6 +549,12 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
         return payOrderResult;
     }
 
+    @Override
+    public Void userOrderCancelPay(Long orderId) throws ApiException {
+        orderDao.orderCancelPay(orderId);
+        return null;
+    }
+
     //----------------------------------------------------- private method ---------------------------------------------------------------------------------
 
     /**
@@ -563,14 +569,14 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
         for (Order order : orderList) {
             YfUserOrderListResult orderResult;
             List<OrderDetail> detailList = childList.stream().filter(data -> data.getOrderId().equals(order.getId())).collect(Collectors.toList());
-            if ("N".equalsIgnoreCase(order.getIsPay()) && "N".equalsIgnoreCase(order.getIsCancel())) {
+            if (!"Y".equalsIgnoreCase(order.getIsPay()) && "N".equalsIgnoreCase(order.getIsCancel())) {
                 // 未付款订单状态组装
                 orderResult = BeanUtil.convert(order, YfUserOrderListResult.class);
                 orderResult.setOrderId(order.getId());
                 orderResult.setOrderStatus(UserOrderStatusEnum.WAIT_PAY.getCode());
                 orderResult.setItemList(BeanUtil.convertList(detailList, YfUserOrderListResult.YfUserOrderItem.class));
                 resultList.add(orderResult);
-            } else if ("N".equalsIgnoreCase(order.getIsPay()) && "Y".equalsIgnoreCase(order.getIsCancel())) {
+            } else if (!"Y".equalsIgnoreCase(order.getIsPay()) && "Y".equalsIgnoreCase(order.getIsCancel())) {
                 // 已取消订单状态组装
                 orderResult = BeanUtil.convert(order, YfUserOrderListResult.class);
                 orderResult.setOrderId(order.getId());

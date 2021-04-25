@@ -20,7 +20,7 @@ public class Asserts {
         throw new ApiException(errorCode);
     }
 
-    private static void fail(int code, String message) {
+    public static void fail(int code, String message) {
         fail(new ErrorCode(code, message));
     }
 

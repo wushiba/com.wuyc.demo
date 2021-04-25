@@ -287,6 +287,14 @@ class MerchantInfoController extends AbstractBaseController {
         return CommonResult.success(wxPayMpOrderResult);
     }
 
+
+    @SaCheckLogin
+    @RequestMapping(value = "/cancelWebsiteCodePay", method = {RequestMethod.POST})
+    public CommonResult<Void> cancelWebsiteCodePay(@RequestBody WebsiteCodePayReq websiteCodePayReq) {
+        merchantInfoService.cancelWebsiteCodePay(websiteCodePayReq);
+        return CommonResult.success(null);
+    }
+
     /**
      * 创建网点码收货地址
      *

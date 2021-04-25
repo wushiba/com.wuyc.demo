@@ -1,14 +1,17 @@
 package com.yfshop.wx.service;
 
-import cn.hutool.core.util.ArrayUtil;
-import cn.hutool.extra.spring.SpringUtil;
 import com.github.binarywang.wxpay.bean.order.WxPayMpOrderResult;
+import com.github.binarywang.wxpay.bean.request.WxPayOrderQueryRequest;
 import com.github.binarywang.wxpay.bean.request.WxPayUnifiedOrderRequest;
+import com.github.binarywang.wxpay.bean.result.WxPayOrderQueryResult;
 import com.github.binarywang.wxpay.exception.WxPayException;
 import com.github.binarywang.wxpay.service.WxPayService;
+import com.yfshop.common.util.BeanUtil;
 import com.yfshop.wx.api.service.MpPayService;
+import lombok.SneakyThrows;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 
 @DubboService
 public class MpPayServiceImpl implements MpPayService {
@@ -17,8 +20,22 @@ public class MpPayServiceImpl implements MpPayService {
 
     @Override
     public WxPayMpOrderResult createPayOrder(WxPayUnifiedOrderRequest request) throws WxPayException {
-        WxPayMpOrderResult wxPayMpOrderResult=wxPayService.createOrder(request);
+        WxPayMpOrderResult wxPayMpOrderResult = wxPayService.createOrder(request);
         return wxPayMpOrderResult;
+    }
+
+    @Override
+    public WxPayOrderQueryResult queryOrder(String outTradeNo) throws WxPayException {
+        WxPayOrderQueryRequest wxPayOrderQueryRequest = new WxPayOrderQueryRequest();
+        wxPayOrderQueryRequest.setOutTradeNo(outTradeNo);
+        return wxPayService.queryOrder(wxPayOrderQueryRequest);
+    }
+
+    @SneakyThrows
+    @Async
+    @Override
+    public void closeOrder(String outTradeNo){
+        wxPayService.closeOrder(outTradeNo);
     }
 
 }

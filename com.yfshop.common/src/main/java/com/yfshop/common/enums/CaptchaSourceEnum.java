@@ -2,7 +2,7 @@ package com.yfshop.common.enums;
 
 public enum CaptchaSourceEnum {
 
-    LOGIN_CAPTCHA("LOGIN_CAPTCHA", 5,10,"【光明撸渴】验证码：%s，五分钟内有效","光明撸渴登录验证码");
+    LOGIN_CAPTCHA("LOGIN_CAPTCHA", 5,10,"【雨帆健康家】验证码：%s，五分钟内有效","雨帆健康家登录验证码");
 
     private String source;
 

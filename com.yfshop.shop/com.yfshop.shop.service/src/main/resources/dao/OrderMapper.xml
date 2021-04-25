@@ -5,13 +5,19 @@
     <update id="updateOrderPayStatus">
         update yf_order
         set is_pay = 'Y'
-        where id = #{orderId} and is_pay = 'N'
+        where id = #{orderId} and is_pay = 'I'
     </update>
 
     <update id="updateOrderPayEntryCount">
         update yf_order
-        set pay_entry_count = pay_entry_count + 1
-        where id = #{orderId} and is_pay = 'N'
+        set pay_entry_count = pay_entry_count + 1, is_pay='I'
+        where id = #{orderId} and is_pay in ('I','N')
+    </update>
+
+    <update id="orderCancelPay">
+        update yf_order
+        set is_pay='N'
+        where id = #{orderId} and is_pay = 'I'
     </update>
 
 </mapper>
