@@ -21,6 +21,7 @@ import com.yfshop.admin.api.website.request.WebsiteCodeAddressReq;
 import com.yfshop.admin.api.website.request.WebsiteCodeBindReq;
 import com.yfshop.admin.api.website.request.WebsiteCodePayReq;
 import com.yfshop.admin.api.website.result.*;
+import com.yfshop.admin.dao.WebsiteCodeDao;
 import com.yfshop.code.mapper.*;
 import com.yfshop.code.model.*;
 import com.yfshop.common.enums.GroupRoleEnum;
@@ -94,7 +95,8 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
 
     @Value("${wxPay.notifyUrl}")
     private String wxPayNotifyUrl;
-
+    @Resource
+    private WebsiteCodeDao websiteCodeDao;
 
     @Override
     public MerchantResult getWebsiteInfo(Integer merchantId) throws ApiException {
@@ -298,6 +300,12 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
 
     @Override
     public Integer applyWebsiteCode(Integer merchantId, Integer count, String email) throws ApiException {
+        WebsiteCode last = websiteCodeMapper.selectOne(Wrappers.<WebsiteCode>lambdaQuery().eq(WebsiteCode::getMerchantId, merchantId).orderByDesc());
+        if (last != null) {
+            int sumCount = websiteCodeDao.sumWebsiteCodeByBeforeId(last.getId(), merchantId);
+            sumCount = sumCount + count;
+            Asserts.assertTrue(sumCount < 10000, 500, "商户最多只能申请1万个网点码！");
+        }
         Merchant merchant = merchantMapper.selectById(merchantId);
         WebsiteCode websiteCode = new WebsiteCode();
         websiteCode.setCreateTime(LocalDateTime.now());

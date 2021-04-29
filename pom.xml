@@ -55,8 +55,8 @@
         <weixin-java-mp.version>4.0.0</weixin-java-mp.version>
         <weixin-java-pay.version>4.0.0</weixin-java-pay.version>
         <cn.dev33.version>1.15.0.RELEASE</cn.dev33.version>
-        <docker.registry>172.17.0.111</docker.registry>
-        <docker.host>http://172.17.0.111:2375</docker.host>
+        <docker.registry>127.0.0.1</docker.registry>
+        <docker.host>http://127.0.0.1:2375</docker.host>
         <docker.namespace>library</docker.namespace>
         <docker.username>admin</docker.username>
         <docker.password>Harbor12345</docker.password>

@@ -1,8 +1,6 @@
 package com.yfshop.admin.controller.activity;
 
 import cn.dev33.satoken.annotation.SaCheckLogin;
-import cn.hutool.core.io.IoUtil;
-import cn.hutool.crypto.SecureUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.yfshop.admin.api.activity.request.ActCodeImportReq;
 import com.yfshop.admin.api.activity.request.ActCodeQueryDetailsReq;
@@ -11,7 +9,6 @@ import com.yfshop.admin.api.activity.result.ActCodeBatchRecordResult;
 import com.yfshop.admin.api.activity.service.AdminActCodeManageService;
 import com.yfshop.common.api.CommonResult;
 import com.yfshop.common.base.BaseController;
-import com.yfshop.common.exception.Asserts;
 import io.swagger.annotations.ApiOperation;
 import lombok.SneakyThrows;
 import org.apache.dubbo.config.annotation.DubboReference;
@@ -19,10 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.BufferedReader;
-import java.util.ArrayList;
 import java.util.List;
 
 /**

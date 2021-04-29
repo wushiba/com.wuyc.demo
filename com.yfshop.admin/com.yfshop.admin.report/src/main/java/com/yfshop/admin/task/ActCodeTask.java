@@ -105,16 +105,14 @@ public class ActCodeTask {
         }
         logger.info("溯源码合成结束");
 
-        CollectionUtil.split(actCodeBatchDetails, 1000).forEach(item -> {
-            actCodeBatchDetailMapper.insertBatchSomeColumn(item);
-        });
-
-
+        CollectionUtil.split(actCodeBatchDetails, 1000).forEach(item ->
+                actCodeBatchDetailMapper.insertBatchSomeColumn(item)
+        );
         String name = actCodeBatch.getBatchNo() + ".txt";
-        FileUtil.appendUtf8Lines(codeFile, actCodeCodeTargetDir+name);
+        FileUtil.appendUtf8Lines(codeFile, actCodeCodeTargetDir + name);
         logger.info("批从号{},{}个溯源码,生成完毕", actCodeBatch.getBatchNo(), actCodeBatch.getQuantity());
         actCodeBatch.setFileStatus("FAIL");
-        UploadResult response = ossUploader.upload(new File(actCodeCodeTargetDir,name), name);
+        UploadResult response = ossUploader.upload(new File(actCodeCodeTargetDir, name), name);
         if (response.isSuccessful()) {
             actCodeBatch.setFileStatus("SUCCESS");
             actCodeBatch.setFileUrl(response.getUrl());
@@ -143,7 +141,7 @@ public class ActCodeTask {
                 }
             });
             String actCodeId = "actCode:" + actCodeBatch.getId();
-            CollectionUtil.split(sourceCodes, 10000).forEach(item -> {
+            CollectionUtil.split(sourceCodes, 50000).forEach(item -> {
                 String codes = StringUtils.join(item);
                 stringRedisTemplate.opsForList().leftPush(actCodeId, codes);
             });

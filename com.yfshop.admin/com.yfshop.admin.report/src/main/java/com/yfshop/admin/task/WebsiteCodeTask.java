@@ -128,21 +128,21 @@ public class WebsiteCodeTask {
     //商户码 3位地区码+6位pid+6位年月日+5位序号
     @Async
     public void buildWebSiteCode(WebsiteCode websiteCode) {
-        Date date = DateUtil.getDate(DateUtil.localDateTimeToDate(websiteCode.getCreateTime()));
-        int count = websiteCodeDao.sumWebsiteCodeByBeforeId(websiteCode.getId(), date);
-        if (count > 99999) {
-            logger.info("{},超出当日限量了", websiteCode.getBatchNo());
+        int count = websiteCodeDao.sumWebsiteCodeByBeforeId(websiteCode.getId(),websiteCode.getMerchantId());
+        if (count > 9999) {
+            logger.info("{},超出限量了", websiteCode.getBatchNo());
+            websiteCode.setFileStatus("FAIL");
+            websiteCodeMapper.updateById(websiteCode);
             return;
         }
-        String dateTime = cn.hutool.core.date.DateUtil.format(date, "yyMMdd");
         Merchant merchant = merchantMapper.selectById(websiteCode.getMerchantId());
         Region region = regionMapper.selectById(merchant.getCityId());
-        String code = String.format("%03d%06d%s", region == null ? 0 : region.getAreaCode(), websiteCode.getMerchantId(), dateTime);
+        String code = String.format("%s-%03d", merchant.getMobile().substring(merchant.getMobile().length()-4),region == null ? 0 : region.getAreaCode());
         List<WebsiteCodeDetail> list = new ArrayList<>();
         for (int i = 0; i < websiteCode.getQuantity(); i++) {
             WebsiteCodeDetail websiteCodeDetail = new WebsiteCodeDetail();
             websiteCodeDetail.setBatchId(websiteCode.getId());
-            websiteCodeDetail.setAlias(String.format("%s%05d", code, ++count));
+            websiteCodeDetail.setAlias(String.format("%s-%04d", code, ++count));
             websiteCodeDetail.setIsActivate("N");
             websiteCodeDetail.setPid(websiteCode.getMerchantId());
             websiteCodeDetail.setPidPath(websiteCode.getPidPath());

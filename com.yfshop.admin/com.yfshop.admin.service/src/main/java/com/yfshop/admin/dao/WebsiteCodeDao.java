@@ -5,7 +5,6 @@ import com.yfshop.admin.api.website.request.WebsiteCodeQueryReq;
 import com.yfshop.admin.api.website.result.WebsiteCodeResult;
 import org.apache.ibatis.annotations.Param;
 
-import java.util.Date;
 import java.util.List;
 
 public interface WebsiteCodeDao {
@@ -14,5 +13,5 @@ public interface WebsiteCodeDao {
 
     int queryWebsiteCodeCount(WebsiteCodeQueryReq req);
 
-    int sumWebsiteCodeByBeforeId(@Param("id") Integer id,@Param("startDate") Date startDate);
+    int sumWebsiteCodeByBeforeId(@Param("id") Integer id,@Param("merchantId") Integer merchantId);
 }

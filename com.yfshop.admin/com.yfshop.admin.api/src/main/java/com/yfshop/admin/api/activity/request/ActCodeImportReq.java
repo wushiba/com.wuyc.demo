@@ -2,10 +2,8 @@ package com.yfshop.admin.api.activity.request;
 
 import lombok.Data;
 
-import javax.annotation.RegEx;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
-import javax.validation.constraints.Size;
 import java.io.Serializable;
 
 @Data
