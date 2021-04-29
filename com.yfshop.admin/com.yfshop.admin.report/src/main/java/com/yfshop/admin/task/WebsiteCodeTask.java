@@ -182,7 +182,7 @@ public class WebsiteCodeTask {
         Text text = new Text();
         text.setFontSize(48);
         text.setColor("#333333");
-        text.setX(254);
+        text.setX(360);
         text.setY(1008);
         text.setText(websiteCode);
         texts.add(text);

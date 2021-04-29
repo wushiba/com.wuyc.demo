@@ -39,10 +39,10 @@ spring:
     password:
 
   mail:
-    host: smtp.126.com
+    host: smtp.sina.cn
     port: 465
-    username: yousheng_hui@126.com
-    password: YTLXAVOGNLTZHUBZ
+    username: yflook@sina.cn
+    password: 558eac7a98baacf4
     protocol: smtp
     test-connection: true
     default-encoding: UTF-8

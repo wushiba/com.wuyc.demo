@@ -3,10 +3,12 @@ package com.yfshop.admin;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.validation.ValidationAutoConfiguration;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.scheduling.annotation.EnableAsync;
 
-@MapperScan("com.yfshop.admin")
-@SpringBootApplication
+@SpringBootApplication(exclude = {ValidationAutoConfiguration.class})
+@EnableAsync
 public class AdminReportApplication {
     public static void main(String[] args) {
         ConfigurableApplicationContext applicationContext = SpringApplication.run(AdminReportApplication.class, args);
