@@ -72,6 +72,6 @@
     <select id="sumWebsiteCodeByBeforeId" resultType="java.lang.Integer">
         select IFNULL(sum(c.quantity),0)
         from yf_website_code c
-        where c.create_time &gt;= #{startDate} and c.id &lt; #{id}
+        where c.merchant_id = #{merchantId} and c.id &lt; #{id}
     </select>
 </mapper>

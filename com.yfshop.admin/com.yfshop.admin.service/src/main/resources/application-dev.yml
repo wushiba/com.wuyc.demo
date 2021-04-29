@@ -61,7 +61,7 @@ dubbo:
   configcenter:
     address: zookeeper://127.0.0.1:2181
   protocol:
-    port: 20981
+    port: 20882
     name: dubbo
   scan:
     base-packages: com.yfshop.admin
@@ -108,3 +108,12 @@ shop:
 
 merchant:
   url: https://prev-merchant.yufanlook.com/
+
+websiteCode:
+  dir: F://websiteCode/
+  url: https://prev-merchant.yufanlook.com/#/MerchantRegisterPrep?websiteCode=
+
+actCode:
+  srcDir: F://actCode/src/
+  targetDir: F://actCode/target/
+  url: https://prev-m.yufanlook.com/#/LuckDrawPage?actCode=

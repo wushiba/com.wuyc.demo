@@ -59,7 +59,7 @@ dubbo:
     port: 20886
     name: dubbo
   scan:
-    base-packages: com.yfshop.report
+    base-packages: com.yfshop.admin
   provider:
     dynamic: true
     timeout: 30000

@@ -64,7 +64,7 @@ dubbo:
     port: 20886
     name: dubbo
   scan:
-    base-packages: com.yfshop.report
+    base-packages: com.yfshop.admin
   provider:
     dynamic: true
     timeout: 30000
@@ -94,7 +94,7 @@ xxl:
       address=:
       ### xxl-job executor server-info
       ip=:
-      port: 19999
+      port: 19998
       ### xxl-job executor log-path
       logpath: /home/www/web-deploy/yufan-admin-report/xxl-job/
       ### xxl-job executor log-retention-days
@@ -103,12 +103,12 @@ xxl:
 
 websiteCode:
   dir: F://websiteCode/
-  url: http://192.168.11.34:8088/#/MerchantRegisterPrep?websiteCode=
+  url: https://prev-merchant.yufanlook.com/#/MerchantRegisterPrep?websiteCode=
 
 actCode:
   srcDir: F://actCode/src/
   targetDir: F://actCode/target/
-  url: http://192.168.11.34:8088/#/LuckDrawPage?actCode=
+  url: https://prev-m.yufanlook.com/#/LuckDrawPage?actCode=
 
 wxPay:
   notifyUrl: http://prev-wx.yufan.51jujibao.com/wx/pay/notify/order/
