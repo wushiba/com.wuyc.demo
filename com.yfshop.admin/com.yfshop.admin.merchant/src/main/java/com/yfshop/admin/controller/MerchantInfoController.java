@@ -69,6 +69,17 @@ class MerchantInfoController extends AbstractBaseController {
         return CommonResult.success(merchantInfoService.getChildMerchant(getCurrentAdminUserId()));
     }
 
+
+    @SaCheckLogin
+    @RequestMapping(value = "/getWebsiteList", method = {RequestMethod.GET, RequestMethod.POST})
+    @ResponseBody
+    public CommonResult<List<MerchantGroupResult>> getWebsiteList(MerchantGroupReq merchantGroupReq) {
+        if (merchantGroupReq.getMerchantId() == null) {
+            merchantGroupReq.setMerchantId(getCurrentAdminUserId());
+        }
+        return CommonResult.success(merchantInfoService.getWebsiteList(merchantGroupReq));
+    }
+
     @RequestMapping(value = "/checkSubscribe", method = {RequestMethod.GET, RequestMethod.POST})
     @ResponseBody
     public CommonResult<Integer> checkSubscribe() throws WxErrorException {

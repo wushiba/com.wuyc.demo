@@ -191,4 +191,6 @@ public interface MerchantInfoService {
     Integer checkActivate(String websiteCode);
 
     void cancelWebsiteCodePay(WebsiteCodePayReq websiteCodePayReq);
+
+    List<MerchantGroupResult> getWebsiteList(MerchantGroupReq merchantGroupReq);
 }

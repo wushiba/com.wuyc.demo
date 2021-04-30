@@ -520,7 +520,6 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
         merchantGroupResult.setCount(count);
         LambdaQueryWrapper lambdaQueryWrapper = Wrappers.<Merchant>lambdaQuery()
                 .eq(Merchant::getPid, merchantGroupReq.getMerchantId())
-                .ne(Merchant::getRoleAlias, "wd")
                 .eq(Merchant::getIsEnable, "Y")
                 .eq(Merchant::getIsDelete, "N");
         List<Merchant> merchantList = merchantMapper.selectList(lambdaQueryWrapper);
@@ -619,6 +618,28 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
                 .in(WebsiteCode::getId, websiteCodePayReq.getIds())
                 .eq(WebsiteCode::getOrderStatus, "PAYING"));
 
+    }
+
+    @Override
+    public List<MerchantGroupResult> getWebsiteList(MerchantGroupReq merchantGroupReq) {
+        LambdaQueryWrapper lambdaQueryWrapper = Wrappers.<Merchant>lambdaQuery()
+                .eq(Merchant::getPid, merchantGroupReq.getMerchantId())
+                .eq(Merchant::getRoleAlias, "wd")
+                .eq(Merchant::getIsEnable, "Y")
+                .eq(Merchant::getIsDelete, "N");
+        List<Merchant> merchantList = merchantMapper.selectList(lambdaQueryWrapper);
+        List<MerchantGroupResult> merchantGroupResults = new ArrayList<>();
+        merchantList.forEach(item -> {
+            MerchantGroupResult child = new MerchantGroupResult();
+            child.setMerchantId(item.getId());
+            child.setMerchantName(item.getMerchantName());
+            child.setCurrentExchange(getCurrentExchange(item.getId(), merchantGroupReq.getStartCreateTime(), merchantGroupReq.getEndCreateTime()));
+            child.setTotalExchange(getTotalExchange(item.getId()));
+            child.setGoodsRecord(websiteGoodsRecordDao.sumGoodsRecord(item.getId()));
+            child.setCount(getAllWebsiteCount(item.getId(), merchantGroupReq.getStartCreateTime(), merchantGroupReq.getEndCreateTime()));
+            merchantGroupResults.add(child);
+        });
+        return merchantGroupResults;
     }
 
     private Integer getCurrentWebsiteCount(Integer merchantId, Date startCreateTime, Date endCreateTime) {
