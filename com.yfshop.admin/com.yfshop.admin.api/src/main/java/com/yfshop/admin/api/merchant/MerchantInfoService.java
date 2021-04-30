@@ -8,6 +8,7 @@ import com.yfshop.admin.api.merchant.result.MerchantGroupResult;
 import com.yfshop.admin.api.merchant.result.MerchantResult;
 import com.yfshop.admin.api.website.request.WebsiteCodeAddressReq;
 import com.yfshop.admin.api.website.request.WebsiteCodeBindReq;
+import com.yfshop.admin.api.website.request.WebsiteCodeDataReq;
 import com.yfshop.admin.api.website.request.WebsiteCodePayReq;
 import com.yfshop.admin.api.website.result.*;
 import com.yfshop.common.exception.ApiException;
@@ -193,4 +194,6 @@ public interface MerchantInfoService {
     void cancelWebsiteCodePay(WebsiteCodePayReq websiteCodePayReq);
 
     List<MerchantGroupResult> getWebsiteList(MerchantGroupReq merchantGroupReq);
+
+    WebsiteCodeGroupResult getWebsiteCodeData(WebsiteCodeDataReq websiteCodeDataReq);
 }

@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Data
-public class WebsiteCodeGropResult implements Serializable {
+public class WebsiteCodeGroupResult implements Serializable {
     private int count;
     private Integer currentExchange;
     private Integer totalExchange;

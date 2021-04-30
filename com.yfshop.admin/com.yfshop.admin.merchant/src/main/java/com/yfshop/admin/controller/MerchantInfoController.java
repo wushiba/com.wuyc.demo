@@ -197,6 +197,19 @@ class MerchantInfoController extends AbstractBaseController {
         return CommonResult.success(websiteCodeDetailResults);
     }
 
+
+    /**
+     * 获取我的网点码
+     *
+     * @return
+     */
+    @SaCheckLogin
+    @RequestMapping(value = "/getWebsiteCodeData", method = {RequestMethod.POST})
+    public CommonResult<WebsiteCodeGroupResult> getWebsiteCodeData(WebsiteCodeDataReq websiteCodeDataReq) {
+        WebsiteCodeGroupResult websiteCodeGroupResult = merchantInfoService.getWebsiteCodeData(websiteCodeDataReq);
+        return CommonResult.success(websiteCodeGroupResult);
+    }
+
     /**
      * 绑点网点码
      *

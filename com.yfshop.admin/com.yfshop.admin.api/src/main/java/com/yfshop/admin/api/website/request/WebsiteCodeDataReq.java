@@ -1,9 +1,11 @@
 package com.yfshop.admin.api.website.request;
 
 import com.yfshop.common.util.DateUtil;
+import lombok.Data;
 
 import java.util.Date;
 
+@Data
 public class WebsiteCodeDataReq {
     private Date startCreateTime;
     private Date endCreateTime;

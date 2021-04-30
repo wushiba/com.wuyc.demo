@@ -10,7 +10,6 @@ import java.util.List;
 
 @Data
 public class WebsiteCodeDataResult implements Serializable {
-    private int count;
     private Integer merchantId;
     private String merchantName;
     private String alias;
