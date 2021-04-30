@@ -17,5 +17,4 @@ public class WebsiteCodeDataResult implements Serializable {
     private LocalDateTime activityTime;
     private Integer currentExchange;
     private Integer totalExchange;
-    private Integer currentGoodsRecord;
 }

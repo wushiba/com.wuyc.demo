@@ -3,18 +3,19 @@ package com.yfshop.admin.api.website.request;
 import com.yfshop.common.util.DateUtil;
 import lombok.Data;
 
+import java.io.Serializable;
 import java.util.Date;
 
 @Data
-public class WebsiteCodeDataReq {
-    private Date startCreateTime;
-    private Date endCreateTime;
+public class WebsiteCodeDataReq implements Serializable {
+    private Date startTime;
+    private Date endTime;
     private Integer merchantId;
 
-    public Date getEndCreateTime() {
-        if (endCreateTime == null) {
-            endCreateTime = startCreateTime;
+    public Date getEndTime() {
+        if (endTime == null) {
+            endTime = startTime;
         }
-        return endCreateTime == null ? null : DateUtil.plusDays(endCreateTime, 1);
+        return endTime == null ? null : DateUtil.plusDays(endTime, 1);
     }
 }

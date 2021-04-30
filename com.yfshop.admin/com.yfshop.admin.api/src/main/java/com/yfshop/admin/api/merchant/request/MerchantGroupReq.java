@@ -8,15 +8,14 @@ import java.util.Date;
 
 @Data
 public class MerchantGroupReq implements Serializable {
-    private Date startCreateTime;
-    private Date endCreateTime;
+    private Date startTime;
+    private Date endTime;
     private Integer merchantId;
-
-
-    public Date getEndCreateTime() {
-        if (endCreateTime == null) {
-            endCreateTime = startCreateTime;
+    
+    public Date getEndTime() {
+        if (endTime == null) {
+            endTime = getStartTime();
         }
-        return endCreateTime == null ? null : DateUtil.plusDays(endCreateTime, 1);
+        return endTime == null ? null : DateUtil.plusDays(endTime, 1);
     }
 }
