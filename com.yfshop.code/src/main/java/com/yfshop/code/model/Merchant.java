@@ -15,7 +15,7 @@ import lombok.EqualsAndHashCode;
  * </p>
  *
  * @author yoush
- * @since 2021-03-27
+ * @since 2021-04-30
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -120,6 +120,11 @@ public class Merchant extends Model<Merchant> {
      * 是否删除， Y(删除)， N（未删除）, 默认未删除
      */
     private String isDelete;
+
+    /**
+     * 结算
+     */
+    private String settlement;
 
 
     @Override

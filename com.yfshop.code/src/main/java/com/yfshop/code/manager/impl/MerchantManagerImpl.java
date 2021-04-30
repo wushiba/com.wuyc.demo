@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
  * </p>
  *
  * @author yoush
- * @since 2021-03-27
+ * @since 2021-04-30
  */
 @Service
 public class MerchantManagerImpl extends ServiceImpl<MerchantMapper, Merchant> implements MerchantManager {

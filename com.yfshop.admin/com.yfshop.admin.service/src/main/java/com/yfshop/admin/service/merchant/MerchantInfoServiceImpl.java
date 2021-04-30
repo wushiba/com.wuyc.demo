@@ -532,7 +532,7 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
             myself.setMerchantName(merchant.getMerchantName());
             myself.setCurrentExchange(getCurrentExchange(merchant.getId(), merchantGroupReq.getStartCreateTime(), merchantGroupReq.getEndCreateTime()));
             myself.setTotalExchange(getTotalExchange(merchant.getId()));
-            myself.setGoodsRecord(websiteGoodsRecordDao.sumGoodsRecord(merchant.getId()));
+            myself.setCurrentGoodsRecord(websiteGoodsRecordDao.sumGoodsRecord(merchant.getId(),merchantGroupReq.getStartCreateTime(), merchantGroupReq.getEndCreateTime())));
             myself.setCount(myselfCount);
             merchantGroupResults.add(myself);
         }
@@ -542,7 +542,7 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
             child.setMerchantName(item.getMerchantName());
             child.setCurrentExchange(getCurrentExchange(item.getId(), merchantGroupReq.getStartCreateTime(), merchantGroupReq.getEndCreateTime()));
             child.setTotalExchange(getTotalExchange(item.getId()));
-            child.setGoodsRecord(websiteGoodsRecordDao.sumGoodsRecord(item.getId()));
+            child.setCurrentGoodsRecord(websiteGoodsRecordDao.sumGoodsRecord(item.getId(),merchantGroupReq.getStartCreateTime(), merchantGroupReq.getEndCreateTime())));
             child.setCount(getAllWebsiteCount(item.getId(), merchantGroupReq.getStartCreateTime(), merchantGroupReq.getEndCreateTime()));
             merchantGroupResults.add(child);
         });
@@ -635,7 +635,7 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
             child.setMerchantName(item.getMerchantName());
             child.setCurrentExchange(getCurrentExchange(item.getId(), merchantGroupReq.getStartCreateTime(), merchantGroupReq.getEndCreateTime()));
             child.setTotalExchange(getTotalExchange(item.getId()));
-            child.setGoodsRecord(websiteGoodsRecordDao.sumGoodsRecord(item.getId()));
+            child.setCurrentGoodsRecord(websiteGoodsRecordDao.sumGoodsRecord(item.getId(), merchantGroupReq.getStartCreateTime(), merchantGroupReq.getEndCreateTime()));
             child.setCount(getAllWebsiteCount(item.getId(), merchantGroupReq.getStartCreateTime(), merchantGroupReq.getEndCreateTime()));
             merchantGroupResults.add(child);
         });

@@ -14,7 +14,7 @@ public class MerchantGroupResult implements Serializable {
     private boolean isHaveWebsite;
     private Integer currentExchange;
     private Integer totalExchange;
-    private Integer goodsRecord;
+    private Integer currentGoodsRecord;
     private List<MerchantGroupResult> list = new ArrayList<>();
 
 }

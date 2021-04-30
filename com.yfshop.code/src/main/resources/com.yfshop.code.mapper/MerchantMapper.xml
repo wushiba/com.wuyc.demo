@@ -28,11 +28,12 @@
         <result column="sub_address" property="subAddress" />
         <result column="is_enable" property="isEnable" />
         <result column="is_delete" property="isDelete" />
+        <result column="settlement" property="settlement" />
     </resultMap>
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        id, create_time, update_time, open_id, pid, p_merchant_name, pid_path, role_alias, role_name, merchant_name, mobile, password, contacts, head_img_url, province, city, district, province_id, city_id, district_id, address, sub_address, is_enable, is_delete
+        id, create_time, update_time, open_id, pid, p_merchant_name, pid_path, role_alias, role_name, merchant_name, mobile, password, contacts, head_img_url, province, city, district, province_id, city_id, district_id, address, sub_address, is_enable, is_delete, settlement
     </sql>
 
 </mapper>
