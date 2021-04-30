@@ -22,6 +22,7 @@ import com.yfshop.admin.api.website.request.WebsiteCodeBindReq;
 import com.yfshop.admin.api.website.request.WebsiteCodePayReq;
 import com.yfshop.admin.api.website.result.*;
 import com.yfshop.admin.dao.WebsiteCodeDao;
+import com.yfshop.admin.dao.WebsiteGoodsRecordDao;
 import com.yfshop.code.mapper.*;
 import com.yfshop.code.model.*;
 import com.yfshop.common.enums.GroupRoleEnum;
@@ -97,6 +98,9 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
     private String wxPayNotifyUrl;
     @Resource
     private WebsiteCodeDao websiteCodeDao;
+
+    @Resource
+    private WebsiteGoodsRecordDao websiteGoodsRecordDao;
 
     @Override
     public MerchantResult getWebsiteInfo(Integer merchantId) throws ApiException {
@@ -527,6 +531,9 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
             myself.setHaveWebsite(true);
             myself.setMerchantId(merchant.getId());
             myself.setMerchantName(merchant.getMerchantName());
+            myself.setCurrentExchange(getCurrentExchange(merchant.getId(), merchantGroupReq.getStartCreateTime(), merchantGroupReq.getEndCreateTime()));
+            myself.setTotalExchange(getTotalExchange(merchant.getId()));
+            myself.setGoodsRecord(websiteGoodsRecordDao.sumGoodsRecord(merchant.getId()));
             myself.setCount(myselfCount);
             merchantGroupResults.add(myself);
         }
@@ -534,8 +541,10 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
             MerchantGroupResult child = new MerchantGroupResult();
             child.setMerchantId(item.getId());
             child.setMerchantName(item.getMerchantName());
-            Integer childCount = getAllWebsiteCount(item.getId(), merchantGroupReq.getStartCreateTime(), merchantGroupReq.getEndCreateTime());
-            child.setCount(childCount);
+            child.setCurrentExchange(getCurrentExchange(item.getId(), merchantGroupReq.getStartCreateTime(), merchantGroupReq.getEndCreateTime()));
+            child.setTotalExchange(getTotalExchange(item.getId()));
+            child.setGoodsRecord(websiteGoodsRecordDao.sumGoodsRecord(item.getId()));
+            child.setCount(getAllWebsiteCount(item.getId(), merchantGroupReq.getStartCreateTime(), merchantGroupReq.getEndCreateTime()));
             merchantGroupResults.add(child);
         });
         return merchantGroupResult;
@@ -623,6 +632,7 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
         return merchantMapper.selectCount(lambdaQueryWrapper);
     }
 
+
     private Integer getAllWebsiteCount(Integer merchantId, Date startCreateTime, Date endCreateTime) {
         LambdaQueryWrapper lambdaQueryWrapper = Wrappers.<Merchant>lambdaQuery()
                 .like(Merchant::getPidPath, merchantId + ".")
@@ -633,4 +643,20 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
                 .lt(endCreateTime != null, Merchant::getCreateTime, endCreateTime != null ? DateUtil.plusDays(endCreateTime, 1) : null);
         return merchantMapper.selectCount(lambdaQueryWrapper);
     }
+
+
+    private Integer getCurrentExchange(Integer merchantId, Date startCreateTime, Date endCreateTime) {
+        LambdaQueryWrapper lambdaQueryWrapper = Wrappers.<WebsiteBill>lambdaQuery()
+                .like(WebsiteBill::getPidPath, merchantId + ".")
+                .ge(startCreateTime != null, WebsiteBill::getCreateTime, startCreateTime)
+                .lt(endCreateTime != null, WebsiteBill::getCreateTime, endCreateTime != null ? DateUtil.plusDays(endCreateTime, 1) : null);
+        return merchantMapper.selectCount(lambdaQueryWrapper);
+    }
+
+    private Integer getTotalExchange(Integer merchantId) {
+        LambdaQueryWrapper lambdaQueryWrapper = Wrappers.<WebsiteBill>lambdaQuery()
+                .like(WebsiteBill::getPidPath, merchantId + ".");
+        return merchantMapper.selectCount(lambdaQueryWrapper);
+    }
+
 }

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yfshop.admin.dao.WebsiteGoodsRecordDao">
+
+    <select id="sumGoodsRecord" resultType="java.lang.Integer">
+        select IFNULL(sum(r.quantity),0)
+        from yf_website_goods_record r
+        where r.pid_path like CONCAT('%', #{merchantId},'.%')
+    </select>
+</mapper>

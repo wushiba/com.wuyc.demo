@@ -133,20 +133,20 @@ public class WxPayController {
 //   * @param request 请求对象
 //   * @return 退款操作结果
 //   */
-    @ApiOperation(value = "退款")
-    @PostMapping("/refund/{pwd}")
-    public WxPayRefundResult refund(@PathVariable String pwd, @RequestBody WxPayRefundRequest request) throws WxPayException {
-        Asserts.assertEquals("64293481", pwd, 500, "无效的请求");
-        return this.wxService.refund(request);
-    }
-
-
-    @PostMapping("/refund/all/{pwd}")
-    public Void refundAll(@PathVariable String pwd, String startTime, String endTime) throws WxPayException {
-        Asserts.assertEquals("64293481", pwd, 500, "无效的请求");
-
-        return mpService.refundAll(DateUtil.parse(startTime), DateUtil.parse(endTime));
-    }
+//    @ApiOperation(value = "退款")
+//    @PostMapping("/refund/{pwd}")
+//    public WxPayRefundResult refund(@PathVariable String pwd, @RequestBody WxPayRefundRequest request) throws WxPayException {
+//        Asserts.assertEquals("64293481", pwd, 500, "无效的请求");
+//        return this.wxService.refund(request);
+//    }
+//
+//
+//    @PostMapping("/refund/all/{pwd}")
+//    public Void refundAll(@PathVariable String pwd, String startTime, String endTime) throws WxPayException {
+//        Asserts.assertEquals("64293481", pwd, 500, "无效的请求");
+//
+//        return mpService.refundAll(DateUtil.parse(startTime), DateUtil.parse(endTime));
+//    }
 //
 //  /**
 //   * <pre>

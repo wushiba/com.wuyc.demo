@@ -1,7 +1,6 @@
 package com.yfshop.admin.api.merchant;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.github.binarywang.wxpay.bean.notify.WxPayOrderNotifyResult;
 import com.github.binarywang.wxpay.bean.order.WxPayMpOrderResult;
 import com.yfshop.admin.api.merchant.request.MerchantGroupReq;
 import com.yfshop.admin.api.merchant.request.MerchantReq;
@@ -11,7 +10,6 @@ import com.yfshop.admin.api.website.request.WebsiteCodeAddressReq;
 import com.yfshop.admin.api.website.request.WebsiteCodeBindReq;
 import com.yfshop.admin.api.website.request.WebsiteCodePayReq;
 import com.yfshop.admin.api.website.result.*;
-import com.yfshop.common.api.CommonResult;
 import com.yfshop.common.exception.ApiException;
 import com.yfshop.wx.api.request.WxPayOrderNotifyReq;
 

@@ -29,7 +29,7 @@ public class Generator {
     //作者
     private static String authorName="yoush";
     //要生成的表名
-    private static String[] tables= {"yf_coupon_expired_config"};
+    private static String[] tables= {"yf_website_goods_record"};
     private static String prefix="yf_";
 
     //数据库配置四要素
@@ -131,7 +131,7 @@ public class Generator {
         gen.setPackageInfo(new PackageConfig()
                 //.setModuleName("User")
                 .setParent(basePackage)// 自定义包路径
-                .setController("com.yfshop.open.controller")// 这里是控制器包名，默认 web
+                .setController("controller")// 这里是控制器包名，默认 web
                 .setEntity("model")
                 .setMapper("mapper")
                 .setService("manager")
