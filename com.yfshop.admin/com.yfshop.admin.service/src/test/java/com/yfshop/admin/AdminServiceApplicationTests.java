@@ -1,7 +1,13 @@
 package com.yfshop.admin;
 
+import cn.afterturn.easypoi.excel.annotation.Excel;
+import cn.afterturn.easypoi.excel.annotation.ExcelTarget;
+import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.io.FileUtil;
+import cn.hutool.crypto.SecureUtil;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.google.common.collect.Lists;
 import com.yfshop.admin.api.mall.AdminMallManageService;
 import com.yfshop.admin.api.mall.request.CreateBannerReq;
@@ -18,26 +24,40 @@ import com.yfshop.code.manager.MenuManager;
 import com.yfshop.code.mapper.ItemContentMapper;
 import com.yfshop.code.mapper.ItemImageMapper;
 import com.yfshop.code.mapper.ItemMapper;
+import com.yfshop.code.mapper.MerchantMapper;
+import com.yfshop.code.mapper.RegionMapper;
 import com.yfshop.code.model.Item;
 import com.yfshop.code.model.ItemContent;
 import com.yfshop.code.model.ItemImage;
 import com.yfshop.code.model.Menu;
+import com.yfshop.code.model.Merchant;
+import com.yfshop.code.model.Region;
 import com.yfshop.common.enums.GroupRoleEnum;
 import com.yfshop.common.enums.ReceiveWayEnum;
+import com.yfshop.common.util.AddressUtil;
+import lombok.Data;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
-import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationContext;
+import org.springframework.dao.DuplicateKeyException;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
 @SpringBootTest
 public class AdminServiceApplicationTests {
+    private static final Logger logger = LoggerFactory.getLogger(AdminServiceApplicationTests.class);
 
     @DubboReference(check = false)
     private AdminMallManageService adminMallManageService;
@@ -55,6 +75,12 @@ public class AdminServiceApplicationTests {
     private MenuManager menuManager;
     @Resource
     private AdminMenuManageService adminMenuManageService;
+    @Resource
+    private MerchantMapper merchantMapper;
+    @Resource
+    private RegionMapper regionMapper;
+    @Resource
+    private TransactionTemplate transactionTemplate;
 
     //    @Test
     void contextLoads2222222() {
@@ -342,7 +368,7 @@ public class AdminServiceApplicationTests {
         }
     }
 
-//    @Test
+    //    @Test
     public void createMenus() {
         createSysMenus22222222();
         createZongBuMenus22222222();
@@ -1337,5 +1363,261 @@ public class AdminServiceApplicationTests {
         req.setSpecInfo(generateItemSkuReq);
         req.setCandidateSkus(candidateSkuList);
         adminMallManageService.saveItemSku(req);
+    }
+
+    public void importMerchantsFromExcel(String excelPath, String fgsProvince) {
+        List<MerchantExcel1> list = ExcelUtils.importExcel(excelPath, 1, 1, MerchantExcel1.class);
+        if (list == null) {
+            return;
+        }
+        list = list.stream().filter(excel -> StringUtils.isNotBlank(excel.fenGongSi)).collect(Collectors.toList());
+        System.out.println(JSON.toJSONString(list, true));
+
+        Map<String, List<MerchantExcel1>> indexMap = list.stream()
+                .collect(Collectors.groupingBy(excel -> excel.fenGongSi + "-" + excel.fenGongSiMobile));
+
+        transactionTemplate.executeWithoutResult(status -> {
+            int count = 1;
+            for (Entry<String, List<MerchantExcel1>> entry : indexMap.entrySet()) {
+                String[] split = StringUtils.split(entry.getKey(), "-");
+                // 分公司
+                String fenGongSi = split[0];
+                String fenGongSiMobile = split[1];
+                Merchant fgs = new Merchant();
+                fgs.setCreateTime(LocalDateTime.now());
+                fgs.setUpdateTime(LocalDateTime.now());
+                fgs.setOpenId(null);
+                fgs.setPid(10389);
+                fgs.setPMerchantName("雨帆总公司");
+                fgs.setPidPath("10389." + fgs.getId() + ".");
+                fgs.setRoleAlias(GroupRoleEnum.FGS.getCode());
+                fgs.setRoleName(GroupRoleEnum.FGS.getDescription());
+                fgs.setMerchantName(fgsProvince + "分公司" + count++);
+                fgs.setMobile(fenGongSiMobile);
+                fgs.setPassword(SecureUtil.md5(SecureUtil.md5("123456")));
+                fgs.setContacts(fenGongSi);
+                fgs.setHeadImgUrl(null);
+                fgs.setProvince(fgsProvince);
+                fgs.setProvinceId(15);
+                fgs.setCity(null);
+                fgs.setCityId(null);
+                fgs.setDistrict(null);
+                fgs.setDistrictId(null);
+                fgs.setAddress(null);
+                fgs.setSubAddress(null);
+                fgs.setIsEnable("Y");
+                fgs.setIsDelete("N");
+                merchantMapper.insert(fgs);
+                Merchant entity = new Merchant();
+                entity.setId(fgs.getId());
+                entity.setPidPath("10389." + fgs.getId() + ".");
+                merchantMapper.updateById(entity);
+                // 经销商
+                for (MerchantExcel1 excel : entry.getValue()) {
+                    if (!StringUtils.startsWith(excel.getAddress(), fgs.getProvince())) {
+                        excel.setAddress(fgs.getProvince() + excel.getAddress());
+                    }
+
+                    List<Map<String, String>> maps = AddressUtil.addressResolution(excel.getAddress());
+                    Map<String, String> addressResolution = maps.isEmpty() ? null : maps.get(0);
+                    String province = null;
+                    String city = null;
+                    String county = null;
+                    String town = null;
+                    if (addressResolution != null) {
+                        province = addressResolution.get("province");
+                        city = addressResolution.get("city");
+                        county = addressResolution.get("county");
+                        town = addressResolution.get("town");
+                    }
+
+                    Merchant sub = new Merchant();
+                    sub.setCreateTime(LocalDateTime.now());
+                    sub.setUpdateTime(LocalDateTime.now());
+                    sub.setOpenId(null);
+                    sub.setPid(fgs.getId());
+                    sub.setPMerchantName(fgs.getMerchantName());
+                    sub.setPidPath(fgs.getPidPath() + sub.getId() + ".");
+                    sub.setRoleAlias(GroupRoleEnum.JXS.getCode());
+                    sub.setRoleName(GroupRoleEnum.JXS.getDescription());
+                    sub.setMerchantName(excel.getJingXiaoShangMerchantName());
+                    sub.setMobile(excel.getMobile());
+                    sub.setPassword(SecureUtil.md5(SecureUtil.md5("123456")));
+                    sub.setContacts(excel.contacts);
+                    sub.setHeadImgUrl(null);
+                    sub.setProvince(fgs.getProvince());
+                    sub.setProvinceId(fgs.getProvinceId());
+
+                    sub.setCity(city);
+                    sub.setCityId(null);
+                    sub.setDistrict(county);
+                    sub.setDistrictId(null);
+
+                    sub.setAddress(town);
+                    sub.setSubAddress(null);
+                    sub.setIsEnable("Y");
+                    sub.setIsDelete("N");
+                    sub.setSettlement(excel.yingShouShangZhangPiPeiQuYu);
+
+                    buildAddress(sub, addressResolution);
+                    try {
+                        merchantMapper.insert(sub);
+                    } catch (DuplicateKeyException e) {
+                        String errorMsg = e.getMessage();
+                        logger.error("重复的经销商手机号" + errorMsg);
+                        String mobile = StringUtils.substring(errorMsg,
+                                StringUtils.indexOf(errorMsg, "Duplicate entry '") + "Duplicate entry '".length(),
+                                StringUtils.indexOf(errorMsg, "' for key 'yf_merchant.uk_mobile'")
+                        );
+                        FileUtil.writeLines(new ArrayList<>(Arrays.asList(mobile)), "C:\\Users\\xulg\\Desktop\\重复手机号.txt", "utf-8", true);
+                    }
+                    Merchant newBean = new Merchant();
+                    newBean.setId(sub.getId());
+                    newBean.setPidPath(entity.getPidPath() + sub.getId() + ".");
+                    merchantMapper.updateById(newBean);
+                }
+            }
+        });
+    }
+
+    //    @Test
+    public void importMerchantsFromExcel1() {
+        String path1 = "C:\\Users\\xulg\\Documents\\WeChat Files\\wxid_z5mrg8zx4b3v21\\FileStorage\\File\\2021-04\\（山东）-618大促账号信息收集(2)(1)(1).xlsx";
+        String province = "山东省";
+        importMerchantsFromExcel(path1, province);
+    }
+
+    //    @Test
+    public void importMerchantsFromExcel2() {
+        String path1 = "C:\\Users\\xulg\\Documents\\WeChat Files\\wxid_z5mrg8zx4b3v21\\FileStorage\\File\\2021-04\\海南618大促账号信息收集.xlsx";
+        String province = "海南省";
+        importMerchantsFromExcel(path1, province);
+    }
+
+    //    @Test
+    public void importMerchantsFromExcel3() {
+        String path1 = "C:\\Users\\xulg\\Documents\\WeChat Files\\wxid_z5mrg8zx4b3v21\\FileStorage\\File\\2021-04\\618大促账号信息收集（安徽）(1)(1).xlsx";
+        String province = "安徽省";
+        importMerchantsFromExcel(path1, province);
+    }
+
+    //    @Test
+    public void importMerchantsFromExcel4() {
+        String path1 = "C:\\Users\\xulg\\Documents\\WeChat Files\\wxid_z5mrg8zx4b3v21\\FileStorage\\File\\2021-04\\618大促账号信息收集（上海）.xlsx";
+        String province = "上海";
+        importMerchantsFromExcel(path1, province);
+    }
+
+    //    @Test
+    public void importMerchantsFromExcel5() {
+        String path1 = "C:\\Users\\xulg\\Documents\\WeChat Files\\wxid_z5mrg8zx4b3v21\\FileStorage\\File\\2021-04\\山西省618大促账号信息收集(5)(2).xlsx";
+        String province = "山西省";
+        importMerchantsFromExcel(path1, province);
+    }
+
+    //    @Test
+    public void importMerchantsFromExcel6() {
+        String path1 = "C:\\Users\\xulg\\Documents\\WeChat Files\\wxid_z5mrg8zx4b3v21\\FileStorage\\File\\2021-04\\618大促账号信息收集（重庆）(2).xlsx";
+        String province = "重庆";
+        importMerchantsFromExcel(path1, province);
+    }
+
+    //    @Test
+    public void importMerchantsFromExcel7() {
+        String path1 = "C:\\Users\\xulg\\Documents\\WeChat Files\\wxid_z5mrg8zx4b3v21\\FileStorage\\File\\2021-04\\618大促账号信息收集(四川）4(1).xlsx";
+        String province = "四川省";
+        importMerchantsFromExcel(path1, province);
+    }
+
+    //    @Test
+    public void importMerchantsFromExcel8() {
+        String path1 = "C:\\Users\\xulg\\Documents\\WeChat Files\\wxid_z5mrg8zx4b3v21\\FileStorage\\File\\2021-04\\618大促账号信息收集（云南）(1).xlsx";
+        String province = "云南省";
+        importMerchantsFromExcel(path1, province);
+    }
+
+    //    @Test
+    public void importMerchantsFromExcel9() {
+        String path1 = "C:\\Users\\xulg\\Documents\\WeChat Files\\wxid_z5mrg8zx4b3v21\\FileStorage\\File\\2021-04\\618大促账号信息收集（陕西）(1).xlsx";
+        String province = "陕西省";//error
+        importMerchantsFromExcel(path1, province);
+    }
+
+    //    @Test
+    public void importMerchantsFromExcel10() {
+        String path1 = "C:\\Users\\xulg\\Documents\\WeChat Files\\wxid_z5mrg8zx4b3v21\\FileStorage\\File\\2021-04\\618大促账号信息收集（贵州）(1).xlsx";
+        String province = "贵州省";
+        importMerchantsFromExcel(path1, province);
+    }
+
+    //    @Test
+    public void importMerchantsFromExcel11() {
+        String path1 = "C:\\Users\\xulg\\Documents\\WeChat Files\\wxid_z5mrg8zx4b3v21\\FileStorage\\File\\2021-04\\618大促账号信息收集(广东)(1).xlsx";
+        String province = "广东省";
+        importMerchantsFromExcel(path1, province);
+    }
+
+    //    @Test
+    public void importMerchantsFromExcel12() {
+        String path1 = "C:\\Users\\xulg\\Documents\\WeChat Files\\wxid_z5mrg8zx4b3v21\\FileStorage\\File\\2021-04\\618大促账号信息收集（江苏）(2)(1).xlsx";
+        String province = "江苏省";
+        importMerchantsFromExcel(path1, province);
+    }
+
+    @ExcelTarget("MerchantExcel1")
+    @Data
+    public static class MerchantExcel1 {
+        @Excel(name = "分公司/（若无分公司则填省区负责人）", width = 18)
+        private String fenGongSi;
+
+        @Excel(name = "分公司或省区负责人联系电话", width = 18)
+        private String fenGongSiMobile;
+
+        @Excel(name = "经销商商户名", width = 18)
+        private String jingXiaoShangMerchantName;
+
+        @Excel(name = "联系人", width = 18)
+        private String contacts;
+
+        @Excel(name = "联系电话", width = 18)
+        private String mobile;
+
+        @Excel(name = "省份", width = 18)
+        private String province;
+
+        @Excel(name = "地市", width = 18)
+        private String city;
+
+        @Excel(name = "详细地址", width = 18)
+        private String address;
+
+        @Excel(name = "应收上账匹配区域", width = 18)
+        private String yingShouShangZhangPiPeiQuYu;
+    }
+
+    public void buildAddress(Merchant merchant, Map<String, String> addressResolution) {
+        if (CollectionUtil.isNotEmpty(addressResolution)) {
+            merchant.setProvince(addressResolution.get("province"));
+            Region province = regionMapper.selectOne(Wrappers.<Region>lambdaQuery()
+                    .eq(Region::getName, addressResolution.get("province")));
+            if (province != null) {
+                merchant.setProvinceId(province.getId());
+                Region city = regionMapper.selectOne(Wrappers.<Region>lambdaQuery()
+                        .eq(Region::getName, addressResolution.get("city"))
+                        .eq(Region::getPid, province.getId()));
+                if (city != null) {
+                    merchant.setCityId(city.getId());
+                    Region county = regionMapper.selectOne(Wrappers.<Region>lambdaQuery()
+                            .eq(Region::getName, addressResolution.get("county"))
+                            .eq(Region::getPid, city.getId()));
+                    if (county != null) {
+                        merchant.setDistrictId(county.getId());
+                    }
+                }
+            }
+            merchant.setCity(addressResolution.get("city"));
+            merchant.setDistrict(addressResolution.get("county"));
+            merchant.setAddress(addressResolution.get("town"));
+        }
     }
 }
