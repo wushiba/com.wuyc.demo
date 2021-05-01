@@ -271,10 +271,11 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
             allStatus.add("WAIT");
             allStatus.add("DELIVERY");
             allStatus.add("SUCCESS");
-        }
-        if ("PENDING".equals(status)) {
+        }else if ("PENDING".equals(status)) {
             allStatus.add("PENDING");
             allStatus.add("PAYING");
+        }else{
+            allStatus.add("status");
         }
         LambdaQueryWrapper<WebsiteCode> lambdaQueryWrapper = Wrappers.<WebsiteCode>lambdaQuery()
                 .and(itemWrapper -> itemWrapper
@@ -282,7 +283,6 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
                         .or()
                         .like(WebsiteCode::getPidPath, merchantId + "."))
                 .in(CollectionUtil.isNotEmpty(allStatus), WebsiteCode::getOrderStatus, allStatus)
-                .eq(StringUtils.isNotBlank(status) && !"ALL".equals(status), WebsiteCode::getOrderStatus, status)
                 .orderByDesc(WebsiteCode::getId);
         IPage<WebsiteCode> websiteCodeIPage = websiteCodeMapper.selectPage(new Page<>(pageIndex, pageSize), lambdaQueryWrapper);
         return BeanUtil.iPageConvert(websiteCodeIPage, WebsiteCodeResult.class);
