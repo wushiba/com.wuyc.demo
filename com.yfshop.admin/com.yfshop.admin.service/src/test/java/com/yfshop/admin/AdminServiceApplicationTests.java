@@ -38,6 +38,7 @@ import com.yfshop.common.util.AddressUtil;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -1418,8 +1419,7 @@ public class AdminServiceApplicationTests {
                         excel.setAddress(fgs.getProvince() + excel.getAddress());
                     }
 
-                    List<Map<String, String>> maps = AddressUtil.addressResolution(excel.getAddress());
-                    Map<String, String> addressResolution = maps.isEmpty() ? null : maps.get(0);
+                    Map<String, String> addressResolution = AddressUtil.addressResolution(excel.getAddress());
                     String province = null;
                     String city = null;
                     String county = null;
@@ -1561,6 +1561,20 @@ public class AdminServiceApplicationTests {
     public void importMerchantsFromExcel12() {
         String path1 = "C:\\Users\\xulg\\Documents\\WeChat Files\\wxid_z5mrg8zx4b3v21\\FileStorage\\File\\2021-04\\618大促账号信息收集（江苏）(2)(1).xlsx";
         String province = "江苏省";
+        importMerchantsFromExcel(path1, province);
+    }
+
+//    @Test
+//    public void importMerchantsFromExcel13() {
+//        String path1 = "f:\\618大促账号信息收集（湖北）(1).xlsx";
+//        String province = "湖北省";
+//        importMerchantsFromExcel(path1, province);
+//    }
+
+    @Test
+    public void importMerchantsFromExcel14() {
+        String path1 = "f:\\福建收集资料模板(1)(1).xlsx";
+        String province = "福建省";
         importMerchantsFromExcel(path1, province);
     }
 

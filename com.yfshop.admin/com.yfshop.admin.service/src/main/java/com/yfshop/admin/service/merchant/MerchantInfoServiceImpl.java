@@ -225,9 +225,7 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
 
     public void buildAddress(WebsiteCodeBindReq websiteCodeBindReq) {
         if (StringUtils.isNotBlank(websiteCodeBindReq.getAddress())) {
-            List<Map<String, String>> addressList = AddressUtil.addressResolution(websiteCodeBindReq.getAddress());
-            if (!CollectionUtil.isEmpty(addressList)) {
-                Map<String, String> maps = addressList.get(0);
+            Map<String, String> maps = AddressUtil.addressResolution(websiteCodeBindReq.getAddress());
                 websiteCodeBindReq.setProvince(maps.get("province"));
                 Region province = regionMapper.selectOne(Wrappers.<Region>lambdaQuery()
                         .eq(Region::getName, maps.get("province")));
@@ -250,8 +248,6 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
                 websiteCodeBindReq.setDistrict(maps.get("county"));
                 websiteCodeBindReq.setAddress(maps.get("town"));
             }
-        }
-
     }
 
     @Override
