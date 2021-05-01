@@ -21,7 +21,7 @@ public interface WebsiteBillService {
      * @param status
      * @return
      */
-    WebsiteBillDayResult getBillListByMerchantId(Integer merchantId, Date dateTime, String status) throws ApiException;
+    WebsiteBillDayResult getBillListByMerchantId(Integer merchantId, Date startTime,Date endTime, String status) throws ApiException;
 
     /**
      * 获取网点记账列表

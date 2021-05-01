@@ -74,18 +74,17 @@ public class WebsiteBillServiceImpl implements WebsiteBillService {
      * @return
      */
     @Override
-    public WebsiteBillDayResult getBillListByMerchantId(Integer merchantId, Date dateTime, String status) throws ApiException {
-        Date nextDate = null;
-        if (dateTime != null) {
-            nextDate = DateUtil.plusDays(dateTime, 1);
+    public WebsiteBillDayResult getBillListByMerchantId(Integer merchantId, Date startTime,Date endTime, String status) throws ApiException {
+        if (endTime!=null){
+            endTime = DateUtil.plusDays(endTime, 1);
         }
         Integer count=websiteBillMapper.selectCount(Wrappers.<WebsiteBill>lambdaQuery()
                         .eq(WebsiteBill::getMerchantId, merchantId)
                         .eq(WebsiteBill::getIsConfirm, status));
         List<WebsiteBill> websiteBills = websiteBillMapper.selectList(Wrappers.<WebsiteBill>lambdaQuery()
                 .eq(WebsiteBill::getMerchantId, merchantId)
-                .ge(dateTime != null, WebsiteBill::getCreateTime, dateTime)
-                .lt(nextDate != null, WebsiteBill::getCreateTime, nextDate)
+                .ge(startTime != null, WebsiteBill::getCreateTime, startTime)
+                .lt(endTime != null, WebsiteBill::getCreateTime, endTime)
                 .eq(WebsiteBill::getIsConfirm, status)
                 .orderByDesc(WebsiteBill::getCreateTime));
         WebsiteBillDayResult websiteBillDayResult = new WebsiteBillDayResult();
