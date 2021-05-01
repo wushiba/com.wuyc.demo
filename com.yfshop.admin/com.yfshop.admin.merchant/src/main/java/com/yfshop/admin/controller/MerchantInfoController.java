@@ -73,7 +73,7 @@ class MerchantInfoController extends AbstractBaseController {
     @SaCheckLogin
     @RequestMapping(value = "/getWebsiteList", method = {RequestMethod.GET, RequestMethod.POST})
     @ResponseBody
-    public CommonResult<List<MerchantGroupResult>> getWebsiteList(MerchantGroupReq merchantGroupReq) {
+    public CommonResult<MerchantGroupResult> getWebsiteList(MerchantGroupReq merchantGroupReq) {
         if (merchantGroupReq.getMerchantId() == null) {
             merchantGroupReq.setMerchantId(getCurrentAdminUserId());
         }

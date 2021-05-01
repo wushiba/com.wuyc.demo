@@ -515,7 +515,7 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
     public MerchantGroupResult merchantGroup(MerchantGroupReq merchantGroupReq) throws ApiException {
         MerchantGroupResult merchantGroupResult = new MerchantGroupResult();
         Integer myselfCount = getCurrentWebsiteCount(merchantGroupReq.getMerchantId(), merchantGroupReq.getStartTime(), merchantGroupReq.getEndTime());
-        Integer count = getAllWebsiteCount(merchantGroupReq.getMerchantId(), merchantGroupReq.getStartTime(), merchantGroupReq.getEndTime());
+        Integer count = getAllWebsiteCodeCount(merchantGroupReq.getMerchantId(), merchantGroupReq.getStartTime(), merchantGroupReq.getEndTime());
         Merchant merchant = merchantMapper.selectById(merchantGroupReq.getMerchantId());
         merchantGroupResult.setMerchantId(merchant.getId());
         merchantGroupResult.setMerchantName(merchant.getMerchantName());
@@ -535,7 +535,7 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
             myself.setCurrentExchange(getCurrentExchange(merchant.getId(), merchantGroupReq.getStartTime(), merchantGroupReq.getEndTime()));
             myself.setTotalExchange(getCurrentExchange(merchant.getId(),null,null));
             myself.setCurrentGoodsRecord(websiteGoodsRecordDao.sumCurrentGoodsRecord(merchant.getId(), merchantGroupReq.getStartTime(), merchantGroupReq.getEndTime()));
-            myself.setCount(myselfCount);
+            myself.setCount(count);
             merchantGroupResults.add(myself);
         }
         merchantList.forEach(item -> {
@@ -545,7 +545,7 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
             child.setCurrentExchange(getCurrentExchange(item.getId(), merchantGroupReq.getStartTime(), merchantGroupReq.getEndTime()));
             child.setTotalExchange(getCurrentExchange(item.getId(),null,null));
             child.setCurrentGoodsRecord(websiteGoodsRecordDao.sumAllGoodsRecord(item.getId(), merchantGroupReq.getStartTime(), merchantGroupReq.getEndTime()));
-            child.setCount(getAllWebsiteCount(item.getId(), merchantGroupReq.getStartTime(), merchantGroupReq.getEndTime()));
+            child.setCount(getAllWebsiteCodeCount(item.getId(), merchantGroupReq.getStartTime(), merchantGroupReq.getEndTime()));
             merchantGroupResults.add(child);
         });
         merchantGroupResult.setList(merchantGroupResults);
@@ -624,7 +624,9 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
     }
 
     @Override
-    public List<MerchantGroupResult> getWebsiteList(MerchantGroupReq merchantGroupReq) {
+    public MerchantGroupResult getWebsiteList(MerchantGroupReq merchantGroupReq) {
+        MerchantGroupResult merchantGroupResult=new MerchantGroupResult();
+        AtomicInteger count= new AtomicInteger();
         LambdaQueryWrapper lambdaQueryWrapper = Wrappers.<Merchant>lambdaQuery()
                 .eq(Merchant::getPid, merchantGroupReq.getMerchantId())
                 .eq(Merchant::getRoleAlias, "wd")
@@ -639,10 +641,13 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
             child.setCurrentExchange(getCurrentExchangeByPid(item.getId(), merchantGroupReq.getStartTime(), merchantGroupReq.getEndTime()));
             child.setTotalExchange(getCurrentExchangeByPid(item.getId(),null,null));
             child.setCurrentGoodsRecord(websiteGoodsRecordDao.sumGoodsRecordByMerchantId(item.getId(), merchantGroupReq.getStartTime(), merchantGroupReq.getEndTime()));
-            child.setCount(getAllWebsiteCount(item.getId(), merchantGroupReq.getStartTime(), merchantGroupReq.getEndTime()));
+            child.setCount(getAllWebsiteCodeCount(item.getId(), merchantGroupReq.getStartTime(), merchantGroupReq.getEndTime()));
+            count.addAndGet(child.getCount());
             merchantGroupResults.add(child);
         });
-        return merchantGroupResults;
+        merchantGroupResult.setCount(count.get());
+        merchantGroupResult.setList(merchantGroupResults);
+        return merchantGroupResult;
     }
 
 
@@ -676,14 +681,35 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
     }
 
 
+
+
+    private Integer getCurrentWebsiteCodeCount(Integer merchantId, Date startTime, Date endTime) {
+        LambdaQueryWrapper lambdaQueryWrapper = Wrappers.<WebsiteCodeDetail>lambdaQuery()
+                .eq(WebsiteCodeDetail::getPid, merchantId)
+                .eq(WebsiteCodeDetail::getIsActivate, "Y")
+                .ge(startTime != null, WebsiteCodeDetail::getActivityTime, startTime)
+                .lt(endTime != null, WebsiteCodeDetail::getActivityTime, endTime);
+        return merchantMapper.selectCount(lambdaQueryWrapper);
+    }
+
+
+    private Integer getAllWebsiteCodeCount(Integer merchantId, Date startTime, Date endTime) {
+        LambdaQueryWrapper lambdaQueryWrapper = Wrappers.<WebsiteCodeDetail>lambdaQuery()
+                .like(WebsiteCodeDetail::getPidPath, merchantId + ".")
+                .eq(WebsiteCodeDetail::getIsActivate, "Y");
+//                .ge(startTime != null, WebsiteCodeDetail::getActivityTime, startTime)
+//                .lt(endTime != null, WebsiteCodeDetail::getActivityTime, endTime);
+        return merchantMapper.selectCount(lambdaQueryWrapper);
+    }
+
     private Integer getCurrentWebsiteCount(Integer merchantId, Date startTime, Date endTime) {
         LambdaQueryWrapper lambdaQueryWrapper = Wrappers.<Merchant>lambdaQuery()
                 .eq(Merchant::getPid, merchantId)
                 .eq(Merchant::getRoleAlias, "wd")
                 .eq(Merchant::getIsEnable, "Y")
-                .eq(Merchant::getIsDelete, "N")
-                .ge(startTime != null, Merchant::getCreateTime, startTime)
-                .lt(endTime != null, Merchant::getCreateTime, endTime);
+                .eq(Merchant::getIsDelete, "N");
+//                .ge(startTime != null, Merchant::getCreateTime, startTime)
+//                .lt(endTime != null, Merchant::getCreateTime, endTime);
         return merchantMapper.selectCount(lambdaQueryWrapper);
     }
 
