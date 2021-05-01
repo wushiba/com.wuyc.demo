@@ -251,19 +251,15 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
     }
 
     @Override
-    public List<WebsiteCodeDetailResult> getMyWebsiteCode(Integer merchantId, String status, Date dateTime) throws ApiException {
-        Date nextDate = null;
-        if (dateTime != null) {
-            nextDate = DateUtil.plusDays(dateTime, 1);
-        }
+    public List<WebsiteCodeDetailResult> getMyWebsiteCode(Integer merchantId, String status, Date startTime,Date endTime) throws ApiException {
         List<WebsiteCodeDetail> websiteCodeDetails = websiteCodeDetailMapper.selectList(Wrappers.<WebsiteCodeDetail>lambdaQuery()
                 .and(itemWrapper -> itemWrapper
                         .eq(WebsiteCodeDetail::getMerchantId, merchantId)
                         .or()
                         .like(WebsiteCodeDetail::getPidPath, merchantId + "."))
                 .eq(WebsiteCodeDetail::getIsActivate, status)
-                .ge(dateTime != null, WebsiteCodeDetail::getCreateTime, dateTime)
-                .lt(nextDate != null, WebsiteCodeDetail::getCreateTime, nextDate)
+                .ge(startTime != null, WebsiteCodeDetail::getCreateTime, startTime)
+                .lt(endTime != null, WebsiteCodeDetail::getCreateTime, endTime)
                 .orderByDesc(WebsiteCodeDetail::getUpdateTime));
         return BeanUtil.convertList(websiteCodeDetails, WebsiteCodeDetailResult.class);
     }

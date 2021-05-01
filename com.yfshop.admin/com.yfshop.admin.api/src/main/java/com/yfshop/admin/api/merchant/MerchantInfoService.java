@@ -62,7 +62,7 @@ public interface MerchantInfoService {
      * @return
      * @throws ApiException
      */
-    List<WebsiteCodeDetailResult> getMyWebsiteCode(Integer merchantId, String status, Date dateTime) throws ApiException;
+    List<WebsiteCodeDetailResult> getMyWebsiteCode(Integer merchantId, String status, Date startTime,Date sendTime) throws ApiException;
 
     /**
      * 获取待申请网点码
