@@ -689,7 +689,7 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
                 .eq(WebsiteCodeDetail::getIsActivate, "Y")
                 .ge(startTime != null, WebsiteCodeDetail::getActivityTime, startTime)
                 .lt(endTime != null, WebsiteCodeDetail::getActivityTime, endTime);
-        return merchantMapper.selectCount(lambdaQueryWrapper);
+        return websiteCodeDetailMapper.selectCount(lambdaQueryWrapper);
     }
 
 
@@ -699,7 +699,7 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
                 .eq(WebsiteCodeDetail::getIsActivate, "Y");
 //                .ge(startTime != null, WebsiteCodeDetail::getActivityTime, startTime)
 //                .lt(endTime != null, WebsiteCodeDetail::getActivityTime, endTime);
-        return merchantMapper.selectCount(lambdaQueryWrapper);
+        return websiteCodeDetailMapper.selectCount(lambdaQueryWrapper);
     }
 
     private Integer getCurrentWebsiteCount(Integer merchantId, Date startTime, Date endTime) {
