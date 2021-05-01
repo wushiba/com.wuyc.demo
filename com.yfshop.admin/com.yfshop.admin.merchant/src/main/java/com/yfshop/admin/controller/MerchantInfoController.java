@@ -193,7 +193,7 @@ class MerchantInfoController extends AbstractBaseController {
     @SaCheckLogin
     @RequestMapping(value = "/myWebsiteCode", method = {RequestMethod.POST})
     public CommonResult<List<WebsiteCodeDetailResult>> getMyWebsiteCode(WebsiteCodeReq websiteCodeReq) {
-        List<WebsiteCodeDetailResult> websiteCodeDetailResults = merchantInfoService.getMyWebsiteCode(getCurrentAdminUserId(), websiteCodeReq.getStatus(), websiteCodeReq.getStartTime(),websiteCodeReq.getEndTime());
+        List<WebsiteCodeDetailResult> websiteCodeDetailResults = merchantInfoService.getMyWebsiteCode(getCurrentAdminUserId(), websiteCodeReq.getStatus(), websiteCodeReq.getStartTime(), websiteCodeReq.getEndTime());
         return CommonResult.success(websiteCodeDetailResults);
     }
 
@@ -206,6 +206,9 @@ class MerchantInfoController extends AbstractBaseController {
     @SaCheckLogin
     @RequestMapping(value = "/getWebsiteCodeData", method = {RequestMethod.POST})
     public CommonResult<WebsiteCodeGroupResult> getWebsiteCodeData(WebsiteCodeDataReq websiteCodeDataReq) {
+        if (websiteCodeDataReq.getMerchantId() == null) {
+            websiteCodeDataReq.setMerchantId(getCurrentAdminUserId());
+        }
         WebsiteCodeGroupResult websiteCodeGroupResult = merchantInfoService.getWebsiteCodeData(websiteCodeDataReq);
         return CommonResult.success(websiteCodeGroupResult);
     }
