@@ -30,13 +30,13 @@ class MerchantBillController implements BaseController {
     @SaCheckLogin
     @RequestMapping(value = "/getBillByDay", method = {RequestMethod.POST})
     public CommonResult<WebsiteBillDayResult> getBillByDay(WebsiteCodeReq websiteReq) {
-        return CommonResult.success(websiteBillService.getBillListByMerchantId(getCurrentAdminUserId(), websiteReq.getDateTime(), websiteReq.getStatus()));
+        return CommonResult.success(websiteBillService.getBillListByMerchantId(getCurrentAdminUserId(), websiteReq.getStartTime(), websiteReq.getEndTime(),websiteReq.getStatus()));
     }
 
     @SaCheckLogin
     @RequestMapping(value = "/getBillByWebsiteCode", method = {RequestMethod.POST})
     public CommonResult<WebsiteBillDayResult> getBillByWebsiteCode(WebsiteCodeReq websiteReq) {
-        return CommonResult.success(websiteBillService.getBillByWebsiteCode(websiteReq.getWebsiteCode(), websiteReq.getDateTime()));
+        return CommonResult.success(websiteBillService.getBillByWebsiteCode(websiteReq.getWebsiteCode(), websiteReq.getStartTime(),websiteReq.getEndTime()));
     }
 
     @SaCheckLogin

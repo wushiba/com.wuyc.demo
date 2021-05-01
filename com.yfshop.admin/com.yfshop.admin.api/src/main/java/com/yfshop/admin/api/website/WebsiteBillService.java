@@ -17,7 +17,6 @@ public interface WebsiteBillService {
      * 获取网点记账列表
      *
      * @param merchantId
-     * @param dateTime
      * @param status
      * @return
      */
@@ -30,7 +29,7 @@ public interface WebsiteBillService {
      * @param dateTime
      * @return
      */
-    WebsiteBillDayResult getBillByWebsiteCode(String websiteCode, Date dateTime);
+    WebsiteBillDayResult getBillByWebsiteCode(String websiteCode, Date startTime,Date endTime);
 
     /**
      * 账单确认
