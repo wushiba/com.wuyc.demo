@@ -641,7 +641,7 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
             child.setCurrentExchange(getCurrentExchangeByPid(item.getId(), merchantGroupReq.getStartTime(), merchantGroupReq.getEndTime()));
             child.setTotalExchange(getCurrentExchangeByPid(item.getId(),null,null));
             child.setCurrentGoodsRecord(websiteGoodsRecordDao.sumGoodsRecordByMerchantId(item.getId(), merchantGroupReq.getStartTime(), merchantGroupReq.getEndTime()));
-            child.setCount(getAllWebsiteCodeCount(item.getId(), merchantGroupReq.getStartTime(), merchantGroupReq.getEndTime()));
+            child.setCount(getCurrentWebsiteCodeCount(item.getId(), merchantGroupReq.getStartTime(), merchantGroupReq.getEndTime()));
             count.addAndGet(child.getCount());
             merchantGroupResults.add(child);
         });
@@ -685,7 +685,7 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
 
     private Integer getCurrentWebsiteCodeCount(Integer merchantId, Date startTime, Date endTime) {
         LambdaQueryWrapper lambdaQueryWrapper = Wrappers.<WebsiteCodeDetail>lambdaQuery()
-                .eq(WebsiteCodeDetail::getPid, merchantId)
+                .eq(WebsiteCodeDetail::getMerchantId, merchantId)
                 .eq(WebsiteCodeDetail::getIsActivate, "Y")
                 .ge(startTime != null, WebsiteCodeDetail::getActivityTime, startTime)
                 .lt(endTime != null, WebsiteCodeDetail::getActivityTime, endTime);
