@@ -1571,10 +1571,24 @@ public class AdminServiceApplicationTests {
 //        importMerchantsFromExcel(path1, province);
 //    }
 
-    @Test
+    //@Test
     public void importMerchantsFromExcel14() {
         String path1 = "f:\\福建收集资料模板(1)(1).xlsx";
         String province = "福建省";
+        importMerchantsFromExcel(path1, province);
+    }
+
+    @Test
+    public void importMerchantsFromExcel15() {
+        String path1 = "f:\\618大促账号信息收集（湖北）(1).xlsx";
+        String province = "湖北省";
+        importMerchantsFromExcel(path1, province);
+    }
+
+    @Test
+    public void importMerchantsFromExcel16() {
+        String path1 = "f:\\618大促账号信息收集-湖南(1)(1).xlsx";
+        String province = "湖南省";
         importMerchantsFromExcel(path1, province);
     }
 
