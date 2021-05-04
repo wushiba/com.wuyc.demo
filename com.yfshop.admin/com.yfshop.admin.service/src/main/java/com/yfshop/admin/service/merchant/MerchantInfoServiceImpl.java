@@ -426,7 +426,7 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
         websiteCode.setOrderStatus("PAYING");
         int count = websiteCodeMapper.update(websiteCode, Wrappers.<WebsiteCode>lambdaQuery()
                 .in(WebsiteCode::getId, websiteCodePayReq.getIds())
-                .in(WebsiteCode::getOrderStatus, "PENDING","WAIT"));
+                .in(WebsiteCode::getOrderStatus, "PENDING","PAYING"));
         Asserts.assertTrue(count > 0, 500, "没有要支付的订单！");
         WebsiteCodeAmountResult websiteCodeAmountResult = applyWebsiteCodeAmount(websiteCodePayReq.getIds());
         String fee = websiteCodeAmountResult.getAmount().add(websiteCodeAmountResult.getPostage()).toPlainString();
