@@ -1641,7 +1641,7 @@ public class AdminServiceApplicationTests {
         importMerchantsFromExcel(path1, province);
     }
 
-    @Test
+//    @Test
     public void importMerchantsFromExcel22() {
         String path1 = "C:\\Users\\xulg\\Documents\\WeChat Files\\wxid_z5mrg8zx4b3v21\\FileStorage\\File\\2021-05\\618大促账号信息收集(河南).xlsx";
         String province = "河南省";
