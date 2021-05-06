@@ -23,6 +23,7 @@ import com.yfshop.common.exception.Asserts;
 import com.yfshop.common.util.BeanUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboService;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
@@ -96,8 +97,12 @@ public class AdminMerchantManageServiceImpl implements AdminMerchantManageServic
         merchant.setIsDelete("N");
         merchant.setPid(pm.getId());
         merchant.setPMerchantName(pm.getMerchantName());
-        merchantMapper.insert(merchant);
-        merchant.setPidPath(this.generatePidPath(pm.getId(),merchant.getId()));
+        try {
+            merchantMapper.insert(merchant);
+        } catch (DuplicateKeyException e) {
+            throw new ApiException(500, "手机号" + merchant.getMobile() + "已经注册过了");
+        }
+        merchant.setPidPath(this.generatePidPath(pm.getId(), merchant.getId()));
         merchantMapper.updateById(merchant);
         return null;
     }
@@ -156,7 +161,7 @@ public class AdminMerchantManageServiceImpl implements AdminMerchantManageServic
         merchant.setAddress(req.getAddress());
         merchant.setPid(pm.getId());
         merchant.setPMerchantName(pm.getMerchantName());
-        merchant.setPidPath(this.generatePidPath(pm.getId(),merchant.getId()));
+        merchant.setPidPath(this.generatePidPath(pm.getId(), merchant.getId()));
         int rows = merchantMapper.updateById(merchant);
         Asserts.assertTrue(rows > 0, 500, "编辑商户信息失败");
 
@@ -241,7 +246,7 @@ public class AdminMerchantManageServiceImpl implements AdminMerchantManageServic
         }
     }
 
-    private String generatePidPath(Integer pid,Integer id) {
+    private String generatePidPath(Integer pid, Integer id) {
         if (pid == null || pid == 0) {
             return null;
         }
@@ -253,7 +258,7 @@ public class AdminMerchantManageServiceImpl implements AdminMerchantManageServic
             parent = this.getParent(parent.getPid());
         }
         path.addFirst(parent.getId());
-        return StringUtils.join(path, ".")+".";
+        return StringUtils.join(path, ".") + ".";
     }
 
     private Merchant getParent(Integer pid) throws ApiException {
