@@ -315,7 +315,7 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
         websiteCode.setPidPath(merchant.getPidPath());
         websiteCode.setQuantity(count);
         if (StringUtils.isBlank(email)) {
-            websiteCode.setOrderAmount(new BigDecimal("0.35").multiply(new BigDecimal(count)));
+            websiteCode.setOrderAmount(new BigDecimal("0.3").multiply(new BigDecimal(count)));
             websiteCode.setPostage(new BigDecimal(8));
             float g = new BigDecimal(count).multiply(new BigDecimal("4.3")).floatValue();//每张大约4.3g
             if (g > 1000) {

@@ -38,7 +38,6 @@ import com.yfshop.common.util.AddressUtil;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
-import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -1372,6 +1371,7 @@ public class AdminServiceApplicationTests {
             return;
         }
         list = list.stream().filter(excel -> StringUtils.isNotBlank(excel.fenGongSi)).collect(Collectors.toList());
+        list = list.stream().filter(excel -> StringUtils.isNotBlank(excel.jingXiaoShangMerchantName)).collect(Collectors.toList());
         System.out.println(JSON.toJSONString(list, true));
 
         Map<String, List<MerchantExcel1>> indexMap = list.stream()
@@ -1408,11 +1408,24 @@ public class AdminServiceApplicationTests {
                 fgs.setSubAddress(null);
                 fgs.setIsEnable("Y");
                 fgs.setIsDelete("N");
-                merchantMapper.insert(fgs);
+
                 Merchant entity = new Merchant();
-                entity.setId(fgs.getId());
-                entity.setPidPath("10389." + fgs.getId() + ".");
-                merchantMapper.updateById(entity);
+                try {
+                    merchantMapper.insert(fgs);
+
+                    entity.setId(fgs.getId());
+                    entity.setPidPath("10389." + fgs.getId() + ".");
+                    merchantMapper.updateById(entity);
+                } catch (DuplicateKeyException e) {
+                    Merchant merchant = merchantMapper.selectOne(Wrappers.lambdaQuery(Merchant.class).eq(Merchant::getMobile, fenGongSiMobile));
+                    if (!merchant.getRoleAlias().equals(GroupRoleEnum.FGS.getCode())) {
+                        throw e;
+                    }
+                    fgs = merchant;
+                    entity.setId(fgs.getId());
+                    entity.setPidPath("10389." + fgs.getId() + ".");
+                }
+
                 // 经销商
                 for (MerchantExcel1 excel : entry.getValue()) {
                     if (!StringUtils.startsWith(excel.getAddress(), fgs.getProvince())) {
@@ -1578,17 +1591,52 @@ public class AdminServiceApplicationTests {
         importMerchantsFromExcel(path1, province);
     }
 
-    @Test
+    //    @Test
     public void importMerchantsFromExcel15() {
         String path1 = "f:\\618大促账号信息收集（湖北）(1).xlsx";
         String province = "湖北省";
         importMerchantsFromExcel(path1, province);
     }
 
-    @Test
+    //    @Test
     public void importMerchantsFromExcel16() {
         String path1 = "f:\\618大促账号信息收集-湖南(1)(1).xlsx";
         String province = "湖南省";
+        importMerchantsFromExcel(path1, province);
+    }
+
+    //    @Test
+    public void importMerchantsFromExcel17() {
+        String path1 = "C:\\Users\\xulg\\Documents\\WeChat Files\\wxid_z5mrg8zx4b3v21\\FileStorage\\File\\2021-05\\618大促账号信息收集（江西）(1).xlsx";
+        String province = "江西省";
+        importMerchantsFromExcel(path1, province);
+    }
+
+    //    @Test
+    public void importMerchantsFromExcel18() {
+        String path1 = "C:\\Users\\xulg\\Documents\\WeChat Files\\wxid_z5mrg8zx4b3v21\\FileStorage\\File\\2021-05\\618大促账号信息收集（浙江）(1).xlsx";
+        String province = "浙江省";
+        importMerchantsFromExcel(path1, province);
+    }
+
+    //    @Test
+    public void importMerchantsFromExcel19() {
+        String path1 = "C:\\Users\\xulg\\Documents\\WeChat Files\\wxid_z5mrg8zx4b3v21\\FileStorage\\File\\2021-05\\618大促账号信息收集（陕西）(1).xlsx";
+        String province = "陕西省";
+        importMerchantsFromExcel(path1, province);
+    }
+
+    //    @Test
+    public void importMerchantsFromExcel20() {
+        String path1 = "C:\\Users\\xulg\\Documents\\WeChat Files\\wxid_z5mrg8zx4b3v21\\FileStorage\\File\\2021-05\\618大促账号信息收集(广西)(1).xlsx";
+        String province = "广西省";
+        importMerchantsFromExcel(path1, province);
+    }
+
+    //    @Test
+    public void importMerchantsFromExcel21() {
+        String path1 = "C:\\Users\\xulg\\Documents\\WeChat Files\\wxid_z5mrg8zx4b3v21\\FileStorage\\File\\2021-05\\618大促账号信息收集（江西）(2).xlsx";
+        String province = "江西省";
         importMerchantsFromExcel(path1, province);
     }
 
