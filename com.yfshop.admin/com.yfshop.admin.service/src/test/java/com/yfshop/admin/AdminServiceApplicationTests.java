@@ -38,6 +38,7 @@ import com.yfshop.common.util.AddressUtil;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -1637,6 +1638,13 @@ public class AdminServiceApplicationTests {
     public void importMerchantsFromExcel21() {
         String path1 = "C:\\Users\\xulg\\Documents\\WeChat Files\\wxid_z5mrg8zx4b3v21\\FileStorage\\File\\2021-05\\618大促账号信息收集（江西）(2).xlsx";
         String province = "江西省";
+        importMerchantsFromExcel(path1, province);
+    }
+
+    @Test
+    public void importMerchantsFromExcel22() {
+        String path1 = "C:\\Users\\xulg\\Documents\\WeChat Files\\wxid_z5mrg8zx4b3v21\\FileStorage\\File\\2021-05\\618大促账号信息收集(河南).xlsx";
+        String province = "河南省";
         importMerchantsFromExcel(path1, province);
     }
 

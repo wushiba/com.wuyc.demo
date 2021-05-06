@@ -21,18 +21,39 @@ import com.yfshop.admin.api.website.request.WebsiteCodeAddressReq;
 import com.yfshop.admin.api.website.request.WebsiteCodeBindReq;
 import com.yfshop.admin.api.website.request.WebsiteCodeDataReq;
 import com.yfshop.admin.api.website.request.WebsiteCodePayReq;
-import com.yfshop.admin.api.website.result.*;
+import com.yfshop.admin.api.website.result.WebsiteCodeAddressResult;
+import com.yfshop.admin.api.website.result.WebsiteCodeAmountResult;
+import com.yfshop.admin.api.website.result.WebsiteCodeDataResult;
+import com.yfshop.admin.api.website.result.WebsiteCodeDetailResult;
+import com.yfshop.admin.api.website.result.WebsiteCodeGroupResult;
+import com.yfshop.admin.api.website.result.WebsiteCodeResult;
+import com.yfshop.admin.api.website.result.WebsiteTypeResult;
 import com.yfshop.admin.dao.WebsiteCodeDao;
 import com.yfshop.admin.dao.WebsiteGoodsRecordDao;
-import com.yfshop.code.mapper.*;
-import com.yfshop.code.model.*;
+import com.yfshop.code.mapper.MerchantDetailMapper;
+import com.yfshop.code.mapper.MerchantMapper;
+import com.yfshop.code.mapper.RegionMapper;
+import com.yfshop.code.mapper.UserMapper;
+import com.yfshop.code.mapper.WebsiteBillMapper;
+import com.yfshop.code.mapper.WebsiteCodeAddressMapper;
+import com.yfshop.code.mapper.WebsiteCodeDetailMapper;
+import com.yfshop.code.mapper.WebsiteCodeMapper;
+import com.yfshop.code.mapper.WebsiteTypeMapper;
+import com.yfshop.code.model.Merchant;
+import com.yfshop.code.model.MerchantDetail;
+import com.yfshop.code.model.Region;
+import com.yfshop.code.model.User;
+import com.yfshop.code.model.WebsiteBill;
+import com.yfshop.code.model.WebsiteCode;
+import com.yfshop.code.model.WebsiteCodeAddress;
+import com.yfshop.code.model.WebsiteCodeDetail;
+import com.yfshop.code.model.WebsiteType;
 import com.yfshop.common.enums.GroupRoleEnum;
 import com.yfshop.common.enums.PayPrefixEnum;
 import com.yfshop.common.exception.ApiException;
 import com.yfshop.common.exception.Asserts;
 import com.yfshop.common.util.AddressUtil;
 import com.yfshop.common.util.BeanUtil;
-import com.yfshop.common.util.DateUtil;
 import com.yfshop.common.util.GeoUtils;
 import com.yfshop.wx.api.request.WxPayOrderNotifyReq;
 import com.yfshop.wx.api.service.MpPayService;
@@ -63,6 +84,15 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Validated
 @DubboService
 public class MerchantInfoServiceImpl implements MerchantInfoService {
+
+    // 单价
+    private static final String PIECE_PRICE = "0.3";
+    // 每张大约4.3g
+    private static final String PIECE_WEIGHT = "4.3";
+    // 基础运费
+    private static final int DEFAULT_POSTAGE = 8;
+    // 每一公斤超重运费
+    private static final double OVERWEIGHT_POSTAGE = 2.5D;
 
     @Resource
     private MerchantMapper merchantMapper;
@@ -226,32 +256,32 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
     public void buildAddress(WebsiteCodeBindReq websiteCodeBindReq) {
         if (StringUtils.isNotBlank(websiteCodeBindReq.getAddress())) {
             Map<String, String> maps = AddressUtil.addressResolution(websiteCodeBindReq.getAddress());
-                websiteCodeBindReq.setProvince(maps.get("province"));
-                Region province = regionMapper.selectOne(Wrappers.<Region>lambdaQuery()
-                        .eq(Region::getName, maps.get("province")));
-                if (province != null) {
-                    websiteCodeBindReq.setProvinceId(province.getId());
-                    Region city = regionMapper.selectOne(Wrappers.<Region>lambdaQuery()
-                            .eq(Region::getName, maps.get("city"))
-                            .eq(Region::getPid, province.getId()));
-                    if (city != null) {
-                        websiteCodeBindReq.setCityId(city.getId());
-                        Region county = regionMapper.selectOne(Wrappers.<Region>lambdaQuery()
-                                .eq(Region::getName, maps.get("county"))
-                                .eq(Region::getPid, city.getId()));
-                        if (county != null) {
-                            websiteCodeBindReq.setDistrictId(county.getId());
-                        }
+            websiteCodeBindReq.setProvince(maps.get("province"));
+            Region province = regionMapper.selectOne(Wrappers.<Region>lambdaQuery()
+                    .eq(Region::getName, maps.get("province")));
+            if (province != null) {
+                websiteCodeBindReq.setProvinceId(province.getId());
+                Region city = regionMapper.selectOne(Wrappers.<Region>lambdaQuery()
+                        .eq(Region::getName, maps.get("city"))
+                        .eq(Region::getPid, province.getId()));
+                if (city != null) {
+                    websiteCodeBindReq.setCityId(city.getId());
+                    Region county = regionMapper.selectOne(Wrappers.<Region>lambdaQuery()
+                            .eq(Region::getName, maps.get("county"))
+                            .eq(Region::getPid, city.getId()));
+                    if (county != null) {
+                        websiteCodeBindReq.setDistrictId(county.getId());
                     }
                 }
-                websiteCodeBindReq.setCity(maps.get("city"));
-                websiteCodeBindReq.setDistrict(maps.get("county"));
-                websiteCodeBindReq.setAddress(maps.get("town"));
             }
+            websiteCodeBindReq.setCity(maps.get("city"));
+            websiteCodeBindReq.setDistrict(maps.get("county"));
+            websiteCodeBindReq.setAddress(maps.get("town"));
+        }
     }
 
     @Override
-    public List<WebsiteCodeDetailResult> getMyWebsiteCode(Integer merchantId, String status, Date startTime,Date endTime) throws ApiException {
+    public List<WebsiteCodeDetailResult> getMyWebsiteCode(Integer merchantId, String status, Date startTime, Date endTime) throws ApiException {
         List<WebsiteCodeDetail> websiteCodeDetails = websiteCodeDetailMapper.selectList(Wrappers.<WebsiteCodeDetail>lambdaQuery()
                 .and(itemWrapper -> itemWrapper
                         .eq(WebsiteCodeDetail::getMerchantId, merchantId)
@@ -271,10 +301,10 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
             allStatus.add("WAIT");
             allStatus.add("DELIVERY");
             allStatus.add("SUCCESS");
-        }else if ("PENDING".equals(status)) {
+        } else if ("PENDING".equals(status)) {
             allStatus.add("PENDING");
             allStatus.add("PAYING");
-        }else{
+        } else {
             allStatus.add("status");
         }
         LambdaQueryWrapper<WebsiteCode> lambdaQueryWrapper = Wrappers.<WebsiteCode>lambdaQuery()
@@ -315,13 +345,8 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
         websiteCode.setPidPath(merchant.getPidPath());
         websiteCode.setQuantity(count);
         if (StringUtils.isBlank(email)) {
-            websiteCode.setOrderAmount(new BigDecimal("0.3").multiply(new BigDecimal(count)));
-            websiteCode.setPostage(new BigDecimal(8));
-            float g = new BigDecimal(count).multiply(new BigDecimal("4.3")).floatValue();//每张大约4.3g
-            if (g > 1000) {
-                double amount = Math.ceil((g - 1000) / 1000f) * 2.5d;
-                websiteCode.setPostage(websiteCode.getPostage().add(new BigDecimal(String.valueOf(amount))));
-            }
+            websiteCode.setOrderAmount(new BigDecimal(PIECE_PRICE).multiply(new BigDecimal(count)));
+            websiteCode.setPostage(getTotalPostage(count));
         } else {
             websiteCode.setOrderStatus("SUCCESS");
         }
@@ -393,6 +418,7 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
 
     @Override
     public WebsiteCodeAmountResult applyWebsiteCodeAmount(List<Integer> ids) throws ApiException {
+        /*
         WebsiteCodeAmountResult websiteCodeAmountResult = new WebsiteCodeAmountResult();
         websiteCodeAmountResult.setAmount(new BigDecimal(0));
         websiteCodeAmountResult.setPostage(new BigDecimal(0));
@@ -404,6 +430,21 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
                 websiteCodeAmountResult.setPostage(websiteCodeAmountResult.getPostage().add(item.getPostage()));
                 websiteCodeAmountResult.setQuantity(websiteCodeAmountResult.getQuantity() + item.getQuantity());
             });
+        }
+        return websiteCodeAmountResult;
+        */
+        WebsiteCodeAmountResult websiteCodeAmountResult = new WebsiteCodeAmountResult();
+        if (CollectionUtil.isEmpty(ids)) {
+            websiteCodeAmountResult.setAmount(new BigDecimal(0));
+            websiteCodeAmountResult.setPostage(new BigDecimal(0));
+            websiteCodeAmountResult.setQuantity(0);
+        } else {
+            List<WebsiteCode> websiteCodes = websiteCodeMapper.selectBatchIds(ids);
+            int totalQuantity = websiteCodes.stream().mapToInt(WebsiteCode::getQuantity).sum();
+            int totalCount = websiteCodes.stream().mapToInt((item) -> item.getOrderAmount().intValue()).sum();
+            websiteCodeAmountResult.setAmount(new BigDecimal(PIECE_PRICE).multiply(new BigDecimal(totalCount)));
+            websiteCodeAmountResult.setPostage(getTotalPostage(totalCount));
+            websiteCodeAmountResult.setQuantity(totalQuantity);
         }
         return websiteCodeAmountResult;
     }
@@ -426,7 +467,7 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
         websiteCode.setOrderStatus("PAYING");
         int count = websiteCodeMapper.update(websiteCode, Wrappers.<WebsiteCode>lambdaQuery()
                 .in(WebsiteCode::getId, websiteCodePayReq.getIds())
-                .in(WebsiteCode::getOrderStatus, "PENDING","PAYING"));
+                .in(WebsiteCode::getOrderStatus, "PENDING", "PAYING"));
         Asserts.assertTrue(count > 0, 500, "没有要支付的订单！");
         WebsiteCodeAmountResult websiteCodeAmountResult = applyWebsiteCodeAmount(websiteCodePayReq.getIds());
         String fee = websiteCodeAmountResult.getAmount().add(websiteCodeAmountResult.getPostage()).toPlainString();
@@ -518,7 +559,7 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
         merchantGroupResult.setCount(count);
         LambdaQueryWrapper lambdaQueryWrapper = Wrappers.<Merchant>lambdaQuery()
                 .eq(Merchant::getPid, merchantGroupReq.getMerchantId())
-                .ne(Merchant::getRoleAlias,"wd")
+                .ne(Merchant::getRoleAlias, "wd")
                 .eq(Merchant::getIsEnable, "Y")
                 .eq(Merchant::getIsDelete, "N");
         List<Merchant> merchantList = merchantMapper.selectList(lambdaQueryWrapper);
@@ -529,7 +570,7 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
             myself.setMerchantId(merchant.getId());
             myself.setMerchantName(merchant.getMerchantName());
             myself.setCurrentExchange(getCurrentExchange(merchant.getId(), merchantGroupReq.getStartTime(), merchantGroupReq.getEndTime()));
-            myself.setTotalExchange(getCurrentExchange(merchant.getId(),null,null));
+            myself.setTotalExchange(getCurrentExchange(merchant.getId(), null, null));
             myself.setCurrentGoodsRecord(websiteGoodsRecordDao.sumCurrentGoodsRecord(merchant.getId(), merchantGroupReq.getStartTime(), merchantGroupReq.getEndTime()));
             myself.setCount(count);
             merchantGroupResults.add(myself);
@@ -539,7 +580,7 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
             child.setMerchantId(item.getId());
             child.setMerchantName(item.getMerchantName());
             child.setCurrentExchange(getCurrentExchange(item.getId(), merchantGroupReq.getStartTime(), merchantGroupReq.getEndTime()));
-            child.setTotalExchange(getCurrentExchange(item.getId(),null,null));
+            child.setTotalExchange(getCurrentExchange(item.getId(), null, null));
             child.setCurrentGoodsRecord(websiteGoodsRecordDao.sumAllGoodsRecord(item.getId(), merchantGroupReq.getStartTime(), merchantGroupReq.getEndTime()));
             child.setCount(getAllWebsiteCodeCount(item.getId(), merchantGroupReq.getStartTime(), merchantGroupReq.getEndTime()));
             merchantGroupResults.add(child);
@@ -621,8 +662,8 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
 
     @Override
     public MerchantGroupResult getWebsiteList(MerchantGroupReq merchantGroupReq) {
-        MerchantGroupResult merchantGroupResult=new MerchantGroupResult();
-        AtomicInteger count= new AtomicInteger();
+        MerchantGroupResult merchantGroupResult = new MerchantGroupResult();
+        AtomicInteger count = new AtomicInteger();
         LambdaQueryWrapper lambdaQueryWrapper = Wrappers.<Merchant>lambdaQuery()
                 .eq(Merchant::getPid, merchantGroupReq.getMerchantId())
                 .eq(Merchant::getRoleAlias, "wd")
@@ -635,7 +676,7 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
             child.setMerchantId(item.getId());
             child.setMerchantName(item.getMerchantName());
             child.setCurrentExchange(getCurrentExchangeByPid(item.getId(), merchantGroupReq.getStartTime(), merchantGroupReq.getEndTime()));
-            child.setTotalExchange(getCurrentExchangeByPid(item.getId(),null,null));
+            child.setTotalExchange(getCurrentExchangeByPid(item.getId(), null, null));
             child.setCurrentGoodsRecord(websiteGoodsRecordDao.sumGoodsRecordByMerchantId(item.getId(), merchantGroupReq.getStartTime(), merchantGroupReq.getEndTime()));
             child.setCount(getCurrentWebsiteCodeCount(item.getId(), merchantGroupReq.getStartTime(), merchantGroupReq.getEndTime()));
             count.addAndGet(child.getCount());
@@ -663,7 +704,7 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
             websiteCodeDataResult.setActivityTime(item.getActivityTime());
             websiteCodeDataResult.setMerchantId(item.getMerchantId());
             websiteCodeDataResult.setCurrentExchange(getCurrentExchangeByWebsiteCode(item.getAlias(), websiteCodeDataReq.getStartTime(), websiteCodeDataReq.getEndTime()));
-            websiteCodeDataResult.setTotalExchange(getCurrentExchangeByWebsiteCode(item.getAlias(),null,null));
+            websiteCodeDataResult.setTotalExchange(getCurrentExchangeByWebsiteCode(item.getAlias(), null, null));
             currentCurrentExchange.addAndGet(websiteCodeDataResult.getCurrentExchange());
             totalExchange.addAndGet(websiteCodeDataResult.getTotalExchange());
             websiteCodeDataResults.add(websiteCodeDataResult);
@@ -675,8 +716,6 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
         websiteCodeGroupResult.setTotalExchange(totalExchange.get());
         return websiteCodeGroupResult;
     }
-
-
 
 
     private Integer getCurrentWebsiteCodeCount(Integer merchantId, Date startTime, Date endTime) {
@@ -747,4 +786,13 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
         return websiteBillMapper.selectCount(lambdaQueryWrapper);
     }
 
+    private BigDecimal getTotalPostage(int totalCount) {
+        BigDecimal totalPostage = new BigDecimal(String.valueOf(DEFAULT_POSTAGE));
+        float g = new BigDecimal(totalCount).multiply(new BigDecimal(PIECE_WEIGHT)).floatValue();//每张大约4.3g
+        if (g > 1000) {
+            double amount = Math.ceil((g - 1000) / 1000f) * OVERWEIGHT_POSTAGE;
+            totalPostage = totalPostage.add(new BigDecimal(String.valueOf(amount)));
+        }
+        return totalPostage;
+    }
 }
