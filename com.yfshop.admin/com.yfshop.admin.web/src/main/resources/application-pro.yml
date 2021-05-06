@@ -22,7 +22,7 @@ dubbo:
 spring:
   thymeleaf:
     # 页面模板页地址
-     prefix: file:///home/www/web-deploy/template/yf-admin/
+    prefix: file:///home/www/web-deploy/template/yf-admin/
 #    prefix: file:///home/www/web-deploy/html/upms.yufanlook.com/
     suffix: .html
     mode: HTML
