@@ -34,7 +34,7 @@ dubbo:
   configcenter:
     address: zookeeper://${ZOOKEEPER_HOST:192.168.11.197}:${ZOOKEEPER_PORT:2181}
   protocol:
-    port: 20981
+    port: 20885
     name: dubbo
   scan:
     base-packages: com.yfshop.open
