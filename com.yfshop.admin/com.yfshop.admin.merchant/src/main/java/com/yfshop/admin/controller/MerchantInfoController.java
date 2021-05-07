@@ -20,6 +20,7 @@ import com.yfshop.admin.config.UserStpLogic;
 import com.yfshop.common.api.CommonResult;
 import com.yfshop.common.enums.GroupRoleEnum;
 import com.yfshop.common.exception.Asserts;
+import com.yfshop.common.validate.annotation.Mobile;
 import me.chanjar.weixin.common.error.WxErrorException;
 import me.chanjar.weixin.mp.api.WxMpService;
 import me.chanjar.weixin.mp.bean.result.WxMpUser;
@@ -363,6 +364,7 @@ class MerchantInfoController extends AbstractBaseController {
 
     /**
      * 获取网点码二维码
+     *
      * @param websiteCode
      * @return
      */
@@ -376,10 +378,11 @@ class MerchantInfoController extends AbstractBaseController {
 
     /**
      * 查询附近的商户
-     * @param districtId    区id
-     * @param longitude     经度
-     * @param latitude      纬度
-     * @return  List<MerchantResult>
+     *
+     * @param districtId 区id
+     * @param longitude  经度
+     * @param latitude   纬度
+     * @return List<MerchantResult>
      */
     @RequestMapping(value = "/findNearMerchantList", method = {RequestMethod.GET, RequestMethod.POST})
     @ResponseBody
@@ -391,6 +394,7 @@ class MerchantInfoController extends AbstractBaseController {
 
     /**
      * 网点补货
+     *
      * @param mobile
      * @param count
      * @return
@@ -398,10 +402,23 @@ class MerchantInfoController extends AbstractBaseController {
     @RequestMapping(value = "/websiteAddGoods", method = {RequestMethod.GET, RequestMethod.POST})
     @ResponseBody
     @SaCheckLogin
-    public CommonResult<Void> websiteAddGoods(String mobile,Integer count) {
-        return CommonResult.success(merchantInfoService.websiteAddGoods(getCurrentAdminUserId(),mobile, count));
+    public CommonResult<Void> websiteAddGoods(@Mobile(message = "手机号不正确") String mobile, Integer count) {
+        return CommonResult.success(merchantInfoService.websiteAddGoods(getCurrentAdminUserId(), mobile, count));
     }
 
+
+    /**
+     * 查询网点数据
+     *
+     * @param mobile
+     * @return
+     */
+    @RequestMapping(value = "/getWebsiteByMobile", method = {RequestMethod.GET, RequestMethod.POST})
+    @ResponseBody
+    @SaCheckLogin
+    public CommonResult<MerchantResult> getWebsiteByMobile(@Mobile(message = "手机号不正确") String mobile) {
+        return CommonResult.success(merchantInfoService.getWebsiteByMobile(mobile));
+    }
 
 
 }

@@ -1,5 +1,7 @@
 package com.yfshop.code.model;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.activerecord.Model;
 import java.time.LocalDateTime;
@@ -22,6 +24,7 @@ public class WebsiteGoodsRecord extends Model<WebsiteGoodsRecord> {
 
     private static final long serialVersionUID = 1L;
 
+    @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
 
     private LocalDateTime createTime;

@@ -766,6 +766,15 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
         return null;
     }
 
+
+    @Override
+    public MerchantResult getWebsiteByMobile(String mobile) throws ApiException {
+        Merchant merchant = merchantMapper.selectOne(Wrappers.<Merchant>lambdaQuery()
+                .eq(Merchant::getMobile, mobile));
+        Asserts.assertNonNull(merchant, 500, "网点不存在!");
+        return BeanUtil.convert(merchant, MerchantResult.class);
+    }
+
     private Integer getCurrentWebsiteCodeCount(Integer merchantId, Date startTime, Date endTime) {
         LambdaQueryWrapper lambdaQueryWrapper = Wrappers.<WebsiteCodeDetail>lambdaQuery()
                 .eq(WebsiteCodeDetail::getMerchantId, merchantId)

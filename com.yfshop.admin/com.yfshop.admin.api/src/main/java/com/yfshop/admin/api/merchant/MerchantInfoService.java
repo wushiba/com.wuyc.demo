@@ -200,4 +200,6 @@ public interface MerchantInfoService {
     List<MerchantResult> findNearMerchantList(Integer districtId, Double longitude, Double latitude);
 
     Void websiteAddGoods(Integer merchantId, String mobile, Integer count) throws ApiException;
+
+    MerchantResult getWebsiteByMobile(String mobile) throws ApiException;
 }
