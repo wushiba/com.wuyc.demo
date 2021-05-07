@@ -1,6 +1,6 @@
 ---
 server:
-  port: 9099
+  port: 10000
 dubbo:
   registry:
     address: zookeeper://10.11.3.98:2181
@@ -8,6 +8,8 @@ dubbo:
     address: zookeeper://10.11.3.98:2181
   configcenter:
     address: zookeeper://10.11.3.98:2181
+  application:
+    name: yfshop-shop-web
   scan:
     base-packages: com.yfshop.open
   provider:

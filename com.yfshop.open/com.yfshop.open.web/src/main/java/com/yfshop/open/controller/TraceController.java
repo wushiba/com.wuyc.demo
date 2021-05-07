@@ -1,7 +1,6 @@
 package com.yfshop.open.controller;
 
 import com.yfshop.common.api.CommonResult;
-import com.yfshop.open.api.blpshop.request.OrderReq;
 import com.yfshop.open.api.trace.request.StorageReq;
 import com.yfshop.open.api.trace.request.TraceReq;
 import com.yfshop.open.api.trace.service.TraceService;

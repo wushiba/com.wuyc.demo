@@ -1,6 +1,6 @@
 ---
 server:
-  port: 9099
+  port: 10000
 dubbo:
   registry:
     address: zookeeper://10.11.3.97:2181?backup=10.11.3.99:2181,10.11.3.99:2182
