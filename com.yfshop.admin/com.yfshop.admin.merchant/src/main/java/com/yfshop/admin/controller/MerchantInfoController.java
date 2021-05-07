@@ -361,12 +361,47 @@ class MerchantInfoController extends AbstractBaseController {
         return CommonResult.success(null);
     }
 
+    /**
+     * 获取网点码二维码
+     * @param websiteCode
+     * @return
+     */
     @SaCheckLogin
     @RequestMapping(value = "/getWebsiteCodeQrCode", method = {RequestMethod.GET})
     public String getWebsiteCodeQrCode(String websiteCode) {
         QrConfig qrConfig = new QrConfig(750, 750);
         return QrCodeUtil.generateAsBase64(websiteCodeUrl + websiteCode, qrConfig, "png");
     }
+
+
+    /**
+     * 查询附近的商户
+     * @param districtId    区id
+     * @param longitude     经度
+     * @param latitude      纬度
+     * @return  List<MerchantResult>
+     */
+    @RequestMapping(value = "/findNearMerchantList", method = {RequestMethod.GET, RequestMethod.POST})
+    @ResponseBody
+    @SaCheckLogin
+    public CommonResult<List<MerchantResult>> findNearMerchantList(Integer districtId, Double longitude, Double latitude) {
+        return CommonResult.success(merchantInfoService.findNearMerchantList(districtId, longitude, latitude));
+    }
+
+
+    /**
+     * 网点补货
+     * @param mobile
+     * @param count
+     * @return
+     */
+    @RequestMapping(value = "/websiteAddGoods", method = {RequestMethod.GET, RequestMethod.POST})
+    @ResponseBody
+    @SaCheckLogin
+    public CommonResult<Void> websiteAddGoods(String mobile,Integer count) {
+        return CommonResult.success(merchantInfoService.websiteAddGoods(getCurrentAdminUserId(),mobile, count));
+    }
+
 
 
 }

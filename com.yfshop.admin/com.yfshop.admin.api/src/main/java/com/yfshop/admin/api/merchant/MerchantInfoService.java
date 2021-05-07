@@ -62,7 +62,7 @@ public interface MerchantInfoService {
      * @return
      * @throws ApiException
      */
-    List<WebsiteCodeDetailResult> getMyWebsiteCode(Integer merchantId, String status, Date startTime,Date sendTime) throws ApiException;
+    List<WebsiteCodeDetailResult> getMyWebsiteCode(Integer merchantId, String status, Date startTime, Date sendTime) throws ApiException;
 
     /**
      * 获取待申请网点码
@@ -196,4 +196,8 @@ public interface MerchantInfoService {
     MerchantGroupResult getWebsiteList(MerchantGroupReq merchantGroupReq);
 
     WebsiteCodeGroupResult getWebsiteCodeData(WebsiteCodeDataReq websiteCodeDataReq);
+
+    List<MerchantResult> findNearMerchantList(Integer districtId, Double longitude, Double latitude);
+
+    Void websiteAddGoods(Integer merchantId, String mobile, Integer count) throws ApiException;
 }

@@ -4,8 +4,10 @@ import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.crypto.SecureUtil;
 import cn.hutool.extra.spring.SpringUtil;
+import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.binarywang.wxpay.bean.order.WxPayMpOrderResult;
@@ -30,28 +32,14 @@ import com.yfshop.admin.api.website.result.WebsiteCodeResult;
 import com.yfshop.admin.api.website.result.WebsiteTypeResult;
 import com.yfshop.admin.dao.WebsiteCodeDao;
 import com.yfshop.admin.dao.WebsiteGoodsRecordDao;
-import com.yfshop.code.mapper.MerchantDetailMapper;
-import com.yfshop.code.mapper.MerchantMapper;
-import com.yfshop.code.mapper.RegionMapper;
-import com.yfshop.code.mapper.UserMapper;
-import com.yfshop.code.mapper.WebsiteBillMapper;
-import com.yfshop.code.mapper.WebsiteCodeAddressMapper;
-import com.yfshop.code.mapper.WebsiteCodeDetailMapper;
-import com.yfshop.code.mapper.WebsiteCodeMapper;
-import com.yfshop.code.mapper.WebsiteTypeMapper;
-import com.yfshop.code.model.Merchant;
-import com.yfshop.code.model.MerchantDetail;
-import com.yfshop.code.model.Region;
-import com.yfshop.code.model.User;
-import com.yfshop.code.model.WebsiteBill;
-import com.yfshop.code.model.WebsiteCode;
-import com.yfshop.code.model.WebsiteCodeAddress;
-import com.yfshop.code.model.WebsiteCodeDetail;
-import com.yfshop.code.model.WebsiteType;
+import com.yfshop.code.mapper.*;
+import com.yfshop.code.model.*;
+import com.yfshop.common.constants.CacheConstants;
 import com.yfshop.common.enums.GroupRoleEnum;
 import com.yfshop.common.enums.PayPrefixEnum;
 import com.yfshop.common.exception.ApiException;
 import com.yfshop.common.exception.Asserts;
+import com.yfshop.common.service.RedisService;
 import com.yfshop.common.util.AddressUtil;
 import com.yfshop.common.util.BeanUtil;
 import com.yfshop.common.util.GeoUtils;
@@ -62,6 +50,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.geo.Distance;
+import org.springframework.data.geo.GeoResult;
+import org.springframework.data.geo.GeoResults;
+import org.springframework.data.geo.Point;
+import org.springframework.data.redis.connection.RedisGeoCommands;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
@@ -74,6 +67,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 /**
  * 用户用户服务
@@ -93,6 +87,9 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
     private static final int DEFAULT_POSTAGE = 8;
     // 每一公斤超重运费
     private static final double OVERWEIGHT_POSTAGE = 2.5D;
+
+    @Resource
+    private RedisService redisService;
 
     @Resource
     private MerchantMapper merchantMapper;
@@ -134,6 +131,9 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
 
     @Resource
     private WebsiteGoodsRecordDao websiteGoodsRecordDao;
+
+    @Resource
+    private WebsiteGoodsRecordMapper websiteGoodsRecordMapper;
 
     @Override
     public MerchantResult getWebsiteInfo(Integer merchantId) throws ApiException {
@@ -597,7 +597,7 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
             Merchant pMerchant = merchantMapper.selectById(merchantReq.getPId());
             Merchant merchant = new Merchant();
             merchant.setPid(merchantReq.getPId());
-            merchant.setPMerchantName(pMerchant.getMerchantName());
+            merchant.setPMerchantName(StringUtils.isNotBlank(pMerchant.getMerchantName()) ? pMerchant.getMerchantName() : merchantReq.getContacts());
             merchant.setRoleAlias(merchantReq.getRoleAlias());
             merchant.setRoleName(GroupRoleEnum.getByCode(merchantReq.getRoleAlias()).getDescription());
             merchant.setMerchantName(merchantReq.getMerchantName());
@@ -717,6 +717,54 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
         return websiteCodeGroupResult;
     }
 
+    @Override
+    public List<MerchantResult> findNearMerchantList(Integer districtId, Double longitude, Double latitude) {
+        List<MerchantResult> merchantResultList = initWdMerchantList();
+        if (CollectionUtils.isEmpty(merchantResultList)) {
+            return null;
+        }
+
+        List<MerchantResult> resultList = new ArrayList<>();
+        if (districtId != null) {
+            resultList = merchantResultList.stream().filter(data -> data.getDistrictId().intValue() == districtId)
+                    .collect(Collectors.toList());
+            return resultList;
+        }
+
+        GeoResults<RedisGeoCommands.GeoLocation<Object>> geoResults = redisService.findNearDataList(CacheConstants.MERCHANT_GRO_DATA,
+                longitude, latitude, CacheConstants.USER_MERCHANT_DISTANCE, CacheConstants.USER_MERCHANT_DISTANCE_UNIT);
+        if (geoResults == null) {
+            return resultList;
+        }
+
+        Map<Integer, List<MerchantResult>> merchantMap = merchantResultList.stream().collect(Collectors.groupingBy(MerchantResult::getId));
+        for (GeoResult<RedisGeoCommands.GeoLocation<Object>> locationGeoResult : geoResults) {
+            Distance dist = locationGeoResult.getDistance();
+            RedisGeoCommands.GeoLocation<Object> content = locationGeoResult.getContent();
+            Point point = content.getPoint();
+            Object merchantId = content.getName();
+            System.out.println("merchantId=" + merchantId.toString() + "&distance=" + dist.toString() + "&coordinate=" + point.toString());
+            MerchantResult merchantData = merchantMap.get(Integer.valueOf(merchantId.toString())).get(0);
+            merchantData.setDistance(dist.toString());
+            resultList.add(merchantData);
+        }
+        return resultList;
+    }
+
+    @Override
+    public Void websiteAddGoods(Integer merchantId, String mobile, Integer count) throws ApiException {
+        Merchant merchant = merchantMapper.selectOne(Wrappers.<Merchant>lambdaQuery()
+                .eq(Merchant::getMobile, mobile));
+        Asserts.assertNonNull(merchant, 500, "网点不存在!");
+        Asserts.assertTrue(count > 0, 500, "补货数量要大于0");
+        WebsiteGoodsRecord websiteGoodsRecord = new WebsiteGoodsRecord();
+        websiteGoodsRecord.setPidPath(merchant.getPidPath());
+        websiteGoodsRecord.setQuantity(count);
+        websiteGoodsRecord.setWebsiteId(merchant.getId());
+        websiteGoodsRecord.setMerchantId(merchantId);
+        websiteGoodsRecordMapper.insert(websiteGoodsRecord);
+        return null;
+    }
 
     private Integer getCurrentWebsiteCodeCount(Integer merchantId, Date startTime, Date endTime) {
         LambdaQueryWrapper lambdaQueryWrapper = Wrappers.<WebsiteCodeDetail>lambdaQuery()
@@ -794,5 +842,53 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
             totalPostage = totalPostage.add(new BigDecimal(String.valueOf(amount)));
         }
         return totalPostage;
+    }
+
+
+    //-------------------------------------------------------- privete-method-----------------------------------------------------------------//
+
+    /**
+     * 初始化网点
+     */
+    private List<MerchantResult> initWdMerchantList() {
+        Object merchantListObject = redisService.get(CacheConstants.MERCHANT_LIST_INFO_DATA);
+        if (merchantListObject != null) {
+            return JSON.parseArray(merchantListObject.toString(), MerchantResult.class);
+        }
+
+        List<Merchant> merchantList = merchantMapper.selectList(Wrappers.lambdaQuery(Merchant.class)
+                .eq(Merchant::getRoleAlias, GroupRoleEnum.WD.getCode())
+                .orderByDesc(Merchant::getId));
+        if (CollectionUtils.isEmpty(merchantList)) {
+            return null;
+        }
+
+        List<Integer> idList = merchantList.stream().map(Merchant::getId).collect(Collectors.toList());
+        List<MerchantDetail> detailList = merchantDetailMapper.selectList(Wrappers.lambdaQuery(MerchantDetail.class)
+                .in(MerchantDetail::getMerchantId, idList)
+                .orderByDesc(MerchantDetail::getMerchantId));
+
+        Map<Integer, List<MerchantDetail>> detailMap = detailList.stream().collect(
+                Collectors.groupingBy(MerchantDetail::getMerchantId));
+        List<MerchantResult> merchantResultList = BeanUtil.convertList(merchantList, MerchantResult.class);
+        merchantResultList.forEach(merchant -> {
+            List<MerchantDetail> merchantDetailList = detailMap.get(merchant.getId());
+            if (CollectionUtils.isNotEmpty(merchantDetailList)) {
+                merchant.setLongitude(merchantDetailList.get(0).getLongitude());
+                merchant.setLatitude(merchantDetailList.get(0).getLatitude());
+                merchant.setGeoHash(merchantDetailList.get(0).getGeoHash());
+            }
+        });
+
+        // 将商户信息存入redis
+        redisService.set(CacheConstants.MERCHANT_LIST_INFO_DATA, JSON.toJSONString(merchantResultList), 60 * 10);
+
+        // 更新缓存中的商户经纬度，先删除后更新
+        detailList.forEach(merchantDetail -> {
+            Long aLong = redisService.zRemove(CacheConstants.MERCHANT_GRO_DATA, merchantDetail.getMerchantId() + "");
+
+            redisService.geoAdd(CacheConstants.MERCHANT_GRO_DATA, merchantDetail.getLongitude(), merchantDetail.getLatitude(), merchantDetail.getMerchantId());
+        });
+        return merchantResultList;
     }
 }
