@@ -8,9 +8,6 @@ dubbo:
     address: zookeeper://10.11.3.98:2181
   configcenter:
     address: zookeeper://10.11.3.98:2181
-  protocol:
-    port: 20951
-    name: dubbo
   scan:
     base-packages: com.yfshop.open
   provider:
@@ -19,3 +16,14 @@ dubbo:
     retries: 0
   consumer:
     check: false
+
+spring:
+  thymeleaf:
+    # 页面模板页地址
+    prefix: file:///home/www/web-deploy/template/yf-open/
+    suffix: .html
+    mode: HTML
+    encoding: UTF-8
+    cache: false
+    servlet:
+      content-type: text/html
