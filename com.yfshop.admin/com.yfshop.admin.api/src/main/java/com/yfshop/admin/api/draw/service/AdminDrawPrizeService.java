@@ -1,9 +1,9 @@
 package com.yfshop.admin.api.draw.service;
 
 import java.util.List;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+
 import com.yfshop.admin.api.draw.request.QueryDrawPrizeReq;
-import com.yfshop.admin.api.draw.result.YfDrawPrizeResult;
+import com.yfshop.admin.api.draw.result.DrawPrizeResult;
 import com.yfshop.common.exception.ApiException;
 
 /**
@@ -21,7 +21,7 @@ public interface AdminDrawPrizeService {
 	 * @return 
 	 * @Description:
 	 */
-	public YfDrawPrizeResult getYfDrawPrizeById(Integer id) throws ApiException;
+	public DrawPrizeResult getYfDrawPrizeById(Integer id) throws ApiException;
 
 	/**
 	 * 得到所有抽奖活动奖品YfDrawPrize
@@ -29,6 +29,6 @@ public interface AdminDrawPrizeService {
 	 * @return 
 	 * @Description:
 	 */
-	public List<YfDrawPrizeResult> getAll(QueryDrawPrizeReq req) throws ApiException;
+	public List<DrawPrizeResult> getAll(QueryDrawPrizeReq req) throws ApiException;
 
 }

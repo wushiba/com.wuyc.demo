@@ -8,8 +8,11 @@ import com.yfshop.admin.api.coupon.result.YfCouponResult;
 import com.yfshop.admin.api.coupon.service.AdminCouponService;
 import com.yfshop.admin.api.draw.request.CreateDrawActivityReq;
 import com.yfshop.admin.api.draw.request.QueryDrawActivityReq;
-import com.yfshop.admin.api.draw.result.YfDrawActivityResult;
+import com.yfshop.admin.api.draw.request.SaveProvinceRateReq;
+import com.yfshop.admin.api.draw.result.DrawActivityResult;
+import com.yfshop.admin.api.draw.result.DrawProvinceResult;
 import com.yfshop.admin.api.draw.service.AdminDrawActivityService;
+import com.yfshop.admin.api.draw.service.AdminDrawProvinceService;
 import com.yfshop.admin.api.mall.AdminMallManageService;
 import com.yfshop.common.api.CommonResult;
 import com.yfshop.common.base.BaseController;
@@ -23,6 +26,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.validation.constraints.NotNull;
+import java.util.List;
 
 @Controller
 @RequestMapping("admin/draw")
@@ -38,11 +42,14 @@ public class AdminDrawController implements BaseController {
     @DubboReference(check = false)
     private AdminMallManageService adminMallManageService;
 
+    @DubboReference
+    private AdminDrawProvinceService adminDrawProvinceService;
+
     @RequestMapping(value = "/findList", method = {RequestMethod.POST})
     @ResponseBody
     @SaCheckLogin
     @SaCheckRole(value = "sys")
-    public CommonResult<Page<YfDrawActivityResult>> findList(QueryDrawActivityReq req) {
+    public CommonResult<Page<DrawActivityResult>> findList(QueryDrawActivityReq req) {
         return CommonResult.success(adminDrawActivityService.findYfDrawActivityListByPage(req));
     }
 
@@ -51,7 +58,7 @@ public class AdminDrawController implements BaseController {
     @SaCheckLogin
     @SaCheckRole(value = "sys")
     public CommonResult<Void> updateCouponStatus(@NotNull(message = "活动id不能为空") Integer id,
-                                           @NotNull(message = "上下架状态不能为空") String isEnable) {
+                                                 @NotNull(message = "上下架状态不能为空") String isEnable) {
         adminDrawActivityService.updateYfDrawActivityStatus(id, isEnable);
         return CommonResult.success(null);
     }
@@ -84,6 +91,25 @@ public class AdminDrawController implements BaseController {
     @SaCheckRole(value = "sys")
     public CommonResult<Page<YfCouponResult>> findCouponList(QueryCouponReq req) {
         return CommonResult.success(adminCouponService.findYfCouponListByPage(req));
+    }
+
+
+    @RequestMapping(value = "/rate/province/save", method = {RequestMethod.POST})
+    @ResponseBody
+    @SaCheckLogin
+    @SaCheckRole(value = "sys")
+    public CommonResult<Void> saveProvinceRate(List<SaveProvinceRateReq> req) {
+
+        return CommonResult.success(adminDrawProvinceService.saveProvinceRate(req));
+    }
+
+    @RequestMapping(value = "/rate/province/list", method = {RequestMethod.POST})
+    @ResponseBody
+    @SaCheckLogin
+    @SaCheckRole(value = "sys")
+    public CommonResult<List<DrawProvinceResult>> getProvinceRate() {
+
+        return CommonResult.success(adminDrawProvinceService.getProvinceRate());
     }
 
 }

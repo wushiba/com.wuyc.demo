@@ -3,7 +3,7 @@ package com.yfshop.admin.service.draw;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.yfshop.admin.api.draw.request.QueryDrawPrizeReq;
-import com.yfshop.admin.api.draw.result.YfDrawPrizeResult;
+import com.yfshop.admin.api.draw.result.DrawPrizeResult;
 import com.yfshop.admin.api.draw.service.AdminDrawPrizeService;
 import com.yfshop.code.mapper.DrawPrizeMapper;
 import com.yfshop.code.model.DrawPrize;
@@ -28,19 +28,19 @@ public class AdminDrawPrizeServiceImpl implements AdminDrawPrizeService {
 	private DrawPrizeMapper drawPrizeMapper;
 
 	@Override
-	public YfDrawPrizeResult getYfDrawPrizeById(Integer id) throws ApiException {
+	public DrawPrizeResult getYfDrawPrizeById(Integer id) throws ApiException {
 		if (id == null || id <= 0) return null;
-		YfDrawPrizeResult yfDrawPrizeResult = null;
+		DrawPrizeResult yfDrawPrizeResult = null;
 		DrawPrize yfDrawPrize = this.drawPrizeMapper.selectById(id);
 		if (yfDrawPrize != null) {
-			yfDrawPrizeResult = new YfDrawPrizeResult();
+			yfDrawPrizeResult = new DrawPrizeResult();
 			BeanUtil.copyProperties(yfDrawPrize, yfDrawPrizeResult);
 		}	
 		return yfDrawPrizeResult;
 	}
 
 	@Override
-	public List<YfDrawPrizeResult> getAll(QueryDrawPrizeReq req) throws ApiException {
+	public List<DrawPrizeResult> getAll(QueryDrawPrizeReq req) throws ApiException {
 		LambdaQueryWrapper<DrawPrize> queryWrapper = Wrappers.lambdaQuery(DrawPrize.class)
 				.eq(req.getActId() != null, DrawPrize::getActId, req.getActId())
 				.eq(req.getPrizeLevel() != null, DrawPrize::getPrizeLevel, req.getPrizeLevel())
@@ -48,7 +48,7 @@ public class AdminDrawPrizeServiceImpl implements AdminDrawPrizeService {
 				.orderByDesc(DrawPrize::getId);
 
 		List<DrawPrize> dataList = drawPrizeMapper.selectList(queryWrapper);
-		return BeanUtil.convertList(dataList, YfDrawPrizeResult.class);
+		return BeanUtil.convertList(dataList, DrawPrizeResult.class);
 	}
 
 }

@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
  * @Copyright:Copyright 
  */
 @Data
-public class YfDrawActivityResult implements Serializable{
+public class DrawActivityResult implements Serializable{
 
 	private static final long serialVersionUID = -1L;
 	

@@ -7,7 +7,7 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.yfshop.admin.api.draw.request.CreateDrawActivityReq;
 import com.yfshop.admin.api.draw.request.QueryDrawActivityReq;
-import com.yfshop.admin.api.draw.result.YfDrawActivityResult;
+import com.yfshop.admin.api.draw.result.DrawActivityResult;
 import com.yfshop.admin.api.draw.service.AdminDrawActivityService;
 import com.yfshop.code.mapper.DrawActivityMapper;
 import com.yfshop.code.mapper.DrawPrizeMapper;
@@ -55,39 +55,39 @@ public class AdminDrawActivityServiceImpl implements AdminDrawActivityService {
     private DrawProvinceRateMapper drawProvinceRateMapper;
 
     @Override
-    public YfDrawActivityResult getYfDrawActivityById(Integer id) throws ApiException {
+    public DrawActivityResult getYfDrawActivityById(Integer id) throws ApiException {
         if (id == null || id <= 0) return null;
-        YfDrawActivityResult yfDrawActivityResult = null;
+        DrawActivityResult yfDrawActivityResult = null;
         DrawActivity yfDrawActivity = this.drawActivityMapper.selectById(id);
         if (yfDrawActivity != null) {
-            yfDrawActivityResult = new YfDrawActivityResult();
+            yfDrawActivityResult = new DrawActivityResult();
             BeanUtil.copyProperties(yfDrawActivity, yfDrawActivityResult);
         }
         return yfDrawActivityResult;
     }
 
     @Override
-    public Page<YfDrawActivityResult> findYfDrawActivityListByPage(QueryDrawActivityReq req) throws ApiException {
+    public Page<DrawActivityResult> findYfDrawActivityListByPage(QueryDrawActivityReq req) throws ApiException {
         LambdaQueryWrapper<DrawActivity> queryWrapper = Wrappers.lambdaQuery(DrawActivity.class)
                 .eq(req.getIsEnable() != null, DrawActivity::getIsEnable, req.getIsEnable())
                 .eq(req.getActTitle() != null, DrawActivity::getActTitle, req.getActTitle())
                 .orderByDesc(DrawActivity::getId);
 
         Page<DrawActivity> itemPage = drawActivityMapper.selectPage(new Page<>(req.getPageIndex(), req.getPageSize()), queryWrapper);
-        Page<YfDrawActivityResult> page = new Page<>(itemPage.getCurrent(), itemPage.getSize(), itemPage.getTotal());
-        page.setRecords(BeanUtil.convertList(itemPage.getRecords(), YfDrawActivityResult.class));
+        Page<DrawActivityResult> page = new Page<>(itemPage.getCurrent(), itemPage.getSize(), itemPage.getTotal());
+        page.setRecords(BeanUtil.convertList(itemPage.getRecords(), DrawActivityResult.class));
         return page;
     }
 
     @Override
-    public List<YfDrawActivityResult> getAll(QueryDrawActivityReq req) throws ApiException {
+    public List<DrawActivityResult> getAll(QueryDrawActivityReq req) throws ApiException {
         LambdaQueryWrapper<DrawActivity> queryWrapper = Wrappers.lambdaQuery(DrawActivity.class)
                 .eq(req.getIsEnable() != null, DrawActivity::getIsEnable, req.getIsEnable())
                 .eq(req.getActTitle() != null, DrawActivity::getActTitle, req.getActTitle())
                 .orderByDesc(DrawActivity::getId);
 
         List<DrawActivity> dataList = drawActivityMapper.selectList(queryWrapper);
-        return BeanUtil.convertList(dataList, YfDrawActivityResult.class);
+        return BeanUtil.convertList(dataList, DrawActivityResult.class);
     }
 
     @Override

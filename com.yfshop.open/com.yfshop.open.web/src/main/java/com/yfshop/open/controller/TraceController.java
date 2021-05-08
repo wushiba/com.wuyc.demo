@@ -29,7 +29,7 @@ public class TraceController {
      */
     @RequestMapping(value = "/saveTrace", method = {RequestMethod.POST})
     public CommonResult saveTrace(@RequestBody List<TraceReq> traceReqs) {
-        logger.info("saveTrace->{}", traceReqs.toString());
+        //logger.info("saveTrace->{}", traceReqs.toString());
         traceService.syncTrace(traceReqs);
         return CommonResult.success(1, "接收成功");
     }
@@ -42,7 +42,7 @@ public class TraceController {
      */
     @RequestMapping(value = "/saveStorage", method = {RequestMethod.POST})
     public CommonResult saveStorage(@RequestBody List<StorageReq> storageReqs) {
-        logger.info("saveStorage->{}", storageReqs.toString());
+        //logger.info("saveStorage->{}", storageReqs.toString());
         traceService.syncStorage(storageReqs);
         return CommonResult.success(1, "接收成功");
     }

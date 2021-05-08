@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
  * @Copyright:Copyright 
  */
 @Data
-public class YfDrawProvinceResult implements Serializable{
+public class DrawProvinceResult implements Serializable{
 
 	private static final long serialVersionUID = -1L;
 	
@@ -53,18 +53,18 @@ public class YfDrawProvinceResult implements Serializable{
 	
     /** 排序 */
     private Integer sort;
-	
+
 	// ------------------------------------------------------------ 附加字段 start ---------------------------------------------------------------------
-	
+
 	/** 分页参数-当前页 */
 	private Integer pageIndex;
-	
+
 	/** 分页参数-从第几条开始 */
 	private Integer pageStart;
-	
+
 	/** 分页参数-每页条数 */
 	private Integer pageSize;
-	
+
 	// ------------------------------------------------------------ 附加字段 end ------------------------------------------------------------------------
 
 }

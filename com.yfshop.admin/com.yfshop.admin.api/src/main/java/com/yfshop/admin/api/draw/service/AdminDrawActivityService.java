@@ -4,7 +4,7 @@ import java.util.List;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.yfshop.admin.api.draw.request.CreateDrawActivityReq;
 import com.yfshop.admin.api.draw.request.QueryDrawActivityReq;
-import com.yfshop.admin.api.draw.result.YfDrawActivityResult;
+import com.yfshop.admin.api.draw.result.DrawActivityResult;
 import com.yfshop.common.exception.ApiException;
 
 /**
@@ -22,7 +22,7 @@ public interface AdminDrawActivityService {
 	 * @return 
 	 * @Description:
 	 */
-	public YfDrawActivityResult getYfDrawActivityById(Integer id) throws ApiException;
+	public DrawActivityResult getYfDrawActivityById(Integer id) throws ApiException;
 
 	/**
 	 * 分页查询抽奖活动YfDrawActivity
@@ -30,7 +30,7 @@ public interface AdminDrawActivityService {
 	 * @return 
 	 * @Description:
 	 */
-	public Page<YfDrawActivityResult> findYfDrawActivityListByPage(QueryDrawActivityReq req) throws ApiException;
+	public Page<DrawActivityResult> findYfDrawActivityListByPage(QueryDrawActivityReq req) throws ApiException;
 
 	/**
 	 * 得到所有抽奖活动YfDrawActivity
@@ -38,7 +38,7 @@ public interface AdminDrawActivityService {
 	 * @return 
 	 * @Description:
 	 */
-	public List<YfDrawActivityResult> getAll(QueryDrawActivityReq req) throws ApiException;
+	public List<DrawActivityResult> getAll(QueryDrawActivityReq req) throws ApiException;
 
 	/**
 	 * 添加抽奖活动YfDrawActivity
