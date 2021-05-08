@@ -94,9 +94,6 @@ public class CustomGlobalExceptionResolver implements HandlerExceptionResolver, 
             if ((apiException.getErrorCode().getCode() == 605 && apiException.getMessage().contains("微信"))) {
                 SaTokenCookieUtil.delCookie(request, response, "yfopen");
             }
-            if (apiException.getErrorCode().getCode() == 606) {
-                SaTokenCookieUtil.delCookie(request, response, "yfopen");
-            }
 
         }
         HandlerMethod handlerMethod = (HandlerMethod) handler;
