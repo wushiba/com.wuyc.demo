@@ -104,13 +104,13 @@ public class WebsiteBillServiceImpl implements WebsiteBillService {
     @Override
     public WebsiteBillDayResult getBillByWebsiteCode(String websiteCode, Date startTime,Date endTime) {
         Integer count=websiteBillMapper.selectCount(Wrappers.<WebsiteBill>lambdaQuery()
-                .eq(WebsiteBill::getWebsiteCode, websiteCode)
-                .eq(WebsiteBill::getIsConfirm, 'Y'));
+                .eq(WebsiteBill::getWebsiteCode, websiteCode));
+//                .eq(WebsiteBill::getIsConfirm, 'Y'));
         List<WebsiteBill> websiteBills = websiteBillMapper.selectList(Wrappers.<WebsiteBill>lambdaQuery()
                 .eq(WebsiteBill::getWebsiteCode, websiteCode)
                 .ge(startTime != null, WebsiteBill::getCreateTime, startTime)
                 .lt(endTime != null, WebsiteBill::getCreateTime, endTime)
-                .eq(WebsiteBill::getIsConfirm, 'Y')
+//                .eq(WebsiteBill::getIsConfirm, 'Y')
                 .orderByDesc(WebsiteBill::getCreateTime));
         WebsiteBillDayResult websiteBillDayResult = new WebsiteBillDayResult();
         List<WebsiteBillResult> websiteBillResults = new ArrayList<>();
