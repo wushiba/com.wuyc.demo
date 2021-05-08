@@ -19,6 +19,7 @@ import com.yfshop.common.util.BeanUtil;
 import com.yfshop.shop.dao.OrderDao;
 import com.yfshop.shop.service.activity.result.YfDrawActivityResult;
 import com.yfshop.shop.service.activity.result.YfDrawPrizeResult;
+import com.yfshop.shop.service.activity.service.FrontDrawRecordService;
 import com.yfshop.shop.service.activity.service.FrontDrawService;
 import com.yfshop.shop.service.address.UserAddressService;
 import com.yfshop.shop.service.address.result.UserAddressResult;
@@ -91,6 +92,8 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
     private FrontMerchantService frontMerchantService;
     @Resource
     private FrontUserCouponService frontUserCouponService;
+    @Resource
+    private FrontDrawRecordService frontDrawRecordService;
 
     private final static String drawCanUseRegion = "湖南,湖北,江西,四川,重庆,江苏,浙江,安徽,福建,广东,广西,河南,云南,贵州,山东,陕西,海南,山西,上海";
 
@@ -218,6 +221,7 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
                 userCoupon.setUseStatus(UserCouponStatusEnum.NO_USE.getCode());
                 userCoupon.setId(orderDetail.getUserCouponId());
                 userCouponMapper.updateById(userCoupon);
+                frontDrawRecordService.updateDrawRecordUseStatus(orderDetail.getUserCouponId(),UserCouponStatusEnum.NO_USE.getCode());
             }
             orderDetail.setOrderStatus(UserOrderStatusEnum.CANCEL.getCode());
             orderDetailMapper.updateById(orderDetail);
@@ -255,6 +259,7 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
             userCoupon.setUseStatus(UserCouponStatusEnum.HAS_USE.getCode());
             userCoupon.setId(orderDetail.getUserCouponId());
             userCouponMapper.updateById(userCoupon);
+            frontDrawRecordService.updateDrawRecordUseStatus(orderDetail.getUserCouponId(),UserCouponStatusEnum.HAS_USE.getCode());
         }
         return null;
     }

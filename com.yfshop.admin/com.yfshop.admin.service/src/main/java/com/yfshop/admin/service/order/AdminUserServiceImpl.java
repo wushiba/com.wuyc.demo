@@ -4,10 +4,8 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.yfshop.admin.api.order.service.AdminUserOrderService;
 import com.yfshop.admin.api.website.WebsiteBillService;
 import com.yfshop.admin.dao.OrderDao;
-import com.yfshop.code.mapper.OrderAddressMapper;
-import com.yfshop.code.mapper.OrderDetailMapper;
-import com.yfshop.code.mapper.OrderMapper;
-import com.yfshop.code.mapper.UserCouponMapper;
+import com.yfshop.code.mapper.*;
+import com.yfshop.code.model.DrawRecord;
 import com.yfshop.code.model.Order;
 import com.yfshop.code.model.OrderDetail;
 import com.yfshop.code.model.UserCoupon;
@@ -41,7 +39,8 @@ public class AdminUserServiceImpl implements AdminUserOrderService {
     private WebsiteBillService websiteBillService;
     @Resource
     private OrderDetailMapper orderDetailMapper;
-
+    @Resource
+    private DrawRecordMapper drawRecordMapper;
     /**
      * 用户付款后修改订单状态
      * @param orderId   主订单id
@@ -101,6 +100,12 @@ public class AdminUserServiceImpl implements AdminUserOrderService {
             userCoupon.setId(orderDetail.getUserCouponId());
             userCoupon.setUseStatus(UserCouponStatusEnum.HAS_USE.getCode());
             userCouponMapper.updateById(userCoupon);
+            userCoupon = userCouponMapper.selectById(orderDetail.getUserCouponId());
+            if (userCoupon != null) {
+                DrawRecord drawRecord = new DrawRecord();
+                drawRecord.setUseStatus(UserCouponStatusEnum.HAS_USE.getCode());
+                drawRecordMapper.update(drawRecord, Wrappers.<DrawRecord>lambdaQuery().eq(DrawRecord::getActCode, userCoupon.getActCode()));
+            }
         }
         return null;
     }

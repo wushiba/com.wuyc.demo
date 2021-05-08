@@ -38,7 +38,7 @@ public class Ip2regionUtil {
         }
     }
 
-    public static String getProvinceByIp(String ipStr) {
+    public static String getRegionByIp(String ipStr) {
         if (!Util.isIpAddress(ipStr)) {
             return null;
         }
@@ -48,16 +48,14 @@ public class Ip2regionUtil {
                 return null;
             }
             String region = dataBlock.getRegion();
-            String[] dataArr = region.split("\\|");
-            System.out.println(JSON.toJSONString(dataArr));
-            return dataArr[2];
+            return region;
         } catch (Exception e) {
             return null;
         }
     }
 
     public static void main(String[] args) {
-        System.out.println(Ip2regionUtil.getProvinceByIp("115.192.37.107"));
+        System.out.println(Ip2regionUtil.getRegionByIp("115.192.37.107"));
     }
 
 }

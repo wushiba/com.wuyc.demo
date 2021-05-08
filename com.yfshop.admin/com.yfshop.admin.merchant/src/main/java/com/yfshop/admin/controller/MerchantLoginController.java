@@ -10,6 +10,7 @@ import com.yfshop.admin.api.merchant.result.MerchantResult;
 import com.yfshop.common.api.CommonResult;
 import com.yfshop.common.base.BaseController;
 import com.yfshop.common.enums.CaptchaSourceEnum;
+import com.yfshop.common.enums.GroupRoleEnum;
 import com.yfshop.common.exception.Asserts;
 import com.yfshop.common.validate.annotation.Mobile;
 import org.apache.dubbo.config.annotation.DubboReference;
@@ -46,6 +47,7 @@ class MerchantLoginController extends AbstractBaseController {
     @RequestMapping(value = "/loginByPwd", method = {RequestMethod.POST})
     public CommonResult<MerchantResult> loginByPwd(MerchantLoginReq merchantLoginReq) {
         MerchantResult merchantResult = merchantLoginService.loginByPwd(merchantLoginReq.getMobile(), merchantLoginReq.getPwd());
+        Asserts.assertTrue("jxs,fxs,cxy,ywy,cxy,wd".contains(merchantResult.getRoleAlias()), 500, "您不支持公众号登录！");
         StpUtil.setLoginId(merchantResult.getId());
         return CommonResult.success(merchantResult);
     }
@@ -68,12 +70,14 @@ class MerchantLoginController extends AbstractBaseController {
     public CommonResult<MerchantResult> loginByWx() {
         if (StpUtil.isLogin()) {
             MerchantResult merchantResult = merchantService.getWebsiteInfo(getCurrentAdminUserId());
+            Asserts.assertTrue("jxs,fxs,cxy,ywy,cxy,wd".contains(merchantResult.getRoleAlias()), 500, "您不支持公众号登录！");
             StpUtil.setLoginId(merchantResult.getId());
             return CommonResult.success(merchantResult);
         } else {
             String openId = getCurrentOpenId();
             Asserts.assertStringNotBlank(openId, 605, "微信未授权");
             MerchantResult merchantResult = merchantLoginService.loginByWx(openId);
+            Asserts.assertTrue("jxs,fxs,cxy,ywy,cxy,wd".contains(merchantResult.getRoleAlias()), 500, "您不支持公众号登录！");
             StpUtil.setLoginId(merchantResult.getId());
             return CommonResult.success(merchantResult);
         }

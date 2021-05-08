@@ -2,17 +2,21 @@ package com.yfshop.admin.controller.draw;
 
 import cn.dev33.satoken.annotation.SaCheckLogin;
 import cn.dev33.satoken.annotation.SaCheckRole;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.yfshop.admin.api.coupon.request.QueryCouponReq;
 import com.yfshop.admin.api.coupon.result.YfCouponResult;
 import com.yfshop.admin.api.coupon.service.AdminCouponService;
 import com.yfshop.admin.api.draw.request.CreateDrawActivityReq;
 import com.yfshop.admin.api.draw.request.QueryDrawActivityReq;
+import com.yfshop.admin.api.draw.request.QueryDrawRecordReq;
 import com.yfshop.admin.api.draw.request.SaveProvinceRateReq;
 import com.yfshop.admin.api.draw.result.DrawActivityResult;
 import com.yfshop.admin.api.draw.result.DrawProvinceResult;
+import com.yfshop.admin.api.draw.result.DrawRecordResult;
 import com.yfshop.admin.api.draw.service.AdminDrawActivityService;
 import com.yfshop.admin.api.draw.service.AdminDrawProvinceService;
+import com.yfshop.admin.api.draw.service.AdminDrawRecordService;
 import com.yfshop.admin.api.mall.AdminMallManageService;
 import com.yfshop.common.api.CommonResult;
 import com.yfshop.common.base.BaseController;
@@ -44,6 +48,9 @@ public class AdminDrawController implements BaseController {
 
     @DubboReference
     private AdminDrawProvinceService adminDrawProvinceService;
+
+    @DubboReference
+    private AdminDrawRecordService adminDrawRecordService;
 
     @RequestMapping(value = "/findList", method = {RequestMethod.POST})
     @ResponseBody
@@ -110,6 +117,25 @@ public class AdminDrawController implements BaseController {
     public CommonResult<List<DrawProvinceResult>> getProvinceRate() {
 
         return CommonResult.success(adminDrawProvinceService.getProvinceRate());
+    }
+
+
+    @RequestMapping(value = "/rate/province/delete", method = {RequestMethod.POST})
+    @ResponseBody
+    @SaCheckLogin
+    @SaCheckRole(value = "sys")
+    public CommonResult<Void> deleteProvinceRate(Integer id) {
+
+        return CommonResult.success(adminDrawProvinceService.deleteProvinceRate(id));
+    }
+
+    @RequestMapping(value = "/record/list", method = {RequestMethod.POST})
+    @ResponseBody
+    @SaCheckLogin
+    @SaCheckRole(value = "sys")
+    public CommonResult<IPage<DrawRecordResult>> getDrawRecordList(QueryDrawRecordReq recordReq) {
+
+        return CommonResult.success(adminDrawRecordService.getDrawRecordList(recordReq));
     }
 
 }

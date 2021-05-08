@@ -11,6 +11,7 @@ import com.yfshop.code.model.*;
 import com.yfshop.common.constants.CacheConstants;
 import com.yfshop.common.enums.BoxSpecValEnum;
 import com.yfshop.common.enums.ProvinceEnum;
+import com.yfshop.common.enums.UserCouponStatusEnum;
 import com.yfshop.common.exception.ApiException;
 import com.yfshop.common.exception.Asserts;
 import com.yfshop.common.service.RedisService;
@@ -18,15 +19,19 @@ import com.yfshop.common.util.BeanUtil;
 import com.yfshop.shop.service.activity.result.YfActCodeBatchDetailResult;
 import com.yfshop.shop.service.activity.result.YfDrawActivityResult;
 import com.yfshop.shop.service.activity.result.YfDrawPrizeResult;
+import com.yfshop.shop.service.activity.service.FrontDrawRecordService;
 import com.yfshop.shop.service.activity.service.FrontDrawService;
 import com.yfshop.shop.service.coupon.result.YfUserCouponResult;
 import com.yfshop.shop.service.coupon.service.FrontUserCouponService;
 import com.yfshop.shop.service.user.result.UserResult;
 import com.yfshop.shop.service.user.service.FrontUserService;
 import com.yfshop.shop.utils.Ip2regionUtil;
+import com.yfshop.shop.utils.ProxyUtil;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.scheduling.annotation.Async;
+
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -55,6 +60,8 @@ public class FrontDrawServiceImpl implements FrontDrawService {
     @Resource
     private FrontUserService frontUserService;
     @Resource
+    private FrontDrawRecordService frontDrawRecordService;
+    @Resource
     private DrawActivityMapper drawActivityMapper;
     @Resource
     private FrontUserCouponService frontUserCouponService;
@@ -62,6 +69,8 @@ public class FrontDrawServiceImpl implements FrontDrawService {
     private DrawProvinceRateMapper drawProvinceRateMapper;
     @Resource
     private ActCodeBatchDetailMapper actCodeBatchDetailMapper;
+    @Resource
+    private TraceMapper traceMapper;
 
     @Override
     public YfDrawActivityResult getDrawActivityById(Integer id) throws ApiException {
@@ -109,6 +118,7 @@ public class FrontDrawServiceImpl implements FrontDrawService {
 
     /**
      * 用户点击抽奖
+     *
      * @param userId  用户id
      * @param ipStr   用户当前所在id
      * @param actCode 活动码
@@ -122,7 +132,6 @@ public class FrontDrawServiceImpl implements FrontDrawService {
         YfActCodeBatchDetailResult actCodeBatchDetail = this.getYfActCodeBatchDetailByActCode(actCode);
         Asserts.assertNonNull(actCodeBatchDetail, 500, "请扫描正确的券码");
         Integer drawActivityId = actCodeBatchDetail.getActId();
-
         // 判断是否使用, 根据actCode查询用户优惠券表
         if (!"2bfdd1cc48ac96a9".equalsIgnoreCase(actCode)) {
             UserCoupon userCoupon = userCouponMapper.selectOne(Wrappers.lambdaQuery(UserCoupon.class).eq(UserCoupon::getActCode, actCode));
@@ -162,20 +171,32 @@ public class FrontDrawServiceImpl implements FrontDrawService {
         result.setDrawPrizeLevel(prizeLevel);
         result.setCouponTitle(thirdPrize.getPrizeTitle());
         result.setDrawPrizeIcon(thirdPrize.getPrizeIcon());
-        Integer provinceId = this.getProvinceByIpStr(ipStr);
-        if (provinceId == null) {
-            logger.info("======抽奖用户userId=" + userId +  ",actCode=" + actCode + ",抽奖结果=" + JSON.toJSONString(result));
-            frontUserCouponService.createUserCouponByPrize(userId, actCode, thirdPrize);
-            return result;
-        }
+        String region = Ip2regionUtil.getRegionByIp(ipStr);
+        String location = "";
+        Integer provinceId = null;
+        if (StringUtils.isNotBlank(region)) {
+            String[] dataArr = region.split("\\|");
+            try {
+                location = dataArr[2];
+                provinceId = this.getProvinceByIpStr(location);
+            } catch (Exception e) {
 
+            }
+            if (provinceId == null) {
+                logger.info("======抽奖用户userId=" + userId + ",actCode=" + actCode + ",抽奖结果=" + JSON.toJSONString(result));
+                frontUserCouponService.createUserCouponByPrize(userId, actCode, thirdPrize);
+                actCodeBatchDetail.setActTitle(yfDrawActivityResult.getActTitle());
+                frontDrawRecordService.saveDrawRecord(userId, actCodeBatchDetail, thirdPrize, location);
+                return result;
+            }
+        }
         // 判断省份抽奖规则有没有走定制化, 找不到根据活动奖品概率去发奖品, 根据大盒小盒,去抽奖
         DrawProvinceRate provinceRate = this.getProvinceRateByActIdAndProvince(actCodeBatchDetail.getActId(), provinceId);
         if (provinceRate == null) {
             if (BoxSpecValEnum.BIG.getCode().equalsIgnoreCase(actCodeBatchDetail.getBoxSpecVal())) {
-                prizeLevel = startDraw(userId, firstPrize.getWinRate(), firstPrize.getPrizeCount(),  secondPrize.getWinRate(), secondPrize.getPrizeCount());
+                prizeLevel = startDraw(userId, firstPrize.getWinRate(), firstPrize.getPrizeCount(), secondPrize.getWinRate(), secondPrize.getPrizeCount());
             } else {
-                prizeLevel = startDraw(userId, firstPrize.getWinRate(), firstPrize.getPrizeCount(),  secondPrize.getSmallBoxRate(), secondPrize.getPrizeCount());
+                prizeLevel = startDraw(userId, firstPrize.getWinRate(), firstPrize.getPrizeCount(), secondPrize.getSmallBoxRate(), secondPrize.getPrizeCount());
             }
         } else {
             if (BoxSpecValEnum.BIG.getCode().equalsIgnoreCase(actCodeBatchDetail.getBoxSpecVal())) {
@@ -190,26 +211,37 @@ public class FrontDrawServiceImpl implements FrontDrawService {
         result.setCouponTitle(drawPrize.getPrizeTitle());
         result.setDrawPrizeIcon(drawPrize.getPrizeIcon());
 
-        logger.info("======抽奖用户userId=" + userId +  ",actCode=" + actCode + ",抽奖结果=" + JSON.toJSONString(result));
+        logger.info("======抽奖用户userId=" + userId + ",actCode=" + actCode + ",抽奖结果=" + JSON.toJSONString(result));
         frontUserCouponService.createUserCouponByPrize(userId, actCode, drawPrize);
+        actCodeBatchDetail.setActTitle(yfDrawActivityResult.getActTitle());
+        frontDrawRecordService.saveDrawRecord(userId, actCodeBatchDetail, drawPrize, location);
         return result;
     }
 
     @Override
     public YfActCodeBatchDetailResult getYfActCodeBatchDetailByActCode(String actCode) throws ApiException {
         Asserts.assertStringNotBlank(actCode, 500, "请扫描正确的券码");
-
+        YfActCodeBatchDetailResult yfActCodeBatchDetailResult = null;
         ActCodeBatchDetail actCodeBatchDetail = null;
         Object userObject = redisService.get(CacheConstants.ACT_CODE_BATCH_ACT_NO + actCode);
         if (userObject != null) {
-            actCodeBatchDetail = JSON.parseObject(userObject.toString(), ActCodeBatchDetail.class);
+            yfActCodeBatchDetailResult = JSON.parseObject(userObject.toString(), YfActCodeBatchDetailResult.class);
         } else {
             actCodeBatchDetail = actCodeBatchDetailMapper.selectOne(Wrappers
                     .lambdaQuery(ActCodeBatchDetail.class).eq(ActCodeBatchDetail::getActCode, actCode));
+            if (actCodeBatchDetail != null) {
+                yfActCodeBatchDetailResult = BeanUtil.convert(actCodeBatchDetail, YfActCodeBatchDetailResult.class);
+                Trace trace = traceMapper.selectOne(Wrappers.<Trace>lambdaQuery().eq(Trace::getTraceNo, actCodeBatchDetail.getTraceNo()));
+                if (trace != null) {
+                    yfActCodeBatchDetailResult.setBoxSpecVal("1002".equals(trace.getProductNo()) ? BoxSpecValEnum.BIG.getCode() : BoxSpecValEnum.SMALL.getCode());
+                    yfActCodeBatchDetailResult.setDealerName(trace.getDealerName());
+                    yfActCodeBatchDetailResult.setDealerAddress(trace.getDealerAddress());
+                }
+            }
             redisService.set(CacheConstants.ACT_CODE_BATCH_ACT_NO + actCode,
-                    JSON.toJSONString(actCodeBatchDetail), 60 * 30);
+                    JSON.toJSONString(yfActCodeBatchDetailResult), 60 * 30);
         }
-        return actCodeBatchDetail == null ? null : BeanUtil.convert(actCodeBatchDetail, YfActCodeBatchDetailResult.class) ;
+        return yfActCodeBatchDetailResult;
     }
 
     @Override
@@ -246,18 +278,10 @@ public class FrontDrawServiceImpl implements FrontDrawService {
 
     /**
      * 根据用户ip地址 获取所在省份
-     * @param ipStr
-     * @return  provinceId || null
+     *
+     * @return provinceId || null
      */
-    private Integer getProvinceByIpStr(String ipStr) {
-        if (!"pro".equalsIgnoreCase(SpringUtil.getActiveProfile())) {
-            return 15;
-        }
-
-        String province = Ip2regionUtil.getProvinceByIp(ipStr);
-        if (StringUtils.isBlank(province)) {
-            return null;
-        }
+    private Integer getProvinceByIpStr(String province) {
         ProvinceEnum provinceEnum = ProvinceEnum.getByPrefix(province);
         if (provinceEnum == null) {
             return null;
@@ -295,11 +319,12 @@ public class FrontDrawServiceImpl implements FrontDrawService {
 
     /**
      * 生成随机字符串抽奖
-     * @param firstRate     一等奖中奖概率
-     * @param firstRate     一等奖中奖概率
-     * @param firstCount    一等奖数量
-     * @param secondRate    二等奖中奖概率
-     * @param secondCount   二等奖数量
+     *
+     * @param firstRate   一等奖中奖概率
+     * @param firstRate   一等奖中奖概率
+     * @param firstCount  一等奖数量
+     * @param secondRate  二等奖中奖概率
+     * @param secondCount 二等奖数量
      * @return
      */
     private Integer startDraw(Integer userId, Integer firstRate, Integer firstCount, Integer secondRate, Integer secondCount) {

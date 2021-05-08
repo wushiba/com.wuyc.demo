@@ -6,6 +6,8 @@ import com.yfshop.admin.api.merchant.request.MerchantLoginReq;
 import com.yfshop.admin.api.merchant.result.MerchantResult;
 import com.yfshop.common.api.CommonResult;
 import com.yfshop.common.base.BaseController;
+import com.yfshop.common.enums.GroupRoleEnum;
+import com.yfshop.common.exception.Asserts;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,6 +36,7 @@ class AdminMerchantLoginController implements BaseController {
     @RequestMapping(value = "/loginByPwd", method = {RequestMethod.POST})
     public CommonResult<MerchantResult> loginByPwd(MerchantLoginReq merchantLoginReq) {
         MerchantResult merchantResult = merchantLoginService.loginByPwd(merchantLoginReq.getMobile(), merchantLoginReq.getPwd());
+        Asserts.assertNotEquals(merchantResult.getRoleAlias(),GroupRoleEnum.WD.getCode(),500,"网点用户请在公众号登录！");
         StpUtil.setLoginId(merchantResult.getId());
         return CommonResult.success(merchantResult);
     }

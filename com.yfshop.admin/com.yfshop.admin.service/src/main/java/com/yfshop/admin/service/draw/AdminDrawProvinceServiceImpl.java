@@ -63,6 +63,7 @@ public class AdminDrawProvinceServiceImpl implements AdminDrawProvinceService {
         return BeanUtil.convertList(dataList, DrawProvinceResult.class);
     }
 
+
     @Override
     public Void saveProvinceRate(List<SaveProvinceRateReq> req) throws ApiException {
         req.forEach(item -> {
@@ -73,6 +74,12 @@ public class AdminDrawProvinceServiceImpl implements AdminDrawProvinceService {
                 drawProvinceRateMapper.updateById(drawProvinceRate);
             }
         });
+        return null;
+    }
+
+    @Override
+    public Void deleteProvinceRate(Integer id) {
+        drawProvinceRateMapper.deleteById(id);
         return null;
     }
 
