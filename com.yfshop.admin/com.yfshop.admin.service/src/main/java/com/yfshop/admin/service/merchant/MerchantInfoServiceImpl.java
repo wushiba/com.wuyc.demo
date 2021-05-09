@@ -441,9 +441,8 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
         } else {
             List<WebsiteCode> websiteCodes = websiteCodeMapper.selectBatchIds(ids);
             int totalQuantity = websiteCodes.stream().mapToInt(WebsiteCode::getQuantity).sum();
-            int totalCount = websiteCodes.stream().mapToInt((item) -> item.getOrderAmount().intValue()).sum();
-            websiteCodeAmountResult.setAmount(new BigDecimal(PIECE_PRICE).multiply(new BigDecimal(totalCount)));
-            websiteCodeAmountResult.setPostage(getTotalPostage(totalCount));
+            websiteCodeAmountResult.setAmount(new BigDecimal(PIECE_PRICE).multiply(new BigDecimal(totalQuantity)));
+            websiteCodeAmountResult.setPostage(getTotalPostage(totalQuantity));
             websiteCodeAmountResult.setQuantity(totalQuantity);
         }
         return websiteCodeAmountResult;
