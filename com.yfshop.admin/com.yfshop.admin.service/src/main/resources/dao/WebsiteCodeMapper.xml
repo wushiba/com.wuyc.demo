@@ -88,10 +88,10 @@
         <if test="req.merchantName!=null and req.merchantName!=''">
             and w.merchant_name = #{req.merchantName}
         </if>
-        <if test="orderStatus=='UNSHIPPED'">
+        <if test="req.orderStatus=='UNSHIPPED'">
             and w.express_no is null
         </if>
-        <if test="orderStatus=='SHIPPED'">
+        <if test="req.orderStatus=='SHIPPED'">
             and w.express_no is not null
         </if>
         <if test="req.expressNo!=null and req.expressNo!=''">
