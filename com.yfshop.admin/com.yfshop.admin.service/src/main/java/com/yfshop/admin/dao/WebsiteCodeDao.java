@@ -17,5 +17,5 @@ public interface WebsiteCodeDao {
 
     List<WebsiteCodeResult> queryWebsiteCodeByWl(IPage page,@Param("req") WebsiteCodeQueryReq req);
 
-    long queryWebsiteCodeCountByWl(WebsiteCodeQueryReq req);
+    int queryWebsiteCodeCountByWl(WebsiteCodeQueryReq req);
 }
