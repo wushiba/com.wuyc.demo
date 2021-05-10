@@ -70,7 +70,7 @@
     </select>
 
     <select id="queryWebsiteCodeByWl" resultType="com.yfshop.admin.api.website.result.WebsiteCodeResult">
-        select w.*,m.mobile as merchant_mobile,m.role_name
+        select w.*,m.mobile,concat(w.contracts,',',w.mobile,',',w.address) as address merchant_mobile,m.role_name
         from yf_website_code w left join yf_merchant m on m.id = w.merchant_id
         where 1=1
         <if test="req.merchantId!=null">
