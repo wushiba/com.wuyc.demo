@@ -8,6 +8,7 @@ import cn.hutool.crypto.SecureUtil;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.google.common.collect.Lists;
 import com.yfshop.admin.api.mall.AdminMallManageService;
 import com.yfshop.admin.api.mall.request.CreateBannerReq;
@@ -20,6 +21,8 @@ import com.yfshop.admin.api.mall.result.BannerResult;
 import com.yfshop.admin.api.mall.result.ItemSkuResult;
 import com.yfshop.admin.api.menu.AdminMenuManageService;
 import com.yfshop.admin.api.menu.result.MenuResult;
+import com.yfshop.admin.api.merchant.AdminMerchantManageService;
+import com.yfshop.admin.api.merchant.result.MerchantResult;
 import com.yfshop.code.manager.MenuManager;
 import com.yfshop.code.mapper.ItemContentMapper;
 import com.yfshop.code.mapper.ItemImageMapper;
@@ -82,6 +85,8 @@ public class AdminServiceApplicationTests {
     private RegionMapper regionMapper;
     @Resource
     private TransactionTemplate transactionTemplate;
+    @DubboReference(check = false)
+    private AdminMerchantManageService adminMerchantManageService;
 
     //    @Test
     void contextLoads2222222() {
@@ -1641,7 +1646,7 @@ public class AdminServiceApplicationTests {
         importMerchantsFromExcel(path1, province);
     }
 
-//    @Test
+    //    @Test
     public void importMerchantsFromExcel22() {
         String path1 = "C:\\Users\\xulg\\Documents\\WeChat Files\\wxid_z5mrg8zx4b3v21\\FileStorage\\File\\2021-05\\618大促账号信息收集(河南).xlsx";
         String province = "河南省";
@@ -1703,5 +1708,21 @@ public class AdminServiceApplicationTests {
             merchant.setDistrict(addressResolution.get("county"));
             merchant.setAddress(addressResolution.get("town"));
         }
+    }
+
+//    @Test
+    public void adasdADAD() {
+        IPage<MerchantResult> merchantResultIPage = adminMerchantManageService.pageQueryMerchantsByPidAndRoleAlias(
+                13000, "fgs", "北京分公司", 1, 10000);
+        System.out.println(JSON.toJSONString(merchantResultIPage, true));
+    }
+
+//    @Test
+    public void dadada() {
+        Page<Merchant> page = merchantMapper.selectPage(new Page<>(1, 10000),
+                Wrappers.lambdaQuery(Merchant.class).eq(Merchant::getRoleAlias, "fgs")
+                        .like(StringUtils.isNotBlank("北京分公司"), Merchant::getMerchantName, "北京分公司")
+        );
+        System.out.println(JSON.toJSONString(page, true));
     }
 }

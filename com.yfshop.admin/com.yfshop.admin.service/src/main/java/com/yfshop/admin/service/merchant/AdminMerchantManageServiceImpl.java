@@ -231,19 +231,30 @@ public class AdminMerchantManageServiceImpl implements AdminMerchantManageServic
         if (merchant == null) {
             return BeanUtil.emptyPageData(pageIndex, pageSize);
         }
+        List<Merchant> list;
         if (merchant.getRoleAlias().equals(GroupRoleEnum.SYS.getCode())) {
-            Page<Merchant> page = merchantMapper.selectPage(new Page<>(pageIndex, pageSize),
-                    Wrappers.lambdaQuery(Merchant.class).eq(Merchant::getRoleAlias, roleAlias)
-                            .like(StringUtils.isNotBlank(merchantName), Merchant::getMerchantName, merchantName)
+            list = merchantMapper.selectList(Wrappers.lambdaQuery(Merchant.class).eq(Merchant::getRoleAlias, roleAlias)
+                    .like(StringUtils.isNotBlank(merchantName), Merchant::getMerchantName, merchantName)
             );
-            return BeanUtil.iPageConvert(page, MerchantResult.class);
+            //Page<Merchant> page = merchantMapper.selectPage(new Page<>(pageIndex, pageSize),
+            //        Wrappers.lambdaQuery(Merchant.class).eq(Merchant::getRoleAlias, roleAlias)
+            //                .like(StringUtils.isNotBlank(merchantName), Merchant::getMerchantName, merchantName)
+            //);
+            //return BeanUtil.iPageConvert(page, MerchantResult.class);
         } else {
-            Page<Merchant> page = merchantMapper.selectPage(new Page<>(pageIndex, pageSize),
-                    Wrappers.lambdaQuery(Merchant.class).eq(Merchant::getPid, merchantId).eq(Merchant::getRoleAlias, roleAlias)
-                            .like(StringUtils.isNotBlank(merchantName), Merchant::getMerchantName, merchantName)
+            list = merchantMapper.selectList(Wrappers.lambdaQuery(Merchant.class).eq(Merchant::getPid, merchantId)
+                    .eq(Merchant::getRoleAlias, roleAlias).like(StringUtils.isNotBlank(merchantName), Merchant::getMerchantName, merchantName)
             );
-            return BeanUtil.iPageConvert(page, MerchantResult.class);
+            //Page<Merchant> page = merchantMapper.selectPage(new Page<>(pageIndex, pageSize),
+            //        Wrappers.lambdaQuery(Merchant.class).eq(Merchant::getPid, merchantId).eq(Merchant::getRoleAlias, roleAlias)
+            //                .like(StringUtils.isNotBlank(merchantName), Merchant::getMerchantName, merchantName)
+            //);
+            //return BeanUtil.iPageConvert(page, MerchantResult.class);
         }
+        Page<MerchantResult> page = new Page<>(pageIndex, pageSize);
+        page.setRecords(BeanUtil.convertList(list, MerchantResult.class));
+        page.setTotal(list.size());
+        return page;
     }
 
     private String generatePidPath(Integer pid, Integer id) {
