@@ -17,6 +17,8 @@ public class StorageReq implements Serializable {
      */
     private String dealerNo;
 
+    private String dealerMobile;
+
     /**
      * 经销商名称
      */
