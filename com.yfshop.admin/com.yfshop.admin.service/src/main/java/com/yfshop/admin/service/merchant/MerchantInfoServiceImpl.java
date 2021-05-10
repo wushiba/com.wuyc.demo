@@ -45,6 +45,9 @@ import com.yfshop.common.util.BeanUtil;
 import com.yfshop.common.util.GeoUtils;
 import com.yfshop.wx.api.request.WxPayOrderNotifyReq;
 import com.yfshop.wx.api.service.MpPayService;
+import com.yfshop.wx.api.service.MpService;
+import me.chanjar.weixin.mp.bean.template.WxMpTemplateData;
+import me.chanjar.weixin.mp.bean.template.WxMpTemplateMessage;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
@@ -123,6 +126,9 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
 
     @DubboReference
     private MpPayService mpPayService;
+
+    @DubboReference
+    private MpService mpService;
 
     @Value("${wxPay.notifyUrl}")
     private String wxPayNotifyUrl;
@@ -457,6 +463,7 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public WxPayMpOrderResult applyWebsiteCodePay(WebsiteCodePayReq websiteCodePayReq) throws ApiException {
+        Asserts.assertCollectionNotEmpty(websiteCodePayReq.getIds(), 500, "请选择你要付款的订单！");
         WebsiteCodeAddress websiteCodeAddress = websiteCodeAddressMapper.selectById(websiteCodePayReq.getAddressId());
         WebsiteCode websiteCode = new WebsiteCode();
         websiteCode.setMobile(websiteCodeAddress.getMobile());
@@ -464,11 +471,12 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
         websiteCode.setAddress(websiteCodeAddress.getProvince() + websiteCodeAddress.getCity() + websiteCodeAddress.getDistrict() + websiteCodeAddress.getAddress());
         websiteCode.setOrderNo(String.format("%06d", websiteCodeAddress.getMerchantId()) + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyMMddHHmmssSSS")));
         websiteCode.setOrderStatus("PAYING");
+        WebsiteCodeAmountResult websiteCodeAmountResult = applyWebsiteCodeAmount(websiteCodePayReq.getIds());
+        websiteCode.setPostage(websiteCodeAmountResult.getPostage().divide(new BigDecimal(websiteCodePayReq.getIds().size()), 2, BigDecimal.ROUND_CEILING));
         int count = websiteCodeMapper.update(websiteCode, Wrappers.<WebsiteCode>lambdaQuery()
                 .in(WebsiteCode::getId, websiteCodePayReq.getIds())
                 .in(WebsiteCode::getOrderStatus, "PENDING", "PAYING"));
         Asserts.assertTrue(count > 0, 500, "没有要支付的订单！");
-        WebsiteCodeAmountResult websiteCodeAmountResult = applyWebsiteCodeAmount(websiteCodePayReq.getIds());
         String fee = websiteCodeAmountResult.getAmount().add(websiteCodeAmountResult.getPostage()).toPlainString();
         WxPayUnifiedOrderRequest orderRequest = new WxPayUnifiedOrderRequest();
         orderRequest.setBody("网点码申请");
@@ -752,16 +760,32 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
 
     @Override
     public Void websiteAddGoods(Integer merchantId, String mobile, Integer count) throws ApiException {
-        Merchant merchant = merchantMapper.selectOne(Wrappers.<Merchant>lambdaQuery()
+        Merchant merchant = merchantMapper.selectById(merchantId);
+        Merchant websiteCode = merchantMapper.selectOne(Wrappers.<Merchant>lambdaQuery()
                 .eq(Merchant::getMobile, mobile));
-        Asserts.assertNonNull(merchant, 500, "网点不存在!");
+        Asserts.assertNonNull(websiteCode, 500, "网点不存在!");
         Asserts.assertTrue(count > 0, 500, "补货数量要大于0");
         WebsiteGoodsRecord websiteGoodsRecord = new WebsiteGoodsRecord();
-        websiteGoodsRecord.setPidPath(merchant.getPidPath());
+        websiteGoodsRecord.setPidPath(websiteCode.getPidPath());
         websiteGoodsRecord.setQuantity(count);
-        websiteGoodsRecord.setWebsiteId(merchant.getId());
+        websiteGoodsRecord.setWebsiteId(websiteCode.getId());
         websiteGoodsRecord.setMerchantId(merchantId);
         websiteGoodsRecordMapper.insert(websiteGoodsRecord);
+        if (websiteCode.getOpenId() != null) {
+            List<WxMpTemplateData> data = new ArrayList<>();
+            data.add(new WxMpTemplateData("first.DATA", "二等奖135ml椰岛鹿龟酒已经完成补货！"));
+            data.add(new WxMpTemplateData("keyword1.DATA", "135ml椰岛鹿龟酒"));
+            data.add(new WxMpTemplateData("keyword2.DATA", count + "瓶"));
+            data.add(new WxMpTemplateData("keyword3.DATA", DateFormatUtils.format(new Date(), "yyyy-MM-dd HH:mm:ss")));
+            data.add(new WxMpTemplateData("keyword4.DATA", merchant.getMerchantName()));
+            data.add(new WxMpTemplateData("remark.DATA", "二等奖135ml椰岛鹿龟酒已经完成补货！"));
+            WxMpTemplateMessage wxMpTemplateMessage = WxMpTemplateMessage.builder()
+                    .toUser(merchant.getOpenId())
+                    .templateId("jzGtPNFoz6lzKi1c7q6ELj3BinPBFdtujMVeM4lSobs")
+                    .data(data)
+                    .build();
+            mpService.sendWxMpTemplateMsg(wxMpTemplateMessage);
+        }
         return null;
     }
 

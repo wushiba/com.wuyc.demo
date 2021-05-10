@@ -182,6 +182,12 @@ public class CustomGlobalExceptionResolver implements HandlerExceptionResolver, 
                 codeAndMessage.setMessage(apiException.getErrorCode().getMessage());
                 return codeAndMessage;
 
+            }else if (t instanceof BindException){
+                BindException apiException = (BindException) t;
+                CodeAndMessage codeAndMessage = new CodeAndMessage();
+                codeAndMessage.setCode(500);
+                codeAndMessage.setMessage(apiException.getMessage());
+                return codeAndMessage;
             }
             if (t instanceof NotLoginException) {
                 return new CodeAndMessage(605, "当前状态未登录！");
