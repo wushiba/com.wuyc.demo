@@ -53,8 +53,6 @@ public class AdminWebsiteManageController implements BaseController {
     @RequestMapping(value = "/queryAllWebsiteCode", method = {RequestMethod.GET, RequestMethod.POST})
     @ResponseBody
     public CommonResult<IPage> queryAllWebsiteCode(WebsiteCodeQueryReq websiteCodeQueryReq) {
-
-
         return CommonResult.success(adminWebsiteCodeManageService.queryWebsiteCodeList(websiteCodeQueryReq));
     }
 
@@ -65,8 +63,6 @@ public class AdminWebsiteManageController implements BaseController {
     @RequestMapping(value = "/queryWebsiteCodeByWl", method = {RequestMethod.GET, RequestMethod.POST})
     @ResponseBody
     public CommonResult<IPage> queryWebsiteCodeByWl(WebsiteCodeQueryReq websiteCodeQueryReq) {
-
-
         return CommonResult.success(adminWebsiteCodeManageService.queryWebsiteCodeByWl(websiteCodeQueryReq));
     }
 
