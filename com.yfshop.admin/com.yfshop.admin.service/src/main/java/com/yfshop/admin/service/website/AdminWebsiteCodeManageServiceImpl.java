@@ -51,12 +51,21 @@ public class AdminWebsiteCodeManageServiceImpl implements AdminWebsiteCodeManage
     }
 
     @Override
+    public IPage<WebsiteCodeResult> queryWebsiteCodeByWl(WebsiteCodeQueryReq req) throws ApiException {
+        IPage page = new Page<WebsiteCodeQueryReq>(req.getPageIndex(), req.getPageSize());
+        List<WebsiteCodeResult> list = websiteCodeDao.queryWebsiteCodeByWl(page, req);
+        page.setTotal(websiteCodeDao.queryWebsiteCodeCountByWl(req));
+        page.setRecords(list);
+        return page;
+    }
+
+    @Override
     public IPage<WebsiteCodeDetailResult> queryWebsiteCodeDetailsList(WebsiteCodeQueryDetailsReq req) throws ApiException {
         LambdaQueryWrapper<WebsiteCodeDetail> wrappers = Wrappers.<WebsiteCodeDetail>lambdaQuery()
                 .and(req.getMerchantId() != null, wrapper -> wrapper
                         .eq(WebsiteCodeDetail::getPid, req.getMerchantId())
                         .or()
-                        .like(WebsiteCodeDetail::getPidPath, req.getMerchantId()+"."))
+                        .like(WebsiteCodeDetail::getPidPath, req.getMerchantId() + "."))
                 .eq(StringUtils.isNotBlank(req.getAlias()), WebsiteCodeDetail::getAlias, req.getAlias())
                 .eq(req.getBatchId() != null, WebsiteCodeDetail::getBatchId, req.getBatchId())
                 .eq(StringUtils.isNotBlank(req.getIsActivate()), WebsiteCodeDetail::getIsActivate, req.getIsActivate())
@@ -75,7 +84,7 @@ public class AdminWebsiteCodeManageServiceImpl implements AdminWebsiteCodeManage
                 .and(wrapper -> wrapper
                         .eq(WebsiteCodeDetail::getPid, req.getMerchantId())
                         .or()
-                        .like(WebsiteCodeDetail::getPidPath, req.getMerchantId()+"."))
+                        .like(WebsiteCodeDetail::getPidPath, req.getMerchantId() + "."))
                 .eq(StringUtils.isNotBlank(req.getAlias()), WebsiteCodeDetail::getAlias, req.getAlias())
                 .eq(req.getBatchId() != null, WebsiteCodeDetail::getBatchId, req.getBatchId())
                 .eq(StringUtils.isNotBlank(req.getIsActivate()), WebsiteCodeDetail::getIsActivate, req.getIsActivate())

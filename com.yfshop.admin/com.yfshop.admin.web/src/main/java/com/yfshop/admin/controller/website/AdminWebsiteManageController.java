@@ -57,6 +57,16 @@ public class AdminWebsiteManageController implements BaseController {
     }
 
 
+
+    @SaCheckLogin
+    @ApiOperation(value = "查询全部的网点码", httpMethod = "POST")
+    @RequestMapping(value = "/queryWebsiteCodeByWl", method = {RequestMethod.GET, RequestMethod.POST})
+    @ResponseBody
+    public CommonResult<IPage> queryWebsiteCodeByWl(WebsiteCodeQueryReq websiteCodeQueryReq) {
+        return CommonResult.success(adminWebsiteCodeManageService.queryWebsiteCodeByWl(websiteCodeQueryReq));
+    }
+
+
     @SaCheckLogin
     @ApiOperation(value = "查询网点码详情", httpMethod = "POST")
     @RequestMapping(value = "/queryWebsiteCodeDetails", method = {RequestMethod.GET, RequestMethod.POST})

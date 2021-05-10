@@ -25,6 +25,8 @@ public interface AdminWebsiteCodeManageService {
     IPage<WebsiteCodeResult> queryWebsiteCodeList(WebsiteCodeQueryReq websiteCodeQueryReq) throws ApiException;
 
 
+    IPage<WebsiteCodeResult> queryWebsiteCodeByWl(WebsiteCodeQueryReq websiteCodeQueryReq) throws ApiException;
+
     /**
      * 获取网点码详情
      *
@@ -56,4 +58,5 @@ public interface AdminWebsiteCodeManageService {
      * @return
      */
     String getWebsiteCodeUrl(Integer id) throws ApiException;
+
 }
