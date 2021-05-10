@@ -118,30 +118,30 @@ public class AdminDrawActivityServiceImpl implements AdminDrawActivityService {
             drawPrizeList.add(drawPrize);
             prizeMap.put(prize.getPrizeLevel(), drawPrize);
         });
-
-        // 特殊省份的特殊中奖概率
-        List<DrawProvinceRate> provinceRateList = new ArrayList<>();
-        List<CreateDrawActivityReq.ProvinceRateReq> provinceList = req.getProvinceRateList();
-        if (CollectionUtils.isNotEmpty(provinceList)) {
-            provinceList.forEach(provinceRateReq -> {
-                DrawProvinceRate provinceRate = BeanUtil.convert(provinceRateReq, DrawProvinceRate.class);
-                provinceRate.setCreateTime(localDateTime);
-                provinceRate.setUpdateTime(localDateTime);
-                provinceRate.setActId(drawActivity.getId());
-                provinceRate.setFirstPrizeId(prizeMap.get(1).getId());
-                provinceRate.setSecondPrizeId(prizeMap.get(2).getId());
-                provinceRate.setThirdPrizeId(prizeMap.get(3).getId());
-                drawProvinceRateMapper.insert(provinceRate);
-                provinceRateList.add(provinceRate);
-            });
-        }
+//
+//        // 特殊省份的特殊中奖概率
+//        List<DrawProvinceRate> provinceRateList = new ArrayList<>();
+//        List<CreateDrawActivityReq.ProvinceRateReq> provinceList = req.getProvinceRateList();
+//        if (CollectionUtils.isNotEmpty(provinceList)) {
+//            provinceList.forEach(provinceRateReq -> {
+//                DrawProvinceRate provinceRate = BeanUtil.convert(provinceRateReq, DrawProvinceRate.class);
+//                provinceRate.setCreateTime(localDateTime);
+//                provinceRate.setUpdateTime(localDateTime);
+//                provinceRate.setActId(drawActivity.getId());
+//                provinceRate.setFirstPrizeId(prizeMap.get(1).getId());
+//                provinceRate.setSecondPrizeId(prizeMap.get(2).getId());
+//                provinceRate.setThirdPrizeId(prizeMap.get(3).getId());
+//                drawProvinceRateMapper.insert(provinceRate);
+//                provinceRateList.add(provinceRate);
+//            });
+//        }
         // 存入缓存，设置半年有效期有效
         redisService.set(CacheConstants.DRAW_ACTIVITY_PREFIX + drawActivity.getId(),
                 JSON.toJSONString(drawActivity), 60 * 60 * 24 * 30);
         redisService.set(CacheConstants.DRAW_PRIZE_NAME_PREFIX + drawActivity.getId(),
                 JSON.toJSONString(drawPrizeList), 60 * 60 * 24 * 30);
-        redisService.set(CacheConstants.DRAW_PROVINCE_RATE_PREFIX + drawActivity.getId(),
-                JSON.toJSONString(provinceRateList), 60 * 60 * 24 * 30);
+//        redisService.set(CacheConstants.DRAW_PROVINCE_RATE_PREFIX + drawActivity.getId(),
+//                JSON.toJSONString(provinceRateList), 60 * 60 * 24 * 30);
     }
 
     @Override
@@ -168,34 +168,32 @@ public class AdminDrawActivityServiceImpl implements AdminDrawActivityService {
             prizeMap.put(prize.getPrizeLevel(), drawPrize);
         });
 
-        // 编辑定制化省份中奖概率
-        List<DrawProvinceRate> provinceRateList = new ArrayList<>();
-        List<CreateDrawActivityReq.ProvinceRateReq> provinceList = req.getProvinceRateList();
-        if (CollectionUtils.isNotEmpty(provinceList)) {
-            // 特殊省份的中奖概率 先删除后新增
-            drawProvinceRateMapper.delete(Wrappers.lambdaQuery(DrawProvinceRate.class)
-                    .eq(DrawProvinceRate::getActId, req.getId()));
-
-            provinceList.forEach(provinceRateReq -> {
-                DrawProvinceRate provinceRate = BeanUtil.convert(provinceRateReq, DrawProvinceRate.class);
-                provinceRate.setUpdateTime(localDateTime);
-                provinceRate.setCreateTime(localDateTime);
-                provinceRate.setActId(drawActivity.getId());
-                provinceRate.setFirstPrizeId(prizeMap.get(1).getId());
-                provinceRate.setSecondPrizeId(prizeMap.get(2).getId());
-                provinceRate.setThirdPrizeId(prizeMap.get(3).getId());
-                drawProvinceRateMapper.insert(provinceRate);
-                provinceRateList.add(provinceRate);
-            });
-        }
+//        // 编辑定制化省份中奖概率
+//        List<DrawProvinceRate> provinceRateList = new ArrayList<>();
+//        List<CreateDrawActivityReq.ProvinceRateReq> provinceList = req.getProvinceRateList();
+//        if (CollectionUtils.isNotEmpty(provinceList)) {
+//            // 特殊省份的中奖概率 先删除后新增
+//            drawProvinceRateMapper.delete(Wrappers.lambdaQuery(DrawProvinceRate.class)
+//                    .eq(DrawProvinceRate::getActId, req.getId()));
+//
+//            provinceList.forEach(provinceRateReq -> {
+//                DrawProvinceRate provinceRate = BeanUtil.convert(provinceRateReq, DrawProvinceRate.class);
+//                provinceRate.setUpdateTime(localDateTime);
+//                provinceRate.setCreateTime(localDateTime);
+//                provinceRate.setActId(drawActivity.getId());
+//                provinceRate.setFirstPrizeId(prizeMap.get(1).getId());
+//                provinceRate.setSecondPrizeId(prizeMap.get(2).getId());
+//                provinceRate.setThirdPrizeId(prizeMap.get(3).getId());
+//                drawProvinceRateMapper.insert(provinceRate);
+//                provinceRateList.add(provinceRate);
+//            });
+//        }
 
         // 存入缓存，设置半年有效期有效
         redisService.set(CacheConstants.DRAW_ACTIVITY_PREFIX + drawActivity.getId(),
                 JSON.toJSONString(drawActivity), 60 * 60 * 24 * 30);
         redisService.set(CacheConstants.DRAW_PRIZE_NAME_PREFIX + drawActivity.getId(),
                 JSON.toJSONString(drawPrizeList), 60 * 60 * 24 * 30);
-        redisService.set(CacheConstants.DRAW_PROVINCE_RATE_PREFIX + drawActivity.getId(),
-                JSON.toJSONString(provinceRateList), 60 * 60 * 24 * 30);
     }
 
     @Override
@@ -241,22 +239,22 @@ public class AdminDrawActivityServiceImpl implements AdminDrawActivityService {
         Asserts.assertFalse(bigBoxRate >= 10000 || smallBoxRate >= 10000, 500, "一等奖品加二等奖品概率之和不能大于100");
 
         // 校验特殊省份的特殊中奖概率
-        List<CreateDrawActivityReq.ProvinceRateReq> provinceRateList = req.getProvinceRateList();
-        if (CollectionUtils.isEmpty(provinceRateList)) return;
-        Asserts.assertFalse(provinceRateList.size() > 34, 500, "省份数量不正确");
-
-        provinceRateList.forEach(provinceRate -> {
-            Asserts.assertNonNull(provinceRate.getProvinceId(), 500, "省份id不可以为空");
-            Asserts.assertStringNotBlank(provinceRate.getProvinceName(), 500, "省份名称不可以为空");
-            Asserts.assertNonNull(provinceRate.getFirstWinRate(), 500, "一等奖中奖概率不可以为空");
-            Asserts.assertNonNull(provinceRate.getSecondWinRate(), 500, "二等奖大瓶中奖概率不可以为空");
-            Asserts.assertNonNull(provinceRate.getSecondSmallBoxWinRate(), 500, "二等奖小瓶中奖概率不可以为空");
-
-            int bigWinRate = provinceRate.getFirstWinRate() + provinceRate.getSecondWinRate();
-            int smallWinRate = provinceRate.getFirstWinRate() + provinceRate.getSecondSmallBoxWinRate();
-            Asserts.assertFalse(bigWinRate > 10000 || smallWinRate > 10000 ,
-                    500, provinceRate.getProvinceName() + "一等奖品加二等奖品概率之和不能大于100");
-        });
+//        List<CreateDrawActivityReq.ProvinceRateReq> provinceRateList = req.getProvinceRateList();
+//        if (CollectionUtils.isEmpty(provinceRateList)) return;
+//        Asserts.assertFalse(provinceRateList.size() > 34, 500, "省份数量不正确");
+//
+//        provinceRateList.forEach(provinceRate -> {
+//            Asserts.assertNonNull(provinceRate.getProvinceId(), 500, "省份id不可以为空");
+//            Asserts.assertStringNotBlank(provinceRate.getProvinceName(), 500, "省份名称不可以为空");
+//            Asserts.assertNonNull(provinceRate.getFirstWinRate(), 500, "一等奖中奖概率不可以为空");
+//            Asserts.assertNonNull(provinceRate.getSecondWinRate(), 500, "二等奖大瓶中奖概率不可以为空");
+//            Asserts.assertNonNull(provinceRate.getSecondSmallBoxWinRate(), 500, "二等奖小瓶中奖概率不可以为空");
+//
+//            int bigWinRate = provinceRate.getFirstWinRate() + provinceRate.getSecondWinRate();
+//            int smallWinRate = provinceRate.getFirstWinRate() + provinceRate.getSecondSmallBoxWinRate();
+//            Asserts.assertFalse(bigWinRate > 10000 || smallWinRate > 10000 ,
+//                    500, provinceRate.getProvinceName() + "一等奖品加二等奖品概率之和不能大于100");
+//        });
     }
 }
 

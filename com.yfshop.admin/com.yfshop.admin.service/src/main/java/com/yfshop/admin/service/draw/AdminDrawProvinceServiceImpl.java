@@ -1,19 +1,26 @@
 package com.yfshop.admin.service.draw;
 
+import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.yfshop.admin.api.draw.request.CreateDrawActivityReq;
 import com.yfshop.admin.api.draw.request.QueryProvinceRateReq;
 import com.yfshop.admin.api.draw.request.SaveProvinceRateReq;
 import com.yfshop.admin.api.draw.result.DrawProvinceResult;
 import com.yfshop.admin.api.draw.service.AdminDrawProvinceService;
 import com.yfshop.code.mapper.DrawProvinceRateMapper;
 import com.yfshop.code.model.DrawProvinceRate;
+import com.yfshop.common.constants.CacheConstants;
 import com.yfshop.common.exception.ApiException;
+import com.yfshop.common.exception.Asserts;
+import com.yfshop.common.service.RedisService;
 import com.yfshop.common.util.BeanUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboService;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -28,6 +35,8 @@ public class AdminDrawProvinceServiceImpl implements AdminDrawProvinceService {
 
     @Resource
     private DrawProvinceRateMapper drawProvinceRateMapper;
+    @Resource
+    private RedisService redisService;
 
     @Override
     public DrawProvinceResult getYfDrawProvinceById(Integer id) throws ApiException {
@@ -66,6 +75,23 @@ public class AdminDrawProvinceServiceImpl implements AdminDrawProvinceService {
 
     @Override
     public Void saveProvinceRate(List<SaveProvinceRateReq> req) throws ApiException {
+        if (CollectionUtils.isEmpty(req)) return null;
+        Asserts.assertFalse(req.size() > 34, 500, "省份数量不正确");
+
+        req.forEach(provinceRate -> {
+            Asserts.assertNonNull(provinceRate.getProvinceId(), 500, "省份id不可以为空");
+            Asserts.assertStringNotBlank(provinceRate.getProvinceName(), 500, "省份名称不可以为空");
+            Asserts.assertNonNull(provinceRate.getFirstWinRate(), 500, "一等奖中奖概率不可以为空");
+            Asserts.assertNonNull(provinceRate.getSecondWinRate(), 500, "二等奖大瓶中奖概率不可以为空");
+            Asserts.assertNonNull(provinceRate.getSecondSmallBoxWinRate(), 500, "二等奖小瓶中奖概率不可以为空");
+
+            int bigWinRate = provinceRate.getFirstWinRate() + provinceRate.getSecondWinRate();
+            int smallWinRate = provinceRate.getFirstWinRate() + provinceRate.getSecondSmallBoxWinRate();
+            Asserts.assertFalse(bigWinRate > 10000 || smallWinRate > 10000,
+                    500, provinceRate.getProvinceName() + "一等奖品加二等奖品概率之和不能大于100");
+        });
+        List<DrawProvinceRate> drawProvinceRateList = new ArrayList<>();
+        Integer actId = req.get(0).getActId();
         req.forEach(item -> {
             DrawProvinceRate drawProvinceRate = BeanUtil.convert(item, DrawProvinceRate.class);
             if (item.getId() == null) {
@@ -73,13 +99,22 @@ public class AdminDrawProvinceServiceImpl implements AdminDrawProvinceService {
             } else {
                 drawProvinceRateMapper.updateById(drawProvinceRate);
             }
+            drawProvinceRateList.add(drawProvinceRate);
         });
+        redisService.set(CacheConstants.DRAW_PROVINCE_RATE_PREFIX + actId,
+                JSON.toJSONString(drawProvinceRateList), 60 * 60 * 24 * 30);
         return null;
     }
 
     @Override
     public Void deleteProvinceRate(Integer id) {
+        DrawProvinceRate drawProvinceRate = drawProvinceRateMapper.selectById(id);
+        if (drawProvinceRate == null) return null;
         drawProvinceRateMapper.deleteById(id);
+        List<DrawProvinceRate> drawProvinceRateList = drawProvinceRateMapper.selectList(Wrappers.lambdaQuery(DrawProvinceRate.class)
+                .eq(DrawProvinceRate::getActId, drawProvinceRate.getActId()));
+        redisService.set(CacheConstants.DRAW_PROVINCE_RATE_PREFIX + drawProvinceRate.getActId(),
+                JSON.toJSONString(drawProvinceRateList), 60 * 60 * 24 * 30);
         return null;
     }
 

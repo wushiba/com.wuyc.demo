@@ -14,4 +14,8 @@ public interface WebsiteCodeDao {
     int queryWebsiteCodeCount(WebsiteCodeQueryReq req);
 
     int sumWebsiteCodeByBeforeId(@Param("id") Integer id,@Param("merchantId") Integer merchantId);
+
+    List<WebsiteCodeResult> queryWebsiteCodeByWl(IPage page,@Param("req") WebsiteCodeQueryReq req);
+
+    long queryWebsiteCodeCountByWl(WebsiteCodeQueryReq req);
 }
