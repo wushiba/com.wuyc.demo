@@ -15,6 +15,7 @@ import com.yfshop.code.mapper.RegionMapper;
 import com.yfshop.code.model.DrawPrize;
 import com.yfshop.code.model.DrawProvinceRate;
 import com.yfshop.code.model.Region;
+import com.yfshop.code.model.RlItemHotpot;
 import com.yfshop.common.constants.CacheConstants;
 import com.yfshop.common.exception.ApiException;
 import com.yfshop.common.exception.Asserts;
@@ -26,6 +27,9 @@ import org.apache.dubbo.config.annotation.DubboService;
 import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * @Title:抽奖省份定制化中奖几率Service实现
@@ -87,7 +91,7 @@ public class AdminDrawProvinceServiceImpl implements AdminDrawProvinceService {
 
         req.forEach(provinceRate -> {
             Asserts.assertNonNull(provinceRate.getProvinceId(), 500, "省份id不可以为空");
-            // Asserts.assertStringNotBlank(provinceRate.getProvinceName(), 500, "省份名称不可以为空");
+            Asserts.assertStringNotBlank(provinceRate.getProvinceName(), 500, "省份名称不可以为空");
             Asserts.assertNonNull(provinceRate.getFirstWinRate(), 500, "一等奖中奖概率不可以为空");
             Asserts.assertNonNull(provinceRate.getSecondWinRate(), 500, "二等奖大瓶中奖概率不可以为空");
             Asserts.assertNonNull(provinceRate.getSecondSmallBoxWinRate(), 500, "二等奖小瓶中奖概率不可以为空");
@@ -100,24 +104,18 @@ public class AdminDrawProvinceServiceImpl implements AdminDrawProvinceService {
         List<DrawProvinceRate> drawProvinceRateList = new ArrayList<>();
         Integer actId = req.get(0).getActId();
         drawProvinceRateMapper.deleteById(Wrappers.lambdaQuery(DrawProvinceRate.class).eq(DrawProvinceRate::getActId, actId));
-        DrawPrize firstDrawPrize = drawPrizeMapper.selectOne(Wrappers.lambdaQuery(DrawPrize.class).eq(DrawPrize::getActId, actId).eq(DrawPrize::getPrizeLevel, 1));
-        DrawPrize secondDrawPrize = drawPrizeMapper.selectOne(Wrappers.lambdaQuery(DrawPrize.class).eq(DrawPrize::getActId, actId).eq(DrawPrize::getPrizeLevel, 2));
-        DrawPrize thirdPrize = drawPrizeMapper.selectOne(Wrappers.lambdaQuery(DrawPrize.class).eq(DrawPrize::getActId, actId).eq(DrawPrize::getPrizeLevel, 3));
+        Map<Integer,DrawPrize> drawPrizeMap = drawPrizeMapper.selectList(Wrappers.lambdaQuery(DrawPrize.class).eq(DrawPrize::getActId, actId)).stream().collect(Collectors.toMap(DrawPrize::getPrizeLevel, Function.identity()));
         req.forEach(item -> {
             DrawProvinceRate drawProvinceRate = BeanUtil.convert(item, DrawProvinceRate.class);
-            Region region = regionMapper.selectById(drawProvinceRate.getProvinceId());
-            if (region != null) {
-                drawProvinceRate.setProvinceName(region.getName());
-                if (firstDrawPrize != null) {
-                    drawProvinceRate.setFirstPrizeId(firstDrawPrize.getId());
+                if (drawPrizeMap.get(1) != null) {
+                    drawProvinceRate.setFirstPrizeId(drawPrizeMap.get(1).getId());
                 }
-                if (secondDrawPrize != null) {
-                    drawProvinceRate.setSecondPrizeId(secondDrawPrize.getId());
+                if (drawPrizeMap.get(2)  != null) {
+                    drawProvinceRate.setSecondPrizeId(drawPrizeMap.get(2).getId());
                 }
-                if (thirdPrize != null) {
-                    drawProvinceRate.setThirdPrizeId(thirdPrize.getId());
+                if (drawPrizeMap.get(3) != null) {
+                    drawProvinceRate.setThirdPrizeId(drawPrizeMap.get(3).getId());
                 }
-            }
             drawProvinceRateMapper.insert(drawProvinceRate);
             drawProvinceRateList.add(drawProvinceRate);
         });
