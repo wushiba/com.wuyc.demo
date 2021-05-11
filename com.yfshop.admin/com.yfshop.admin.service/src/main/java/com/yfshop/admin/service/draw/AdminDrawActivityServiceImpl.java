@@ -23,6 +23,7 @@ import com.yfshop.common.exception.Asserts;
 import com.yfshop.common.service.RedisService;
 import com.yfshop.common.util.BeanUtil;
 import com.yfshop.common.util.DateUtil;
+import org.apache.dubbo.config.annotation.DubboService;
 import org.apache.dubbo.config.annotation.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,7 +42,7 @@ import java.util.stream.Collectors;
  * @Since:2021-03-24 11:12:29
  * @Version:1.1.0
  */
-@Service(dynamic = true)
+@DubboService
 public class AdminDrawActivityServiceImpl implements AdminDrawActivityService {
 
     @Resource
