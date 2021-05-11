@@ -101,6 +101,7 @@ public class AdminDrawProvinceServiceImpl implements AdminDrawProvinceService {
         Integer actId = req.get(0).getActId();
         DrawPrize firstDrawPrize = drawPrizeMapper.selectOne(Wrappers.lambdaQuery(DrawPrize.class).eq(DrawPrize::getActId, actId).eq(DrawPrize::getPrizeLevel, 1));
         DrawPrize secondDrawPrize = drawPrizeMapper.selectOne(Wrappers.lambdaQuery(DrawPrize.class).eq(DrawPrize::getActId, actId).eq(DrawPrize::getPrizeLevel, 2));
+        DrawPrize thirdPrize = drawPrizeMapper.selectOne(Wrappers.lambdaQuery(DrawPrize.class).eq(DrawPrize::getActId, actId).eq(DrawPrize::getPrizeLevel, 3));
         req.forEach(item -> {
             DrawProvinceRate drawProvinceRate = BeanUtil.convert(item, DrawProvinceRate.class);
             if (item.getId() == null) {
@@ -112,6 +113,9 @@ public class AdminDrawProvinceServiceImpl implements AdminDrawProvinceService {
                     }
                     if (secondDrawPrize != null) {
                         drawProvinceRate.setSecondPrizeId(secondDrawPrize.getId());
+                    }
+                    if (thirdPrize != null) {
+                        drawProvinceRate.setThirdPrizeId(thirdPrize.getId());
                     }
                 }
                 drawProvinceRateMapper.insert(drawProvinceRate);
