@@ -27,7 +27,7 @@ public class BlpShopController implements BaseController {
      * @return
      */
     @RequestMapping(value = "/getOrder", method = {RequestMethod.POST})
-    public OrderResult getOrder(@RequestBody OrderReq orderReq) {
+    public OrderResult getOrder(OrderReq orderReq) {
         checkWhiteIp();
         return orderService.getOrder(orderReq);
     }
@@ -39,7 +39,7 @@ public class BlpShopController implements BaseController {
      * @return
      */
     @RequestMapping(value = "/send", method = {RequestMethod.POST})
-    public SendResult send(@RequestBody SendReq sendReq) {
+    public SendResult send(SendReq sendReq) {
         checkWhiteIp();
         return orderService.send(sendReq);
     }
@@ -51,31 +51,31 @@ public class BlpShopController implements BaseController {
      * @return
      */
     @RequestMapping(value = "/checkRefundStatus", method = {RequestMethod.POST})
-    public CheckRefundStatusResult checkRefundStatus(@RequestBody CheckRefundStatusReq checkRefundStatusReq) {
+    public CheckRefundStatusResult checkRefundStatus(CheckRefundStatusReq checkRefundStatusReq) {
         checkWhiteIp();
         return orderService.checkRefundStatus(checkRefundStatusReq);
     }
 
     @RequestMapping(value = "/downloadProduct", method = {RequestMethod.POST})
-    public DownloadProductResult downloadProduct(@RequestBody DownloadProductReq downloadProductReq) {
+    public DownloadProductResult downloadProduct(DownloadProductReq downloadProductReq) {
         checkWhiteIp();
         return orderService.downloadProduct(downloadProductReq);
     }
 
     @RequestMapping(value = "/syncStock", method = {RequestMethod.POST})
-    public SyncStockResult syncStock(@RequestBody SyncStockReq syncStockReq) {
+    public SyncStockResult syncStock(SyncStockReq syncStockReq) {
         checkWhiteIp();
         return orderService.syncStock(syncStockReq);
     }
 
     @RequestMapping(value = "/getRefund", method = {RequestMethod.POST})
-    public RefundResult getRefund(@RequestBody RefundReq refundReq) {
+    public RefundResult getRefund(RefundReq refundReq) {
         checkWhiteIp();
         return orderService.getRefund(refundReq);
     }
 
 
     public void checkWhiteIp() {
-        Asserts.assertTrue("192.168.1.1".contains(getRequestIpStr()), 500, "非法的ip请求");
+       // Asserts.assertTrue("192.168.1.1".contains(getRequestIpStr()), 500, "非法的ip请求");
     }
 }
