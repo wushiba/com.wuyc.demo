@@ -127,9 +127,9 @@ public class AdminDrawController implements BaseController {
     @ResponseBody
     @SaCheckLogin
     @SaCheckRole(value = "sys")
-    public CommonResult<List<DrawProvinceResult>> getProvinceRate() {
+    public CommonResult<List<DrawProvinceResult>> getProvinceRate(Integer id) {
 
-        return CommonResult.success(adminDrawProvinceService.getProvinceRate());
+        return CommonResult.success(adminDrawProvinceService.getProvinceRate(id));
     }
 
 

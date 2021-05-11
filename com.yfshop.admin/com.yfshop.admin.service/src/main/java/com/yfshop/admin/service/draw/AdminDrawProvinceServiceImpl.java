@@ -67,8 +67,8 @@ public class AdminDrawProvinceServiceImpl implements AdminDrawProvinceService {
 
 
     @Override
-    public List<DrawProvinceResult> getProvinceRate() {
-        List<DrawProvinceRate> dataList = drawProvinceRateMapper.selectList(Wrappers.emptyWrapper());
+    public List<DrawProvinceResult> getProvinceRate(Integer id) {
+        List<DrawProvinceRate> dataList = drawProvinceRateMapper.selectList(Wrappers.lambdaQuery(DrawProvinceRate.class).eq(DrawProvinceRate::getActId, id));
         return BeanUtil.convertList(dataList, DrawProvinceResult.class);
     }
 
