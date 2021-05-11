@@ -9,8 +9,12 @@ import com.yfshop.admin.api.draw.request.QueryProvinceRateReq;
 import com.yfshop.admin.api.draw.request.SaveProvinceRateReq;
 import com.yfshop.admin.api.draw.result.DrawProvinceResult;
 import com.yfshop.admin.api.draw.service.AdminDrawProvinceService;
+import com.yfshop.code.mapper.DrawPrizeMapper;
 import com.yfshop.code.mapper.DrawProvinceRateMapper;
+import com.yfshop.code.mapper.RegionMapper;
+import com.yfshop.code.model.DrawPrize;
 import com.yfshop.code.model.DrawProvinceRate;
+import com.yfshop.code.model.Region;
 import com.yfshop.common.constants.CacheConstants;
 import com.yfshop.common.exception.ApiException;
 import com.yfshop.common.exception.Asserts;
@@ -32,11 +36,14 @@ import java.util.List;
  */
 @DubboService
 public class AdminDrawProvinceServiceImpl implements AdminDrawProvinceService {
-
+    @Resource
+    private DrawPrizeMapper drawPrizeMapper;
     @Resource
     private DrawProvinceRateMapper drawProvinceRateMapper;
     @Resource
     private RedisService redisService;
+    @Resource
+    private RegionMapper regionMapper;
 
     @Override
     public DrawProvinceResult getYfDrawProvinceById(Integer id) throws ApiException {
@@ -80,7 +87,7 @@ public class AdminDrawProvinceServiceImpl implements AdminDrawProvinceService {
 
         req.forEach(provinceRate -> {
             Asserts.assertNonNull(provinceRate.getProvinceId(), 500, "省份id不可以为空");
-            Asserts.assertStringNotBlank(provinceRate.getProvinceName(), 500, "省份名称不可以为空");
+            // Asserts.assertStringNotBlank(provinceRate.getProvinceName(), 500, "省份名称不可以为空");
             Asserts.assertNonNull(provinceRate.getFirstWinRate(), 500, "一等奖中奖概率不可以为空");
             Asserts.assertNonNull(provinceRate.getSecondWinRate(), 500, "二等奖大瓶中奖概率不可以为空");
             Asserts.assertNonNull(provinceRate.getSecondSmallBoxWinRate(), 500, "二等奖小瓶中奖概率不可以为空");
@@ -92,9 +99,21 @@ public class AdminDrawProvinceServiceImpl implements AdminDrawProvinceService {
         });
         List<DrawProvinceRate> drawProvinceRateList = new ArrayList<>();
         Integer actId = req.get(0).getActId();
+        DrawPrize firstDrawPrize = drawPrizeMapper.selectOne(Wrappers.lambdaQuery(DrawPrize.class).eq(DrawPrize::getActId, actId).eq(DrawPrize::getPrizeLevel, 1));
+        DrawPrize secondDrawPrize = drawPrizeMapper.selectOne(Wrappers.lambdaQuery(DrawPrize.class).eq(DrawPrize::getActId, actId).eq(DrawPrize::getPrizeLevel, 2));
         req.forEach(item -> {
             DrawProvinceRate drawProvinceRate = BeanUtil.convert(item, DrawProvinceRate.class);
             if (item.getId() == null) {
+                Region region = regionMapper.selectById(drawProvinceRate.getProvinceId());
+                if (region != null) {
+                    drawProvinceRate.setProvinceName(region.getName());
+                    if (firstDrawPrize != null) {
+                        drawProvinceRate.setFirstPrizeId(firstDrawPrize.getId());
+                    }
+                    if (secondDrawPrize != null) {
+                        drawProvinceRate.setSecondPrizeId(secondDrawPrize.getId());
+                    }
+                }
                 drawProvinceRateMapper.insert(drawProvinceRate);
             } else {
                 drawProvinceRateMapper.updateById(drawProvinceRate);
