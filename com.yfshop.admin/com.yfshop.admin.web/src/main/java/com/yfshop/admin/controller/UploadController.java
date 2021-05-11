@@ -104,8 +104,7 @@ public class UploadController {
             return CommonResult.failed(ResultCode.FAILED, "请选择文件!");
         }
         String dest = UUID.randomUUID().toString().replace("-", "") + ".jpg";
-        String date = DateUtil.format(LocalDateTime.now(), "yyyyMMdd");
-        String dirStr = imagePath + File.separator + date;
+        String dirStr = imagePath + File.separator;
         File dir = new File(dirStr);
         if (!dir.exists() && !dir.isDirectory()) {
             dir.mkdir();
@@ -113,7 +112,7 @@ public class UploadController {
         String name = dir + File.separator + dest;
         File newFile = new File(name);
         file.transferTo(newFile);
-        String url = host + "/image/yf-shop/" + date + "/" + dest;
+        String url = host + "/image/yf-shop/"+ dest;
         return CommonResult.success(url);
     }
 
