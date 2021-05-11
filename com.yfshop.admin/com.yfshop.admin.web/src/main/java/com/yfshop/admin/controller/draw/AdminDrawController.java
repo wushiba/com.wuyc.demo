@@ -105,7 +105,7 @@ public class AdminDrawController implements BaseController {
     @ResponseBody
     @SaCheckLogin
     @SaCheckRole(value = "sys")
-    public CommonResult<Void> saveProvinceRate(List<SaveProvinceRateReq> req) {
+    public CommonResult<Void> saveProvinceRate(@RequestBody List<SaveProvinceRateReq> req) {
 
         return CommonResult.success(adminDrawProvinceService.saveProvinceRate(req));
     }

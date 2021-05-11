@@ -12,9 +12,11 @@ import com.yfshop.admin.api.draw.service.AdminDrawActivityService;
 import com.yfshop.code.mapper.DrawActivityMapper;
 import com.yfshop.code.mapper.DrawPrizeMapper;
 import com.yfshop.code.mapper.DrawProvinceRateMapper;
+import com.yfshop.code.mapper.DrawRecordMapper;
 import com.yfshop.code.model.DrawActivity;
 import com.yfshop.code.model.DrawPrize;
 import com.yfshop.code.model.DrawProvinceRate;
+import com.yfshop.code.model.DrawRecord;
 import com.yfshop.common.constants.CacheConstants;
 import com.yfshop.common.exception.ApiException;
 import com.yfshop.common.exception.Asserts;
@@ -54,6 +56,9 @@ public class AdminDrawActivityServiceImpl implements AdminDrawActivityService {
     @Resource
     private DrawProvinceRateMapper drawProvinceRateMapper;
 
+    @Resource
+    private DrawRecordMapper drawRecordMapper;
+
     @Override
     public DrawActivityResult getYfDrawActivityById(Integer id) throws ApiException {
         if (id == null || id <= 0) return null;
@@ -72,10 +77,13 @@ public class AdminDrawActivityServiceImpl implements AdminDrawActivityService {
                 .eq(req.getIsEnable() != null, DrawActivity::getIsEnable, req.getIsEnable())
                 .eq(req.getActTitle() != null, DrawActivity::getActTitle, req.getActTitle())
                 .orderByDesc(DrawActivity::getId);
-
         Page<DrawActivity> itemPage = drawActivityMapper.selectPage(new Page<>(req.getPageIndex(), req.getPageSize()), queryWrapper);
         Page<DrawActivityResult> page = new Page<>(itemPage.getCurrent(), itemPage.getSize(), itemPage.getTotal());
-        page.setRecords(BeanUtil.convertList(itemPage.getRecords(), DrawActivityResult.class));
+        List<DrawActivityResult> list = BeanUtil.convertList(itemPage.getRecords(), DrawActivityResult.class);
+        list.forEach(item -> {
+            item.setDrawCount(drawRecordMapper.selectCount(Wrappers.lambdaQuery(DrawRecord.class).eq(DrawRecord::getActId, item.getId())));
+        });
+        page.setRecords(list);
         return page;
     }
 
