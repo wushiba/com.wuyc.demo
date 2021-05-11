@@ -103,7 +103,7 @@ public class AdminDrawProvinceServiceImpl implements AdminDrawProvinceService {
         });
         List<DrawProvinceRate> drawProvinceRateList = new ArrayList<>();
         Integer actId = req.get(0).getActId();
-        drawProvinceRateMapper.deleteById(Wrappers.lambdaQuery(DrawProvinceRate.class).eq(DrawProvinceRate::getActId, actId));
+        drawProvinceRateMapper.delete(Wrappers.lambdaQuery(DrawProvinceRate.class).eq(DrawProvinceRate::getActId, actId));
         Map<Integer,DrawPrize> drawPrizeMap = drawPrizeMapper.selectList(Wrappers.lambdaQuery(DrawPrize.class).eq(DrawPrize::getActId, actId)).stream().collect(Collectors.toMap(DrawPrize::getPrizeLevel, Function.identity()));
         req.forEach(item -> {
             DrawProvinceRate drawProvinceRate = BeanUtil.convert(item, DrawProvinceRate.class);
