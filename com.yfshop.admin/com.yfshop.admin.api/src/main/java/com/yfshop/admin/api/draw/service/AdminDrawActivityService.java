@@ -4,6 +4,7 @@ import java.util.List;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.yfshop.admin.api.draw.request.CreateDrawActivityReq;
 import com.yfshop.admin.api.draw.request.QueryDrawActivityReq;
+import com.yfshop.admin.api.draw.result.DrawActivityDetailsResult;
 import com.yfshop.admin.api.draw.result.DrawActivityResult;
 import com.yfshop.common.exception.ApiException;
 
@@ -69,4 +70,10 @@ public interface AdminDrawActivityService {
 	 */
 	public void deleteYfDrawActivityById(Integer id) throws ApiException;
 
+	/**
+	 * 获取活动详情
+	 * @param id
+	 * @return
+	 */
+	DrawActivityDetailsResult getDrawActivityDetails(Integer id);
 }

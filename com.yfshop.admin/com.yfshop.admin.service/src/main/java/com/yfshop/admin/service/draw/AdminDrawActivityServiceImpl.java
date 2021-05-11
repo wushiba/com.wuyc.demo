@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.yfshop.admin.api.draw.request.CreateDrawActivityReq;
 import com.yfshop.admin.api.draw.request.QueryDrawActivityReq;
+import com.yfshop.admin.api.draw.result.DrawActivityDetailsResult;
 import com.yfshop.admin.api.draw.result.DrawActivityResult;
 import com.yfshop.admin.api.draw.service.AdminDrawActivityService;
 import com.yfshop.code.mapper.DrawActivityMapper;
@@ -227,6 +228,16 @@ public class AdminDrawActivityServiceImpl implements AdminDrawActivityService {
         keyList.add(CacheConstants.DRAW_PRIZE_NAME_PREFIX + id);
         keyList.add(CacheConstants.DRAW_PROVINCE_RATE_PREFIX + id);
         redisService.del(keyList);
+    }
+
+    @Override
+    public DrawActivityDetailsResult getDrawActivityDetails(Integer id) {
+        DrawActivity drawActivity = drawActivityMapper.selectById(id);
+        Asserts.assertNonNull(drawActivity, 500, "抽奖活动不存在");
+        DrawActivityDetailsResult drawActivityDetailsResult = BeanUtil.convert(drawActivity, DrawActivityDetailsResult.class);
+        List<DrawPrize> drawPrizeList = drawPrizeMapper.selectList(Wrappers.lambdaQuery(DrawPrize.class).eq(DrawPrize::getActId, id));
+        drawActivityDetailsResult.setPrizeList(BeanUtil.convertList(drawPrizeList, DrawActivityDetailsResult.DrawPrizeResult.class));
+        return drawActivityDetailsResult;
     }
 
     public void checkUpdateParams(CreateDrawActivityReq req) throws ApiException {

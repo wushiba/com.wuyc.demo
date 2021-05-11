@@ -11,6 +11,7 @@ import com.yfshop.admin.api.draw.request.CreateDrawActivityReq;
 import com.yfshop.admin.api.draw.request.QueryDrawActivityReq;
 import com.yfshop.admin.api.draw.request.QueryDrawRecordReq;
 import com.yfshop.admin.api.draw.request.SaveProvinceRateReq;
+import com.yfshop.admin.api.draw.result.DrawActivityDetailsResult;
 import com.yfshop.admin.api.draw.result.DrawActivityResult;
 import com.yfshop.admin.api.draw.result.DrawProvinceResult;
 import com.yfshop.admin.api.draw.result.DrawRecordResult;
@@ -20,6 +21,7 @@ import com.yfshop.admin.api.draw.service.AdminDrawRecordService;
 import com.yfshop.admin.api.mall.AdminMallManageService;
 import com.yfshop.common.api.CommonResult;
 import com.yfshop.common.base.BaseController;
+import io.swagger.models.auth.In;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -79,6 +81,16 @@ public class AdminDrawController implements BaseController {
         return CommonResult.success(null);
     }
 
+    @RequestMapping(value = "/getDrawActivityDetails", method = {RequestMethod.GET, RequestMethod.POST})
+    @ResponseBody
+    @SaCheckLogin
+    @SaCheckRole(value = "sys")
+    public CommonResult<DrawActivityDetailsResult> getDrawActivityDetails(Integer id) {
+
+        return CommonResult.success(adminDrawActivityService.getDrawActivityDetails(id));
+    }
+
+
     @RequestMapping(value = "/saveOrUpdate", method = {RequestMethod.GET, RequestMethod.POST})
     @ResponseBody
     @SaCheckLogin
@@ -91,6 +103,7 @@ public class AdminDrawController implements BaseController {
         }
         return CommonResult.success(null);
     }
+
 
     @RequestMapping(value = "/coupon/findList", method = {RequestMethod.POST})
     @ResponseBody
