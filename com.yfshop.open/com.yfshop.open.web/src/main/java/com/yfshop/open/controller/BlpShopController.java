@@ -76,7 +76,7 @@ public class BlpShopController implements BaseController {
 
 
     public void checkWhiteIp() {
-
-       // Asserts.assertTrue("192.168.1.1".contains(getRequestIpStr()), 500, "非法的ip请求");
+        String whiteIp = "100.127.194.32,39.100.98.192,39.100.101.196,39.100.95.210,39.100.102.131,39.100.77.163,39.100.96.221,47.92.131.145,39.100.116.151,39.100.114.12,39.100.128.210,39.100.126.12,39.100.128.189,39.99.148.62";
+        Asserts.assertTrue(whiteIp.contains(getRequestIpStr()), 500, "非法的ip请求");
     }
 }
