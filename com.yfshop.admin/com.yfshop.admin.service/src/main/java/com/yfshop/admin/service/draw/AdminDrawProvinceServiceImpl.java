@@ -99,29 +99,26 @@ public class AdminDrawProvinceServiceImpl implements AdminDrawProvinceService {
         });
         List<DrawProvinceRate> drawProvinceRateList = new ArrayList<>();
         Integer actId = req.get(0).getActId();
+        drawProvinceRateMapper.deleteById(Wrappers.lambdaQuery(DrawProvinceRate.class).eq(DrawProvinceRate::getActId, actId));
         DrawPrize firstDrawPrize = drawPrizeMapper.selectOne(Wrappers.lambdaQuery(DrawPrize.class).eq(DrawPrize::getActId, actId).eq(DrawPrize::getPrizeLevel, 1));
         DrawPrize secondDrawPrize = drawPrizeMapper.selectOne(Wrappers.lambdaQuery(DrawPrize.class).eq(DrawPrize::getActId, actId).eq(DrawPrize::getPrizeLevel, 2));
         DrawPrize thirdPrize = drawPrizeMapper.selectOne(Wrappers.lambdaQuery(DrawPrize.class).eq(DrawPrize::getActId, actId).eq(DrawPrize::getPrizeLevel, 3));
         req.forEach(item -> {
             DrawProvinceRate drawProvinceRate = BeanUtil.convert(item, DrawProvinceRate.class);
-            if (item.getId() == null) {
-                Region region = regionMapper.selectById(drawProvinceRate.getProvinceId());
-                if (region != null) {
-                    drawProvinceRate.setProvinceName(region.getName());
-                    if (firstDrawPrize != null) {
-                        drawProvinceRate.setFirstPrizeId(firstDrawPrize.getId());
-                    }
-                    if (secondDrawPrize != null) {
-                        drawProvinceRate.setSecondPrizeId(secondDrawPrize.getId());
-                    }
-                    if (thirdPrize != null) {
-                        drawProvinceRate.setThirdPrizeId(thirdPrize.getId());
-                    }
+            Region region = regionMapper.selectById(drawProvinceRate.getProvinceId());
+            if (region != null) {
+                drawProvinceRate.setProvinceName(region.getName());
+                if (firstDrawPrize != null) {
+                    drawProvinceRate.setFirstPrizeId(firstDrawPrize.getId());
                 }
-                drawProvinceRateMapper.insert(drawProvinceRate);
-            } else {
-                drawProvinceRateMapper.updateById(drawProvinceRate);
+                if (secondDrawPrize != null) {
+                    drawProvinceRate.setSecondPrizeId(secondDrawPrize.getId());
+                }
+                if (thirdPrize != null) {
+                    drawProvinceRate.setThirdPrizeId(thirdPrize.getId());
+                }
             }
+            drawProvinceRateMapper.insert(drawProvinceRate);
             drawProvinceRateList.add(drawProvinceRate);
         });
         redisService.set(CacheConstants.DRAW_PROVINCE_RATE_PREFIX + actId,
