@@ -40,6 +40,9 @@ public class DrawProvinceResult implements Serializable{
 	
     /** 二等奖中奖几率 */
     private Integer secondWinRate;
+
+    /** 二等奖小盒中奖概率 */
+    private Integer secondSmallBoxWinRate;
 	
     /** 三等奖id */
     private Integer thirdPrizeId;

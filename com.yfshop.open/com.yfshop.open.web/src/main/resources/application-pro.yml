@@ -10,7 +10,7 @@ dubbo:
   configcenter:
     address: zookeeper://10.11.3.97:2181?backup=10.11.3.99:2181,10.11.3.99:2182
   application:
-    name: yfshop-shop-web
+    name: yfshop-open-web
   consumer:
     timeout: 30000
     retries: 0

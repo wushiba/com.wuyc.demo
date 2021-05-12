@@ -9,7 +9,7 @@ dubbo:
   configcenter:
     address: zookeeper://10.11.3.98:2181
   application:
-    name: yfshop-shop-web
+    name: yfshop-open-web
   scan:
     base-packages: com.yfshop.open
   provider:
