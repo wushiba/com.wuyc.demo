@@ -14,15 +14,15 @@ public class ApiReq implements Serializable {
     private String bizcontent;
     private String method;
     private String sign;
-    private String appKey;
+    private String appkey;
     private String token;
 
 
     public boolean checkSign() {
-        String date = "2c55f7fa26f04c959711c47ebc546bf8appKey" + appKey + "bizcontent" + bizcontent + "method" + method+"token"+token + "2c55f7fa26f04c959711c47ebc546bf8";
-        System.out.println(date);
+        String date = "2c55f7fa26f04c959711c47ebc546bf8appKey" + appkey + "bizcontent" + bizcontent + "method" + method+"token"+token + "2c55f7fa26f04c959711c47ebc546bf8";
+        //System.out.println(date);
         String sign = SecureUtil.md5(date.toLowerCase());
-        System.out.println(sign);
+       // System.out.println(sign);
         return this.sign.equals(sign);
     }
 
