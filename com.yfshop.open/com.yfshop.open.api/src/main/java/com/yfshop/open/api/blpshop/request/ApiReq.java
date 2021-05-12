@@ -19,7 +19,7 @@ public class ApiReq implements Serializable {
 
 
     public boolean checkSign() {
-        String date = "appKey" + appKey + "bizcontent" + bizcontent + "method" + method + "2c55f7fa26f04c959711c47ebc546bf8";
+        String date = "2c55f7fa26f04c959711c47ebc546bf8appKey" + appKey + "bizcontent" + bizcontent + "method" + method + "2c55f7fa26f04c959711c47ebc546bf8";
         String sign = SecureUtil.md5(date.toLowerCase(Locale.ROOT));
         return this.sign.equals(sign);
     }
