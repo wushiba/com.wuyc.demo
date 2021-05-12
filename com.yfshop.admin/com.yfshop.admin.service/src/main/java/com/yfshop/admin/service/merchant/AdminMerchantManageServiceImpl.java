@@ -147,7 +147,9 @@ public class AdminMerchantManageServiceImpl implements AdminMerchantManageServic
         merchant.setRoleAlias(req.getRoleAlias());
         merchant.setRoleName(GroupRoleEnum.getByCode(req.getRoleAlias()).getDescription());
         merchant.setMerchantName(req.getMerchantName());
-        merchant.setMobile(req.getMobile());
+        if (!existMerchant.getMobile().equals(req.getMobile())) {
+            merchant.setMobile(req.getMobile());
+        }
         if (StringUtils.isNotBlank(req.getPassword())) {
             merchant.setPassword(SecureUtil.md5(req.getPassword()));
         }
@@ -162,8 +164,12 @@ public class AdminMerchantManageServiceImpl implements AdminMerchantManageServic
         merchant.setPid(pm.getId());
         merchant.setPMerchantName(pm.getMerchantName());
         merchant.setPidPath(this.generatePidPath(pm.getId(), merchant.getId()));
-        int rows = merchantMapper.updateById(merchant);
-        Asserts.assertTrue(rows > 0, 500, "编辑商户信息失败");
+        try {
+            int rows = merchantMapper.updateById(merchant);
+            Asserts.assertTrue(rows > 0, 500, "编辑商户信息失败");
+        } catch (DuplicateKeyException e) {
+            throw new ApiException(500, "手机号" + req.getMobile() + "已存在");
+        }
 
         // 修改pMerchantName
         if (!existMerchant.getMerchantName().equals(req.getMerchantName())) {
