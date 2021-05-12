@@ -20,10 +20,6 @@ public class DrawProvinceResult implements Serializable{
     /**  */
     private Integer id;
 
-    private LocalDateTime createTime;
-
-    private LocalDateTime updateTime;
-
     /** 抽奖活动id */
     private Integer actId;
 	
@@ -44,6 +40,9 @@ public class DrawProvinceResult implements Serializable{
 	
     /** 二等奖中奖几率 */
     private Integer secondWinRate;
+
+    /** 二等奖小盒中奖概率 */
+    private Integer secondSmallBoxWinRate;
 	
     /** 三等奖id */
     private Integer thirdPrizeId;
@@ -53,18 +52,5 @@ public class DrawProvinceResult implements Serializable{
 	
     /** 排序 */
     private Integer sort;
-
-	// ------------------------------------------------------------ 附加字段 start ---------------------------------------------------------------------
-
-	/** 分页参数-当前页 */
-	private Integer pageIndex;
-
-	/** 分页参数-从第几条开始 */
-	private Integer pageStart;
-
-	/** 分页参数-每页条数 */
-	private Integer pageSize;
-
-	// ------------------------------------------------------------ 附加字段 end ------------------------------------------------------------------------
 
 }

@@ -51,6 +51,8 @@ public class Trace extends Model<Trace> {
      */
     private String dealerNo;
 
+    private String dealerMobile;
+
     /**
      * 经销商名称
      */

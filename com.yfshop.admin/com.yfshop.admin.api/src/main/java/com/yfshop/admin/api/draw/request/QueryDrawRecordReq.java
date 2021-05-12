@@ -2,6 +2,7 @@ package com.yfshop.admin.api.draw.request;
 
 import com.yfshop.common.util.DateUtil;
 import io.swagger.annotations.ApiModel;
+import io.swagger.models.auth.In;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -19,7 +20,7 @@ public class QueryDrawRecordReq implements Serializable {
 
     private String prizeTitle;
 
-    private String userId;
+    private Integer userId;
 
     private String userName;
 

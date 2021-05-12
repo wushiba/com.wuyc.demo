@@ -1,6 +1,7 @@
 package com.yfshop.admin.controller;
 
 import cn.dev33.satoken.annotation.SaCheckLogin;
+import cn.hutool.core.date.DateUtil;
 import com.aliyun.oss.ClientException;
 import com.aliyuncs.DefaultAcsClient;
 import com.aliyuncs.auth.sts.AssumeRoleRequest;
@@ -11,12 +12,20 @@ import com.aliyuncs.profile.IClientProfile;
 import com.yfshop.admin.oss.OssConfig;
 import com.yfshop.admin.oss.StsSecurityTokenEntity;
 import com.yfshop.common.api.CommonResult;
+import com.yfshop.common.api.ResultCode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import springfox.documentation.annotations.ApiIgnore;
+
+import java.io.File;
+import java.io.IOException;
+import java.time.LocalDateTime;
+import java.util.UUID;
 
 /**
  * @author Xulg
@@ -24,12 +33,17 @@ import springfox.documentation.annotations.ApiIgnore;
  */
 @ApiIgnore
 @Controller
-@RequestMapping("admin/upload/token")
+@RequestMapping("admin/upload/")
 public class UploadController {
+    private static Logger logger = LoggerFactory.getLogger(UploadController.class);
+    @Value("${upload.server.domain}")
+    private String host;
+    @Value("${upload.server.imagePath}")
+    private String imagePath;
     @Autowired
     OssConfig ossConfig;
 
-    @RequestMapping(value = "/createUploadToken", method = {RequestMethod.GET, RequestMethod.POST})
+    @RequestMapping(value = "/token/createUploadToken", method = {RequestMethod.GET, RequestMethod.POST})
     @ResponseBody
     @SaCheckLogin
     public CommonResult<StsSecurityTokenEntity> createUploadToken() {
@@ -78,6 +92,28 @@ public class UploadController {
             return CommonResult.failed("获取令牌失败");
         }
 
+    }
+
+    @RequestMapping("/image")
+    @ResponseBody
+//    @SaCheckLogin
+    @CrossOrigin
+    public CommonResult uploadImage(@RequestParam("file") MultipartFile file) throws IOException {
+        logger.info("======================================进入上传文件uploadImage");
+        if (file.isEmpty()) {
+            return CommonResult.failed(ResultCode.FAILED, "请选择文件!");
+        }
+        String dest = UUID.randomUUID().toString().replace("-", "") + ".jpg";
+        String dirStr = imagePath + File.separator;
+        File dir = new File(dirStr);
+        if (!dir.exists() && !dir.isDirectory()) {
+            dir.mkdir();
+        }
+        String name = dir + File.separator + dest;
+        File newFile = new File(name);
+        file.transferTo(newFile);
+        String url = host + "/image/yf-shop/"+ dest;
+        return CommonResult.success(url);
     }
 
 }

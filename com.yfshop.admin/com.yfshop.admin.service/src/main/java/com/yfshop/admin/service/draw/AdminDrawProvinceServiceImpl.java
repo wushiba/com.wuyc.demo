@@ -9,8 +9,13 @@ import com.yfshop.admin.api.draw.request.QueryProvinceRateReq;
 import com.yfshop.admin.api.draw.request.SaveProvinceRateReq;
 import com.yfshop.admin.api.draw.result.DrawProvinceResult;
 import com.yfshop.admin.api.draw.service.AdminDrawProvinceService;
+import com.yfshop.code.mapper.DrawPrizeMapper;
 import com.yfshop.code.mapper.DrawProvinceRateMapper;
+import com.yfshop.code.mapper.RegionMapper;
+import com.yfshop.code.model.DrawPrize;
 import com.yfshop.code.model.DrawProvinceRate;
+import com.yfshop.code.model.Region;
+import com.yfshop.code.model.RlItemHotpot;
 import com.yfshop.common.constants.CacheConstants;
 import com.yfshop.common.exception.ApiException;
 import com.yfshop.common.exception.Asserts;
@@ -22,6 +27,9 @@ import org.apache.dubbo.config.annotation.DubboService;
 import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * @Title:抽奖省份定制化中奖几率Service实现
@@ -32,11 +40,14 @@ import java.util.List;
  */
 @DubboService
 public class AdminDrawProvinceServiceImpl implements AdminDrawProvinceService {
-
+    @Resource
+    private DrawPrizeMapper drawPrizeMapper;
     @Resource
     private DrawProvinceRateMapper drawProvinceRateMapper;
     @Resource
     private RedisService redisService;
+    @Resource
+    private RegionMapper regionMapper;
 
     @Override
     public DrawProvinceResult getYfDrawProvinceById(Integer id) throws ApiException {
@@ -67,8 +78,8 @@ public class AdminDrawProvinceServiceImpl implements AdminDrawProvinceService {
 
 
     @Override
-    public List<DrawProvinceResult> getProvinceRate() {
-        List<DrawProvinceRate> dataList = drawProvinceRateMapper.selectList(Wrappers.emptyWrapper());
+    public List<DrawProvinceResult> getProvinceRate(Integer id) {
+        List<DrawProvinceRate> dataList = drawProvinceRateMapper.selectList(Wrappers.lambdaQuery(DrawProvinceRate.class).eq(DrawProvinceRate::getActId, id));
         return BeanUtil.convertList(dataList, DrawProvinceResult.class);
     }
 
@@ -92,13 +103,20 @@ public class AdminDrawProvinceServiceImpl implements AdminDrawProvinceService {
         });
         List<DrawProvinceRate> drawProvinceRateList = new ArrayList<>();
         Integer actId = req.get(0).getActId();
+        drawProvinceRateMapper.delete(Wrappers.lambdaQuery(DrawProvinceRate.class).eq(DrawProvinceRate::getActId, actId));
+        Map<Integer,DrawPrize> drawPrizeMap = drawPrizeMapper.selectList(Wrappers.lambdaQuery(DrawPrize.class).eq(DrawPrize::getActId, actId)).stream().collect(Collectors.toMap(DrawPrize::getPrizeLevel, Function.identity()));
         req.forEach(item -> {
             DrawProvinceRate drawProvinceRate = BeanUtil.convert(item, DrawProvinceRate.class);
-            if (item.getId() == null) {
-                drawProvinceRateMapper.insert(drawProvinceRate);
-            } else {
-                drawProvinceRateMapper.updateById(drawProvinceRate);
-            }
+                if (drawPrizeMap.get(1) != null) {
+                    drawProvinceRate.setFirstPrizeId(drawPrizeMap.get(1).getId());
+                }
+                if (drawPrizeMap.get(2)  != null) {
+                    drawProvinceRate.setSecondPrizeId(drawPrizeMap.get(2).getId());
+                }
+                if (drawPrizeMap.get(3) != null) {
+                    drawProvinceRate.setThirdPrizeId(drawPrizeMap.get(3).getId());
+                }
+            drawProvinceRateMapper.insert(drawProvinceRate);
             drawProvinceRateList.add(drawProvinceRate);
         });
         redisService.set(CacheConstants.DRAW_PROVINCE_RATE_PREFIX + actId,

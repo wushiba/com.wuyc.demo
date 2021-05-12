@@ -96,15 +96,15 @@ public class OrderServiceImpl implements OrderService {
                     for (OrderDetail detail : value) {
                         RlItemHotpot rlItemHotpot = skuMap.get(detail.getSkuId());
                         OrderResult.GoodInfo goodInfo = new OrderResult.GoodInfo();
-                        goodInfo.setProductId(detail.getSkuId()+"");
-                        goodInfo.setSubOrderNo(detail.getSkuId()+"");
+                        goodInfo.setProductId(detail.getSkuId() + "");
+                        goodInfo.setSubOrderNo(detail.getSkuId() + "");
                         goodInfo.setTradeGoodsNo(rlItemHotpot.getOutSkuNo());
                         goodInfo.setPlatGoodsId(rlItemHotpot.getOutItemNo());
                         goodInfo.setPlatSkuId(rlItemHotpot.getOutSkuNo());
                         goodInfo.setOutItemId(rlItemHotpot.getOutItemNo());
                         goodInfo.setOutSkuId(rlItemHotpot.getOutSkuNo());
                         goodInfo.setTradeGoodsName(detail.getItemTitle());
-                        goodInfo.setTradeGoodsSpec(detail.getSpecNameValueJson());
+                        goodInfo.setTradeGoodsSpec(jsonFormatText(detail.getSpecNameValueJson()));
                         goodInfo.setGoodsCount(detail.getItemCount());
                         goodInfo.setPrice(detail.getItemPrice());
                         goodInfos.add(goodInfo);
@@ -191,7 +191,7 @@ public class OrderServiceImpl implements OrderService {
                     s.setSkuPrice(sku.getSkuSalePrice());
                     s.setSkuQuantity(sku.getSkuStock());
                     s.setSkuName(sku.getSkuTitle());
-                    s.setSkuProperty(sku.getSpecNameValueJson());
+                    s.setSkuProperty(jsonFormatText(sku.getSpecNameValueJson()));
                     s.setSkuPictureUrl(sku.getSkuCover());
                     skus.add(s);
                 }
@@ -227,5 +227,12 @@ public class OrderServiceImpl implements OrderService {
         refundResult.setIsSuccess(true);
         refundResult.setTotalCount(0);
         return refundResult;
+    }
+
+    public String jsonFormatText(String json) {
+        if (StringUtils.isNotBlank(json)) {
+            json = json.replace("\"", "").replace("{", "").replace("}", "");
+        }
+        return json;
     }
 }

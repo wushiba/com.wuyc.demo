@@ -49,6 +49,8 @@ public class DrawActivityResult implements Serializable{
 	
     /** 是否可用(Y可用, N不可用) */
     private String isEnable;
+
+    private Integer drawCount;
 	
 	// ------------------------------------------------------------ 附加字段 start ---------------------------------------------------------------------
 	

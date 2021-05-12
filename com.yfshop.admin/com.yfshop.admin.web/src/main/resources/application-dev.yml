@@ -47,3 +47,10 @@ oss:
   access: LTAI5tR27BbR5u1pmvBtvY8j
   secret: rkqXDsJR4Z98Wdtu4xaIv5gxqaJZ7d
   oprefix: /yufan
+
+  # 文件上传服务器配置
+upload:
+  server:
+    domain: https://c.yufanlook.com
+    imagePath: /mnt/static/s.yufanlook.com/image/yf-shop
+    excelPath: /mnt/static/s.yufanlook.com/excel/yf-shop

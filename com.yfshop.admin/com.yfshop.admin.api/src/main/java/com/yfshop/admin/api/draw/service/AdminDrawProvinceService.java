@@ -42,7 +42,7 @@ public interface AdminDrawProvinceService {
      */
     Void saveProvinceRate(List<SaveProvinceRateReq> req) throws ApiException;
 
-    List<DrawProvinceResult> getProvinceRate();
+    List<DrawProvinceResult> getProvinceRate(Integer id);
 
     Void deleteProvinceRate(Integer id);
 }
