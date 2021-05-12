@@ -11,7 +11,7 @@ import java.util.Locale;
 
 @Data
 public class ApiReq implements Serializable {
-    private String bizContent;
+    private String bizcontent;
     private String method;
     private String sign;
     private String appKey;
@@ -19,12 +19,12 @@ public class ApiReq implements Serializable {
 
 
     public boolean checkSign() {
-        String date = "appKey" + appKey + "bizContent" + bizContent + "method" + method + "2c55f7fa26f04c959711c47ebc546bf8";
+        String date = "appKey" + appKey + "bizcontent" + bizcontent + "method" + method + "2c55f7fa26f04c959711c47ebc546bf8";
         String sign = SecureUtil.md5(date.toLowerCase(Locale.ROOT));
         return this.sign.equals(sign);
     }
 
     public <T> T getReq(Class<T> beanClass) {
-        return JSONUtil.toBean(bizContent, beanClass);
+        return JSONUtil.toBean(bizcontent, beanClass);
     }
 }
