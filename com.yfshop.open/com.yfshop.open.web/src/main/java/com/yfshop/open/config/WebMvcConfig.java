@@ -50,8 +50,6 @@ public class WebMvcConfig extends BaseWebMvcConfig {
         //设置日期格式
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.configure(MapperFeature.ACCEPT_CASE_INSENSITIVE_PROPERTIES, true);
-//        objectMapper.setDateFormat(new MyDateTimeDateFormat());
-
         // 指定时区
         objectMapper.setTimeZone(TimeZone.getTimeZone("GMT+8:00"));
         // 日期类型字符串处理

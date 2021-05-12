@@ -30,6 +30,8 @@ public class OrderReq implements Serializable {
      * 订单时间类别(订单修改时间=JH_01，订单创建时间=JH_02) (ERP抓单默认JH_02)
      */
     private String timeType;
+
+    private String shopType;
     /**
      * 页码 1
      */
