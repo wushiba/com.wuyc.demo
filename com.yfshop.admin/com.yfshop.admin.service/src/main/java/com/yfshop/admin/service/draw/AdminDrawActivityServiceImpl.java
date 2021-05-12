@@ -24,6 +24,8 @@ import com.yfshop.common.exception.Asserts;
 import com.yfshop.common.service.RedisService;
 import com.yfshop.common.util.BeanUtil;
 import com.yfshop.common.util.DateUtil;
+import com.yfshop.common.util.StringUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.apache.dubbo.config.annotation.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -76,8 +78,8 @@ public class AdminDrawActivityServiceImpl implements AdminDrawActivityService {
     @Override
     public Page<DrawActivityResult> findYfDrawActivityListByPage(QueryDrawActivityReq req) throws ApiException {
         LambdaQueryWrapper<DrawActivity> queryWrapper = Wrappers.lambdaQuery(DrawActivity.class)
-                .eq(req.getIsEnable() != null, DrawActivity::getIsEnable, req.getIsEnable())
-                .eq(req.getActTitle() != null, DrawActivity::getActTitle, req.getActTitle())
+                .eq(StringUtils.isNotBlank(req.getIsEnable()), DrawActivity::getIsEnable, req.getIsEnable())
+                .like(StringUtils.isNotBlank(req.getActTitle()), DrawActivity::getActTitle, req.getActTitle())
                 .orderByDesc(DrawActivity::getId);
         Page<DrawActivity> itemPage = drawActivityMapper.selectPage(new Page<>(req.getPageIndex(), req.getPageSize()), queryWrapper);
         Page<DrawActivityResult> page = new Page<>(itemPage.getCurrent(), itemPage.getSize(), itemPage.getTotal());
@@ -92,8 +94,8 @@ public class AdminDrawActivityServiceImpl implements AdminDrawActivityService {
     @Override
     public List<DrawActivityResult> getAll(QueryDrawActivityReq req) throws ApiException {
         LambdaQueryWrapper<DrawActivity> queryWrapper = Wrappers.lambdaQuery(DrawActivity.class)
-                .eq(req.getIsEnable() != null, DrawActivity::getIsEnable, req.getIsEnable())
-                .eq(req.getActTitle() != null, DrawActivity::getActTitle, req.getActTitle())
+                .eq(StringUtils.isNotBlank(req.getIsEnable()), DrawActivity::getIsEnable, req.getIsEnable())
+                .like(StringUtils.isNotBlank(req.getActTitle()), DrawActivity::getActTitle, req.getActTitle())
                 .orderByDesc(DrawActivity::getId);
 
         List<DrawActivity> dataList = drawActivityMapper.selectList(queryWrapper);
