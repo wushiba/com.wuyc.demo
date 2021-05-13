@@ -13,11 +13,13 @@ import com.google.common.collect.Lists;
 import com.yfshop.admin.api.mall.AdminMallManageService;
 import com.yfshop.admin.api.mall.request.CreateBannerReq;
 import com.yfshop.admin.api.mall.request.GenerateItemSkuReq;
+import com.yfshop.admin.api.mall.request.ItemCreateReq;
 import com.yfshop.admin.api.mall.request.ItemSpecNameAndValue;
 import com.yfshop.admin.api.mall.request.RecreateItemSkuReq;
 import com.yfshop.admin.api.mall.request.SaveItemSkuReq;
 import com.yfshop.admin.api.mall.request.SaveItemSkuReq.ItemCandidateSku;
 import com.yfshop.admin.api.mall.result.BannerResult;
+import com.yfshop.admin.api.mall.result.ItemResult;
 import com.yfshop.admin.api.mall.result.ItemSkuResult;
 import com.yfshop.admin.api.menu.AdminMenuManageService;
 import com.yfshop.admin.api.menu.result.MenuResult;
@@ -50,6 +52,8 @@ import org.springframework.dao.DuplicateKeyException;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import javax.annotation.Resource;
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -87,6 +91,24 @@ public class AdminServiceApplicationTests {
     private TransactionTemplate transactionTemplate;
     @DubboReference(check = false)
     private AdminMerchantManageService adminMerchantManageService;
+
+    @Test
+    public void sdasdadada() {
+        ItemCreateReq req = new ItemCreateReq();
+        req.setItemTitle("ffsdfsd");
+        req.setReceiveWay(ReceiveWayEnum.ALL.getCode());
+        req.setCategoryId(2);
+        req.setItemSubTitle("fafdf");
+        req.setIsEnable("N");
+        req.setItemImages(Arrays.asList("1", "2"));
+        req.setItemContent("fsdfdsfsfsafsaffsafasfsafa");
+        if (false) {
+            adminMallManageService2.createItem(req);
+        }
+
+        ItemResult itemDetailAndSkuList = adminMallManageService2.findItemDetailAndSkuList(2034);
+        System.out.println(JSON.toJSONString(itemDetailAndSkuList, true));
+    }
 
     //    @Test
     void contextLoads2222222() {
@@ -1710,14 +1732,14 @@ public class AdminServiceApplicationTests {
         }
     }
 
-//    @Test
+    //    @Test
     public void adasdADAD() {
         IPage<MerchantResult> merchantResultIPage = adminMerchantManageService.pageQueryMerchantsByPidAndRoleAlias(
                 13000, "fgs", "北京分公司", 1, 10000);
         System.out.println(JSON.toJSONString(merchantResultIPage, true));
     }
 
-//    @Test
+    //    @Test
     public void dadada() {
         Page<Merchant> page = merchantMapper.selectPage(new Page<>(1, 10000),
                 Wrappers.lambdaQuery(Merchant.class).eq(Merchant::getRoleAlias, "fgs")
