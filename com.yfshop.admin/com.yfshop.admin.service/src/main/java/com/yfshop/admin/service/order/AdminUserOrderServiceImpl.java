@@ -1,5 +1,7 @@
 package com.yfshop.admin.service.order;
 
+import java.math.BigDecimal;
+
 import com.google.common.collect.Lists;
 
 import java.time.LocalDateTime;
@@ -197,7 +199,30 @@ public class AdminUserOrderServiceImpl implements AdminUserOrderService {
         orderDetailResult.setExpressNo(orderDetail.getExpressNo());
         orderDetailResult.setList(Lists.newArrayList());
         orderDetailResult.setId(id);
-        orderDetailResult.getList().add(BeanUtil.convert(orderDetail, OrderDetailResult.OrderDetails.class));
+        OrderDetailResult.OrderDetails orderDetails = new OrderDetailResult.OrderDetails();
+        orderDetails.setCreateTime(orderDetail.getCreateTime());
+        orderDetails.setOrderNo(orderDetail.getOrderNo());
+        orderDetails.setUserId(orderDetail.getUserId());
+        orderDetails.setUserName(orderDetail.getUserName());
+        orderDetails.setOrderId(orderDetail.getOrderId());
+        orderDetails.setMerchantId(orderDetail.getMerchantId());
+        orderDetails.setPidPath(orderDetail.getPidPath());
+        orderDetails.setWebsiteCode(orderDetail.getWebsiteCode());
+        orderDetails.setReceiveWay(orderDetail.getReceiveWay());
+        orderDetails.setIsPay(orderDetail.getIsPay());
+        orderDetails.setItemCover(orderDetail.getItemCover());
+        orderDetails.setItemPrice(orderDetail.getItemPrice());
+        orderDetails.setItemCount(orderDetail.getItemCount());
+        orderDetails.setFreight(orderDetail.getFreight());
+        orderDetails.setCouponPrice(orderDetail.getCouponPrice());
+        orderDetails.setOrderPrice(orderDetail.getOrderPrice());
+        orderDetails.setPayPrice(orderDetail.getPayPrice());
+        orderDetails.setOrderStatus(orderDetail.getOrderStatus());
+        orderDetails.setItemTitle(orderDetail.getItemTitle());
+        orderDetails.setSpecNameValueJson(orderDetail.getSpecNameValueJson());
+        orderDetails.setSpecValueStr(orderDetail.getSpecValueStr());
+        orderDetails.setConfirmTime(orderDetail.getConfirmTime());
+        orderDetailResult.getList().add(orderDetails);
         return orderDetailResult;
     }
 }

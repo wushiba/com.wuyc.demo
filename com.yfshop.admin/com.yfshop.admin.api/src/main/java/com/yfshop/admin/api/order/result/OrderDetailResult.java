@@ -47,7 +47,6 @@ public class OrderDetailResult implements Serializable {
     private List<OrderDetails> list;
 
     @Data
-    @AllArgsConstructor
     public static class OrderDetails implements Serializable {
         private LocalDateTime createTime;
 
