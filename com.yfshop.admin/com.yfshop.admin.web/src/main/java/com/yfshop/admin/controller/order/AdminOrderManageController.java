@@ -51,6 +51,7 @@ public class AdminOrderManageController implements BaseController {
     @SaCheckLogin
     @ApiOperation(value = "更新订单物流", httpMethod = "POST")
     @RequestMapping(value = "/updateOrderExpress", method = {RequestMethod.POST})
+    @SaCheckRole(value = "sys")
     @ResponseBody
     public CommonResult<Void> updateOrderExpress(OrderExpressReq orderExpressReq) {
         return CommonResult.success(adminUserOrderService.updateOrderExpress(orderExpressReq));
@@ -58,8 +59,9 @@ public class AdminOrderManageController implements BaseController {
 
 
     @SaCheckLogin
-    @ApiOperation(value = "更新订单物流", httpMethod = "POST")
-    @RequestMapping(value = "/updateOrderExpress", method = {RequestMethod.POST})
+    @ApiOperation(value = "获取订单详情", httpMethod = "POST")
+    @RequestMapping(value = "/getOrderDetail", method = {RequestMethod.POST})
+    @SaCheckRole(value = "sys")
     @ResponseBody
     public CommonResult<OrderDetailResult> getOrderDetail(Long id) {
         return CommonResult.success(adminUserOrderService.getOrderDetail(id));
