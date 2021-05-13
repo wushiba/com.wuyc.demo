@@ -103,25 +103,41 @@ public class ActCodeConsume {
         actCodeBatch.setFileStatus("DONGING");
         actCodeBatchMapper.updateById(actCodeBatch);
         logger.info("开始合成溯源码");
-        for (String code : codes) {
-            LocalDateTime now = LocalDateTime.now();
-            ActCodeBatchDetail actCodeBatchDetail = new ActCodeBatchDetail();
-            actCodeBatchDetail.setActCode(DigestUtil.md5HexTo16(SecureUtil.md5("yf" + code)));
-            actCodeBatchDetail.setTraceNo(code);
-            actCodeBatchDetail.setActId(actCodeBatch.getActId());
-            actCodeBatchDetail.setBatchId(actCodeBatch.getId());
-            actCodeBatchDetail.setCreateTime(now);
-            actCodeBatchDetails.add(actCodeBatchDetail);
-            codeFile.add(String.format("%s,%s%s", code, actCodeCodeUrl, actCodeBatchDetail.getActCode()));
+        if (actCodeBatch.getType() == 0) {
+            for (String code : codes) {
+                LocalDateTime now = LocalDateTime.now();
+                ActCodeBatchDetail actCodeBatchDetail = new ActCodeBatchDetail();
+                actCodeBatchDetail.setActCode(DigestUtil.md5HexTo16(SecureUtil.md5("yf" + code)));
+                actCodeBatchDetail.setTraceNo(code);
+                actCodeBatchDetail.setActId(actCodeBatch.getActId());
+                actCodeBatchDetail.setBatchId(actCodeBatch.getId());
+                actCodeBatchDetail.setCreateTime(now);
+                actCodeBatchDetails.add(actCodeBatchDetail);
+                codeFile.add(String.format("%s,%s%s", code, actCodeCodeUrl, actCodeBatchDetail.getActCode()));
+            }
+        } else {
+            for (String code : codes) {
+                LocalDateTime now = LocalDateTime.now();
+                ActCodeBatchDetail actCodeBatchDetail = new ActCodeBatchDetail();
+                actCodeBatchDetail.setActCode(DigestUtil.md5HexTo16(SecureUtil.md5("yf" + code)));
+                actCodeBatchDetail.setTraceNo(code);
+                actCodeBatchDetail.setActId(actCodeBatch.getActId());
+                actCodeBatchDetail.setBatchId(actCodeBatch.getId());
+                actCodeBatchDetail.setCreateTime(now);
+                actCodeBatchDetails.add(actCodeBatchDetail);
+                codeFile.add(String.format("%s%s", actCodeCodeUrl, actCodeBatchDetail.getActCode()));
+            }
         }
         logger.info("溯源码合成结束");
         try {
             actCodeBatchDetailMapper.insertBatchSomeColumn(actCodeBatchDetails);
-            Integer count = actCodeBatch.getQuantity() == null ? 0 : actCodeBatch.getQuantity();
-            actCodeBatch.setQuantity(count + codes.size());
+            if (actCodeBatch.getType() == 0) {
+                Integer count = actCodeBatch.getQuantity() == null ? 0 : actCodeBatch.getQuantity();
+                actCodeBatch.setQuantity(count + codes.size());
+                actCodeBatchMapper.updateById(actCodeBatch);
+            }
             String filePath = actCodeCodeTargetDir + actCodeBatch.getBatchNo() + ".txt";
             FileUtil.appendUtf8Lines(codeFile, filePath);
-            actCodeBatchMapper.updateById(actCodeBatch);
         } catch (Exception e) {
             e.printStackTrace();
             String filePath = actCodeCodeTargetDir + actCodeBatch.getBatchNo() + "-fail.txt";
