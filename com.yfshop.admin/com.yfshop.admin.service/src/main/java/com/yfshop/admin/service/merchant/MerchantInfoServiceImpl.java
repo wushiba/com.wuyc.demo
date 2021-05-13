@@ -16,6 +16,8 @@ import com.github.binarywang.wxpay.bean.request.WxPayUnifiedOrderRequest;
 import com.yfshop.admin.api.merchant.MerchantInfoService;
 import com.yfshop.admin.api.merchant.request.MerchantGroupReq;
 import com.yfshop.admin.api.merchant.request.MerchantReq;
+import com.yfshop.admin.api.merchant.request.QueryGoodsRecordReq;
+import com.yfshop.admin.api.merchant.result.GoodsRecordResult;
 import com.yfshop.admin.api.merchant.result.MerchantGroupResult;
 import com.yfshop.admin.api.merchant.result.MerchantResult;
 import com.yfshop.admin.api.website.WebsiteCodeTaskService;
@@ -70,6 +72,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -129,17 +132,16 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
 
     @DubboReference
     private MpService mpService;
-
     @Value("${wxPay.notifyUrl}")
     private String wxPayNotifyUrl;
     @Resource
     private WebsiteCodeDao websiteCodeDao;
-
     @Resource
     private WebsiteGoodsRecordDao websiteGoodsRecordDao;
-
     @Resource
     private WebsiteGoodsRecordMapper websiteGoodsRecordMapper;
+    @Value("${merchant.url}")
+    private String merchantUrl;
 
     @Override
     public MerchantResult getWebsiteInfo(Integer merchantId) throws ApiException {
@@ -783,6 +785,7 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
                     .toUser(merchant.getOpenId())
                     .templateId("jzGtPNFoz6lzKi1c7q6ELj3BinPBFdtujMVeM4lSobs")
                     .data(data)
+                    .url(String.format("%s#/MerchantReplenishDetail", merchantUrl))
                     .build();
             mpService.sendWxMpTemplateMsg(wxMpTemplateMessage);
         }
@@ -796,6 +799,31 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
                 .eq(Merchant::getMobile, mobile));
         Asserts.assertNonNull(merchant, 500, "网点不存在!");
         return BeanUtil.convert(merchant, MerchantResult.class);
+    }
+
+
+    @Override
+    public List<GoodsRecordResult> websiteGoodsList(QueryGoodsRecordReq recordReq) {
+        List<GoodsRecordResult> result = new ArrayList<>();
+        List<WebsiteGoodsRecord> websiteGoodsRecords = websiteGoodsRecordMapper.selectList(Wrappers.lambdaQuery(WebsiteGoodsRecord.class)
+                .eq(WebsiteGoodsRecord::getWebsiteId, recordReq.getMerchantId())
+                .ge(recordReq.getStartTime() != null, WebsiteGoodsRecord::getCreateTime, recordReq.getStartTime())
+                .lt(recordReq.getEndTime() != null, WebsiteGoodsRecord::getCreateTime, recordReq.getEndTime()).orderByDesc(WebsiteGoodsRecord::getId));
+        if (CollectionUtils.isEmpty(websiteGoodsRecords)) return result;
+        List<Integer> merchantIds = websiteGoodsRecords.stream().map(WebsiteGoodsRecord::getMerchantId).distinct().collect(Collectors.toList());
+        List<Merchant> merchantList = merchantMapper.selectBatchIds(merchantIds);
+        Map<Integer, Merchant> merchantMap = merchantList.stream().collect(Collectors.toMap(Merchant::getId, Function.identity()));
+        websiteGoodsRecords.forEach(item -> {
+            GoodsRecordResult goodsRecordResult = new GoodsRecordResult();
+            Merchant merchant = merchantMap.get(item.getMerchantId());
+            if (merchant != null) {
+                goodsRecordResult.setMerchantName(merchant.getMerchantName());
+            }
+            goodsRecordResult.setQuantity(item.getQuantity());
+            goodsRecordResult.setCreateTime(item.getCreateTime());
+            result.add(goodsRecordResult);
+        });
+        return result;
     }
 
     private Integer getCurrentWebsiteCodeCount(Integer merchantId, Date startTime, Date endTime) {
