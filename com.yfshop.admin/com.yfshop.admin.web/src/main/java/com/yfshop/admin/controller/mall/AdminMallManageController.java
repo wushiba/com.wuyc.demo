@@ -375,4 +375,28 @@ public class AdminMallManageController implements BaseController {
     public CommonResult<Void> enableSku(@NotNull(message = "skuId不能为空") Integer skuId) {
         return CommonResult.success(adminMallManageService.updateSkuIsEnable(skuId, true));
     }
+
+    @ApiOperation(value = "商品下架", httpMethod = "GET")
+    @ApiImplicitParams(value = {
+            @ApiImplicitParam(paramType = "query", name = "itemId", value = "商品Id", required = true)
+    })
+    @RequestMapping(value = "/disableItem", method = {RequestMethod.GET, RequestMethod.POST})
+    @ResponseBody
+    @SaCheckLogin
+    @SaCheckRole(value = "sys")
+    public CommonResult<Void> disableItem(@NotNull(message = "itemId不能为空") Integer itemId) {
+        return CommonResult.success(adminMallManageService.updateItemIsEnable(itemId, false));
+    }
+
+    @ApiOperation(value = "商品上架", httpMethod = "GET")
+    @ApiImplicitParams(value = {
+            @ApiImplicitParam(paramType = "query", name = "itemId", value = "商品Id", required = true)
+    })
+    @RequestMapping(value = "/enableItem", method = {RequestMethod.GET, RequestMethod.POST})
+    @ResponseBody
+    @SaCheckLogin
+    @SaCheckRole(value = "sys")
+    public CommonResult<Void> enableItem(@NotNull(message = "itemId不能为空") Integer itemId) {
+        return CommonResult.success(adminMallManageService.updateItemIsEnable(itemId, true));
+    }
 }
