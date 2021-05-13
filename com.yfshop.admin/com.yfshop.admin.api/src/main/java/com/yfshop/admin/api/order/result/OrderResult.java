@@ -14,7 +14,9 @@ public class OrderResult implements Serializable {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", locale = "zh", timezone = "GMT+8")
     private LocalDateTime updateTime;
 
-    private Integer id;
+    private Long id;
+
+    private String orderNo;
     /**
      * 用户id
      */

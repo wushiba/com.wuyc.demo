@@ -40,9 +40,9 @@ import javax.annotation.Resource;
  * created 2021/4/9 13:43
  **/
 @DubboService
-public class AdminUserServiceImpl implements AdminUserOrderService {
+public class AdminUserOrderServiceImpl implements AdminUserOrderService {
 
-    private static final Logger logger = LoggerFactory.getLogger(AdminUserServiceImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(AdminUserOrderServiceImpl.class);
 
     @Resource
     private OrderDao orderDao;
