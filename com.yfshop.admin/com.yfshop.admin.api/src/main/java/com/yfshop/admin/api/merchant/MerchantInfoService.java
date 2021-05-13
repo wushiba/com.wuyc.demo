@@ -4,6 +4,8 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.github.binarywang.wxpay.bean.order.WxPayMpOrderResult;
 import com.yfshop.admin.api.merchant.request.MerchantGroupReq;
 import com.yfshop.admin.api.merchant.request.MerchantReq;
+import com.yfshop.admin.api.merchant.request.QueryGoodsRecordReq;
+import com.yfshop.admin.api.merchant.result.GoodsRecordResult;
 import com.yfshop.admin.api.merchant.result.MerchantGroupResult;
 import com.yfshop.admin.api.merchant.result.MerchantResult;
 import com.yfshop.admin.api.website.request.WebsiteCodeAddressReq;
@@ -202,4 +204,6 @@ public interface MerchantInfoService {
     Void websiteAddGoods(Integer merchantId, String mobile, Integer count) throws ApiException;
 
     MerchantResult getWebsiteByMobile(String mobile) throws ApiException;
+
+    List<GoodsRecordResult> websiteGoodsList(QueryGoodsRecordReq merchantId);
 }

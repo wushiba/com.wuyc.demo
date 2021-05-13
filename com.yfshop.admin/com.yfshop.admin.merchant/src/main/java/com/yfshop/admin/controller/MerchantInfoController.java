@@ -10,6 +10,8 @@ import com.github.binarywang.wxpay.bean.order.WxPayMpOrderResult;
 import com.yfshop.admin.api.merchant.MerchantInfoService;
 import com.yfshop.admin.api.merchant.request.MerchantGroupReq;
 import com.yfshop.admin.api.merchant.request.MerchantReq;
+import com.yfshop.admin.api.merchant.request.QueryGoodsRecordReq;
+import com.yfshop.admin.api.merchant.result.GoodsRecordResult;
 import com.yfshop.admin.api.merchant.result.MerchantGroupResult;
 import com.yfshop.admin.api.merchant.result.MerchantResult;
 import com.yfshop.admin.api.user.UserService;
@@ -406,6 +408,14 @@ class MerchantInfoController extends AbstractBaseController {
         return CommonResult.success(merchantInfoService.websiteAddGoods(getCurrentAdminUserId(), mobile, count));
     }
 
+
+    @RequestMapping(value = "/websiteGoodsList", method = {RequestMethod.GET, RequestMethod.POST})
+    @ResponseBody
+    @SaCheckLogin
+    public CommonResult<List<GoodsRecordResult>> websiteGoodsList(QueryGoodsRecordReq queryGoodsRecordReq) {
+        queryGoodsRecordReq.setMerchantId(getCurrentAdminUserId());
+        return CommonResult.success(merchantInfoService.websiteGoodsList(queryGoodsRecordReq));
+    }
 
     /**
      * 查询网点数据
