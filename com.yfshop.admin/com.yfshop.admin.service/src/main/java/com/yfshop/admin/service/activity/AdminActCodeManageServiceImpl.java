@@ -99,7 +99,7 @@ public class AdminActCodeManageServiceImpl implements AdminActCodeManageService 
     public Void actCodeImportCount(Integer actId, Integer count) throws ApiException {
         Asserts.assertNonNull(actId, 500, "请选择关联的活动！");
         Asserts.assertNonNull(count, 500, "请输入生成活动码数量！");
-        Asserts.assertTrue(count > 200000, 500, "一次生成数量不能超过20万");
+        Asserts.assertTrue(count <= 200000, 500, "一次生成数量不能超过20万");
         ActCodeBatch actCodeBatch = new ActCodeBatch();
         actCodeBatch.setBatchNo(DateUtil.format(new Date(), "yyMMddHHmmssSSS") + RandomUtil.randomNumbers(4));
         actCodeBatch.setActId(actId);
