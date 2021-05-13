@@ -1,6 +1,7 @@
 package com.yfshop.admin.api.order.result;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -46,7 +47,8 @@ public class OrderDetailResult implements Serializable {
     private List<OrderDetails> list;
 
     @Data
-    public class OrderDetails implements Serializable {
+    @AllArgsConstructor
+    public static class OrderDetails implements Serializable {
         private LocalDateTime createTime;
 
         private String orderNo;
