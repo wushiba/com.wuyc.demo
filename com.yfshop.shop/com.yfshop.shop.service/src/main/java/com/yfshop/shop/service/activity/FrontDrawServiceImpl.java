@@ -37,6 +37,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -154,10 +155,10 @@ public class FrontDrawServiceImpl implements FrontDrawService {
             canDrawCount = 1L;
         }
         String dataStr = DateUtil.format(LocalDateTime.now(), "yyyyMMdd");
-        Long drawCount = redisService.incr(CacheConstants.DRAW_DATE_COUNT + dataStr + userId, 1);
+        Long drawCount = redisService.incr(CacheConstants.DRAW_DATE_COUNT + dataStr + userId, 1,1, TimeUnit.DAYS);
         logger.info("======抽奖用户次数userId=" + userId + "，抽奖" + drawCount);
         Asserts.assertFalse(drawCount > canDrawCount, 502, "您每天只能抽奖" + canDrawCount + "次，请明天再继续抽奖");
-        redisService.expire(CacheConstants.DRAW_DATE_COUNT + dataStr + userId, 60 * 60 * 24);
+        //redisService.expire(CacheConstants.DRAW_DATE_COUNT + dataStr + userId, 60 * 60 * 24);
 
         Map<Integer, List<YfDrawPrizeResult>> prizeMap = prizeList.stream().collect(Collectors
                 .groupingBy(YfDrawPrizeResult::getPrizeLevel));

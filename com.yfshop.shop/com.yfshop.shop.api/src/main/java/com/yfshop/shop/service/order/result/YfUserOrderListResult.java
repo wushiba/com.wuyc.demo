@@ -33,6 +33,8 @@ public class YfUserOrderListResult implements Serializable {
 
     private Long orderId;
 
+    private String orderNo;
+
     private Long orderDetailId;
 
     private String receiveWay;

@@ -6,6 +6,7 @@ import org.springframework.data.redis.connection.RedisGeoCommands;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 /**
  * redis操作Service
@@ -42,6 +43,8 @@ public interface RedisService {
      */
     Boolean expire(String key, long time);
 
+    Boolean expire(String key, long time, TimeUnit timeUnit);
+
     /**
      * 获取过期时间
      */
@@ -56,6 +59,8 @@ public interface RedisService {
      * 按delta递增
      */
     Long incr(String key, long delta);
+
+    Long incr(String key, long delta, long time, TimeUnit timeUnit);
 
     /**
      * 按delta递减
@@ -189,21 +194,23 @@ public interface RedisService {
 
     /**
      * 添加地理位置
-     * @param key           key
-     * @param longitude     经度
-     * @param latitude      纬度
-     * @param value         具体的值
+     *
+     * @param key       key
+     * @param longitude 经度
+     * @param latitude  纬度
+     * @param value     具体的值
      */
     void geoAdd(String key, Double longitude, Double latitude, Object value);
 
     /**
      * 查询当前位置半径内的数据
-     * @param key           key
-     * @param longitude     经度
-     * @param latitude      纬度
-     * @param distance      当前位置方圆多远
-     * @param unit          当前位置方圆多远的单位值
-     * @return  GeoResults<RedisGeoCommands.GeoLocation<Object>>
+     *
+     * @param key       key
+     * @param longitude 经度
+     * @param latitude  纬度
+     * @param distance  当前位置方圆多远
+     * @param unit      当前位置方圆多远的单位值
+     * @return GeoResults<RedisGeoCommands.GeoLocation < Object>>
      */
     GeoResults<RedisGeoCommands.GeoLocation<Object>> findNearDataList(String key, Double longitude, Double latitude, Integer distance, RedisGeoCommands.DistanceUnit unit);
 

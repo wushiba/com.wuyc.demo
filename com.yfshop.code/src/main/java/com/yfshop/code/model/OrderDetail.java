@@ -47,6 +47,8 @@ public class OrderDetail extends Model<OrderDetail> {
      */
     private Long orderId;
 
+    private String orderNo;
+
     private Integer merchantId;
 
     /**

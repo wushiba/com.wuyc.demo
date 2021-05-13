@@ -22,7 +22,7 @@ public interface CacheConstants {
 
     String USER_CART_CACHE_NAME = "UserCartCacheName";
     String USER_CART_CACHE_KEY_PREFIX = "user_cart_";
-
+    String ORDER_DATE_COUNT = "order_date_no_";
     /** 用户每日抽奖次数 */
     String DRAW_DATE_COUNT = "draw_date_user_";
     /** 用户每日抽奖次数 */

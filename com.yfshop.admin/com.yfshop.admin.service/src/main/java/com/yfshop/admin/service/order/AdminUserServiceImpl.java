@@ -139,6 +139,7 @@ public class AdminUserServiceImpl implements AdminUserOrderService {
     public IPage<OrderResult> list(QueryOrderReq req) throws ApiException {
         LambdaQueryWrapper<OrderDetail> wrapper = Wrappers.lambdaQuery(OrderDetail.class)
                 .like(StringUtils.isNoneBlank(req.getUserName()), OrderDetail::getUserName, req.getUserName())
+                .eq(StringUtils.isNoneBlank(req.getOrderNo()), OrderDetail::getOrderNo, req.getOrderNo())
                 .eq(StringUtils.isNoneBlank(req.getReceiveWay()), OrderDetail::getReceiveWay, req.getReceiveWay())
                 .eq(StringUtils.isNoneBlank(req.getOrderStatus()), OrderDetail::getOrderStatus, req.getOrderStatus())
                 .ge(req.getStartTime() != null, OrderDetail::getCreateTime, req.getStartTime())

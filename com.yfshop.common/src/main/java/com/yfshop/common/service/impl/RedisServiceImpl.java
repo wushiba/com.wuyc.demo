@@ -51,6 +51,11 @@ public class RedisServiceImpl implements RedisService {
     }
 
     @Override
+    public Boolean expire(String key, long time, TimeUnit timeUnit) {
+        return redisTemplate.expire(key, time, timeUnit);
+    }
+
+    @Override
     public Long getExpire(String key) {
         return redisTemplate.getExpire(key, TimeUnit.SECONDS);
     }
@@ -63,6 +68,13 @@ public class RedisServiceImpl implements RedisService {
     @Override
     public Long incr(String key, long delta) {
         return redisTemplate.opsForValue().increment(key, delta);
+    }
+
+    @Override
+    public Long incr(String key, long delta, long time, TimeUnit timeUnit) {
+        long result = incr(key, delta);
+        redisTemplate.expire(key, time, timeUnit);
+        return result;
     }
 
     @Override
@@ -217,12 +229,13 @@ public class RedisServiceImpl implements RedisService {
 
     /**
      * 查询当前位置半径内的数据
-     * @param key           key
-     * @param longitude     经度
-     * @param latitude      纬度
-     * @param distance      当前位置方圆多远
-     * @param unit          当前位置方圆多远的单位值
-     * @return  GeoResults<RedisGeoCommands.GeoLocation<Object>>
+     *
+     * @param key       key
+     * @param longitude 经度
+     * @param latitude  纬度
+     * @param distance  当前位置方圆多远
+     * @param unit      当前位置方圆多远的单位值
+     * @return GeoResults<RedisGeoCommands.GeoLocation < Object>>
      */
     @Override
     public GeoResults<RedisGeoCommands.GeoLocation<Object>> findNearDataList(String key, Double longitude, Double latitude,

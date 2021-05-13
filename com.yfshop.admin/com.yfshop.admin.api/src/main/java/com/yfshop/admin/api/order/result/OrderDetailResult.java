@@ -25,6 +25,8 @@ public class OrderDetailResult implements Serializable {
 
     private Long id;
 
+    private String orderNo;
+
     private String address;
     /**
      * 订单发货时间
@@ -47,6 +49,7 @@ public class OrderDetailResult implements Serializable {
     public class OrderDetails implements Serializable {
         private LocalDateTime createTime;
 
+        private String orderNo;
         /**
          * 用户id编号
          */

@@ -1,6 +1,7 @@
 package com.yfshop.shop.service.order;
 
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.github.binarywang.wxpay.bean.order.WxPayMpOrderResult;
@@ -9,12 +10,14 @@ import com.github.binarywang.wxpay.bean.request.WxPayUnifiedOrderRequest;
 import com.github.binarywang.wxpay.exception.WxPayException;
 import com.yfshop.code.mapper.*;
 import com.yfshop.code.model.*;
+import com.yfshop.common.constants.CacheConstants;
 import com.yfshop.common.enums.PayPrefixEnum;
 import com.yfshop.common.enums.ReceiveWayEnum;
 import com.yfshop.common.enums.UserCouponStatusEnum;
 import com.yfshop.common.enums.UserOrderStatusEnum;
 import com.yfshop.common.exception.ApiException;
 import com.yfshop.common.exception.Asserts;
+import com.yfshop.common.service.RedisService;
 import com.yfshop.common.util.BeanUtil;
 import com.yfshop.shop.dao.OrderDao;
 import com.yfshop.shop.service.activity.result.YfDrawActivityResult;
@@ -48,6 +51,7 @@ import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -94,6 +98,9 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
     private FrontUserCouponService frontUserCouponService;
     @Resource
     private FrontDrawRecordService frontDrawRecordService;
+
+    @Resource
+    private RedisService redisService;
 
     private final static String drawCanUseRegion = "湖南,湖北,江西,四川,重庆,江苏,浙江,安徽,福建,广东,广西,河南,云南,贵州,山东,陕西,海南,山西,上海";
 
@@ -609,6 +616,7 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
                 for (OrderDetail orderDetail : detailList) {
                     orderResult = BeanUtil.convert(orderDetail, YfUserOrderListResult.class);
                     orderResult.setOrderDetailId(orderDetail.getId());
+                    orderResult.setOrderNo(orderDetail.getOrderNo());
                     orderResult.setItemList(BeanUtil.convertList(Arrays.asList(orderDetail), YfUserOrderListResult.YfUserOrderItem.class));
                     resultList.add(orderResult);
                 }
@@ -716,6 +724,9 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
         orderDetail.setExpressCompany(null);
         orderDetail.setExpressNo(null);
         orderDetail.setUserName(userName);
+        String dataStr = DateUtil.format(LocalDateTime.now(), "yyyyMMdd");
+        Long orderCount = redisService.incr(CacheConstants.ORDER_DATE_COUNT + dataStr, 0, 1, TimeUnit.DAYS);
+        orderDetail.setOrderNo(String.format("%s%04d", DateFormatUtils.format(new Date(), "yyMMddHHmmss"), orderCount % 10000));
         orderDetailMapper.insert(orderDetail);
         return orderDetail;
     }
@@ -774,6 +785,5 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
             }
         }
     }
-
 }
 
