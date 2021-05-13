@@ -92,16 +92,30 @@ public class ActCodeTask {
         actCodeBatchManager.updateById(actCodeBatch);
         logger.info("批从号{},正在生成{}个溯源码", actCodeBatch.getBatchNo(), actCodeBatch.getQuantity());
         logger.info("开始合成溯源码");
-        for (String code : sourceCodes) {
-            LocalDateTime now = LocalDateTime.now();
-            ActCodeBatchDetail actCodeBatchDetail = new ActCodeBatchDetail();
-            actCodeBatchDetail.setActCode(DigestUtil.md5HexTo16(SecureUtil.md5("yf" + code)));
-            actCodeBatchDetail.setTraceNo(code);
-            actCodeBatchDetail.setActId(actCodeBatch.getActId());
-            actCodeBatchDetail.setBatchId(actCodeBatch.getId());
-            actCodeBatchDetail.setCreateTime(now);
-            actCodeBatchDetails.add(actCodeBatchDetail);
-            codeFile.add(String.format("%s,%s%s", code, actCodeCodeUrl, actCodeBatchDetail.getActCode()));
+        if (actCodeBatch.getType() == 0) {
+            for (String code : sourceCodes) {
+                LocalDateTime now = LocalDateTime.now();
+                ActCodeBatchDetail actCodeBatchDetail = new ActCodeBatchDetail();
+                actCodeBatchDetail.setActCode(DigestUtil.md5HexTo16(SecureUtil.md5("yf" + code)));
+                actCodeBatchDetail.setTraceNo(code);
+                actCodeBatchDetail.setActId(actCodeBatch.getActId());
+                actCodeBatchDetail.setBatchId(actCodeBatch.getId());
+                actCodeBatchDetail.setCreateTime(now);
+                actCodeBatchDetails.add(actCodeBatchDetail);
+                codeFile.add(String.format("%s,%s%s", code, actCodeCodeUrl, actCodeBatchDetail.getActCode()));
+            }
+        } else {
+            for (String code : sourceCodes) {
+                LocalDateTime now = LocalDateTime.now();
+                ActCodeBatchDetail actCodeBatchDetail = new ActCodeBatchDetail();
+                actCodeBatchDetail.setActCode(DigestUtil.md5HexTo16(SecureUtil.md5("yf" + code)));
+                actCodeBatchDetail.setTraceNo(code);
+                actCodeBatchDetail.setActId(actCodeBatch.getActId());
+                actCodeBatchDetail.setBatchId(actCodeBatch.getId());
+                actCodeBatchDetail.setCreateTime(now);
+                actCodeBatchDetails.add(actCodeBatchDetail);
+                codeFile.add(String.format("%s%s", actCodeCodeUrl, actCodeBatchDetail.getActCode()));
+            }
         }
         logger.info("溯源码合成结束");
 
@@ -177,4 +191,19 @@ public class ActCodeTask {
         mailSender.send(message);
     }
 
+    @Async
+    public void build(ActCodeBatch actCodeBatch) {
+        List<String> sourceCodes = new ArrayList<>();
+        for (int i = 0; i < actCodeBatch.getQuantity(); i++) {
+            sourceCodes.add(String.format("yf%05d%07d", actCodeBatch.getId(), i));
+        }
+        String actCodeId = "actCode:" + actCodeBatch.getId();
+        CollectionUtil.split(sourceCodes, 50000).forEach(item -> {
+            String codes = StringUtils.join(item);
+            stringRedisTemplate.opsForList().leftPush(actCodeId, codes);
+        });
+        stringRedisTemplate.expire(actCodeId, 1, TimeUnit.DAYS);
+        actCodeConsumeTask.doWork(actCodeId);
+
+    }
 }

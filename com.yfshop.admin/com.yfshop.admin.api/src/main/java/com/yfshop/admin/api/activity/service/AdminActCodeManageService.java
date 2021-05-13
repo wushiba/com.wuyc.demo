@@ -16,13 +16,16 @@ public interface AdminActCodeManageService {
 
     Void actCodeImport(Integer actId, String md5, String fileUrl) throws ApiException;
 
+    Void actCodeImportCount(Integer actId, Integer count) throws ApiException;
+
     Void checkFile(String md5) throws ApiException;
 
-    String actCodeUrl(Integer merchantId,Integer id);
+    String actCodeUrl(Integer merchantId, Integer id);
 
     Void sendEmailActCode(Integer currentAdminUserId, Integer id, Integer factoryId);
 
     IPage<ActCodeDetailsResult> queryActCodeDetails(ActCodeQueryDetailsReq actCodeQueryReq);
 
     List<ActCodeBatchRecordResult> queryActCodeDownloadRecord(Integer batchId);
+
 }

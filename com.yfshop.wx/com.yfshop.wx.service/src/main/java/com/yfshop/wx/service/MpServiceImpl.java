@@ -1,14 +1,20 @@
 package com.yfshop.wx.service;
 
+import java.time.LocalDateTime;
+
 
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.github.binarywang.wxpay.bean.request.WxPayRefundRequest;
 import com.github.binarywang.wxpay.exception.WxPayException;
 import com.github.binarywang.wxpay.service.WxPayService;
 import com.google.gson.reflect.TypeToken;
+import com.yfshop.code.mapper.OrderDetailMapper;
 import com.yfshop.code.mapper.WxPayNotifyMapper;
+import com.yfshop.code.mapper.WxPayRefundMapper;
 import com.yfshop.code.mapper.WxTemplateMessageMapper;
+import com.yfshop.code.model.OrderDetail;
 import com.yfshop.code.model.WxPayNotify;
+import com.yfshop.code.model.WxPayRefund;
 import com.yfshop.code.model.WxTemplateMessage;
 import com.yfshop.common.util.DateUtil;
 import com.yfshop.wx.api.service.MpService;
@@ -22,8 +28,10 @@ import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
@@ -35,7 +43,10 @@ public class MpServiceImpl implements MpService {
     private WxTemplateMessageMapper wxTemplateMessageMapper;
     @Resource
     private WxPayNotifyMapper wxPayNotifyMapper;
-
+    @Resource
+    private OrderDetailMapper orderDetailMapper;
+    @Resource
+    private WxPayRefundMapper wxPayRefundMapper;
     @Autowired
     private WxPayService wxService;
 
@@ -90,24 +101,50 @@ public class MpServiceImpl implements MpService {
     }
 
     @Override
-    public Void refundAll(Date startTime, Date endTime) {
-        List<WxPayNotify> wxPayNotifies = wxPayNotifyMapper.selectList(Wrappers.<WxPayNotify>lambdaQuery().between(startTime != null && endTime != null, WxPayNotify::getCreateTime, startTime, endTime));
-        wxPayNotifies.forEach(item -> {
+    @Transactional(rollbackFor = Exception.class)
+    public Void refund(Long orderId, String transactionId) throws WxPayException {
+        WxPayNotify wxPayNotify = wxPayNotifyMapper.selectOne(Wrappers.lambdaUpdate(WxPayNotify.class).eq(WxPayNotify::getTransactionId, transactionId));
+        OrderDetail orderDetail = orderDetailMapper.selectById(orderId);
+        if (orderDetail != null && wxPayNotify != null) {
+            WxPayRefund wxPayRefund = new WxPayRefund();
+            wxPayRefund.setCreateTime(LocalDateTime.now());
+            wxPayRefund.setOpenId(wxPayNotify.getOpenId());
+            wxPayRefund.setTotalFee(orderDetail.getPayPrice().multiply(new BigDecimal("100")).intValue());
+            wxPayRefund.setTransactionId(wxPayNotify.getTransactionId());
+            wxPayRefund.setOuttradeNo(wxPayNotify.getOuttradeNo());
+            wxPayRefund.setRefundNo("refundNo-shopOrder-" + orderId);
+            wxPayRefundMapper.insert(wxPayRefund);
             WxPayRefundRequest wxPayRefundRequest = new WxPayRefundRequest();
-            try {
-                wxPayRefundRequest.setTransactionId(item.getTransactionId());
-                wxPayRefundRequest.setRefundFee(item.getTotalFee());
-                wxPayRefundRequest.setTotalFee(item.getTotalFee());
-                wxPayRefundRequest.setOutTradeNo(item.getOuttradeNo());
-                wxPayRefundRequest.setOutRefundNo(item.getTransactionId());
-                wxPayRefundRequest.setRefundDesc("测试退款");
-                this.wxService.refund(wxPayRefundRequest);
-            } catch (WxPayException e) {
-                e.printStackTrace();
-            }
-        });
+            wxPayRefundRequest.setTransactionId(wxPayNotify.getTransactionId());
+            wxPayRefundRequest.setRefundFee(wxPayRefund.getTotalFee());
+            wxPayRefundRequest.setTotalFee(wxPayNotify.getTotalFee());
+            wxPayRefundRequest.setOutTradeNo(wxPayNotify.getOuttradeNo());
+            wxPayRefundRequest.setOutRefundNo(wxPayRefund.getRefundNo());
+            wxPayRefundRequest.setRefundDesc("订单关闭");
+            this.wxService.refund(wxPayRefundRequest);
+        }
         return null;
     }
+
+//    @Override
+//    public Void refundAll(Date startTime, Date endTime) {
+//        List<WxPayNotify> wxPayNotifies = wxPayNotifyMapper.selectList(Wrappers.<WxPayNotify>lambdaQuery().between(startTime != null && endTime != null, WxPayNotify::getCreateTime, startTime, endTime));
+//        wxPayNotifies.forEach(item -> {
+//            WxPayRefundRequest wxPayRefundRequest = new WxPayRefundRequest();
+//            try {
+//                wxPayRefundRequest.setTransactionId(item.getTransactionId());
+//                wxPayRefundRequest.setRefundFee(item.getTotalFee());
+//                wxPayRefundRequest.setTotalFee(item.getTotalFee());
+//                wxPayRefundRequest.setOutTradeNo(item.getOuttradeNo());
+//                wxPayRefundRequest.setOutRefundNo(item.getTransactionId());
+//                wxPayRefundRequest.setRefundDesc("测试退款");
+//                this.wxService.refund(wxPayRefundRequest);
+//            } catch (WxPayException e) {
+//                e.printStackTrace();
+//            }
+//        });
+//        return null;
+//    }
 
 
     private void saveWxTemplateMessage(WxMpTemplateMessage wxMpTemplateMessage, String status) {

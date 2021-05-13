@@ -76,6 +76,11 @@ public class ActCodeBatch extends Model<ActCodeBatch> {
      */
     private String isSend;
 
+    /**
+     * 0导入 1生成
+     */
+    private Integer type;
+
 
     @Override
     protected Serializable pkVal() {

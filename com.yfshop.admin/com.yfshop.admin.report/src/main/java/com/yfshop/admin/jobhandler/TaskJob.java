@@ -77,7 +77,11 @@ public class TaskJob {
             ActCodeBatch actCodeBatch = actCodeBatchMapper.selectOne(Wrappers.lambdaQuery(ActCodeBatch.class).eq(ActCodeBatch::getFileStatus, "WAIT"));
             if (actCodeBatch != null) {
                 actCodeBatchMapper.updateById(actCodeBatch);
-                actCodeTask.downLoadFile(actCodeBatch);
+                if (actCodeBatch.getType() == 0) {
+                    actCodeTask.downLoadFile(actCodeBatch);
+                } else {
+                    actCodeTask.build(actCodeBatch);
+                }
             } else {
                 logger.debug("暂无溯源码任务");
             }

@@ -2,6 +2,7 @@ package com.yfshop.common.enums;
 
 /**
  * 用户订单状态枚举
+ *
  * @author wuyc
  * created 2021/4/1 10:03
  **/
@@ -11,7 +12,8 @@ public enum UserOrderStatusEnum {
     CANCEL("CANCEL", "已取消"),
     WAIT_DELIVERY("WAIT_DELIVERY", "待发货"),
     WAIT_RECEIVE("WAIT_RECEIVE", "待收货"),
-    SUCCESS("SUCCESS", "已完成");
+    SUCCESS("SUCCESS", "已完成"),
+    CLOSED("CLOSED", "已关闭");
 
     private String code;
 

@@ -54,6 +54,17 @@ public class AdminActManageController implements BaseController {
     }
 
     @SaCheckLogin
+    @CrossOrigin
+    @SneakyThrows
+    @ApiOperation(value = "导入溯源码文件", httpMethod = "POST")
+    @RequestMapping(value = "/actCodeImportCount", method = {RequestMethod.GET, RequestMethod.POST})
+    @ResponseBody
+    public CommonResult<Void> actCodeImportCount(Integer actId,Integer count) {
+
+        return CommonResult.success(adminActCodeManageService.actCodeImportCount(actId, count));
+    }
+
+    @SaCheckLogin
     @ApiOperation(value = "获取网点码文件", httpMethod = "POST")
     @RequestMapping(value = "/actCodeUrl", method = {RequestMethod.GET, RequestMethod.POST})
     @ResponseBody

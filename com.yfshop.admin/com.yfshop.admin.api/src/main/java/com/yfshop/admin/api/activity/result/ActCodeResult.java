@@ -68,4 +68,6 @@ public class ActCodeResult implements Serializable {
     private String isSend;
 
 
+    private Integer type;
+
 }

@@ -221,7 +221,7 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
                 userCoupon.setUseStatus(UserCouponStatusEnum.NO_USE.getCode());
                 userCoupon.setId(orderDetail.getUserCouponId());
                 userCouponMapper.updateById(userCoupon);
-                frontDrawRecordService.updateDrawRecordUseStatus(orderDetail.getUserCouponId(),UserCouponStatusEnum.NO_USE.getCode());
+                frontDrawRecordService.updateDrawRecordUseStatus(orderDetail.getUserCouponId(), UserCouponStatusEnum.NO_USE.getCode());
             }
             orderDetail.setOrderStatus(UserOrderStatusEnum.CANCEL.getCode());
             orderDetailMapper.updateById(orderDetail);
@@ -234,6 +234,7 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
 
     /**
      * 用户确认订单
+     *
      * @param userId        用户id
      * @param orderDetailId 订单详情id
      * @throws ApiException
@@ -259,7 +260,7 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
             userCoupon.setUseStatus(UserCouponStatusEnum.HAS_USE.getCode());
             userCoupon.setId(orderDetail.getUserCouponId());
             userCouponMapper.updateById(userCoupon);
-            frontDrawRecordService.updateDrawRecordUseStatus(orderDetail.getUserCouponId(),UserCouponStatusEnum.HAS_USE.getCode());
+            frontDrawRecordService.updateDrawRecordUseStatus(orderDetail.getUserCouponId(), UserCouponStatusEnum.HAS_USE.getCode());
         }
         return null;
     }
@@ -306,8 +307,12 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
 
         Order order = insertUserOrder(userId, null, ReceiveWayEnum.PS.getCode(), num, 1, orderPrice, couponPrice, orderFreight, payPrice, "N", null);
         Long orderId = order.getId();
-
-        insertUserOrderDetail(userId, orderId, null, null, null, ReceiveWayEnum.PS.getCode(), "N", num, itemSku.getItemId(),
+        String userName = null;
+        User user = userMapper.selectById(userId);
+        if (user != null) {
+            userName = user.getNickname();
+        }
+        insertUserOrderDetail(userId, userName, orderId, null, null, null, ReceiveWayEnum.PS.getCode(), "N", num, itemSku.getItemId(),
                 itemSku.getId(), itemSku.getSkuTitle(), itemSku.getSkuSalePrice(), itemSku.getSkuCover(), orderFreight, couponPrice, orderPrice,
                 payPrice, userCoupon.getId(), UserOrderStatusEnum.WAIT_PAY.getCode(), itemSku.getSpecValueIdPath(), itemSku.getSpecNameValueJson());
 
@@ -321,6 +326,7 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
 
     /**
      * 商品购物车下单购买
+     *
      * @param userId       用户id
      * @param cartIds      购物车id
      * @param userCouponId 用户优惠券id
@@ -394,11 +400,15 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
                 childCouponPrice = new BigDecimal(userCoupon.getCouponPrice());
             }
 
-            BigDecimal childOrderFreight =  new BigDecimal(userCart.getNum()).multiply(itemSku.getFreight());
+            BigDecimal childOrderFreight = new BigDecimal(userCart.getNum()).multiply(itemSku.getFreight());
             BigDecimal childOrderPrice = itemSku.getSkuSalePrice().multiply(new BigDecimal(userCart.getNum()));
             BigDecimal childPayPrice = childOrderPrice.add(childOrderFreight).subtract(childCouponPrice);
-
-            insertUserOrderDetail(userId, orderId, null, null, null, ReceiveWayEnum.PS.getCode(), "N", userCart.getNum(),
+            String userName = null;
+            User user = userMapper.selectById(userId);
+            if (user != null) {
+                userName = user.getNickname();
+            }
+            insertUserOrderDetail(userId, userName, orderId, null, null, null, ReceiveWayEnum.PS.getCode(), "N", userCart.getNum(),
                     itemSku.getItemId(), itemSku.getId(), itemSku.getSkuTitle(), itemSku.getSkuSalePrice(), itemSku.getSkuCover(), childOrderFreight, childCouponPrice,
                     childOrderPrice, childPayPrice, userCouponId, UserOrderStatusEnum.WAIT_PAY.getCode(), itemSku.getSpecValueIdPath(), itemSku.getSpecNameValueJson());
         }
@@ -477,11 +487,16 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
         BigDecimal orderPrice = new BigDecimal(itemCount).multiply(itemSku.getSkuSalePrice()).setScale(2, BigDecimal.ROUND_UP);
 
         Order order = insertUserOrder(userId, websiteCode, ReceiveWayEnum.ZT.getCode(), itemCount, itemCount, orderPrice, orderCouponPrice, orderFreight, orderPayPrice, "N", null);
+        String userName = null;
+        User user = userMapper.selectById(userId);
+        if (user != null) {
+            userName = user.getNickname();
+        }
         Long orderId = order.getId();
         for (UserCoupon userCoupon : userCouponList) {
             BigDecimal couponPrice = new BigDecimal(userCoupon.getCouponPrice());
             BigDecimal payPrice = itemSku.getSkuSalePrice().subtract(couponPrice);
-            insertUserOrderDetail(userId, orderId, merchantResult.getId(), merchantResult.getPidPath(), websiteCode, ReceiveWayEnum.ZT.getCode(), "N", 1,
+            insertUserOrderDetail(userId, userName, orderId, merchantResult.getId(), merchantResult.getPidPath(), websiteCode, ReceiveWayEnum.ZT.getCode(), "N", 1,
                     itemSku.getItemId(), itemSku.getId(), itemDetail.getItemTitle(), itemSku.getSkuSalePrice(), itemSku.getSkuCover(), orderFreight, couponPrice,
                     itemSku.getSkuSalePrice(), payPrice, userCoupon.getId(), UserOrderStatusEnum.WAIT_PAY.getCode(), itemSku.getSpecValueIdPath(), itemSku.getSpecNameValueJson());
         }
@@ -520,8 +535,9 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
 
     /**
      * 根据订单号唤起微信支付
-     * @param orderId   用户订单id
-     * @param ipStr		请求ip地址
+     *
+     * @param orderId 用户订单id
+     * @param ipStr   请求ip地址
      * @return WxPayMpOrderResult
      * @throws ApiException
      */
@@ -667,7 +683,7 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
      * @param specNameValueJson 商品sku的规格名称值json串
      * @return
      */
-    private OrderDetail insertUserOrderDetail(Integer userId, Long orderId, Integer merchantId, String pidPath, String websiteCode, String receiveWay,
+    private OrderDetail insertUserOrderDetail(Integer userId, String userName, Long orderId, Integer merchantId, String pidPath, String websiteCode, String receiveWay,
                                               String isPay, Integer itemCount, Integer itemId, Integer skuId, String itemTitle, BigDecimal skuPrice,
                                               String itemCover, BigDecimal freight, BigDecimal couponPrice, BigDecimal orderPrice, BigDecimal payPrice,
                                               Long userCouponId, String orderStatus, String specValueIdPath, String specNameValueJson) {
@@ -699,7 +715,7 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
         orderDetail.setShipTime(null);
         orderDetail.setExpressCompany(null);
         orderDetail.setExpressNo(null);
-
+        orderDetail.setUserName(userName);
         orderDetailMapper.insert(orderDetail);
         return orderDetail;
     }
@@ -739,6 +755,7 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
 
     /**
      * 校验优惠券
+     *
      * @param userCoupon
      * @throws ApiException
      */

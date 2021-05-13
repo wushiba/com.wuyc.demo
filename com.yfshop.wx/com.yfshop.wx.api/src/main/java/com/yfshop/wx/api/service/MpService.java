@@ -1,6 +1,7 @@
 package com.yfshop.wx.api.service;
 
 import com.github.binarywang.wxpay.bean.result.WxPayRefundResult;
+import com.github.binarywang.wxpay.exception.WxPayException;
 import me.chanjar.weixin.mp.bean.template.WxMpTemplateMessage;
 
 import java.util.Date;
@@ -11,5 +12,5 @@ public interface MpService {
 
     void reSendWxMpTemplateMsg(String openId);
 
-    Void refundAll(Date startTime, Date endTime);
+    Void refund(Long orderId, String transactionId) throws WxPayException;;
 }

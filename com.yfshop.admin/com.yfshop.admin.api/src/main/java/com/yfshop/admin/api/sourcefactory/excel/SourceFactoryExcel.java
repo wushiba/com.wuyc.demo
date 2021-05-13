@@ -56,4 +56,6 @@ public class SourceFactoryExcel implements Serializable {
     @NotBlank(message = "是否可用不能为空")
     @CandidateValue(candidateValue = {"Y", "N"}, message = "是否可用值必须是Y|N")
     private String isEnable = "Y";
+
+    private Integer fType = 0;
 }

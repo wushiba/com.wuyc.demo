@@ -1,26 +1,41 @@
 package com.yfshop.admin.service.order;
 
+import com.google.common.collect.Lists;
+
+import java.time.LocalDateTime;
+
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.github.binarywang.wxpay.exception.WxPayException;
+import com.yfshop.admin.api.order.request.OrderExpressReq;
+import com.yfshop.admin.api.order.request.QueryOrderReq;
+import com.yfshop.admin.api.order.result.OrderDetailResult;
+import com.yfshop.admin.api.order.result.OrderResult;
 import com.yfshop.admin.api.order.service.AdminUserOrderService;
 import com.yfshop.admin.api.website.WebsiteBillService;
 import com.yfshop.admin.dao.OrderDao;
 import com.yfshop.code.mapper.*;
-import com.yfshop.code.model.DrawRecord;
-import com.yfshop.code.model.Order;
-import com.yfshop.code.model.OrderDetail;
-import com.yfshop.code.model.UserCoupon;
+import com.yfshop.code.model.*;
 import com.yfshop.common.enums.UserCouponStatusEnum;
 import com.yfshop.common.enums.UserOrderStatusEnum;
 import com.yfshop.common.exception.ApiException;
 import com.yfshop.common.exception.Asserts;
+import com.yfshop.common.util.BeanUtil;
+import com.yfshop.wx.api.service.MpService;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
+
 import javax.annotation.Resource;
 
 /**
  * 后台订单serviceImpl
+ *
  * @author wuyc
  * created 2021/4/9 13:43
  **/
@@ -41,10 +56,18 @@ public class AdminUserServiceImpl implements AdminUserOrderService {
     private OrderDetailMapper orderDetailMapper;
     @Resource
     private DrawRecordMapper drawRecordMapper;
+    @Resource
+    private OrderAddressMapper orderAddressMapper;
+    @Resource
+    private WxPayNotifyMapper wxPayNotifyMapper;
+    @DubboReference
+    private MpService mpService;
+
     /**
      * 用户付款后修改订单状态
-     * @param orderId   主订单id
-     * @param billNo    支付流水号
+     *
+     * @param orderId 主订单id
+     * @param billNo  支付流水号
      * @return
      * @throws ApiException
      */
@@ -56,6 +79,7 @@ public class AdminUserServiceImpl implements AdminUserOrderService {
         Order order = orderMapper.selectById(orderId);
         Asserts.assertNonNull(order, 500, "订单不存在");
         Asserts.assertEquals(order.getIsPay(), "I", 500, "订单未处于支付中");
+        String orderStatus = "ZT".equalsIgnoreCase(order.getReceiveWay()) ? UserOrderStatusEnum.SUCCESS.getCode() : UserOrderStatusEnum.WAIT_DELIVERY.getCode();
         // 修改订单状态，用乐观锁
         int result = orderDao.updateOrderPayStatus(orderId, billNo);
         if (result <= 0) {
@@ -63,7 +87,7 @@ public class AdminUserServiceImpl implements AdminUserOrderService {
         }
         OrderDetail orderDetail = new OrderDetail();
         orderDetail.setIsPay("Y");
-        orderDetail.setOrderStatus("ZT".equalsIgnoreCase(order.getReceiveWay())?UserOrderStatusEnum.SUCCESS.getCode():UserOrderStatusEnum.WAIT_DELIVERY.getCode());
+        orderDetail.setOrderStatus(orderStatus);
         orderDetailMapper.update(orderDetail, Wrappers.<OrderDetail>lambdaQuery().
                 eq(OrderDetail::getOrderId, orderId));
 
@@ -75,6 +99,7 @@ public class AdminUserServiceImpl implements AdminUserOrderService {
 
     /**
      * 用户确认订单
+     *
      * @param userId        用户id
      * @param orderDetailId 订单详情id
      * @throws ApiException
@@ -110,4 +135,68 @@ public class AdminUserServiceImpl implements AdminUserOrderService {
         return null;
     }
 
+    @Override
+    public IPage<OrderResult> list(QueryOrderReq req) throws ApiException {
+        LambdaQueryWrapper<OrderDetail> wrapper = Wrappers.lambdaQuery(OrderDetail.class)
+                .like(StringUtils.isNoneBlank(req.getUserName()), OrderDetail::getUserName, req.getUserName())
+                .eq(StringUtils.isNoneBlank(req.getReceiveWay()), OrderDetail::getReceiveWay, req.getReceiveWay())
+                .eq(StringUtils.isNoneBlank(req.getOrderStatus()), OrderDetail::getOrderStatus, req.getOrderStatus())
+                .ge(req.getStartTime() != null, OrderDetail::getCreateTime, req.getStartTime())
+                .lt(req.getEndTime() != null, OrderDetail::getCreateTime, req.getEndTime());
+        IPage<OrderDetail> iPage = orderDetailMapper.selectPage(new Page<>(req.getPageIndex(), req.getPageSize()), wrapper);
+        return BeanUtil.iPageConvert(iPage, OrderResult.class);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public Void closeOrder(Long id) throws ApiException, WxPayException {
+        OrderDetail orderDetail = orderDetailMapper.selectById(id);
+        switch (UserOrderStatusEnum.getByCode(orderDetail.getOrderStatus())) {
+            case WAIT_PAY:
+            case WAIT_DELIVERY:
+                OrderDetail newOrderDetail = new OrderDetail();
+                newOrderDetail.setOrderStatus(UserOrderStatusEnum.CLOSED.getCode());
+                newOrderDetail.setId(id);
+                orderDetailMapper.updateById(newOrderDetail);
+                Order order = orderMapper.selectById(orderDetail.getOrderId());
+                if (order != null && StringUtils.isNotBlank(order.getBillNo())) {
+                    mpService.refund(id, order.getBillNo());
+                }
+                break;
+
+        }
+        return null;
+    }
+
+
+    @Override
+    public Void updateOrderExpress(OrderExpressReq orderExpressReq) throws ApiException {
+        OrderDetail orderDetail = new OrderDetail();
+        orderDetail.setExpressCompany(orderExpressReq.getExpressName());
+        orderDetail.setExpressNo(orderExpressReq.getExpressNo());
+        orderDetail.setOrderStatus(UserOrderStatusEnum.WAIT_RECEIVE.getCode());
+        orderDetail.setId(orderExpressReq.getId());
+        orderDetailMapper.updateById(orderDetail);
+        return null;
+    }
+
+    @Override
+    public OrderDetailResult getOrderDetail(Long id) throws ApiException {
+        OrderDetail orderDetail = orderDetailMapper.selectById(id);
+        OrderAddress orderAddress = orderAddressMapper.selectOne(Wrappers.lambdaQuery(OrderAddress.class).eq(OrderAddress::getOrderId, orderDetail.getOrderId()));
+        OrderDetailResult orderDetailResult = new OrderDetailResult();
+        orderDetailResult.setCreateTime(orderDetail.getCreateTime());
+        orderDetailResult.setUserName(orderDetail.getUserName());
+        orderDetailResult.setReceiveWay(orderDetail.getReceiveWay());
+        if (orderAddress != null) {
+            orderDetailResult.setAddress(String.format("%s,%s,%s%s%s", orderAddress.getRealname(), orderAddress.getMobile(), orderAddress.getProvince(), orderAddress.getCity(), orderAddress.getDistrict(), orderAddress.getAddress()));
+        }
+        orderDetailResult.setShipTime(orderDetail.getShipTime());
+        orderDetailResult.setExpressCompany(orderDetail.getExpressCompany());
+        orderDetailResult.setExpressNo(orderDetail.getExpressNo());
+        orderDetailResult.setList(Lists.newArrayList());
+        orderDetailResult.setId(id);
+        orderDetailResult.getList().add(BeanUtil.convert(orderDetail, OrderDetailResult.OrderDetails.class));
+        return orderDetailResult;
+    }
 }

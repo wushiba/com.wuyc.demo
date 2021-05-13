@@ -38,6 +38,11 @@ public class OrderDetail extends Model<OrderDetail> {
     private Integer userId;
 
     /**
+     * 用户id编号
+     */
+    private String userName;
+
+    /**
      * 订单id
      */
     private Long orderId;

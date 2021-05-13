@@ -59,4 +59,5 @@ public class ActCodeBatchRecordResult implements Serializable {
     private String mobile;
 
 
+
 }

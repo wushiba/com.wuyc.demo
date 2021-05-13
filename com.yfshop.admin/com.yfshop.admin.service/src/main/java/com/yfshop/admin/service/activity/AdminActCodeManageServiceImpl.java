@@ -90,6 +90,22 @@ public class AdminActCodeManageServiceImpl implements AdminActCodeManageService 
         actCodeBatch.setFileMd5(md5);
         actCodeBatch.setCreateTime(LocalDateTime.now());
         actCodeBatch.setFileSrcUrl(fileUrl);
+        actCodeBatch.setType(0);
+        actCodeBatchMapper.insert(actCodeBatch);
+        return null;
+    }
+
+    @Override
+    public Void actCodeImportCount(Integer actId, Integer count) throws ApiException {
+        Asserts.assertNonNull(actId, 500, "请选择关联的活动！");
+        Asserts.assertNonNull(count, 500, "请输入生成活动码数量！");
+        Asserts.assertTrue(count > 200000, 500, "一次生成数量不能超过20万");
+        ActCodeBatch actCodeBatch = new ActCodeBatch();
+        actCodeBatch.setBatchNo(DateUtil.format(new Date(), "yyMMddHHmmssSSS") + RandomUtil.randomNumbers(4));
+        actCodeBatch.setActId(actId);
+        actCodeBatch.setCreateTime(LocalDateTime.now());
+        actCodeBatch.setQuantity(count);
+        actCodeBatch.setType(1);
         actCodeBatchMapper.insert(actCodeBatch);
         return null;
     }

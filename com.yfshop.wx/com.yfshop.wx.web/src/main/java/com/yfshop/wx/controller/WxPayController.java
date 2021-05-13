@@ -4,6 +4,7 @@ package com.yfshop.wx.controller;
 import cn.hutool.core.date.DateUtil;
 import com.github.binarywang.wxpay.bean.notify.WxPayNotifyResponse;
 import com.github.binarywang.wxpay.bean.notify.WxPayOrderNotifyResult;
+import com.github.binarywang.wxpay.bean.notify.WxPayRefundNotifyResult;
 import com.github.binarywang.wxpay.bean.request.WxPayRefundRequest;
 import com.github.binarywang.wxpay.bean.result.WxPayRefundResult;
 import com.github.binarywang.wxpay.exception.WxPayException;
