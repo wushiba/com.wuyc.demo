@@ -76,4 +76,7 @@ public class SourceFactoryResult implements Serializable {
      * 是否可用: Y(可用), N(禁用)
      */
     private String isEnable;
+
+
+    private Integer fType;
 }
