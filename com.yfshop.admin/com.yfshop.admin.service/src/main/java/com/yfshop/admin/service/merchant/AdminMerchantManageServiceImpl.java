@@ -1,6 +1,7 @@
 package com.yfshop.admin.service.merchant;
 
 import cn.hutool.crypto.SecureUtil;
+import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -13,9 +14,11 @@ import com.yfshop.admin.api.merchant.result.MerchantResult;
 import com.yfshop.admin.dao.MerchantDao;
 import com.yfshop.admin.dto.query.QueryMerchantDetail;
 import com.yfshop.code.mapper.MerchantDetailMapper;
+import com.yfshop.code.mapper.MerchantLogMapper;
 import com.yfshop.code.mapper.RegionMapper;
 import com.yfshop.code.model.Merchant;
 import com.yfshop.code.model.MerchantDetail;
+import com.yfshop.code.model.MerchantLog;
 import com.yfshop.code.model.Region;
 import com.yfshop.common.enums.GroupRoleEnum;
 import com.yfshop.common.exception.ApiException;
@@ -56,7 +59,8 @@ public class AdminMerchantManageServiceImpl implements AdminMerchantManageServic
     private MerchantDetailMapper merchantDetailMapper;
     @Resource
     private MerchantDao customMerchantMapper;
-
+    @Resource
+    private MerchantLogMapper merchantLogMapper;
     @Transactional(rollbackFor = Exception.class)
     @Override
     public Void createMerchant(Integer loginedMerchantId, CreateMerchantReq req) throws ApiException {
@@ -177,7 +181,13 @@ public class AdminMerchantManageServiceImpl implements AdminMerchantManageServic
             entity.setPMerchantName(req.getMerchantName());
             merchantMapper.update(entity, Wrappers.lambdaQuery(Merchant.class).eq(Merchant::getPid, req.getMerchantId()));
         }
-
+        Merchant newM = merchantMapper.selectById(existMerchant.getId());
+        MerchantLog merchantLog = new MerchantLog();
+        merchantLog.setMerchantId(existMerchant.getId());
+        merchantLog.setOperatorId(req.getOperatorId());
+        merchantLog.setBeforeData(JSONUtil.toJsonStr(existMerchant));
+        merchantLog.setAfterData(JSONUtil.toJsonStr(newM));
+        merchantLogMapper.insert(merchantLog);
         return null;
     }
 
@@ -218,12 +228,20 @@ public class AdminMerchantManageServiceImpl implements AdminMerchantManageServic
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public Void updateMerchantIsEnable(Integer merchantId, boolean isEnable) throws ApiException {
+    public Void updateMerchantIsEnable(Integer merchantId,Integer operatorId, boolean isEnable) throws ApiException {
+        Merchant oldM = merchantMapper.selectById(merchantId);
         Merchant merchant = new Merchant();
         merchant.setId(merchantId);
         merchant.setIsEnable(isEnable ? "Y" : "N");
         int rows = merchantMapper.updateById(merchant);
         Asserts.assertTrue(rows > 0, 500, "修改失败");
+        Merchant newM = merchantMapper.selectById(merchantId);
+        MerchantLog merchantLog = new MerchantLog();
+        merchantLog.setMerchantId(oldM.getId());
+        merchantLog.setOperatorId(operatorId);
+        merchantLog.setBeforeData(JSONUtil.toJsonStr(oldM));
+        merchantLog.setAfterData(JSONUtil.toJsonStr(newM));
+        merchantLogMapper.insert(merchantLog);
         return null;
     }
 

@@ -21,7 +21,7 @@
             <groupId>org.apache.dubbo</groupId>
             <artifactId>dubbo</artifactId>
         </dependency>
-           <dependency>
+        <dependency>
             <groupId>org.apache.curator</groupId>
             <artifactId>curator-recipes</artifactId>
         </dependency>
@@ -104,10 +104,6 @@
         <dependency>
             <groupId>com.github.binarywang</groupId>
             <artifactId>weixin-java-pay</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>cn.sto.sdk</groupId>
-            <artifactId>sto-link-sdk</artifactId>
         </dependency>
     </dependencies>
 

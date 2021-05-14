@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.crypto.SecureUtil;
 import cn.hutool.extra.spring.SpringUtil;
+import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -142,6 +143,8 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
     private WebsiteGoodsRecordMapper websiteGoodsRecordMapper;
     @Value("${merchant.url}")
     private String merchantUrl;
+    @Resource
+    private MerchantLogMapper merchantLogMapper;
 
     @Override
     public MerchantResult getWebsiteInfo(Integer merchantId) throws ApiException {
@@ -636,6 +639,13 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
             merchant.setIsEnable("Y");
             merchant.setIsDelete("N");
             merchantMapper.updateById(merchant);
+            Merchant newM = merchantMapper.selectById(m.getId());
+            MerchantLog merchantLog = new MerchantLog();
+            merchantLog.setMerchantId(m.getId());
+            merchantLog.setOperatorId(merchantReq.getOperatorId());
+            merchantLog.setBeforeData(JSONUtil.toJsonStr(m));
+            merchantLog.setAfterData(JSONUtil.toJsonStr(newM));
+            merchantLogMapper.insert(merchantLog);
         }
         return null;
     }

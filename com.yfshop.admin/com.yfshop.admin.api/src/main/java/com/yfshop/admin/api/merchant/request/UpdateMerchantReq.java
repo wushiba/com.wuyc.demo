@@ -20,6 +20,8 @@ import java.io.Serializable;
 public class UpdateMerchantReq implements Serializable {
     private static final long serialVersionUID = 1712420945806506096L;
 
+    private Integer operatorId;
+
     @ApiModelProperty(value = "商户ID", required = true)
     @NotNull(message = "商户ID不能为空")
     private Integer merchantId;

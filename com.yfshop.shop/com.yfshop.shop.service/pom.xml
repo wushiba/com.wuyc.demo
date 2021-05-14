@@ -75,6 +75,15 @@
             <artifactId>ip2region</artifactId>
             <version>1.7.2</version>
         </dependency>
+
+        <dependency>
+            <groupId>cn.sto.sdk</groupId>
+            <artifactId>sto-link-sdk</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.sf</groupId>
+            <artifactId>sf-express-sdk</artifactId>
+        </dependency>
     </dependencies>
     <build>
         <plugins>

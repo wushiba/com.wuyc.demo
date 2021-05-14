@@ -62,6 +62,7 @@ class MerchantInfoController extends AbstractBaseController {
     @ResponseBody
     public CommonResult<Void> saveMerchant(MerchantReq merchantReq) {
         merchantReq.setPId(getCurrentAdminUserId());
+        merchantReq.setOperatorId(getCurrentAdminUserId());
         return CommonResult.success(merchantInfoService.save(merchantReq));
     }
 

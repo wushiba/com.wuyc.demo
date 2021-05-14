@@ -20,6 +20,8 @@ import java.io.Serializable;
 public class MerchantReq implements Serializable {
     private static final long serialVersionUID = 1712420945806506096L;
 
+    private Integer operatorId;
+
     private Integer merchantId;
 
     private Integer pId;

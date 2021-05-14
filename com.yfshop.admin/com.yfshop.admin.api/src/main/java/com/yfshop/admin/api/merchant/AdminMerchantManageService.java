@@ -54,7 +54,7 @@ public interface AdminMerchantManageService {
      * @return void
      * @throws ApiException e
      */
-    Void updateMerchantIsEnable(@NotNull(message = "商户ID不能为空") Integer merchantId, boolean isEnable) throws ApiException;
+    Void updateMerchantIsEnable(@NotNull(message = "商户ID不能为空") Integer merchantId, Integer operatorId, boolean isEnable) throws ApiException;
 
     /**
      * 根据角色标识查询商户列表
