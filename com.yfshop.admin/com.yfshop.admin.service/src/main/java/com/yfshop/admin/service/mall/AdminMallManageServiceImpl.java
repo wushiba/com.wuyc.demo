@@ -295,7 +295,7 @@ public class AdminMallManageServiceImpl implements AdminMallManageService {
             itemResult.setItemCategory(BeanUtil.convert(itemCategory, ItemCategoryResult.class));
         }
         // 查询商品的详情
-        ItemContent itemContent = itemContentManager.getOne(Wrappers.lambdaQuery(ItemContent.class).eq(ItemContent::getItemId, item));
+        ItemContent itemContent = itemContentManager.getOne(Wrappers.lambdaQuery(ItemContent.class).eq(ItemContent::getItemId, item.getId()));
         if (itemContent != null) {
             itemResult.setItemContent(BeanUtil.convert(itemContent, ItemContentResult.class));
         }
