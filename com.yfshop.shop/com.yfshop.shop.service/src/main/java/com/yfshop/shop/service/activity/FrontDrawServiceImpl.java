@@ -96,6 +96,8 @@ public class FrontDrawServiceImpl implements FrontDrawService {
             drawActivity = JSON.parseObject(activityObject.toString(), DrawActivity.class);
         } else {
             drawActivity = drawActivityMapper.selectById(id);
+            redisService.set(CacheConstants.DRAW_ACTIVITY_PREFIX + id,
+                    JSON.toJSONString(drawActivity), 60 * 60 * 24 * 30);
         }
         if (drawActivity == null) {
             return null;
