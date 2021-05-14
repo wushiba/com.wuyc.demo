@@ -6,6 +6,8 @@ import lombok.Data;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -76,6 +78,8 @@ public class ItemSkuResult implements Serializable {
      * 规格名称和值的json串({"尺码":"38","颜色":"黑色"})
      */
     private String specNameValueJson;
+
+    private List<Map<String,String>> spec;
 
     /**
      * 规格id和值id的json串({"123":"131","321":"432"})

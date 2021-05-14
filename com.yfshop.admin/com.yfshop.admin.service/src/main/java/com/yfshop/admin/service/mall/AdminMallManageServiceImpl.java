@@ -2,6 +2,7 @@ package com.yfshop.admin.service.mall;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.collection.IterUtil;
+import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -307,6 +308,17 @@ public class AdminMallManageServiceImpl implements AdminMallManageService {
         List<ItemSku> itemSkuList = skuMapper.selectList(Wrappers.lambdaQuery(ItemSku.class).eq(ItemSku::getItemId, itemId));
         if (CollectionUtil.isNotEmpty(itemSkuList)) {
             itemResult.setItemSkuList(BeanUtil.convertList(itemSkuList, ItemSkuResult.class));
+            itemResult.getItemSkuList().forEach(i -> {
+                List<Map<String, String>> list = new ArrayList<>();
+                i.setSpec(list);
+                Map<String, String> map = JSONUtil.toBean(i.getSpecNameValueJson(), new HashMap<String, String>().getClass());
+                map.forEach((key, value) -> {
+                    Map<String, String> m = new HashMap<>();
+                    m.put("key", key);
+                    m.put("value", value);
+                    list.add(m);
+                });
+            });
         }
         // 查询商品的规格
         List<ItemSpecName> specNames = specNameMapper.selectList(Wrappers.lambdaQuery(ItemSpecName.class).eq(ItemSpecName::getItemId, itemId));
@@ -907,4 +919,5 @@ public class AdminMallManageServiceImpl implements AdminMallManageService {
         // 删除商品的sku信息
         skuMapper.delete(Wrappers.lambdaQuery(ItemSku.class).eq(ItemSku::getItemId, itemId));
     }
+
 }

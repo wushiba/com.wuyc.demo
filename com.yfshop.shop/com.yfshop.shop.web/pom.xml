@@ -96,7 +96,6 @@
             <groupId>com.yfshop.parent</groupId>
             <artifactId>com.yfshop.auth.api</artifactId>
             <version>1.0-SNAPSHOT</version>
-            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.github.binarywang</groupId>
@@ -106,7 +105,10 @@
             <groupId>com.github.binarywang</groupId>
             <artifactId>weixin-java-pay</artifactId>
         </dependency>
-
+        <dependency>
+            <groupId>cn.sto.sdk</groupId>
+            <artifactId>sto-link-sdk</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
