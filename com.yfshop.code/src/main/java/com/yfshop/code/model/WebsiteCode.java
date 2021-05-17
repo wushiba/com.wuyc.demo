@@ -132,6 +132,7 @@ public class WebsiteCode extends Model<WebsiteCode> {
      */
     private String fileStatus;
 
+    private Integer downloadCount;
 
     @Override
     protected Serializable pkVal() {

@@ -43,10 +43,10 @@
         <if test="merchantId!=null">
             and (w.merchant_id=#{merchantId} or w.pid_path like concat('%',#{merchantId},'%') )
         </if>
-        <if test="startTime!=null and startTime!=''">
+        <if test="startTime!=null">
             and w.create_time &gt;= #{startTime}
         </if>
-        <if test="endTime!=null and endTime!=''">
+        <if test="endTime!=null">
             and w.create_time &lt; #{endTime}
         </if>
         <if test="batchNo!=null and batchNo!=''">
@@ -115,10 +115,10 @@
         <if test="merchantId!=null">
             and (w.merchant_id=#{merchantId} or w.pid_path like concat('%',#{merchantId},'%') )
         </if>
-        <if test="startTime!=null and startTime!=''">
+        <if test="startTime!=null">
             and w.create_time &gt;= #{startTime}
         </if>
-        <if test="endTime!=null and endTime!=''">
+        <if test="endTime!=null">
             and w.create_time &lt; #{endTime}
         </if>
         <if test="batchNo!=null and batchNo!=''">

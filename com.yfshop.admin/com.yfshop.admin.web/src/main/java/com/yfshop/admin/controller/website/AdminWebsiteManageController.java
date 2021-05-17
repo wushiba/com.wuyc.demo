@@ -114,4 +114,13 @@ public class AdminWebsiteManageController implements BaseController {
         }
         return null;
     }
+
+
+    @SaCheckLogin
+    @ApiOperation(value = "重新生成网点码", httpMethod = "POST")
+    @RequestMapping(value = "/retryWebsiteCode", method = {RequestMethod.GET, RequestMethod.POST})
+    @ResponseBody
+    public CommonResult<Void> retryWebsiteCode(Integer websiteCodeId) {
+        return CommonResult.success(adminWebsiteCodeManageService.retryWebsiteCode(websiteCodeId));
+    }
 }
