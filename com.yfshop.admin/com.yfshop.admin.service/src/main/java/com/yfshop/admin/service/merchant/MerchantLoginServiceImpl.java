@@ -31,7 +31,7 @@ public class MerchantLoginServiceImpl implements MerchantLoginService {
     @Resource
     MerchantMapper merchantMapper;
 
-    @DubboReference(check = false)
+    @DubboReference
     private CaptchaService captchaService;
 
     @Override

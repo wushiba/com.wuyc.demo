@@ -30,13 +30,13 @@ class MerchantLoginController extends AbstractBaseController {
 
     private static final Logger logger = LoggerFactory.getLogger(MerchantLoginController.class);
 
-    @DubboReference(check = false)
+    @DubboReference
     private MerchantLoginService merchantLoginService;
 
-    @DubboReference(check = false)
+    @DubboReference
     private MerchantInfoService merchantService;
 
-    @DubboReference(check = false)
+    @DubboReference
     private CaptchaService captchaService;
 
     /**
