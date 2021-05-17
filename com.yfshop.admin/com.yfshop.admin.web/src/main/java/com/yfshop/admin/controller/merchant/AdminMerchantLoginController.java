@@ -35,7 +35,7 @@ class AdminMerchantLoginController implements BaseController {
      */
     @RequestMapping(value = "/loginByPwd", method = {RequestMethod.POST})
     public CommonResult<MerchantResult> loginByPwd(MerchantLoginReq merchantLoginReq) {
-        MerchantResult merchantResult = merchantLoginService.loginByPwd(merchantLoginReq.getMobile(), merchantLoginReq.getPwd());
+        MerchantResult merchantResult = merchantLoginService.loginByPwd(merchantLoginReq.getMobile(), merchantLoginReq.getPwd(),null);
         Asserts.assertNotEquals(merchantResult.getRoleAlias(),GroupRoleEnum.WD.getCode(),500,"网点用户请在公众号登录！");
         StpUtil.setLoginId(merchantResult.getId());
         return CommonResult.success(merchantResult);
