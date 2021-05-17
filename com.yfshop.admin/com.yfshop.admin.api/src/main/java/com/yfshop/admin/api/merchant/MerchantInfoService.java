@@ -60,7 +60,6 @@ public interface MerchantInfoService {
      *
      * @param merchantId
      * @param status
-     * @param dateTime
      * @return
      * @throws ApiException
      */
@@ -199,11 +198,13 @@ public interface MerchantInfoService {
 
     WebsiteCodeGroupResult getWebsiteCodeData(WebsiteCodeDataReq websiteCodeDataReq);
 
-    List<MerchantResult> findNearMerchantList(Integer districtId, Double longitude, Double latitude);
+    List<MerchantResult> findNearMerchantList(Integer merchantId,Integer districtId, Double longitude, Double latitude);
 
     Void websiteAddGoods(Integer merchantId, String mobile, Integer count) throws ApiException;
 
     MerchantResult getWebsiteByMobile(String mobile) throws ApiException;
 
     List<GoodsRecordResult> websiteGoodsList(QueryGoodsRecordReq merchantId);
+
+    Integer getWebsiteCodeBindCount(Integer merchantId);
 }

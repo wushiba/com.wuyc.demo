@@ -3,6 +3,7 @@ package com.yfshop.shop.controller.express;
 import cn.dev33.satoken.annotation.SaCheckLogin;
 import com.yfshop.common.api.CommonResult;
 import com.yfshop.common.base.BaseController;
+import com.yfshop.shop.service.express.result.ExpressOrderResult;
 import com.yfshop.shop.service.express.result.ExpressResult;
 import com.yfshop.shop.service.order.service.FrontExpressService;
 import org.apache.dubbo.config.annotation.DubboReference;
@@ -38,7 +39,7 @@ public class ExpressController implements BaseController {
     @RequestMapping(value = "/query", method = {RequestMethod.GET, RequestMethod.POST})
     @ResponseBody
     @SaCheckLogin
-    public CommonResult<List<ExpressResult>> query(Long id) {
+    public CommonResult<ExpressOrderResult> query(Long id) {
 
         return CommonResult.success(expressService.queryExpress(id));
     }

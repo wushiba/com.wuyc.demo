@@ -8,6 +8,7 @@ import com.sf.csim.express.service.HttpClientUtil;
 import com.sto.link.request.LinkRequest;
 import com.sto.link.util.LinkUtils;
 import com.yfshop.admin.api.express.ExpressService;
+import com.yfshop.admin.api.express.result.ExpressOrderResult;
 import com.yfshop.admin.api.express.result.ExpressResult;
 import com.yfshop.admin.api.express.result.SfExpressResult;
 import com.yfshop.admin.api.express.result.StoExpressResult;
@@ -27,9 +28,14 @@ public class ExpressServiceImpl implements ExpressService {
     private OrderDetailMapper orderDetailMapper;
 
     @Override
-    public List<ExpressResult> queryExpress(Long id) throws ApiException {
+    public ExpressOrderResult queryExpress(Long id) throws ApiException {
+        ExpressOrderResult expressOrderResult = new ExpressOrderResult();
         OrderDetail orderDetail = orderDetailMapper.selectById(id);
-        return queryExpressByWayBillNo(orderDetail.getExpressNo());
+        List<ExpressResult> list = queryExpressByWayBillNo(orderDetail.getExpressNo());
+        expressOrderResult.setExpressNo(orderDetail.getExpressNo());
+        expressOrderResult.setExpressName(orderDetail.getExpressCompany());
+        expressOrderResult.setList(list);
+        return expressOrderResult;
     }
 
     @Override
@@ -60,13 +66,15 @@ public class ExpressServiceImpl implements ExpressService {
         if (stoExpressResult.getSuccess().equals("true")) {
             JSONObject dataJson = JSONUtil.parseObj(stoExpressResult.getData());
             JSONArray jsonArray = dataJson.getJSONArray(wayBillNo);
-            jsonArray.forEach(item -> {
-                StoExpressResult.WaybillNoDTO sto = JSONUtil.toBean((JSONObject) item, StoExpressResult.WaybillNoDTO.class);
-                ExpressResult expressResult = new ExpressResult();
-                expressResult.setDateTime(sto.getOpTime());
-                expressResult.setContext(sto.getMemo());
-                expressResultList.add(expressResult);
-            });
+            if (jsonArray!=null) {
+                jsonArray.forEach(item -> {
+                    StoExpressResult.WaybillNoDTO sto = JSONUtil.toBean((JSONObject) item, StoExpressResult.WaybillNoDTO.class);
+                    ExpressResult expressResult = new ExpressResult();
+                    expressResult.setDateTime(sto.getOpTime());
+                    expressResult.setContext(sto.getMemo());
+                    expressResultList.add(expressResult);
+                });
+            }
         }
         return expressResultList;
     }

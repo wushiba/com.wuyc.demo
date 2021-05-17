@@ -2,6 +2,7 @@ package com.yfshop.admin.controller.order;
 
 import cn.dev33.satoken.annotation.SaCheckLogin;
 import com.yfshop.admin.api.express.ExpressService;
+import com.yfshop.admin.api.express.result.ExpressOrderResult;
 import com.yfshop.admin.api.express.result.ExpressResult;
 import com.yfshop.common.api.CommonResult;
 import com.yfshop.common.base.BaseController;
@@ -33,7 +34,7 @@ public class ExpressController implements BaseController {
     @RequestMapping(value = "/query", method = {RequestMethod.GET, RequestMethod.POST})
     @ResponseBody
     @SaCheckLogin
-    public CommonResult<List<ExpressResult>> query(Long id) {
+    public CommonResult<ExpressOrderResult> query(Long id) {
 
         return CommonResult.success(expressService.queryExpress(id));
     }

@@ -1,4 +1,5 @@
 package com.yfshop.shop.service.merchant;
+
 import java.time.LocalDateTime;
 
 import com.alibaba.fastjson.JSON;
@@ -105,6 +106,7 @@ public class FrontMerchantServiceImpl implements FrontMerchantService {
 
     /**
      * 根据网点码查询商户信息
+     *
      * @param websiteCode 网点码
      * @return MerchantResult
      * @throws ApiException
@@ -138,7 +140,8 @@ public class FrontMerchantServiceImpl implements FrontMerchantService {
 
     /**
      * 用户自提二等奖成功后，生成网点记账单
-     * @param orderId     用户主订单id
+     *
+     * @param orderId 用户主订单id
      * @return
      * @throws ApiException
      */
@@ -187,14 +190,22 @@ public class FrontMerchantServiceImpl implements FrontMerchantService {
         if (merchantListObject != null) {
             return JSON.parseArray(merchantListObject.toString(), MerchantResult.class);
         }
-
+        List<Integer> ids = websiteCodeDetailMapper.selectList(Wrappers.lambdaQuery(WebsiteCodeDetail.class)
+                .eq(WebsiteCodeDetail::getIsActivate, "Y"))
+                .stream()
+                .map(WebsiteCodeDetail::getMerchantId)
+                .distinct()
+                .collect(Collectors.toList());
+        if (CollectionUtils.isEmpty(ids)) {
+            return null;
+        }
         List<Merchant> merchantList = merchantMapper.selectList(Wrappers.lambdaQuery(Merchant.class)
-                .eq(Merchant::getRoleAlias, GroupRoleEnum.WD.getCode())
-                .orderByDesc(Merchant::getId));
+                .in(Merchant::getId, ids)
+                .eq(Merchant::getIsEnable, "Y")
+                .eq(Merchant::getIsDelete, "N"));
         if (CollectionUtils.isEmpty(merchantList)) {
             return null;
         }
-
         List<Integer> idList = merchantList.stream().map(Merchant::getId).collect(Collectors.toList());
         List<MerchantDetail> detailList = merchantDetailMapper.selectList(Wrappers.lambdaQuery(MerchantDetail.class)
                 .in(MerchantDetail::getMerchantId, idList)
@@ -217,10 +228,10 @@ public class FrontMerchantServiceImpl implements FrontMerchantService {
 
         // 更新缓存中的商户经纬度，先删除后更新
         detailList.forEach(merchantDetail -> {
-            Long aLong = redisService.zRemove(CacheConstants.MERCHANT_GRO_DATA, merchantDetail.getMerchantId() + "");
-            logger.info("======merchantId=" + merchantDetail.getMerchantId() + "zSetRemoveSize=" + aLong);
+            redisService.zRemove(CacheConstants.MERCHANT_GRO_DATA, merchantDetail.getMerchantId() + "");
             redisService.geoAdd(CacheConstants.MERCHANT_GRO_DATA, merchantDetail.getLongitude(), merchantDetail.getLatitude(), merchantDetail.getMerchantId());
         });
+
         return merchantResultList;
     }
 }

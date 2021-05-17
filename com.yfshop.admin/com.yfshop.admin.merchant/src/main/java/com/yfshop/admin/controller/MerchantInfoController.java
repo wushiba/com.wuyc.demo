@@ -148,7 +148,11 @@ class MerchantInfoController extends AbstractBaseController {
                 merchantResult = merchantInfoService.getMerchantByOpenId(getCurrentOpenId());
             }
             if (merchantResult != null) {
-                Asserts.assertEquals(merchantResult.getRoleAlias(), GroupRoleEnum.WD.getCode(), 500, "网点码未激活！");
+                if (!merchantResult.getRoleAlias().equals(GroupRoleEnum.WD.getCode())) {
+                    Integer count = merchantInfoService.getWebsiteCodeBindCount(merchantResult.getId());
+                    Asserts.assertEquals(count == null ? 0 : count, 0, 500, "您已经绑定过网点码了！");
+                }
+
             }
         } else if (result > 0) {
             merchantResult = merchantInfoService.getMerchantByWebsiteCode(websiteCode);
@@ -391,7 +395,7 @@ class MerchantInfoController extends AbstractBaseController {
     @ResponseBody
     @SaCheckLogin
     public CommonResult<List<MerchantResult>> findNearMerchantList(Integer districtId, Double longitude, Double latitude) {
-        return CommonResult.success(merchantInfoService.findNearMerchantList(districtId, longitude, latitude));
+        return CommonResult.success(merchantInfoService.findNearMerchantList(getCurrentAdminUserId(), districtId, longitude, latitude));
     }
 
 

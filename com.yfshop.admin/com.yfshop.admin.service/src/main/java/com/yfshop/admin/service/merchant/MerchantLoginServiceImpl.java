@@ -11,6 +11,7 @@ import com.yfshop.common.enums.CaptchaSourceEnum;
 import com.yfshop.common.exception.ApiException;
 import com.yfshop.common.exception.Asserts;
 import com.yfshop.common.util.BeanUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.validation.annotation.Validated;
@@ -34,24 +35,32 @@ public class MerchantLoginServiceImpl implements MerchantLoginService {
     private CaptchaService captchaService;
 
     @Override
-    public MerchantResult loginByPwd(String mobile, String pwd) throws ApiException {
+    public MerchantResult loginByPwd(String mobile, String pwd, String openId) throws ApiException {
         Merchant merchant = merchantMapper.selectOne(Wrappers.<Merchant>lambdaQuery()
                 .eq(Merchant::getMobile, mobile)
                 .eq(Merchant::getPassword, SecureUtil.md5(pwd))
                 .eq(Merchant::getIsEnable, "Y")
                 .eq(Merchant::getIsDelete, "N"));
         Asserts.assertNonNull(merchant, 500, "账号或密码输入错误！");
+        if (StringUtils.isNotBlank(openId)) {
+            merchant.setOpenId(openId);
+            merchantMapper.updateById(merchant);
+        }
         return BeanUtil.convert(merchant, MerchantResult.class);
     }
 
     @Override
-    public MerchantResult loginByCaptcha(String mobile, String captcha) throws ApiException {
+    public MerchantResult loginByCaptcha(String mobile, String captcha, String openId) throws ApiException {
         captchaService.checkCaptcha(mobile, captcha, CaptchaSourceEnum.LOGIN_CAPTCHA);
         Merchant merchant = merchantMapper.selectOne(Wrappers.<Merchant>lambdaQuery()
                 .eq(Merchant::getMobile, mobile)
                 .eq(Merchant::getIsEnable, "Y")
                 .eq(Merchant::getIsDelete, "N"));
         Asserts.assertNonNull(merchant, 500, "账号输入错误！");
+        if (StringUtils.isNotBlank(openId)) {
+            merchant.setOpenId(openId);
+            merchantMapper.updateById(merchant);
+        }
         return BeanUtil.convert(merchant, MerchantResult.class);
     }
 
@@ -60,7 +69,8 @@ public class MerchantLoginServiceImpl implements MerchantLoginService {
         Merchant merchant = merchantMapper.selectOne(Wrappers.<Merchant>lambdaQuery()
                 .eq(Merchant::getOpenId, openId)
                 .eq(Merchant::getIsEnable, "Y")
-                .eq(Merchant::getIsDelete, "N"));
+                .eq(Merchant::getIsDelete, "N")
+                .orderByDesc(Merchant::getUpdateTime));
         Asserts.assertNonNull(merchant, 500, "没有商户信息");
         return BeanUtil.convert(merchant, MerchantResult.class);
     }
