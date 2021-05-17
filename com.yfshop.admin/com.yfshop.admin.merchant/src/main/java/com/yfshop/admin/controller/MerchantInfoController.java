@@ -149,6 +149,7 @@ class MerchantInfoController extends AbstractBaseController {
             }
             if (merchantResult != null) {
                 if (!merchantResult.getRoleAlias().equals(GroupRoleEnum.WD.getCode())) {
+                    Asserts.assertTrue("jxs,fxs,cxy,ywy,cxy".contains(merchantResult.getRoleAlias()), 500, "网点码未激活！");
                     Integer count = merchantInfoService.getWebsiteCodeBindCount(merchantResult.getId());
                     Asserts.assertEquals(count == null ? 0 : count, 0, 500, "您已经绑定过网点码了！");
                 }
