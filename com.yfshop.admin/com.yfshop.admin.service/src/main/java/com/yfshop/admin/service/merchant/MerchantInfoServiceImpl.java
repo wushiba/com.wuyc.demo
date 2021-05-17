@@ -237,13 +237,15 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
                 merchantDetailMapper.insert(merchantDetail);
             }
         }
-        Merchant merchantPid = merchantMapper.selectById(websiteCodeDetail.getPid());
-        if (merchantPid != null) {
-            merchant.setPid(merchantPid.getId());
-            merchant.setPidPath(merchantPid.getPidPath() + merchant.getId() + ".");
-            merchant.setPMerchantName(merchantPid.getMerchantName());
-        } else {
-            merchant.setPidPath(merchant.getId() + ".");
+        if (!websiteCodeDetail.getPid().equals(merchantId)) {
+            Merchant merchantPid = merchantMapper.selectById(websiteCodeDetail.getPid());
+            if (merchantPid != null) {
+                merchant.setPid(merchantPid.getId());
+                merchant.setPidPath(merchantPid.getPidPath() + merchant.getId() + ".");
+                merchant.setPMerchantName(merchantPid.getMerchantName());
+            } else {
+                merchant.setPidPath(merchant.getId() + ".");
+            }
         }
         if (StringUtils.isNotBlank(websiteReq.getOpenId())) {
             User user = userMapper.selectOne(Wrappers.<User>lambdaQuery()
@@ -841,7 +843,7 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
     @Override
     public Integer getWebsiteCodeBindCount(Integer merchantId) {
 
-        return getCurrentWebsiteCodeCount(merchantId,null,null);
+        return getCurrentWebsiteCodeCount(merchantId, null, null);
     }
 
     private Integer getCurrentWebsiteCodeCount(Integer merchantId, Date startTime, Date endTime) {
