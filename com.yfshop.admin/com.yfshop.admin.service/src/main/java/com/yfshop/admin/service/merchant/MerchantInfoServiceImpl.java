@@ -213,7 +213,7 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
         } else {
             merchantId = merchant.getId();
             merchant.setHeadImgUrl(headImageUrl);
-            Asserts.assertEquals(merchant.getRoleAlias(), GroupRoleEnum.WD.getCode(), 500, "改手机号已经存在其他身份，请更换网点对应手机号！");
+            //Asserts.assertEquals(merchant.getRoleAlias(), GroupRoleEnum.WD.getCode(), 500, "改手机号已经存在其他身份，请更换网点对应手机号！");
             Asserts.assertEquals(merchant.getMobile(), websiteReq.getMobile(), 500, "手机号不允许被修改！");
             String openId = merchant.getOpenId();
             merchant = BeanUtil.convert(websiteReq, Merchant.class);
