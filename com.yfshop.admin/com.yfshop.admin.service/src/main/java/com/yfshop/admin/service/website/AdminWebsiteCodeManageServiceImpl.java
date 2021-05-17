@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.yfshop.admin.api.website.AdminWebsiteCodeManageService;
+import com.yfshop.admin.api.website.WebsiteCodeTaskService;
 import com.yfshop.admin.api.website.request.WebsiteCodeExpressReq;
 import com.yfshop.admin.api.website.request.WebsiteCodeQueryDetailsReq;
 import com.yfshop.admin.api.website.request.WebsiteCodeQueryReq;
@@ -22,6 +23,7 @@ import com.yfshop.common.exception.Asserts;
 import com.yfshop.common.util.BeanUtil;
 import com.yfshop.common.util.DateUtil;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -40,6 +42,8 @@ public class AdminWebsiteCodeManageServiceImpl implements AdminWebsiteCodeManage
     private WebsiteCodeDetailMapper websiteCodeDetailMapper;
     @Autowired
     private OssDownloader ossDownloader;
+    @DubboReference
+    private WebsiteCodeTaskService websiteCodeTaskService;
 
     @Override
     public IPage<WebsiteCodeResult> queryWebsiteCodeList(WebsiteCodeQueryReq req) throws ApiException {
@@ -112,6 +116,15 @@ public class AdminWebsiteCodeManageServiceImpl implements AdminWebsiteCodeManage
     public String getWebsiteCodeUrl(Integer id) throws ApiException {
         WebsiteCode websiteCode = websiteCodeMapper.selectById(id);
         Asserts.assertStringNotBlank(websiteCode.getFileUrl(), 500, "文件不存在！");
+        Integer count = websiteCode.getDownloadCount();
+        websiteCode.setDownloadCount(count == null ? 1 : count + 1);
+        websiteCodeMapper.updateById(websiteCode);
         return ossDownloader.privateDownloadUrl(websiteCode.getFileUrl(), 60);
+    }
+
+    @Override
+    public Void retryWebsiteCode(Integer websiteCodeId) {
+        websiteCodeTaskService.buildWebSiteCode(websiteCodeId);
+        return null;
     }
 }

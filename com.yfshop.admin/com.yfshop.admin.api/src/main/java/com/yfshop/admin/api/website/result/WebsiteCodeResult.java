@@ -128,5 +128,8 @@ public class WebsiteCodeResult implements Serializable {
     private String email;
 
 
+    private Integer downloadCount;
+
+
 
 }

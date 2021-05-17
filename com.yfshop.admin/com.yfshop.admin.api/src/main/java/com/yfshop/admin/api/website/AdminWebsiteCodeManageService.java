@@ -59,4 +59,5 @@ public interface AdminWebsiteCodeManageService {
      */
     String getWebsiteCodeUrl(Integer id) throws ApiException;
 
+    Void retryWebsiteCode(Integer websiteCodeId);
 }
