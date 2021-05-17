@@ -6,14 +6,11 @@ import cn.dev33.satoken.exception.NotPermissionException;
 import cn.dev33.satoken.exception.NotRoleException;
 import cn.dev33.satoken.exception.SaTokenException;
 import cn.dev33.satoken.stp.StpUtil;
-import cn.hutool.crypto.SecureUtil;
-import cn.hutool.extra.servlet.ServletUtil;
 import com.alibaba.fastjson.JSON;
 import com.yfshop.common.api.CommonResult;
 import com.yfshop.common.api.ErrorCode;
 import com.yfshop.common.api.IErrorCode;
 import com.yfshop.common.api.ResultCode;
-import io.swagger.annotations.Api;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -175,24 +172,40 @@ public class CustomGlobalExceptionResolver implements HandlerExceptionResolver, 
 
     private CodeAndMessage fetchErrorCodeAndMessageByException(Throwable t) {
         if (true) {
+            CodeAndMessage codeAndMessage = new CodeAndMessage();
             if (t instanceof ApiException) {
                 ApiException apiException = (ApiException) t;
-                CodeAndMessage codeAndMessage = new CodeAndMessage();
                 codeAndMessage.setCode(apiException.getErrorCode().getCode());
                 codeAndMessage.setMessage(apiException.getErrorCode().getMessage());
                 return codeAndMessage;
-
-            }else if (t instanceof BindException){
-                BindException apiException = (BindException) t;
-                CodeAndMessage codeAndMessage = new CodeAndMessage();
-                codeAndMessage.setCode(500);
-                codeAndMessage.setMessage(apiException.getMessage());
+            } else if (t instanceof MethodArgumentNotValidException) {
+                MethodArgumentNotValidException validException = (MethodArgumentNotValidException) t;
+                FieldError fieldError = validException.getBindingResult().getFieldError();
+                codeAndMessage.setCode(ERROR_CODE);
+                if (fieldError != null) {
+                    codeAndMessage.setMessage(fieldError.getDefaultMessage());
+                } else {
+                    codeAndMessage.setMessage("参数错误");
+                }
                 return codeAndMessage;
-            }
-            if (t instanceof NotLoginException) {
-                return new CodeAndMessage(605, "当前状态未登录！");
+            } else if (t instanceof ConstraintViolationException) {
+                Set<ConstraintViolation<?>> violations = ((ConstraintViolationException) t).getConstraintViolations();
+                String message = new ArrayList<>(violations).get(0).getMessage();
+                codeAndMessage.setCode(ERROR_CODE);
+                codeAndMessage.setMessage(message);
+                return codeAndMessage;
+            } else if (t instanceof BindException) {
+                List<ObjectError> allErrors = ((BindException) t).getAllErrors();
+                String message = allErrors.get(0).getDefaultMessage();
+                codeAndMessage.setCode(ERROR_CODE);
+                codeAndMessage.setMessage(message);
+                return codeAndMessage;
             } else {
-                return new CodeAndMessage(500, "您当前的网络不稳定，请稍后再试！");
+                if (t instanceof NotLoginException) {
+                    return new CodeAndMessage(605, "当前状态未登录！");
+                } else {
+                    return new CodeAndMessage(500, "您当前的网络不稳定，请稍后再试！");
+                }
             }
         }
         CodeAndMessage codeAndMessage = new CodeAndMessage();
