@@ -2,6 +2,7 @@ package com.yfshop.admin.api.merchant;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.yfshop.admin.api.merchant.request.CreateMerchantReq;
+import com.yfshop.admin.api.merchant.request.MerchantExcelReq;
 import com.yfshop.admin.api.merchant.request.QueryMerchantReq;
 import com.yfshop.admin.api.merchant.request.UpdateMerchantReq;
 import com.yfshop.admin.api.merchant.result.MerchantResult;
@@ -69,5 +70,5 @@ public interface AdminMerchantManageService {
     IPage<MerchantResult> pageQueryMerchantsByPidAndRoleAlias(Integer merchantId, String roleAlias, String merchantName,
                                                               Integer pageIndex, Integer pageSize);
 
-    Void importExcel(List<MerchantExcel> merchantExcels);
+    Void importExcel(List<MerchantExcelReq> merchantExcels);
 }

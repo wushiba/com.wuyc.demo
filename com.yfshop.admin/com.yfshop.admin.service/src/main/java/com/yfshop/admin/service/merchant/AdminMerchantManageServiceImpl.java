@@ -9,10 +9,10 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.yfshop.admin.api.merchant.AdminMerchantManageService;
 import com.yfshop.admin.api.merchant.MerchantExcel;
 import com.yfshop.admin.api.merchant.request.CreateMerchantReq;
+import com.yfshop.admin.api.merchant.request.MerchantExcelReq;
 import com.yfshop.admin.api.merchant.request.QueryMerchantReq;
 import com.yfshop.admin.api.merchant.request.UpdateMerchantReq;
 import com.yfshop.admin.api.merchant.result.MerchantResult;
-import com.yfshop.admin.api.website.request.WebsiteCodeBindReq;
 import com.yfshop.admin.dao.MerchantDao;
 import com.yfshop.admin.dto.query.QueryMerchantDetail;
 import com.yfshop.code.mapper.MerchantDetailMapper;
@@ -288,12 +288,13 @@ public class AdminMerchantManageServiceImpl implements AdminMerchantManageServic
     }
 
     @Override
-    public Void importExcel(List<MerchantExcel> merchantExcels) {
+    public Void importExcel(List<MerchantExcelReq> merchantExcels) {
         if (CollectionUtils.isEmpty(merchantExcels)) return null;
         merchantExcels.stream().forEach(item -> {
             Merchant merchant = new Merchant();
             buildAddress(merchant, item.getAddress());
-            merchantMapper.update(merchant, Wrappers.lambdaQuery(Merchant.class).eq(Merchant::getMobile, item.getMobile()));
+            merchantMapper.update(merchant, Wrappers.lambdaQuery(Merchant.class)
+                    .eq(Merchant::getMobile, item.getMobile()));
         });
 
         return null;

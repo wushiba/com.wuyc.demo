@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.yfshop.admin.api.merchant.*;
 import com.yfshop.admin.api.merchant.MerchantExcel;
 import com.yfshop.admin.api.merchant.request.CreateMerchantReq;
+import com.yfshop.admin.api.merchant.request.MerchantExcelReq;
 import com.yfshop.admin.api.merchant.request.QueryMerchantReq;
 import com.yfshop.admin.api.merchant.request.UpdateMerchantReq;
 import com.yfshop.admin.api.merchant.result.MerchantResult;
@@ -135,7 +136,7 @@ public class AdminMerchantManageController implements BaseController {
     @SaCheckLogin
     @SaCheckRole(value = {"sys"}, mode = SaMode.OR)
     public CommonResult<Void> importExcel(MultipartFile file) {
-        List<MerchantExcel> merchantExcels = ExcelUtils.importExcel(file, 1, 1, MerchantExcel.class);
+        List<MerchantExcelReq> merchantExcels = ExcelUtils.importExcel(file, 0, 1, MerchantExcelReq.class);
         return CommonResult.success(adminMerchantManageService.importExcel(merchantExcels));
     }
 
