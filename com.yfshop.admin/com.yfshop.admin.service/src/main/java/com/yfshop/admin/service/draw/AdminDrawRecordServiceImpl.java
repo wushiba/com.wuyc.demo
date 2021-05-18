@@ -36,10 +36,11 @@ public class AdminDrawRecordServiceImpl implements AdminDrawRecordService {
                 .like(StringUtils.isNotBlank(queryDrawRecordReq.getDealerName()), DrawRecord::getDealerName, queryDrawRecordReq.getDealerName())
                 .like(StringUtils.isNotBlank(queryDrawRecordReq.getDealerAddress()), DrawRecord::getDealerAddress, queryDrawRecordReq.getDealerAddress())
                 .ge(queryDrawRecordReq.getStartTime() != null, DrawRecord::getCreateTime, queryDrawRecordReq.getStartTime())
-                .lt(queryDrawRecordReq.getEndTime() != null, DrawRecord::getCreateTime, queryDrawRecordReq.getEndTime());
+                .lt(queryDrawRecordReq.getEndTime() != null, DrawRecord::getCreateTime, queryDrawRecordReq.getEndTime())
+                .orderByDesc();
         IPage<DrawRecord> iPage = drawRecordMapper.selectPage(new Page<>(queryDrawRecordReq.getPageIndex(), queryDrawRecordReq.getPageSize()), wrapper);
         IPage<DrawRecordResult> result = BeanUtil.iPageConvert(iPage, DrawRecordResult.class);
-        result.setTotal(drawRecordMapper.selectCount(wrapper));
+        //result.setTotal(drawRecordMapper.selectCount(wrapper));
         return result;
     }
 }

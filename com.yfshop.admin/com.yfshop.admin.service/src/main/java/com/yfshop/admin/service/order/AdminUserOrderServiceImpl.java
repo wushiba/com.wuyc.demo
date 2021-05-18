@@ -131,7 +131,9 @@ public class AdminUserOrderServiceImpl implements AdminUserOrderService {
             if (userCoupon != null) {
                 DrawRecord drawRecord = new DrawRecord();
                 drawRecord.setUseStatus(UserCouponStatusEnum.HAS_USE.getCode());
-                drawRecordMapper.update(drawRecord, Wrappers.<DrawRecord>lambdaQuery().eq(DrawRecord::getActCode, userCoupon.getActCode()));
+                drawRecordMapper.update(drawRecord, Wrappers.<DrawRecord>lambdaQuery()
+                        .eq(DrawRecord::getActCode, userCoupon.getActCode())
+                        .eq(DrawRecord::getUserId, userCoupon.getUserId()));
             }
         }
         return null;
@@ -145,7 +147,8 @@ public class AdminUserOrderServiceImpl implements AdminUserOrderService {
                 .eq(StringUtils.isNoneBlank(req.getReceiveWay()), OrderDetail::getReceiveWay, req.getReceiveWay())
                 .eq(StringUtils.isNoneBlank(req.getOrderStatus()), OrderDetail::getOrderStatus, req.getOrderStatus())
                 .ge(req.getStartTime() != null, OrderDetail::getCreateTime, req.getStartTime())
-                .lt(req.getEndTime() != null, OrderDetail::getCreateTime, req.getEndTime());
+                .lt(req.getEndTime() != null, OrderDetail::getCreateTime, req.getEndTime())
+                .orderByDesc();
         IPage<OrderDetail> iPage = orderDetailMapper.selectPage(new Page<>(req.getPageIndex(), req.getPageSize()), wrapper);
         return BeanUtil.iPageConvert(iPage, OrderResult.class);
     }
