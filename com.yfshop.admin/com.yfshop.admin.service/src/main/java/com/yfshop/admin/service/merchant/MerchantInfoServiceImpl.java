@@ -183,6 +183,7 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
                 .eq(WebsiteCodeDetail::getIsActivate, 'N'));
         Asserts.assertNonNull(websiteCodeDetail, 500, "网点码已被绑定！");
         Merchant merchant = null;
+        String roleAlias;
         if (websiteReq.getId() == null) {
             merchant = merchantMapper.selectOne(Wrappers.<Merchant>lambdaQuery()
                     .eq(Merchant::getMobile, websiteReq.getMobile()));
@@ -210,10 +211,11 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
             merchantDetail.setMerchantId(merchant.getId());
             merchantDetail.setGeoHash(GeoUtils.toBase32(websiteReq.getLatitude(), websiteReq.getLongitude(), 12));
             merchantDetailMapper.insert(merchantDetail);
+            roleAlias = GroupRoleEnum.WD.getCode();
         } else {
             merchantId = merchant.getId();
             merchant.setHeadImgUrl(headImageUrl);
-
+            roleAlias = merchant.getRoleAlias();
             Asserts.assertTrue(merchant.getPidPath().contains(websiteCodeDetail.getPidPath()), 500, "该网点码不是你或你的上级申请的，无法绑定！");
             Asserts.assertEquals(merchant.getMobile(), websiteReq.getMobile(), 500, "手机号不允许被修改！");
             String openId = merchant.getOpenId();
@@ -238,7 +240,7 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
                 merchantDetailMapper.insert(merchantDetail);
             }
         }
-        if (merchant.getRoleAlias().equals(GroupRoleEnum.WD.getCode())) {
+        if (GroupRoleEnum.WD.getCode().equals(roleAlias)) {
             Merchant merchantPid = merchantMapper.selectById(websiteCodeDetail.getPid());
             if (merchantPid != null) {
                 merchant.setPid(merchantPid.getId());
