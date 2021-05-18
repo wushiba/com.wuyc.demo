@@ -188,6 +188,7 @@ public class AdminUserOrderServiceImpl implements AdminUserOrderService {
         OrderDetail orderDetail = orderDetailMapper.selectById(id);
         OrderAddress orderAddress = orderAddressMapper.selectOne(Wrappers.lambdaQuery(OrderAddress.class).eq(OrderAddress::getOrderId, orderDetail.getOrderId()));
         OrderDetailResult orderDetailResult = new OrderDetailResult();
+        orderDetailResult.setOrderNo(orderDetail.getOrderNo());
         orderDetailResult.setCreateTime(orderDetail.getCreateTime());
         orderDetailResult.setUserName(orderDetail.getUserName());
         orderDetailResult.setReceiveWay(orderDetail.getReceiveWay());

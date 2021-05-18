@@ -18,9 +18,14 @@ public class OrderResult implements Serializable {
 
     private String orderNo;
     /**
-     * 用户id
+     * 用户id编号
      */
-    private Integer userName;
+    private Integer userId;
+
+    /**
+     * 用户id编号
+     */
+    private String userName;
 
     /**
      * 订单总金额
