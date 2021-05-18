@@ -16,7 +16,6 @@ public class OrderResult implements Serializable {
 
     private Long id;
 
-    private String orderNo;
     /**
      * 用户id编号
      */
@@ -26,6 +25,13 @@ public class OrderResult implements Serializable {
      * 用户id编号
      */
     private String userName;
+
+    /**
+     * 订单id
+     */
+    private Long orderId;
+
+    private String orderNo;
 
     /**
      * 订单总金额
