@@ -75,7 +75,7 @@ public class AddressUtil {
     }
 
     public static void main(String[] args) {
-        System.out.println("地址是：" + addressResolution("上海市龙文区新浦东路3号浦东副食品批发市"));
+        System.out.println("地址是：" + addressResolution("上海市杨浦区杨树浦路2300号2层1区A08室"));
     }
 
 }

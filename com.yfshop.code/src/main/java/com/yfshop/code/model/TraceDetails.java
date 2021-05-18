@@ -19,8 +19,8 @@ import lombok.EqualsAndHashCode;
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
-@TableName("yf_trace")
-public class Trace extends Model<Trace> {
+@TableName("yf_trace_details")
+public class TraceDetails extends Model<TraceDetails> {
 
     private static final long serialVersionUID = 1L;
 
@@ -30,19 +30,29 @@ public class Trace extends Model<Trace> {
     private LocalDateTime createTime;
 
     /**
-     * 盒码
-     */
-    private String traceNo;
-
-    /**
      * 箱码
      */
     private String boxNo;
 
     /**
-     * 1001噜渴200ML,1002噜渴458ML
+     * 经销商编号
      */
-    private String productNo;
+    private String dealerNo;
+
+    /**
+     * 经销商手机号
+     */
+    private String dealerMobile;
+
+    /**
+     * 经销商名称
+     */
+    private String dealerName;
+
+    /**
+     * 经销商地址
+     */
+    private String dealerAddress;
 
 
     @Override

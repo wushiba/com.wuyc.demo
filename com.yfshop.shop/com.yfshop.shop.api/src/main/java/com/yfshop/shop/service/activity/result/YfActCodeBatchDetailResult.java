@@ -46,6 +46,8 @@ public class YfActCodeBatchDetailResult implements Serializable {
      */
     private String boxSpecVal;
 
+    private String dealerMobile;
+
     /**
      * 经销商名称
      */

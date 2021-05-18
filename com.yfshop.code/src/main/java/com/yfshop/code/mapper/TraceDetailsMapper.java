@@ -1,6 +1,6 @@
 package com.yfshop.code.mapper;
 
-import com.yfshop.code.model.Trace;
+import com.yfshop.code.model.TraceDetails;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 /**
@@ -11,6 +11,6 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  * @author yoush
  * @since 2021-05-18
  */
-public interface TraceMapper extends EasyBaseMapper<Trace> {
+public interface TraceDetailsMapper extends EasyBaseMapper<TraceDetails> {
 
 }

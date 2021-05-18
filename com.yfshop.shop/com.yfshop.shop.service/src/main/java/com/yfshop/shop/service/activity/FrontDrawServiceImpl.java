@@ -72,6 +72,8 @@ public class FrontDrawServiceImpl implements FrontDrawService {
     private ActCodeBatchDetailMapper actCodeBatchDetailMapper;
     @Resource
     private TraceMapper traceMapper;
+    @Resource
+    private TraceDetailsMapper traceDetailsMapper;
 
     @Override
     public YfDrawActivityResult getDrawActivityById(Integer id) throws ApiException {
@@ -157,7 +159,7 @@ public class FrontDrawServiceImpl implements FrontDrawService {
             canDrawCount = 1L;
         }
         String dataStr = DateUtil.format(LocalDateTime.now(), "yyyyMMdd");
-        Long drawCount = redisService.incr(CacheConstants.DRAW_DATE_COUNT + dataStr + userId, 1,1, TimeUnit.DAYS);
+        Long drawCount = redisService.incr(CacheConstants.DRAW_DATE_COUNT + dataStr + userId, 1, 1, TimeUnit.DAYS);
         logger.info("======抽奖用户次数userId=" + userId + "，抽奖" + drawCount);
         Asserts.assertFalse(drawCount > canDrawCount, 502, "您每天只能抽奖" + canDrawCount + "次，请明天再继续抽奖");
         //redisService.expire(CacheConstants.DRAW_DATE_COUNT + dataStr + userId, 60 * 60 * 24);
@@ -234,11 +236,16 @@ public class FrontDrawServiceImpl implements FrontDrawService {
                     .lambdaQuery(ActCodeBatchDetail.class).eq(ActCodeBatchDetail::getActCode, actCode));
             if (actCodeBatchDetail != null) {
                 yfActCodeBatchDetailResult = BeanUtil.convert(actCodeBatchDetail, YfActCodeBatchDetailResult.class);
-                Trace trace = traceMapper.selectOne(Wrappers.<Trace>lambdaQuery().eq(Trace::getTraceNo, actCodeBatchDetail.getTraceNo()));
+                Trace trace = traceMapper.selectOne(Wrappers.<Trace>lambdaQuery().eq(Trace::getTraceNo, actCodeBatchDetail.getTraceNo()).orderByDesc());
                 if (trace != null) {
                     yfActCodeBatchDetailResult.setBoxSpecVal("1002".equals(trace.getProductNo()) ? BoxSpecValEnum.BIG.getCode() : BoxSpecValEnum.SMALL.getCode());
-                    yfActCodeBatchDetailResult.setDealerName(trace.getDealerName());
-                    yfActCodeBatchDetailResult.setDealerAddress(trace.getDealerAddress());
+                    TraceDetails traceDetails = traceDetailsMapper.selectOne(Wrappers.<TraceDetails>lambdaQuery().eq(TraceDetails::getBoxNo, trace.getBoxNo()).orderByDesc());
+                    if (traceDetails != null) {
+                        yfActCodeBatchDetailResult.setDealerMobile(traceDetails.getDealerMobile());
+                        yfActCodeBatchDetailResult.setDealerName(traceDetails.getDealerName());
+                        yfActCodeBatchDetailResult.setDealerAddress(traceDetails.getDealerAddress());
+                    }
+
                 }
             }
             redisService.set(CacheConstants.ACT_CODE_BATCH_ACT_NO + actCode,
