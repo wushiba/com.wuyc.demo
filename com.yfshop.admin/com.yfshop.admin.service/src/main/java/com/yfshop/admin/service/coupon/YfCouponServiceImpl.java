@@ -1,6 +1,7 @@
 package com.yfshop.admin.service.coupon;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.yfshop.admin.api.coupon.request.CreateCouponReq;
@@ -48,7 +49,9 @@ public class YfCouponServiceImpl implements AdminCouponService {
     public Page<YfCouponResult> findYfCouponListByPage(QueryCouponReq req) throws ApiException {
         Coupon coupon = BeanUtil.convert(req, Coupon.class);
         Page<Coupon> page = new Page<>(req.getPageIndex(), req.getPageSize());
-        LambdaQueryWrapper<Coupon> queryWrapper = Wrappers.<Coupon>lambdaQuery().setEntity(coupon);
+        LambdaQueryWrapper<Coupon> queryWrapper = Wrappers.<Coupon>lambdaQuery()
+                .eq(StringUtils.isNotBlank(req.getIsEnable()), Coupon::getIsEnable, req.getIsEnable())
+                .like(StringUtils.isNotBlank(req.getCouponTitle()), Coupon::getCouponTitle, req.getCouponTitle());
         Page<Coupon> pageData = couponMapper.selectPage(page, queryWrapper);
 
         Page<YfCouponResult> data = new Page<>(req.getPageIndex(), req.getPageSize(), page.getTotal());
@@ -59,7 +62,9 @@ public class YfCouponServiceImpl implements AdminCouponService {
     @Override
     public List<YfCouponResult> getAll(QueryCouponReq req) throws ApiException {
         Coupon coupon = BeanUtil.convert(req, Coupon.class);
-        LambdaQueryWrapper<Coupon> queryWrapper = Wrappers.<Coupon>lambdaQuery().setEntity(coupon);
+        LambdaQueryWrapper<Coupon> queryWrapper = Wrappers.<Coupon>lambdaQuery()
+                .eq(StringUtils.isNotBlank(req.getIsEnable()), Coupon::getIsEnable, req.getIsEnable())
+                .like(StringUtils.isNotBlank(req.getCouponTitle()), Coupon::getCouponTitle, req.getCouponTitle());
         List<Coupon> dataList = couponMapper.selectList(queryWrapper);
         return BeanUtil.convertList(dataList, YfCouponResult.class);
     }
