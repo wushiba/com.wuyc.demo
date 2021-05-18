@@ -64,8 +64,6 @@ public class AddressUtil {
                         map.put("county", key);
                         key = "";
                         level++;
-                    }else if (key.contains("镇") || key.contains("街道") || key.contains("乡")){
-                        level++;
                     }
                     break;
             }
@@ -75,7 +73,7 @@ public class AddressUtil {
     }
 
     public static void main(String[] args) {
-        System.out.println("地址是：" + addressResolution("上海市杨浦区杨树浦路2300号2层1区A08室"));
+        System.out.println("地址是：" + addressResolution("江西省抚州市东乡区农博城"));
     }
 
 }
