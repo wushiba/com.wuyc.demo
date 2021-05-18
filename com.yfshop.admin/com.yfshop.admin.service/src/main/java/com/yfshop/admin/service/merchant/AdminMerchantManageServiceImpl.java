@@ -7,10 +7,12 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.yfshop.admin.api.merchant.AdminMerchantManageService;
+import com.yfshop.admin.api.merchant.MerchantExcel;
 import com.yfshop.admin.api.merchant.request.CreateMerchantReq;
 import com.yfshop.admin.api.merchant.request.QueryMerchantReq;
 import com.yfshop.admin.api.merchant.request.UpdateMerchantReq;
 import com.yfshop.admin.api.merchant.result.MerchantResult;
+import com.yfshop.admin.api.website.request.WebsiteCodeBindReq;
 import com.yfshop.admin.dao.MerchantDao;
 import com.yfshop.admin.dto.query.QueryMerchantDetail;
 import com.yfshop.code.mapper.MerchantDetailMapper;
@@ -23,17 +25,20 @@ import com.yfshop.code.model.Region;
 import com.yfshop.common.enums.GroupRoleEnum;
 import com.yfshop.common.exception.ApiException;
 import com.yfshop.common.exception.Asserts;
+import com.yfshop.common.util.AddressUtil;
 import com.yfshop.common.util.BeanUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -61,6 +66,7 @@ public class AdminMerchantManageServiceImpl implements AdminMerchantManageServic
     private MerchantDao customMerchantMapper;
     @Resource
     private MerchantLogMapper merchantLogMapper;
+
     @Transactional(rollbackFor = Exception.class)
     @Override
     public Void createMerchant(Integer loginedMerchantId, CreateMerchantReq req) throws ApiException {
@@ -228,7 +234,7 @@ public class AdminMerchantManageServiceImpl implements AdminMerchantManageServic
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public Void updateMerchantIsEnable(Integer merchantId,Integer operatorId, boolean isEnable) throws ApiException {
+    public Void updateMerchantIsEnable(Integer merchantId, Integer operatorId, boolean isEnable) throws ApiException {
         Merchant oldM = merchantMapper.selectById(merchantId);
         Merchant merchant = new Merchant();
         merchant.setId(merchantId);
@@ -280,6 +286,47 @@ public class AdminMerchantManageServiceImpl implements AdminMerchantManageServic
         page.setTotal(list.size());
         return page;
     }
+
+    @Override
+    public Void importExcel(List<MerchantExcel> merchantExcels) {
+        if (CollectionUtils.isEmpty(merchantExcels)) return null;
+        merchantExcels.stream().forEach(item -> {
+            Merchant merchant = new Merchant();
+            buildAddress(merchant, item.getAddress());
+            merchantMapper.update(merchant, Wrappers.lambdaQuery(Merchant.class).eq(Merchant::getMobile, item.getMobile()));
+        });
+
+        return null;
+    }
+
+
+    private void buildAddress(Merchant merchant, String address) {
+        if (StringUtils.isNotBlank(address)) {
+            Map<String, String> maps = AddressUtil.addressResolution(address);
+            Region province = regionMapper.selectOne(Wrappers.<Region>lambdaQuery()
+                    .eq(Region::getName, maps.get("province")));
+            if (province != null) {
+                merchant.setProvinceId(province.getId());
+                Region city = regionMapper.selectOne(Wrappers.<Region>lambdaQuery()
+                        .eq(Region::getName, maps.get("city"))
+                        .eq(Region::getPid, province.getId()));
+                if (city != null) {
+                    merchant.setCityId(city.getId());
+                    Region county = regionMapper.selectOne(Wrappers.<Region>lambdaQuery()
+                            .eq(Region::getName, maps.get("county"))
+                            .eq(Region::getPid, city.getId()));
+                    if (county != null) {
+                        merchant.setDistrictId(county.getId());
+                    }
+                }
+            }
+            merchant.setProvince(maps.get("province"));
+            merchant.setCity(maps.get("city"));
+            merchant.setDistrict(maps.get("county"));
+            merchant.setAddress(maps.get("town"));
+        }
+    }
+
 
     private String generatePidPath(Integer pid, Integer id) {
         if (pid == null || pid == 0) {

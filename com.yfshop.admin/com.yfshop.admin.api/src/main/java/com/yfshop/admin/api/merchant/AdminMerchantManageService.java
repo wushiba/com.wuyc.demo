@@ -68,4 +68,6 @@ public interface AdminMerchantManageService {
      */
     IPage<MerchantResult> pageQueryMerchantsByPidAndRoleAlias(Integer merchantId, String roleAlias, String merchantName,
                                                               Integer pageIndex, Integer pageSize);
+
+    Void importExcel(List<MerchantExcel> merchantExcels);
 }

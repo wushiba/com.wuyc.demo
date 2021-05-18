@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -128,5 +129,15 @@ public class AdminMerchantManageController implements BaseController {
         return CommonResult.success(adminMerchantManageService.pageQueryMerchantsByPidAndRoleAlias(
                 getCurrentAdminUserId(), roleAlias, merchantName, pageIndex, pageSize));
     }
+
+    @RequestMapping(value = "/importExcel", method = {RequestMethod.GET, RequestMethod.POST})
+    @ResponseBody
+    @SaCheckLogin
+    @SaCheckRole(value = {"sys"}, mode = SaMode.OR)
+    public CommonResult<Void> importExcel(MultipartFile file) {
+        List<MerchantExcel> merchantExcels = ExcelUtils.importExcel(file, 1, 1, MerchantExcel.class);
+        return CommonResult.success(adminMerchantManageService.importExcel(merchantExcels));
+    }
+
 
 }

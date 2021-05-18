@@ -213,7 +213,8 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
         } else {
             merchantId = merchant.getId();
             merchant.setHeadImgUrl(headImageUrl);
-            //Asserts.assertEquals(merchant.getRoleAlias(), GroupRoleEnum.WD.getCode(), 500, "改手机号已经存在其他身份，请更换网点对应手机号！");
+
+            Asserts.assertTrue(merchant.getPidPath().contains(websiteCodeDetail.getPidPath()), 500, "该网点码不是你或你的上级申请的，无法绑定！");
             Asserts.assertEquals(merchant.getMobile(), websiteReq.getMobile(), 500, "手机号不允许被修改！");
             String openId = merchant.getOpenId();
             merchant = BeanUtil.convert(websiteReq, Merchant.class);
@@ -237,7 +238,7 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
                 merchantDetailMapper.insert(merchantDetail);
             }
         }
-        if (!websiteCodeDetail.getPid().equals(merchantId)) {
+        if (merchant.getRoleAlias().equals(GroupRoleEnum.WD.getCode())) {
             Merchant merchantPid = merchantMapper.selectById(websiteCodeDetail.getPid());
             if (merchantPid != null) {
                 merchant.setPid(merchantPid.getId());
@@ -692,6 +693,13 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
                 .eq(Merchant::getIsEnable, "Y")
                 .eq(Merchant::getIsDelete, "N");
         List<Merchant> merchantList = merchantMapper.selectList(lambdaQueryWrapper);
+        /**
+         * 判断自己有没有绑定网点码，如果有将自己插入到第一个
+         */
+        if (getWebsiteCodeBindCount(merchantGroupReq.getMerchantId()) > 0) {
+            Merchant merchant = merchantMapper.selectById(merchantGroupReq.getMerchantId());
+            merchantList.add(0, merchant);
+        }
         List<MerchantGroupResult> merchantGroupResults = new ArrayList<>();
         merchantList.forEach(item -> {
             MerchantGroupResult child = new MerchantGroupResult();
@@ -842,8 +850,8 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
 
     @Override
     public Integer getWebsiteCodeBindCount(Integer merchantId) {
-
-        return getCurrentWebsiteCodeCount(merchantId, null, null);
+        Integer count = getCurrentWebsiteCodeCount(merchantId, null, null);
+        return count == null ? 0 : count;
     }
 
     private Integer getCurrentWebsiteCodeCount(Integer merchantId, Date startTime, Date endTime) {
