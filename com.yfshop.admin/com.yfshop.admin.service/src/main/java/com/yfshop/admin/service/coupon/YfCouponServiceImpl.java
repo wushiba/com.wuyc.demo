@@ -61,7 +61,7 @@ public class YfCouponServiceImpl implements AdminCouponService {
 
     @Override
     public List<YfCouponResult> getAll(QueryCouponReq req) throws ApiException {
-        Coupon coupon = BeanUtil.convert(req, Coupon.class);
+//        Coupon coupon = BeanUtil.convert(req, Coupon.class);
         LambdaQueryWrapper<Coupon> queryWrapper = Wrappers.<Coupon>lambdaQuery()
                 .eq(StringUtils.isNotBlank(req.getIsEnable()), Coupon::getIsEnable, req.getIsEnable())
                 .like(StringUtils.isNotBlank(req.getCouponTitle()), Coupon::getCouponTitle, req.getCouponTitle());
