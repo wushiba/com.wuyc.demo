@@ -9,7 +9,13 @@ import com.yfshop.admin.api.coupon.request.QueryCouponReq;
 import com.yfshop.admin.api.coupon.result.YfCouponResult;
 import com.yfshop.admin.api.coupon.service.AdminCouponService;
 import com.yfshop.code.mapper.CouponMapper;
+import com.yfshop.code.mapper.ItemMapper;
+import com.yfshop.code.mapper.UserCouponMapper;
 import com.yfshop.code.model.Coupon;
+import com.yfshop.code.model.Item;
+import com.yfshop.code.model.RlItemHotpot;
+import com.yfshop.code.model.UserCoupon;
+import com.yfshop.common.enums.UserCouponStatusEnum;
 import com.yfshop.common.exception.ApiException;
 import com.yfshop.common.exception.Asserts;
 import com.yfshop.common.util.BeanUtil;
@@ -18,7 +24,12 @@ import org.apache.dubbo.config.annotation.Service;
 
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * @Title:平台优惠券Service实现
@@ -32,6 +43,10 @@ public class YfCouponServiceImpl implements AdminCouponService {
 
     @Resource
     private CouponMapper couponMapper;
+    @Resource
+    private ItemMapper itemMapper;
+    @Resource
+    private UserCouponMapper userCouponMapper;
 
     @Override
     public YfCouponResult getYfCouponById(Integer id) throws ApiException {
@@ -47,26 +62,23 @@ public class YfCouponServiceImpl implements AdminCouponService {
 
     @Override
     public Page<YfCouponResult> findYfCouponListByPage(QueryCouponReq req) throws ApiException {
-        Coupon coupon = BeanUtil.convert(req, Coupon.class);
         Page<Coupon> page = new Page<>(req.getPageIndex(), req.getPageSize());
         LambdaQueryWrapper<Coupon> queryWrapper = Wrappers.<Coupon>lambdaQuery()
                 .eq(StringUtils.isNotBlank(req.getIsEnable()), Coupon::getIsEnable, req.getIsEnable())
                 .like(StringUtils.isNotBlank(req.getCouponTitle()), Coupon::getCouponTitle, req.getCouponTitle());
         Page<Coupon> pageData = couponMapper.selectPage(page, queryWrapper);
-
         Page<YfCouponResult> data = new Page<>(req.getPageIndex(), req.getPageSize(), page.getTotal());
-        data.setRecords(BeanUtil.convertList(pageData.getRecords(), YfCouponResult.class));
+        data.setRecords(getCouponResultList(pageData.getRecords()));
         return data;
     }
 
     @Override
     public List<YfCouponResult> getAll(QueryCouponReq req) throws ApiException {
-//        Coupon coupon = BeanUtil.convert(req, Coupon.class);
         LambdaQueryWrapper<Coupon> queryWrapper = Wrappers.<Coupon>lambdaQuery()
                 .eq(StringUtils.isNotBlank(req.getIsEnable()), Coupon::getIsEnable, req.getIsEnable())
                 .like(StringUtils.isNotBlank(req.getCouponTitle()), Coupon::getCouponTitle, req.getCouponTitle());
         List<Coupon> dataList = couponMapper.selectList(queryWrapper);
-        return BeanUtil.convertList(dataList, YfCouponResult.class);
+        return getCouponResultList(dataList);
     }
 
     @Override
@@ -130,6 +142,38 @@ public class YfCouponServiceImpl implements AdminCouponService {
         } else if ("ITEM".equalsIgnoreCase(useRangeType)) {
             Asserts.assertStringNotBlank(couponReq.getCanUseItemIds(), 500, "请选择可使用的商品");
         }
+    }
+
+
+    private List<YfCouponResult> getCouponResultList(List<Coupon> dataList) {
+        List<YfCouponResult> list = BeanUtil.convertList(dataList, YfCouponResult.class);
+        List<Integer> ids = dataList.stream()
+                .filter(item -> StringUtils.isNotBlank(item.getCanUseItemIds()))
+                .flatMap((item) -> Arrays.stream(item.getCanUseItemIds().split(","))
+                        .map(Integer::valueOf))
+                .distinct().collect(Collectors.toList());
+        Map<Integer, String> itemMaps = itemMapper.selectBatchIds(ids).stream().collect(Collectors.toMap(Item::getId, Item::getItemTitle));
+        list.forEach(item -> {
+            if (StringUtils.isNotBlank(item.getCanUseItemIds())) {
+                List<Integer> itemIds = Arrays.stream(item.getCanUseItemIds().split(",")).map(Integer::valueOf).collect(Collectors.toList());
+                List<String> titles = new ArrayList<>();
+                itemIds.forEach(i -> {
+                    String title = itemMaps.get(i);
+                    if (title != null) {
+                        titles.add(title);
+                    }
+                });
+                item.setCanUseItemNames(org.apache.commons.lang.StringUtils.join(titles, ","));
+            }
+            Integer receiveAmount = userCouponMapper.selectCount(Wrappers.lambdaQuery(UserCoupon.class)
+                    .eq(UserCoupon::getCouponId, item.getId()));
+            Integer useAmount = userCouponMapper.selectCount(Wrappers.lambdaQuery(UserCoupon.class)
+                    .eq(UserCoupon::getCouponId, item.getId())
+                    .in(UserCoupon::getUseStatus, UserCouponStatusEnum.HAS_USE.getCode(), UserCouponStatusEnum.IN_USE.getCode()));
+            item.setUseAmount(useAmount);
+            item.setReceiveAmount(receiveAmount);
+        });
+        return list;
     }
 
 }
