@@ -773,9 +773,12 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
                 Point point = content.getPoint();
                 Object id = content.getName();
                 System.out.println("merchantId=" + id.toString() + "&distance=" + dist.toString() + "&coordinate=" + point.toString());
-                MerchantResult merchantData = merchantMap.get(Integer.valueOf(id.toString())).get(0);
-                merchantData.setDistance(dist.toString());
-                resultList.add(merchantData);
+                List<MerchantResult> merchantLists = merchantMap.get(Integer.valueOf(id.toString()));
+                if (!CollectionUtils.isEmpty(merchantLists)) {
+                    MerchantResult merchantData = merchantLists.get(0);
+                    merchantData.setDistance(dist.toString());
+                    resultList.add(merchantData);
+                }
             }
         }
         Merchant merchant = merchantMapper.selectById(merchantId);
@@ -862,6 +865,7 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
             Merchant merchant = new Merchant();
             merchant.setId(merchantId);
             merchant.setOpenId(openId);
+            merchant.setUpdateTime(LocalDateTime.now());
             merchantMapper.updateById(merchant);
         }
     }
