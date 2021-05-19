@@ -729,7 +729,7 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
             pidPath = merchantMapper.selectById(websiteCodeDataReq.getMerchantId()).getPidPath();
         }
         List<WebsiteCodeDetail> websiteCodeDetailList = websiteCodeDetailMapper.selectList(Wrappers.<WebsiteCodeDetail>lambdaQuery()
-                .eq(websiteCodeDataReq.getMerchantId() == null, WebsiteCodeDetail::getMerchantId, merchantId)
+                .eq(WebsiteCodeDetail::getMerchantId, merchantId)
                 .likeLeft(StringUtils.isNotBlank(pidPath), WebsiteCodeDetail::getPidPath, pidPath)
                 .eq(WebsiteCodeDetail::getIsActivate, "Y"));
         AtomicInteger currentCurrentExchange = new AtomicInteger();
