@@ -725,7 +725,7 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
         orderDetail.setExpressNo(null);
         orderDetail.setUserName(userName);
         String dataStr = DateUtil.format(LocalDateTime.now(), "yyyyMMdd");
-        Long orderCount = redisService.incr(CacheConstants.ORDER_DATE_COUNT + dataStr, 0, 1, TimeUnit.DAYS);
+        Long orderCount = redisService.incr(CacheConstants.ORDER_DATE_COUNT + dataStr, 1, 1, TimeUnit.DAYS);
         orderDetail.setOrderNo(String.format("%s%04d", DateFormatUtils.format(new Date(), "yyMMddHHmmss"), orderCount % 10000));
         orderDetailMapper.insert(orderDetail);
         return orderDetail;

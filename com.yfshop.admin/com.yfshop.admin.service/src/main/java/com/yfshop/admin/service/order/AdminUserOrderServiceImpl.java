@@ -160,7 +160,7 @@ public class AdminUserOrderServiceImpl implements AdminUserOrderService {
                 .eq(StringUtils.isNoneBlank(req.getOrderStatus()), OrderDetail::getOrderStatus, req.getOrderStatus())
                 .ge(req.getStartTime() != null, OrderDetail::getCreateTime, req.getStartTime())
                 .lt(req.getEndTime() != null, OrderDetail::getCreateTime, req.getEndTime())
-                .orderByDesc();
+                .orderByDesc(OrderDetail::getId);
         IPage<OrderDetail> iPage = orderDetailMapper.selectPage(new Page<>(req.getPageIndex(), req.getPageSize()), wrapper);
         return BeanUtil.iPageConvert(iPage, OrderResult.class);
     }

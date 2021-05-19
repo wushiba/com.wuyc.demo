@@ -37,7 +37,7 @@ public class AdminDrawRecordServiceImpl implements AdminDrawRecordService {
                 .like(StringUtils.isNotBlank(queryDrawRecordReq.getDealerAddress()), DrawRecord::getDealerAddress, queryDrawRecordReq.getDealerAddress())
                 .ge(queryDrawRecordReq.getStartTime() != null, DrawRecord::getCreateTime, queryDrawRecordReq.getStartTime())
                 .lt(queryDrawRecordReq.getEndTime() != null, DrawRecord::getCreateTime, queryDrawRecordReq.getEndTime())
-                .orderByDesc();
+                .orderByDesc(DrawRecord::getId);
         IPage<DrawRecord> iPage = drawRecordMapper.selectPage(new Page<>(queryDrawRecordReq.getPageIndex(), queryDrawRecordReq.getPageSize()), wrapper);
         IPage<DrawRecordResult> result = BeanUtil.iPageConvert(iPage, DrawRecordResult.class);
         //result.setTotal(drawRecordMapper.selectCount(wrapper));
