@@ -81,7 +81,7 @@ class MerchantInfoController extends AbstractBaseController {
         if (merchantGroupReq.getMerchantId() == null) {
             merchantGroupReq.setMerchantId(getCurrentAdminUserId());
         }
-        return CommonResult.success(merchantInfoService.getWebsiteList(merchantGroupReq));
+        return CommonResult.success(merchantInfoService.getWebsiteList(getCurrentAdminUserId(),merchantGroupReq));
     }
 
     @RequestMapping(value = "/checkSubscribe", method = {RequestMethod.GET, RequestMethod.POST})

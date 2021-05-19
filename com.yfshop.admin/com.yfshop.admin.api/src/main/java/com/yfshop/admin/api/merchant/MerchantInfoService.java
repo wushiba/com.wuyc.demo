@@ -194,7 +194,7 @@ public interface MerchantInfoService {
 
     void cancelWebsiteCodePay(WebsiteCodePayReq websiteCodePayReq);
 
-    MerchantGroupResult getWebsiteList(MerchantGroupReq merchantGroupReq);
+    MerchantGroupResult getWebsiteList(Integer merchantId,MerchantGroupReq merchantGroupReq);
 
     WebsiteCodeGroupResult getWebsiteCodeData(Integer merchantId,WebsiteCodeDataReq websiteCodeDataReq);
 

@@ -686,7 +686,7 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
     }
 
     @Override
-    public MerchantGroupResult getWebsiteList(MerchantGroupReq merchantGroupReq) {
+    public MerchantGroupResult getWebsiteList(Integer merchantId,MerchantGroupReq merchantGroupReq) {
         MerchantGroupResult merchantGroupResult = new MerchantGroupResult();
         AtomicInteger count = new AtomicInteger();
         LambdaQueryWrapper lambdaQueryWrapper = Wrappers.<Merchant>lambdaQuery()
@@ -710,7 +710,7 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
             child.setCurrentExchange(getCurrentExchangeByPid(item.getId(), merchantGroupReq.getStartTime(), merchantGroupReq.getEndTime()));
             child.setTotalExchange(getCurrentExchangeByPid(item.getId(), null, null));
             child.setCurrentGoodsRecord(websiteGoodsRecordDao.sumGoodsRecordByMerchantId(item.getId(), merchantGroupReq.getStartTime(), merchantGroupReq.getEndTime()));
-            child.setCount(getCurrentWebsiteCodeCount(item.getId(), merchantGroupReq.getStartTime(), merchantGroupReq.getEndTime()));
+            child.setCount(getCurrentWebsiteCodeCount(item.getId(),merchantId));
             count.addAndGet(child.getCount());
             merchantGroupResults.add(child);
         });
@@ -877,6 +877,14 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
                 .eq(WebsiteCodeDetail::getIsActivate, "Y")
                 .ge(startTime != null, WebsiteCodeDetail::getActivityTime, startTime)
                 .lt(endTime != null, WebsiteCodeDetail::getActivityTime, endTime);
+        return websiteCodeDetailMapper.selectCount(lambdaQueryWrapper);
+    }
+
+    private Integer getCurrentWebsiteCodeCount(Integer merchantId, Integer currentMerchantId) {
+        LambdaQueryWrapper lambdaQueryWrapper = Wrappers.<WebsiteCodeDetail>lambdaQuery()
+                .eq(WebsiteCodeDetail::getMerchantId, merchantId)
+                .like(WebsiteCodeDetail::getPidPath, currentMerchantId + ".")
+                .eq(WebsiteCodeDetail::getIsActivate, "Y");
         return websiteCodeDetailMapper.selectCount(lambdaQueryWrapper);
     }
 
