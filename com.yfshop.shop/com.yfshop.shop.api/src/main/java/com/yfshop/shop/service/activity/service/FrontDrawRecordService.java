@@ -20,18 +20,17 @@ public interface FrontDrawRecordService {
      *
      * @param userId
      * @param drawPrize
-     * @param location
      */
-    void saveDrawRecord(Integer userId, YfActCodeBatchDetailResult actCodeBatchDetailResult, YfDrawPrizeResult drawPrize, String location);
+    void saveDrawRecord(Integer userId, Long userCouponId,YfActCodeBatchDetailResult actCodeBatchDetailResult, YfDrawPrizeResult drawPrize);
 
     /**
      * 更新抽奖记录状态
-     * @param actCode
+     * @param userCoupId
      * @param useStatus
      * @param userName
      * @param userMobile
      */
-    void updateDrawRecord(String actCode, String useStatus, String userName, String userMobile);
+    void updateDrawRecord(Long userCoupId, String useStatus, String userName, String userMobile);
 
 
     /**

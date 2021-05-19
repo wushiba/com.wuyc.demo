@@ -59,18 +59,18 @@ public class FrontDrawRecordServiceImpl implements FrontDrawRecordService {
      * @param userId
      * @param actCodeBatchDetailResult
      * @param drawPrize
-     * @param location
      */
     @Async
     @Override
-    public void saveDrawRecord(Integer userId, YfActCodeBatchDetailResult actCodeBatchDetailResult, YfDrawPrizeResult drawPrize, String location) {
+    public void saveDrawRecord(Integer userId, Long userCouponId, YfActCodeBatchDetailResult actCodeBatchDetailResult, YfDrawPrizeResult drawPrize) {
         DrawRecord drawRecord = new DrawRecord();
+        drawRecord.setUserCouponId(userCouponId);
         drawRecord.setActId(actCodeBatchDetailResult.getActId());
         drawRecord.setActTitle(actCodeBatchDetailResult.getActTitle());
         drawRecord.setPrizeLevel(drawPrize.getPrizeLevel());
         drawRecord.setPrizeTitle(drawPrize.getPrizeTitle());
         drawRecord.setUserId(userId);
-        drawRecord.setUserLocation(location);
+        drawRecord.setUserLocation(actCodeBatchDetailResult.getLocation());
         drawRecord.setUseStatus(UserCouponStatusEnum.NO_USE.getCode());
         drawRecord.setSpec(BoxSpecValEnum.BIG.getCode().equals(actCodeBatchDetailResult.getBoxSpecVal()) ? "大盒" : "小盒");
         drawRecord.setActCode(actCodeBatchDetailResult.getActCode());
@@ -82,24 +82,22 @@ public class FrontDrawRecordServiceImpl implements FrontDrawRecordService {
 
     @Override
     @Async
-    public void updateDrawRecord(String actCode, String useStatus, String userName, String userMobile) {
+    public void updateDrawRecord(Long userCoupId, String useStatus, String userName, String userMobile) {
         DrawRecord drawRecord = new DrawRecord();
         drawRecord.setUseStatus(useStatus);
         drawRecord.setUserMobile(userMobile);
         drawRecord.setUserName(userName);
-        drawRecordMapper.update(drawRecord, Wrappers.<DrawRecord>lambdaQuery().eq(DrawRecord::getActCode, actCode));
+        drawRecordMapper.update(drawRecord, Wrappers.<DrawRecord>lambdaQuery().eq(DrawRecord::getUserCouponId, userCoupId));
     }
 
     @Override
     public void updateDrawRecordUseStatus(Long userCoupId, String useStatus) {
-        UserCoupon userCoupon = userCouponMapper.selectById(userCoupId);
-        if (userCoupon != null) {
-            DrawRecord drawRecord = new DrawRecord();
-            drawRecord.setUseStatus(useStatus);
-            drawRecordMapper.update(drawRecord, Wrappers.<DrawRecord>lambdaQuery()
-                    .eq(DrawRecord::getActCode, userCoupon.getActCode())
-                    .eq(DrawRecord::getUserId, userCoupon.getUserId()));
-        }
+        DrawRecord drawRecord = new DrawRecord();
+        drawRecord.setUseStatus(useStatus);
+        drawRecordMapper.update(drawRecord, Wrappers.<DrawRecord>lambdaQuery()
+                .eq(DrawRecord::getUserCouponId, userCoupId)
+                .eq(DrawRecord::getUserId, userCoupId));
+
     }
 }
 

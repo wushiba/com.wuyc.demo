@@ -17,6 +17,7 @@ public class YfActCodeBatchDetailResult implements Serializable {
 
     private static final long serialVersionUID = -1L;
 
+
     /**
      * 活动码 4位活动id+6位年月日+6位随机数+2位crc校验位
      */
@@ -34,6 +35,8 @@ public class YfActCodeBatchDetailResult implements Serializable {
     private Integer actId;
 
     private String actTitle;
+
+    private String location;
 
 
     /**

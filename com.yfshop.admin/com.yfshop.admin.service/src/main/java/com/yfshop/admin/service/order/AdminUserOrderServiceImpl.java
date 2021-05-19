@@ -127,14 +127,10 @@ public class AdminUserOrderServiceImpl implements AdminUserOrderService {
             userCoupon.setId(orderDetail.getUserCouponId());
             userCoupon.setUseStatus(UserCouponStatusEnum.HAS_USE.getCode());
             userCouponMapper.updateById(userCoupon);
-            userCoupon = userCouponMapper.selectById(orderDetail.getUserCouponId());
-            if (userCoupon != null) {
-                DrawRecord drawRecord = new DrawRecord();
-                drawRecord.setUseStatus(UserCouponStatusEnum.HAS_USE.getCode());
-                drawRecordMapper.update(drawRecord, Wrappers.<DrawRecord>lambdaQuery()
-                        .eq(DrawRecord::getActCode, userCoupon.getActCode())
-                        .eq(DrawRecord::getUserId, userCoupon.getUserId()));
-            }
+            DrawRecord drawRecord = new DrawRecord();
+            drawRecord.setUseStatus(UserCouponStatusEnum.HAS_USE.getCode());
+            drawRecordMapper.update(drawRecord, Wrappers.<DrawRecord>lambdaQuery()
+                    .eq(DrawRecord::getUserCouponId, orderDetail.getUserCouponId()));
         }
         return null;
     }

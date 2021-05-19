@@ -21,7 +21,9 @@ import com.yfshop.common.exception.Asserts;
 import com.yfshop.common.service.RedisService;
 import com.yfshop.common.util.BeanUtil;
 import com.yfshop.shop.dao.UserCouponDao;
+import com.yfshop.shop.service.activity.result.YfActCodeBatchDetailResult;
 import com.yfshop.shop.service.activity.result.YfDrawPrizeResult;
+import com.yfshop.shop.service.activity.service.FrontDrawRecordService;
 import com.yfshop.shop.service.coupon.request.QueryUserCouponReq;
 import com.yfshop.shop.service.coupon.result.YfCouponResult;
 import com.yfshop.shop.service.coupon.result.YfUserCouponResult;
@@ -72,6 +74,8 @@ public class FrontUserCouponServiceImpl implements FrontUserCouponService {
     private UserCouponDao userCouponDao;
     @Resource
     private UserCouponMapper userCouponMapper;
+    @Resource
+    private FrontDrawRecordService frontDrawRecordService;
     @Resource
     private FrontUserService frontUserService;
     @DubboReference
@@ -182,15 +186,14 @@ public class FrontUserCouponServiceImpl implements FrontUserCouponService {
      * 用户抽中优惠券后生成优惠券
      *
      * @param userId          用户id
-     * @param actCode         用户扫码抽奖的码，yf_act_code_batch_detail表的actCode
      * @param drawPrizeResult 奖品信息
      * @return
      * @throws ApiException
      */
     @Async
     @Override
-    public YfUserCouponResult createUserCouponByPrize(Integer userId, String actCode, YfDrawPrizeResult drawPrizeResult) throws ApiException {
-        logger.info("======开始创建优惠券用户userId=" + userId + ",actCode=" + actCode + ",开始创建优惠券");
+    public YfUserCouponResult createUserCouponByPrize(Integer userId, YfActCodeBatchDetailResult actCodeBatchDetailResult, YfDrawPrizeResult drawPrizeResult) throws ApiException {
+        logger.info("======开始创建优惠券用户userId=" + userId + ",actCode=" + actCodeBatchDetailResult.getActCode() + ",开始创建优惠券");
         User user = userMapper.selectById(userId);
         Asserts.assertNonNull(user, 500, "用户不存在,请先授权关注公众号");
 
@@ -220,7 +223,7 @@ public class FrontUserCouponServiceImpl implements FrontUserCouponService {
         userCoupon.setCouponTitle(coupon.getCouponTitle());
         userCoupon.setValidStartTime(startDate);
         userCoupon.setValidEndTime(endDate);
-        userCoupon.setActCode(actCode);
+        userCoupon.setActCode(actCodeBatchDetailResult.getActCode());
         userCoupon.setDrawPrizeLevel(drawPrizeResult.getPrizeLevel());
         userCoupon.setDrawActivityId(drawPrizeResult.getActId());
         userCoupon.setDrawPrizeIcon(drawPrizeResult.getPrizeIcon());
@@ -238,8 +241,9 @@ public class FrontUserCouponServiceImpl implements FrontUserCouponService {
         userCoupon.setNickname(user.getNickname());
         userCoupon.setUseStatus(UserCouponStatusEnum.NO_USE.getCode());
         userCouponMapper.insert(userCoupon);
-        logger.info("======结束创建优惠券用户userId=" + userId + ",actCode=" + actCode + ",userCoupon=" + JSON.toJSONString(userCoupon));
-        sendWinningMsg(user.getOpenId(),drawPrizeResult.getPrizeLevel() );
+        logger.info("======结束创建优惠券用户userId=" + userId + ",actCode=" + actCodeBatchDetailResult.getActCode() + ",userCoupon=" + JSON.toJSONString(userCoupon));
+        frontDrawRecordService.saveDrawRecord(userId, userCoupon.getId(), actCodeBatchDetailResult, drawPrizeResult);
+        sendWinningMsg(user.getOpenId(), drawPrizeResult.getPrizeLevel());
         return BeanUtil.convert(userCoupon, YfUserCouponResult.class);
     }
 
@@ -277,7 +281,7 @@ public class FrontUserCouponServiceImpl implements FrontUserCouponService {
                         .templateId("26gbak7X0fBjNlYdtXMUxHVz3N0G4bwq-xMRoe0k2FM")
                         .toUser(openId)
                         .data(data)
-                        .url(String.format("%s#/CouponList",shopUrl))
+                        .url(String.format("%s#/CouponList", shopUrl))
                         .build();
                 mpService.sendWxMpTemplateMsg(wxMpTemplateMessage);
             }

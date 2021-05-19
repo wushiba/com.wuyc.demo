@@ -1,7 +1,6 @@
 package com.yfshop.shop.service.activity;
 
 import cn.hutool.core.date.DateUtil;
-import cn.hutool.extra.spring.SpringUtil;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
@@ -11,7 +10,6 @@ import com.yfshop.code.model.*;
 import com.yfshop.common.constants.CacheConstants;
 import com.yfshop.common.enums.BoxSpecValEnum;
 import com.yfshop.common.enums.ProvinceEnum;
-import com.yfshop.common.enums.UserCouponStatusEnum;
 import com.yfshop.common.exception.ApiException;
 import com.yfshop.common.exception.Asserts;
 import com.yfshop.common.service.RedisService;
@@ -26,11 +24,9 @@ import com.yfshop.shop.service.coupon.service.FrontUserCouponService;
 import com.yfshop.shop.service.user.result.UserResult;
 import com.yfshop.shop.service.user.service.FrontUserService;
 import com.yfshop.shop.utils.Ip2regionUtil;
-import com.yfshop.shop.utils.ProxyUtil;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.scheduling.annotation.Async;
 
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
@@ -60,8 +56,6 @@ public class FrontDrawServiceImpl implements FrontDrawService {
     private UserCouponMapper userCouponMapper;
     @Resource
     private FrontUserService frontUserService;
-    @Resource
-    private FrontDrawRecordService frontDrawRecordService;
     @Resource
     private DrawActivityMapper drawActivityMapper;
     @Resource
@@ -189,9 +183,9 @@ public class FrontDrawServiceImpl implements FrontDrawService {
             }
             if (provinceId == null) {
                 logger.info("======抽奖用户userId=" + userId + ",actCode=" + actCode + ",抽奖结果=" + JSON.toJSONString(result));
-                frontUserCouponService.createUserCouponByPrize(userId, actCode, thirdPrize);
                 actCodeBatchDetail.setActTitle(yfDrawActivityResult.getActTitle());
-                frontDrawRecordService.saveDrawRecord(userId, actCodeBatchDetail, thirdPrize, location);
+                actCodeBatchDetail.setLocation(location);
+                frontUserCouponService.createUserCouponByPrize(userId, actCodeBatchDetail, thirdPrize);
                 return result;
             }
         }
@@ -217,9 +211,9 @@ public class FrontDrawServiceImpl implements FrontDrawService {
         result.setDrawPrizeIcon(drawPrize.getPrizeIcon());
 
         logger.info("======抽奖用户userId=" + userId + ",actCode=" + actCode + ",抽奖结果=" + JSON.toJSONString(result));
-        frontUserCouponService.createUserCouponByPrize(userId, actCode, drawPrize);
         actCodeBatchDetail.setActTitle(yfDrawActivityResult.getActTitle());
-        frontDrawRecordService.saveDrawRecord(userId, actCodeBatchDetail, drawPrize, location);
+        frontUserCouponService.createUserCouponByPrize(userId,actCodeBatchDetail, drawPrize);
+        actCodeBatchDetail.setActTitle(yfDrawActivityResult.getActTitle());
         return result;
     }
 

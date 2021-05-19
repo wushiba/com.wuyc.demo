@@ -57,6 +57,8 @@ public class DrawRecord extends Model<DrawRecord> {
      */
     private String prizeTitle;
 
+    private Long userCouponId;
+
     /**
      * 用户id
      */
