@@ -12,7 +12,7 @@ public interface MerchantLoginService {
      * @param pwd
      * @return
      */
-    MerchantResult loginByPwd(String mobile, String pwd, String openId) throws ApiException;
+    MerchantResult loginByPwd(String mobile, String pwd) throws ApiException;
 
     /**
      * 验证码登录
@@ -21,7 +21,7 @@ public interface MerchantLoginService {
      * @param captcha
      * @return
      */
-    MerchantResult loginByCaptcha(String mobile, String openId, String captcha) throws ApiException;
+    MerchantResult loginByCaptcha(String mobile, String captcha) throws ApiException;
 
     /**
      * 微信登录

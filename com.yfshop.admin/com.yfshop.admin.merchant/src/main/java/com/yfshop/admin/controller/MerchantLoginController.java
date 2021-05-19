@@ -46,7 +46,7 @@ class MerchantLoginController extends AbstractBaseController {
      */
     @RequestMapping(value = "/loginByPwd", method = {RequestMethod.POST})
     public CommonResult<MerchantResult> loginByPwd(MerchantLoginReq merchantLoginReq) {
-        MerchantResult merchantResult = merchantLoginService.loginByPwd(merchantLoginReq.getMobile(), merchantLoginReq.getPwd(),getCurrentOpenId());
+        MerchantResult merchantResult = merchantLoginService.loginByPwd(merchantLoginReq.getMobile(), merchantLoginReq.getPwd());
         Asserts.assertTrue("jxs,fxs,cxy,ywy,cxy,wd".contains(merchantResult.getRoleAlias()), 500, "您不支持公众号登录！");
         StpUtil.setLoginId(merchantResult.getId());
         return CommonResult.success(merchantResult);
@@ -60,7 +60,7 @@ class MerchantLoginController extends AbstractBaseController {
     @RequestMapping(value = "/loginByCaptcha", method = {RequestMethod.POST})
     @ResponseBody
     public CommonResult<MerchantResult> loginByCaptcha(MerchantCaptchaReq merchantCaptchaReq) {
-        MerchantResult merchantResult = merchantLoginService.loginByCaptcha(merchantCaptchaReq.getMobile(), merchantCaptchaReq.getCaptcha(),getCurrentOpenId());
+        MerchantResult merchantResult = merchantLoginService.loginByCaptcha(merchantCaptchaReq.getMobile(), merchantCaptchaReq.getCaptcha());
         Asserts.assertTrue("jxs,fxs,cxy,ywy,cxy,wd".contains(merchantResult.getRoleAlias()), 500, "您不支持公众号登录！");
         StpUtil.setLoginId(merchantResult.getId());
         return CommonResult.success(merchantResult);

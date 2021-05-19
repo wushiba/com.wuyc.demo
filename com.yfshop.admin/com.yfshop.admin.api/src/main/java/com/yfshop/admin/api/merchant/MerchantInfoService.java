@@ -207,4 +207,6 @@ public interface MerchantInfoService {
     List<GoodsRecordResult> websiteGoodsList(QueryGoodsRecordReq merchantId);
 
     Integer getWebsiteCodeBindCount(Integer merchantId);
+
+    void updateOpenId(Integer merchantId,String openId);
 }

@@ -856,6 +856,16 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
         return count == null ? 0 : count;
     }
 
+    @Override
+    public void updateOpenId(Integer merchantId, String openId) {
+        if (merchantId != null) {
+            Merchant merchant = new Merchant();
+            merchant.setId(merchantId);
+            merchant.setOpenId(openId);
+            merchantMapper.updateById(merchant);
+        }
+    }
+
     private Integer getCurrentWebsiteCodeCount(Integer merchantId, Date startTime, Date endTime) {
         LambdaQueryWrapper lambdaQueryWrapper = Wrappers.<WebsiteCodeDetail>lambdaQuery()
                 .eq(WebsiteCodeDetail::getMerchantId, merchantId)

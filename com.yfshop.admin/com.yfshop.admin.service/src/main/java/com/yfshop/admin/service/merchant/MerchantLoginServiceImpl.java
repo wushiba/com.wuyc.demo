@@ -35,32 +35,24 @@ public class MerchantLoginServiceImpl implements MerchantLoginService {
     private CaptchaService captchaService;
 
     @Override
-    public MerchantResult loginByPwd(String mobile, String pwd, String openId) throws ApiException {
+    public MerchantResult loginByPwd(String mobile, String pwd) throws ApiException {
         Merchant merchant = merchantMapper.selectOne(Wrappers.<Merchant>lambdaQuery()
                 .eq(Merchant::getMobile, mobile)
                 .eq(Merchant::getPassword, SecureUtil.md5(pwd))
                 .eq(Merchant::getIsEnable, "Y")
                 .eq(Merchant::getIsDelete, "N"));
         Asserts.assertNonNull(merchant, 500, "账号或密码输入错误！");
-        if (StringUtils.isNotBlank(openId)) {
-            merchant.setOpenId(openId);
-            merchantMapper.updateById(merchant);
-        }
         return BeanUtil.convert(merchant, MerchantResult.class);
     }
 
     @Override
-    public MerchantResult loginByCaptcha(String mobile, String captcha, String openId) throws ApiException {
+    public MerchantResult loginByCaptcha(String mobile, String captcha) throws ApiException {
         captchaService.checkCaptcha(mobile, captcha, CaptchaSourceEnum.LOGIN_CAPTCHA);
         Merchant merchant = merchantMapper.selectOne(Wrappers.<Merchant>lambdaQuery()
                 .eq(Merchant::getMobile, mobile)
                 .eq(Merchant::getIsEnable, "Y")
                 .eq(Merchant::getIsDelete, "N"));
         Asserts.assertNonNull(merchant, 500, "账号输入错误！");
-        if (StringUtils.isNotBlank(openId)) {
-            merchant.setOpenId(openId);
-            merchantMapper.updateById(merchant);
-        }
         return BeanUtil.convert(merchant, MerchantResult.class);
     }
 

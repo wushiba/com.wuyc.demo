@@ -1,11 +1,15 @@
 package com.yfshop.admin.controller.wx;
 
+import cn.dev33.satoken.stp.StpUtil;
+import com.yfshop.admin.api.merchant.MerchantInfoService;
 import com.yfshop.admin.api.merchant.result.MerchantResult;
 import com.yfshop.admin.api.user.UserService;
 import com.yfshop.admin.api.user.request.UserReq;
 import com.yfshop.admin.config.WxMpProperties;
 import com.yfshop.admin.config.WxStpLogic;
+import com.yfshop.admin.controller.AbstractBaseController;
 import com.yfshop.common.api.CommonResult;
+import com.yfshop.common.base.BaseController;
 import com.yfshop.common.util.BeanUtil;
 import lombok.AllArgsConstructor;
 import me.chanjar.weixin.common.bean.WxOAuth2UserInfo;
@@ -23,12 +27,14 @@ import org.springframework.web.bind.annotation.RestController;
 @AllArgsConstructor
 @RestController
 @RequestMapping("/wx/redirect")
-public class WxRedirectController {
+public class WxRedirectController extends AbstractBaseController {
     private final WxMpProperties wxMpProperties;
     private final WxMpService wxService;
     @DubboReference(check = false)
-    UserService userService;
-    final static WxStpLogic wxStpLogic =new WxStpLogic();
+    private UserService userService;
+    @DubboReference(check = false)
+    private MerchantInfoService merchantInfoService;
+    final static WxStpLogic wxStpLogic = new WxStpLogic();
 
 
     @RequestMapping("/authByCode")
@@ -40,10 +46,13 @@ public class WxRedirectController {
         try {
             WxOAuth2AccessToken accessToken = wxService.getOAuth2Service().getAccessToken(code);
             WxOAuth2UserInfo user = wxService.getOAuth2Service().getUserInfo(accessToken, null);
-            UserReq userReq= BeanUtil.convert(user,UserReq.class);
+            UserReq userReq = BeanUtil.convert(user, UserReq.class);
             userReq.setOpenId(user.getOpenid());
             userService.saveUser(userReq);
             wxStpLogic.setLoginId(user.getOpenid());
+            if (StpUtil.isLogin()) {
+                merchantInfoService.updateOpenId(getCurrentAdminUserId(), user.getOpenid());
+            }
         } catch (WxErrorException e) {
             e.printStackTrace();
             return CommonResult.failed();
