@@ -101,11 +101,11 @@ class MerchantInfoController extends AbstractBaseController {
     @SaCheckLogin
     @RequestMapping(value = "/websiteInfo", method = {RequestMethod.POST})
     public CommonResult<MerchantResult> getWebsiteInfo() {
+        merchantInfoService.updateOpenId(getCurrentAdminUserId(), getCurrentOpenId());
         MerchantResult merchantResult = merchantInfoService.getWebsiteInfo(getCurrentAdminUserId());
         String openId = merchantResult.getOpenId();
         if (StringUtils.isBlank(openId)) {
             openId = getCurrentOpenId();
-            merchantInfoService.updateOpenId(getCurrentAdminUserId(), openId);
         }
         if (StringUtils.isBlank(merchantResult.getHeadImgUrl()) && StringUtils.isNotBlank(openId)) {
             UserResult userResult = userService.getUserByOpenId(openId);
