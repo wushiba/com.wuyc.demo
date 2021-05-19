@@ -216,10 +216,10 @@ class MerchantInfoController extends AbstractBaseController {
     @SaCheckLogin
     @RequestMapping(value = "/getWebsiteCodeData", method = {RequestMethod.POST})
     public CommonResult<WebsiteCodeGroupResult> getWebsiteCodeData(WebsiteCodeDataReq websiteCodeDataReq) {
-        if (websiteCodeDataReq.getMerchantId() == null) {
-            websiteCodeDataReq.setMerchantId(getCurrentAdminUserId());
-        }
-        WebsiteCodeGroupResult websiteCodeGroupResult = merchantInfoService.getWebsiteCodeData(websiteCodeDataReq);
+//        if (websiteCodeDataReq.getMerchantId() == null) {
+//            websiteCodeDataReq.setMerchantId(getCurrentAdminUserId());
+//        }
+        WebsiteCodeGroupResult websiteCodeGroupResult = merchantInfoService.getWebsiteCodeData(getCurrentAdminUserId(),websiteCodeDataReq);
         return CommonResult.success(websiteCodeGroupResult);
     }
 

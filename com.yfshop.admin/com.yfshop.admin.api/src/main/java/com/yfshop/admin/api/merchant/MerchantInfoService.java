@@ -196,7 +196,7 @@ public interface MerchantInfoService {
 
     MerchantGroupResult getWebsiteList(MerchantGroupReq merchantGroupReq);
 
-    WebsiteCodeGroupResult getWebsiteCodeData(WebsiteCodeDataReq websiteCodeDataReq);
+    WebsiteCodeGroupResult getWebsiteCodeData(Integer merchantId,WebsiteCodeDataReq websiteCodeDataReq);
 
     List<MerchantResult> findNearMerchantList(Integer merchantId,Integer districtId, Double longitude, Double latitude);
 
