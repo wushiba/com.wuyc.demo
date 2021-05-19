@@ -9,7 +9,6 @@ import com.yfshop.admin.config.WxMpProperties;
 import com.yfshop.admin.config.WxStpLogic;
 import com.yfshop.admin.controller.AbstractBaseController;
 import com.yfshop.common.api.CommonResult;
-import com.yfshop.common.base.BaseController;
 import com.yfshop.common.util.BeanUtil;
 import lombok.AllArgsConstructor;
 import me.chanjar.weixin.common.bean.WxOAuth2UserInfo;
@@ -17,6 +16,8 @@ import me.chanjar.weixin.common.bean.oauth2.WxOAuth2AccessToken;
 import me.chanjar.weixin.common.error.WxErrorException;
 import me.chanjar.weixin.mp.api.WxMpService;
 import org.apache.dubbo.config.annotation.DubboReference;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -35,7 +36,7 @@ public class WxRedirectController extends AbstractBaseController {
     @DubboReference(check = false)
     private MerchantInfoService merchantInfoService;
     final static WxStpLogic wxStpLogic = new WxStpLogic();
-
+    private static final Logger logger = LoggerFactory.getLogger(WxRedirectController.class);
 
     @RequestMapping("/authByCode")
     public CommonResult<MerchantResult> authByCode(@RequestParam String code) {
@@ -50,8 +51,12 @@ public class WxRedirectController extends AbstractBaseController {
             userReq.setOpenId(user.getOpenid());
             userService.saveUser(userReq);
             wxStpLogic.setLoginId(user.getOpenid());
+
             if (StpUtil.isLogin()) {
+                logger.info("登录信息->"+getCurrentAdminUserId()+","+user.getOpenid());
                 merchantInfoService.updateOpenId(getCurrentAdminUserId(), user.getOpenid());
+            }else{
+                logger.info("未登录");
             }
         } catch (WxErrorException e) {
             e.printStackTrace();
