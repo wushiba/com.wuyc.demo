@@ -724,13 +724,13 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
     public WebsiteCodeGroupResult getWebsiteCodeData(Integer merchantId, WebsiteCodeDataReq websiteCodeDataReq) {
         WebsiteCodeGroupResult websiteCodeGroupResult = new WebsiteCodeGroupResult();
         List<WebsiteCodeDataResult> websiteCodeDataResults = new ArrayList<>();
-        String pidPath = null;
+        Integer pidId = null;
         if (websiteCodeDataReq.getMerchantId() != null) {
-            pidPath = merchantMapper.selectById(websiteCodeDataReq.getMerchantId()).getPidPath();
+            pidId = merchantMapper.selectById(websiteCodeDataReq.getMerchantId()).getPid();
         }
         List<WebsiteCodeDetail> websiteCodeDetailList = websiteCodeDetailMapper.selectList(Wrappers.<WebsiteCodeDetail>lambdaQuery()
                 .eq(WebsiteCodeDetail::getMerchantId, merchantId)
-                .likeLeft(StringUtils.isNotBlank(pidPath), WebsiteCodeDetail::getPidPath, pidPath)
+                .eq(pidId != null, WebsiteCodeDetail::getPid, pidId)
                 .eq(WebsiteCodeDetail::getIsActivate, "Y"));
         AtomicInteger currentCurrentExchange = new AtomicInteger();
         AtomicInteger totalExchange = new AtomicInteger();
@@ -900,8 +900,6 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
                 .eq(Merchant::getIsDelete, "N");
         return merchantMapper.selectCount(lambdaQueryWrapper);
     }
-
-
 
 
     private Integer getCurrentExchange(Integer merchantId, Date startTime, Date endTime) {
