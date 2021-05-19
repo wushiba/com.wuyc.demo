@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 import com.google.common.collect.Lists;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -96,6 +97,21 @@ public class AdminUserOrderServiceImpl implements AdminUserOrderService {
         if ("ZT".equalsIgnoreCase(order.getReceiveWay())) {
             websiteBillService.insertWebsiteBill(orderId);
         }
+        List<OrderDetail> orderDetailList = orderDetailMapper.selectList(Wrappers.<OrderDetail>lambdaQuery().
+                eq(OrderDetail::getOrderId, orderId));
+        orderDetailList.forEach(item -> {
+            if (item.getUserCouponId() != null) {
+                UserCoupon userCoupon = new UserCoupon();
+                userCoupon.setId(item.getUserCouponId());
+                userCoupon.setUseStatus(UserCouponStatusEnum.HAS_USE.getCode());
+                userCouponMapper.updateById(userCoupon);
+                DrawRecord drawRecord = new DrawRecord();
+                drawRecord.setUseStatus(UserCouponStatusEnum.HAS_USE.getCode());
+                drawRecordMapper.update(drawRecord, Wrappers.<DrawRecord>lambdaQuery()
+                        .eq(DrawRecord::getUserCouponId, item.getUserCouponId()));
+            }
+        });
+
         return null;
     }
 
