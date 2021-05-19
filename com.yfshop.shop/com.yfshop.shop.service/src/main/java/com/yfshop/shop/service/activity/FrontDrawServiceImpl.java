@@ -212,8 +212,8 @@ public class FrontDrawServiceImpl implements FrontDrawService {
 
         logger.info("======抽奖用户userId=" + userId + ",actCode=" + actCode + ",抽奖结果=" + JSON.toJSONString(result));
         actCodeBatchDetail.setActTitle(yfDrawActivityResult.getActTitle());
-        frontUserCouponService.createUserCouponByPrize(userId,actCodeBatchDetail, drawPrize);
-        actCodeBatchDetail.setActTitle(yfDrawActivityResult.getActTitle());
+        actCodeBatchDetail.setLocation(location);
+        frontUserCouponService.createUserCouponByPrize(userId, actCodeBatchDetail, drawPrize);
         return result;
     }
 
