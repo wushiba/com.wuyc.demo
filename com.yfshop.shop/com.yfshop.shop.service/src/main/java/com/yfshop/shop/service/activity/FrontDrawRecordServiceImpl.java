@@ -95,8 +95,7 @@ public class FrontDrawRecordServiceImpl implements FrontDrawRecordService {
         DrawRecord drawRecord = new DrawRecord();
         drawRecord.setUseStatus(useStatus);
         drawRecordMapper.update(drawRecord, Wrappers.<DrawRecord>lambdaQuery()
-                .eq(DrawRecord::getUserCouponId, userCoupId)
-                .eq(DrawRecord::getUserId, userCoupId));
+                .eq(DrawRecord::getUserCouponId, userCoupId));
 
     }
 }
