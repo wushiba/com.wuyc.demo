@@ -33,8 +33,6 @@ public class WxRedirectController extends AbstractBaseController {
     private final WxMpService wxService;
     @DubboReference(check = false)
     private UserService userService;
-    @DubboReference(check = false)
-    private MerchantInfoService merchantInfoService;
     final static WxStpLogic wxStpLogic = new WxStpLogic();
     private static final Logger logger = LoggerFactory.getLogger(WxRedirectController.class);
 
@@ -51,13 +49,6 @@ public class WxRedirectController extends AbstractBaseController {
             userReq.setOpenId(user.getOpenid());
             userService.saveUser(userReq);
             wxStpLogic.setLoginId(user.getOpenid());
-
-            if (StpUtil.isLogin()) {
-                logger.info("登录信息->"+getCurrentAdminUserId()+","+user.getOpenid());
-                merchantInfoService.updateOpenId(getCurrentAdminUserId(), user.getOpenid());
-            }else{
-                logger.info("未登录");
-            }
         } catch (WxErrorException e) {
             e.printStackTrace();
             return CommonResult.failed();

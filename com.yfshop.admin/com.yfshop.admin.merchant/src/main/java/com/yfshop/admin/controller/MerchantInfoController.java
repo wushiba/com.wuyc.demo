@@ -105,6 +105,7 @@ class MerchantInfoController extends AbstractBaseController {
         String openId = merchantResult.getOpenId();
         if (StringUtils.isBlank(openId)) {
             openId = getCurrentOpenId();
+            merchantInfoService.updateOpenId(getCurrentAdminUserId(), openId);
         }
         if (StringUtils.isBlank(merchantResult.getHeadImgUrl()) && StringUtils.isNotBlank(openId)) {
             UserResult userResult = userService.getUserByOpenId(openId);
