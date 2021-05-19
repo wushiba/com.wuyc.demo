@@ -724,13 +724,9 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
     public WebsiteCodeGroupResult getWebsiteCodeData(Integer merchantId, WebsiteCodeDataReq websiteCodeDataReq) {
         WebsiteCodeGroupResult websiteCodeGroupResult = new WebsiteCodeGroupResult();
         List<WebsiteCodeDataResult> websiteCodeDataResults = new ArrayList<>();
-        Integer pidId = null;
-        if (websiteCodeDataReq.getMerchantId() != null) {
-            pidId = merchantMapper.selectById(websiteCodeDataReq.getMerchantId()).getPid();
-        }
         List<WebsiteCodeDetail> websiteCodeDetailList = websiteCodeDetailMapper.selectList(Wrappers.<WebsiteCodeDetail>lambdaQuery()
                 .eq(WebsiteCodeDetail::getMerchantId, merchantId)
-                .eq(pidId != null, WebsiteCodeDetail::getPid, pidId)
+                .like(websiteCodeDataReq.getMerchantId()!=null, WebsiteCodeDetail::getPidPath, merchantId+".")
                 .eq(WebsiteCodeDetail::getIsActivate, "Y"));
         AtomicInteger currentCurrentExchange = new AtomicInteger();
         AtomicInteger totalExchange = new AtomicInteger();
