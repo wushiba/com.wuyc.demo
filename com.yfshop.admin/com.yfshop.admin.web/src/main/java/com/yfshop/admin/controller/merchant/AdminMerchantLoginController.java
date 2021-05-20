@@ -48,7 +48,7 @@ class AdminMerchantLoginController implements BaseController {
      */
     @RequestMapping(value = "/logout", method = {RequestMethod.POST})
     public CommonResult<MerchantResult> logout() {
-        StpUtil.logout();
+       // StpUtil.logout();
         return CommonResult.success(null);
     }
 
