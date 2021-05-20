@@ -1,5 +1,7 @@
 package com.yfshop.shop.controller.draw;
 
+import cn.hutool.Hutool;
+import cn.hutool.extra.servlet.ServletUtil;
 import com.yfshop.common.api.CommonResult;
 import com.yfshop.common.base.BaseController;
 import com.yfshop.common.enums.CouponResourceEnum;
@@ -15,6 +17,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 @Controller
@@ -38,8 +42,8 @@ public class FrontDrawController implements BaseController {
 
     @RequestMapping(value = "user/clickDraw", method = {RequestMethod.GET, RequestMethod.POST})
     @ResponseBody
-    public CommonResult<YfUserCouponResult> userClickDraw(String actCode) {
-        return CommonResult.success(frontDrawService.userClickDraw(getCurrentUserId(), "115.239.212.133", actCode));
+    public CommonResult<YfUserCouponResult> userClickDraw(HttpServletRequest request, String actCode) {
+        return CommonResult.success(frontDrawService.userClickDraw(getCurrentUserId(), ServletUtil.getClientIP(request), actCode));
     }
 
     @RequestMapping(value = "record/findList", method = {RequestMethod.GET, RequestMethod.POST})

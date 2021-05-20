@@ -159,18 +159,7 @@ public interface BaseController {
         String ip = "0.0.0.0";
         try {
             HttpServletRequest request = getCurrentRequest();
-            ip = request.getHeader("x-forwarded-for");
-            if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
-                ip = request.getHeader("Proxy-Client-IP");
-            }
-
-            if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
-                ip = request.getHeader("WL-Proxy-Client-IP");
-            }
-
-            if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
-                ip = request.getRemoteAddr();
-            }
+            ip = ServletUtil.getClientIP(request);
         } catch (Exception e) {
             e.printStackTrace();
         }
