@@ -61,7 +61,7 @@ public class AdminActManageController implements BaseController {
     @ResponseBody
     public CommonResult<Void> actCodeImportCount(Integer actId,Integer count,String spec) {
 
-        return CommonResult.success(adminActCodeManageService.actCodeImportCount(actId, count));
+        return CommonResult.success(adminActCodeManageService.actCodeImportCount(actId, count,spec));
     }
 
     @SaCheckLogin
