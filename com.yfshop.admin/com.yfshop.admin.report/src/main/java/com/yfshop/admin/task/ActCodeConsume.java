@@ -110,6 +110,7 @@ public class ActCodeConsume {
                 ActCodeBatchDetail actCodeBatchDetail = new ActCodeBatchDetail();
                 actCodeBatchDetail.setActCode(DigestUtil.md5HexTo16(SecureUtil.md5("yf" + code)));
                 actCodeBatchDetail.setTraceNo(code);
+                actCodeBatchDetail.setSpec(actCodeBatch.getSpec());
                 actCodeBatchDetail.setActId(actCodeBatch.getActId());
                 actCodeBatchDetail.setBatchId(actCodeBatch.getId());
                 actCodeBatchDetail.setCreateTime(now);
@@ -122,6 +123,7 @@ public class ActCodeConsume {
                 ActCodeBatchDetail actCodeBatchDetail = new ActCodeBatchDetail();
                 actCodeBatchDetail.setActCode(DigestUtil.md5HexTo16(SecureUtil.md5("yf" + code)));
                 actCodeBatchDetail.setTraceNo(code);
+                actCodeBatchDetail.setSpec(actCodeBatch.getSpec());
                 actCodeBatchDetail.setActId(actCodeBatch.getActId());
                 actCodeBatchDetail.setBatchId(actCodeBatch.getId());
                 actCodeBatchDetail.setCreateTime(now);
