@@ -81,7 +81,7 @@ class MerchantInfoController extends AbstractBaseController {
         if (merchantGroupReq.getMerchantId() == null) {
             merchantGroupReq.setMerchantId(getCurrentAdminUserId());
         }
-        return CommonResult.success(merchantInfoService.getWebsiteList(getCurrentAdminUserId(),merchantGroupReq));
+        return CommonResult.success(merchantInfoService.getWebsiteList(getCurrentAdminUserId(), merchantGroupReq));
     }
 
     @RequestMapping(value = "/checkSubscribe", method = {RequestMethod.GET, RequestMethod.POST})
@@ -103,6 +103,12 @@ class MerchantInfoController extends AbstractBaseController {
     public CommonResult<MerchantResult> getWebsiteInfo() {
         merchantInfoService.updateOpenId(getCurrentAdminUserId(), getCurrentOpenId());
         MerchantResult merchantResult = merchantInfoService.getWebsiteInfo(getCurrentAdminUserId());
+        if (!merchantResult.getRoleAlias().equals(GroupRoleEnum.WD.getCode())) {
+            Integer count = merchantInfoService.getWebsiteCodeBindCount(getCurrentAdminUserId());
+            merchantResult.setIsMerchantCode(count > 0 ? "Y" : "N");
+        } else {
+            merchantResult.setIsMerchantCode("Y");
+        }
         String openId = merchantResult.getOpenId();
         if (StringUtils.isBlank(openId)) {
             openId = getCurrentOpenId();
@@ -219,7 +225,7 @@ class MerchantInfoController extends AbstractBaseController {
 //        if (websiteCodeDataReq.getMerchantId() == null) {
 //            websiteCodeDataReq.setMerchantId(getCurrentAdminUserId());
 //        }
-        WebsiteCodeGroupResult websiteCodeGroupResult = merchantInfoService.getWebsiteCodeData(getCurrentAdminUserId(),websiteCodeDataReq);
+        WebsiteCodeGroupResult websiteCodeGroupResult = merchantInfoService.getWebsiteCodeData(getCurrentAdminUserId(), websiteCodeDataReq);
         return CommonResult.success(websiteCodeGroupResult);
     }
 
