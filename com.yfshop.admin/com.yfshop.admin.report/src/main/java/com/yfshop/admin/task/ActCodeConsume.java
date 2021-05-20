@@ -74,11 +74,13 @@ public class ActCodeConsume {
         ActCodeBatch actCodeBatch = actCodeBatchMapper.selectById(id);
         try {
             actCodeBatch.setFileStatus("FAIL");
-            String fileName = String.format("%s(%sml).txt", actCodeBatch.getBatchNo(), actCodeBatch.getSpec());
+            String fileName = String.format("%s.txt", actCodeBatch.getBatchNo());
+            String targetFileName = String.format("%s(%sml).txt", actCodeBatch.getBatchNo(), actCodeBatch.getSpec());
             String filePath = actCodeCodeTargetDir + fileName;
-            if (new File(filePath).exists()) {
+            File file = new File(filePath);
+            if (file.exists()) {
                 try {
-                    UploadResult response = ossUploader.upload(new File(filePath), fileName);
+                    UploadResult response = ossUploader.upload(file, targetFileName);
                     if (response.isSuccessful()) {
                         actCodeBatch.setFileStatus("SUCCESS");
                         actCodeBatch.setFileUrl(response.getUrl());
