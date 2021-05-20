@@ -50,7 +50,7 @@ public class AdminActManageController implements BaseController {
     @ResponseBody
     public CommonResult<Void> actCodeImportUrl(ActCodeImportReq importReq) {
 
-        return CommonResult.success(adminActCodeManageService.actCodeImport(importReq.getActId(), importReq.getMd5(), importReq.getUrl(),));
+        return CommonResult.success(adminActCodeManageService.actCodeImport(importReq.getActId(), importReq.getMd5(), importReq.getUrl(),importReq.getSpec()));
     }
 
     @SaCheckLogin
