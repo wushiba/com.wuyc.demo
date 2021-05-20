@@ -88,7 +88,7 @@ public class ActCodeTask {
     public void buildActCode(ActCodeBatch actCodeBatch, List<String> sourceCodes) {
         List<ActCodeBatchDetail> actCodeBatchDetails = new ArrayList<>();
         List<String> codeFile = new ArrayList<>();
-        actCodeBatch.setFileStatus("DONGING");
+        actCodeBatch.setFileStatus("DOING");
         actCodeBatchManager.updateById(actCodeBatch);
         logger.info("批从号{},正在生成{}个溯源码", actCodeBatch.getBatchNo(), actCodeBatch.getQuantity());
         logger.info("开始合成溯源码");

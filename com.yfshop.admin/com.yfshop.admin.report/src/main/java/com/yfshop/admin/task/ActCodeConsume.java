@@ -101,7 +101,7 @@ public class ActCodeConsume {
         ActCodeBatch actCodeBatch = actCodeBatchMapper.selectById(id);
         List<ActCodeBatchDetail> actCodeBatchDetails = new ArrayList<>();
         List<String> codeFile = new ArrayList<>();
-        actCodeBatch.setFileStatus("DONGING");
+        actCodeBatch.setFileStatus("DOING");
         actCodeBatchMapper.updateById(actCodeBatch);
         logger.info("开始合成溯源码");
         if (actCodeBatch.getType() == 0) {

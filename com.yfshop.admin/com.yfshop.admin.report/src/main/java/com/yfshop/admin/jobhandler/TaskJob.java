@@ -76,6 +76,7 @@ public class TaskJob {
         if (!actCodeTask.isFlag()) {
             ActCodeBatch actCodeBatch = actCodeBatchMapper.selectOne(Wrappers.lambdaQuery(ActCodeBatch.class).eq(ActCodeBatch::getFileStatus, "WAIT"));
             if (actCodeBatch != null) {
+                actCodeBatch.setFileStatus("DOING");
                 actCodeBatchMapper.updateById(actCodeBatch);
                 if (actCodeBatch.getType() == 0) {
                     actCodeTask.downLoadFile(actCodeBatch);
