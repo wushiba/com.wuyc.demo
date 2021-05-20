@@ -156,7 +156,7 @@ public class AdminActCodeManageServiceImpl implements AdminActCodeManageService 
             HttpUtil.downloadFileFromUrl(fileUrl, filePath);
         }
         String msg = "<p>您好!</p>\n" +
-                "<p>&nbsp;&nbsp;&nbsp;&nbsp;此邮件内含光明活动码（溯源码+抽奖活动码），请妥善保管，切勿外传。雨帆</p>";
+                "<p>&nbsp;&nbsp;&nbsp;&nbsp;此邮件内含光明活动码（溯源码+抽奖活动码）"+ actCodeBatch.getSpec() + "ml，请妥善保管，切勿外传。雨帆</p>";
         emailTask.sendAttachmentsMail(sourceFactory.getEmail(), "光明活动码（溯源码+抽奖活动码）" + actCodeBatch.getSpec() + "ml", msg, filePath);
         actCodeBatch.setIsSend("Y");
         actCodeBatchMapper.updateById(actCodeBatch);
