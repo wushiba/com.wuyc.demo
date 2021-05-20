@@ -75,9 +75,6 @@ public class WebsiteBillServiceImpl implements WebsiteBillService {
      */
     @Override
     public WebsiteBillDayResult getBillListByMerchantId(Integer merchantId, Date startTime,Date endTime, String status) throws ApiException {
-        if (endTime!=null){
-            endTime = DateUtil.plusDays(endTime, 1);
-        }
         Integer count=websiteBillMapper.selectCount(Wrappers.<WebsiteBill>lambdaQuery()
                         .eq(WebsiteBill::getMerchantId, merchantId)
                         .eq(WebsiteBill::getIsConfirm, status));
