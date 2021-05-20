@@ -99,7 +99,7 @@ public class WebSystemOperateLogAspect {
         HttpServletRequest request = attributes.getRequest();
         String requestMethod = request.getMethod();
         String requestUrl = request.getRequestURL().toString();
-        String visitorIp = request.getRemoteAddr();
+        String visitorIp = ServletUtil.getClientIP(request);
         boolean isAjax = this.isAjaxRequest(request, targetClass, targetMethod);
         Integer merchantId = this.loginInfo(request);
         Object requestParameter = this.fetchRequestParameter(request, joinPoint, targetMethod);
