@@ -489,7 +489,7 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
         websiteCode.setPostage(websiteCodeAmountResult.getPostage().divide(new BigDecimal(websiteCodePayReq.getIds().size()), 2, BigDecimal.ROUND_CEILING));
         int count = websiteCodeMapper.update(websiteCode, Wrappers.<WebsiteCode>lambdaQuery()
                 .in(WebsiteCode::getId, websiteCodePayReq.getIds())
-                .in(WebsiteCode::getOrderStatus, "PENDING", "PAYING"));
+                .in(WebsiteCode::getOrderStatus, "PENDING"));
         Asserts.assertTrue(count > 0, 500, "没有要支付的订单！");
         String fee = websiteCodeAmountResult.getAmount().add(websiteCodeAmountResult.getPostage()).toPlainString();
         WxPayUnifiedOrderRequest orderRequest = new WxPayUnifiedOrderRequest();
