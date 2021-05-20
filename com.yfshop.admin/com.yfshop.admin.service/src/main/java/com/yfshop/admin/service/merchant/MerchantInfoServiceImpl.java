@@ -216,6 +216,9 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
             merchantId = merchant.getId();
             merchant.setHeadImgUrl(headImageUrl);
             roleAlias = merchant.getRoleAlias();
+            if (GroupRoleEnum.WD.getCode().equals(roleAlias)) {
+                Asserts.assertTrue(websiteCodeDetail.getPid().equals(merchant.getPid()), 500, "该网点码不是你的上级申请的，无法绑定！");
+            }
             Asserts.assertTrue(merchant.getPidPath().contains(websiteCodeDetail.getPidPath()), 500, "该网点码不是你或你的上级申请的，无法绑定！");
             Asserts.assertEquals(merchant.getMobile(), websiteReq.getMobile(), 500, "手机号不允许被修改！");
             String openId = merchant.getOpenId();
@@ -687,7 +690,7 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
     }
 
     @Override
-    public MerchantGroupResult getWebsiteList(Integer merchantId,MerchantGroupReq merchantGroupReq) {
+    public MerchantGroupResult getWebsiteList(Integer merchantId, MerchantGroupReq merchantGroupReq) {
         MerchantGroupResult merchantGroupResult = new MerchantGroupResult();
         AtomicInteger count = new AtomicInteger();
         LambdaQueryWrapper lambdaQueryWrapper = Wrappers.<Merchant>lambdaQuery()
@@ -711,7 +714,7 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
             child.setCurrentExchange(getCurrentExchangeByPid(item.getId(), merchantGroupReq.getStartTime(), merchantGroupReq.getEndTime()));
             child.setTotalExchange(getCurrentExchangeByPid(item.getId(), null, null));
             child.setCurrentGoodsRecord(websiteGoodsRecordDao.sumGoodsRecordByMerchantId(item.getId(), merchantGroupReq.getStartTime(), merchantGroupReq.getEndTime()));
-            child.setCount(getCurrentWebsiteCodeCount(item.getId(),merchantId));
+            child.setCount(getCurrentWebsiteCodeCount(item.getId(), merchantId));
             count.addAndGet(child.getCount());
             merchantGroupResults.add(child);
         });
@@ -892,7 +895,7 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
 
     private Integer getAllWebsiteCodeCount(Integer merchantId) {
         LambdaQueryWrapper lambdaQueryWrapper = Wrappers.<WebsiteCodeDetail>lambdaQuery()
-                .like(WebsiteCodeDetail::getMerchantPidPath, merchantId+".")
+                .like(WebsiteCodeDetail::getMerchantPidPath, merchantId + ".")
                 .eq(WebsiteCodeDetail::getIsActivate, "Y");
         return websiteCodeDetailMapper.selectCount(lambdaQueryWrapper);
     }
