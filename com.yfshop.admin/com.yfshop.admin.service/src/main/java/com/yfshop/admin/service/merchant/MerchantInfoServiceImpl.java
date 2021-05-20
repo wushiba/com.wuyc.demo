@@ -572,7 +572,7 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
         MerchantGroupResult merchantGroupResult = new MerchantGroupResult();
         Integer myselfCount = getCurrentWebsiteCount(merchantGroupReq.getMerchantId());
         Merchant merchant = merchantMapper.selectById(merchantGroupReq.getMerchantId());
-        Integer count = getAllWebsiteCodeCount(merchant.getPidPath());
+        Integer count = getAllWebsiteCodeCount(merchantGroupReq.getMerchantId());
         merchantGroupResult.setMerchantId(merchant.getId());
         merchantGroupResult.setMerchantName(merchant.getMerchantName());
         merchantGroupResult.setCount(count);
@@ -601,7 +601,7 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
             child.setCurrentExchange(getCurrentExchange(item.getId(), merchantGroupReq.getStartTime(), merchantGroupReq.getEndTime()));
             child.setTotalExchange(getCurrentExchange(item.getId(), null, null));
             child.setCurrentGoodsRecord(websiteGoodsRecordDao.sumAllGoodsRecord(item.getId(), merchantGroupReq.getStartTime(), merchantGroupReq.getEndTime()));
-            child.setCount(getAllWebsiteCodeCount(item.getPidPath()));
+            child.setCount(getAllWebsiteCodeCount(item.getId()));
             merchantGroupResults.add(child);
         });
         merchantGroupResult.setList(merchantGroupResults);
@@ -727,7 +727,7 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
         List<WebsiteCodeDataResult> websiteCodeDataResults = new ArrayList<>();
         List<WebsiteCodeDetail> websiteCodeDetailList = websiteCodeDetailMapper.selectList(Wrappers.<WebsiteCodeDetail>lambdaQuery()
                 .eq(WebsiteCodeDetail::getMerchantId, websiteCodeDataReq.getMerchantId() == null ? merchantId : websiteCodeDataReq.getMerchantId())
-                .like(websiteCodeDataReq.getMerchantId() != null, WebsiteCodeDetail::getPidPath, merchantId + ".")
+                .like(websiteCodeDataReq.getMerchantId() != null, WebsiteCodeDetail::getMerchantPidPath, merchantId + ".")
                 .eq(WebsiteCodeDetail::getIsActivate, "Y"));
         AtomicInteger currentCurrentExchange = new AtomicInteger();
         AtomicInteger totalExchange = new AtomicInteger();
@@ -890,9 +890,9 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
     }
 
 
-    private Integer getAllWebsiteCodeCount(String pidPath) {
+    private Integer getAllWebsiteCodeCount(Integer merchantId) {
         LambdaQueryWrapper lambdaQueryWrapper = Wrappers.<WebsiteCodeDetail>lambdaQuery()
-                .likeLeft(WebsiteCodeDetail::getMerchantPidPath, pidPath)
+                .like(WebsiteCodeDetail::getMerchantPidPath, merchantId+".")
                 .eq(WebsiteCodeDetail::getIsActivate, "Y");
         return websiteCodeDetailMapper.selectCount(lambdaQueryWrapper);
     }
