@@ -42,8 +42,8 @@ public class FrontDrawController implements BaseController {
 
     @RequestMapping(value = "user/clickDraw", method = {RequestMethod.GET, RequestMethod.POST})
     @ResponseBody
-    public CommonResult<YfUserCouponResult> userClickDraw(HttpServletRequest request, String actCode) {
-        return CommonResult.success(frontDrawService.userClickDraw(getCurrentUserId(), ServletUtil.getClientIP(request), actCode));
+    public CommonResult<YfUserCouponResult> userClickDraw(String actCode) {
+        return CommonResult.success(frontDrawService.userClickDraw(getCurrentUserId(), getRequestIpStr(), actCode));
     }
 
     @RequestMapping(value = "record/findList", method = {RequestMethod.GET, RequestMethod.POST})
