@@ -13,6 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.util.CollectionUtils;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @DubboService
@@ -25,18 +27,30 @@ public class TraceServiceImpl implements TraceService {
     @Override
     @Async
     public void syncTrace(List<TraceReq> traceReqList) {
-        List<Trace> traces = BeanUtil.convertList(traceReqList, Trace.class);
-        if (!CollectionUtils.isEmpty(traces)) {
-            traceMapper.saveBatch(traces);
+        if (traceReqList != null) {
+            List<Trace> destList = new ArrayList<>();
+            LocalDateTime now = LocalDateTime.now();
+            traceReqList.forEach(item -> {
+                Trace trace = BeanUtil.convert(item, Trace.class);
+                trace.setCreateTime(now);
+                destList.add(trace);
+            });
+            traceMapper.saveBatch(destList);
         }
     }
 
     @Override
     @Async
-    public void syncStorage(List<StorageReq> traceReqList) {
-        List<TraceDetails> traces = BeanUtil.convertList(traceReqList, TraceDetails.class);
-        if (!CollectionUtils.isEmpty(traces)) {
-            traceDetailsManager.saveBatch(traces);
+    public void syncStorage(List<StorageReq> storageReqList) {
+        if (storageReqList != null) {
+            List<TraceDetails> destList = new ArrayList<>();
+            LocalDateTime now = LocalDateTime.now();
+            storageReqList.forEach(item -> {
+                TraceDetails details = BeanUtil.convert(item, TraceDetails.class);
+                details.setCreateTime(now);
+                destList.add(details);
+            });
+            traceDetailsManager.saveBatch(destList);
         }
     }
 }
