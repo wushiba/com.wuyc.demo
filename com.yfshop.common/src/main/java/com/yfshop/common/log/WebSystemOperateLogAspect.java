@@ -99,7 +99,7 @@ public class WebSystemOperateLogAspect {
         HttpServletRequest request = attributes.getRequest();
         String requestMethod = request.getMethod();
         String requestUrl = request.getRequestURL().toString();
-        String visitorIp = request.getRemoteAddr();
+        String visitorIp = ServletUtil.getClientIP(request);
         boolean isAjax = this.isAjaxRequest(request, targetClass, targetMethod);
         Integer merchantId = this.loginInfo(request);
         Object requestParameter = this.fetchRequestParameter(request, joinPoint, targetMethod);
@@ -115,6 +115,7 @@ public class WebSystemOperateLogAspect {
         visitInfo.setStartTimestamp(System.currentTimeMillis());
         visitInfo.setIsAjax(isAjax);
         visitInfo.setCookies(readCookies(request));
+        visitInfo.setHeaders(ServletUtil.getHeaderMap(request));
         try {
             // execute the handler method
             Object result = joinPoint.proceed();
@@ -394,6 +395,8 @@ public class WebSystemOperateLogAspect {
          * cookie信息
          */
         private Map<String, Map<String, Object>> cookies;
+
+        private Map<String, String> headers;
     }
 
     @Data
