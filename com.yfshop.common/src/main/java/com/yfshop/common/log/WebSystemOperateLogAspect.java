@@ -115,6 +115,7 @@ public class WebSystemOperateLogAspect {
         visitInfo.setStartTimestamp(System.currentTimeMillis());
         visitInfo.setIsAjax(isAjax);
         visitInfo.setCookies(readCookies(request));
+        visitInfo.setHeaders(ServletUtil.getHeaderMap(request));
         try {
             // execute the handler method
             Object result = joinPoint.proceed();
@@ -394,6 +395,8 @@ public class WebSystemOperateLogAspect {
          * cookie信息
          */
         private Map<String, Map<String, Object>> cookies;
+
+        private Map<String, String> headers;
     }
 
     @Data
