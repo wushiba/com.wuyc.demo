@@ -262,6 +262,7 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
         websiteCodeDetail.setMerchantId(merchant.getId());
         websiteCodeDetail.setActivityTime(LocalDateTime.now());
         websiteCodeDetail.setMerchantName(merchant.getMerchantName());
+        websiteCodeDetail.setMerchantPidPath(merchant.getPidPath());
         websiteCodeDetail.setMobile(merchant.getMobile());
         websiteCodeDetail.setIsActivate("Y");
         websiteCodeDetailMapper.updateById(websiteCodeDetail);
@@ -883,7 +884,7 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
     private Integer getCurrentWebsiteCodeCount(Integer merchantId, Integer currentMerchantId) {
         LambdaQueryWrapper lambdaQueryWrapper = Wrappers.<WebsiteCodeDetail>lambdaQuery()
                 .eq(WebsiteCodeDetail::getMerchantId, merchantId)
-                .like(WebsiteCodeDetail::getPidPath, currentMerchantId + ".")
+                .like(WebsiteCodeDetail::getMerchantPidPath, currentMerchantId + ".")
                 .eq(WebsiteCodeDetail::getIsActivate, "Y");
         return websiteCodeDetailMapper.selectCount(lambdaQueryWrapper);
     }
@@ -891,7 +892,7 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
 
     private Integer getAllWebsiteCodeCount(String pidPath) {
         LambdaQueryWrapper lambdaQueryWrapper = Wrappers.<WebsiteCodeDetail>lambdaQuery()
-                .likeLeft(WebsiteCodeDetail::getPidPath, pidPath)
+                .likeLeft(WebsiteCodeDetail::getMerchantPidPath, pidPath)
                 .eq(WebsiteCodeDetail::getIsActivate, "Y");
         return websiteCodeDetailMapper.selectCount(lambdaQueryWrapper);
     }

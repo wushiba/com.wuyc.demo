@@ -61,6 +61,9 @@ public class WebsiteCodeDetail extends Model<WebsiteCodeDetail> {
      */
     private String merchantName;
 
+
+    private String merchantPidPath;
+
     /**
      * 商户手机号码
      */
