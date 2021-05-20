@@ -70,4 +70,6 @@ public class ActCodeResult implements Serializable {
 
     private Integer type;
 
+    private String spec;
+
 }

@@ -48,6 +48,7 @@ public class ActCodeBatchDetail extends Model<ActCodeBatchDetail> {
      */
     private Integer batchId;
 
+    private String spec;
 
     @Override
     protected Serializable pkVal() {

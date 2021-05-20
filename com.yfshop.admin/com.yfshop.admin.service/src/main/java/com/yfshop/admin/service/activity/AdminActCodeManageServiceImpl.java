@@ -82,9 +82,11 @@ public class AdminActCodeManageServiceImpl implements AdminActCodeManageService 
     }
 
     @Override
-    public Void actCodeImport(Integer actId, String md5, String fileUrl) throws ApiException {
+    public Void actCodeImport(Integer actId, String md5, String fileUrl, String spec) throws ApiException {
+        Asserts.assertNonNull(spec, 500, "请选择产品规格值！");
         checkFile(md5);
         ActCodeBatch actCodeBatch = new ActCodeBatch();
+        actCodeBatch.setSpec(spec);
         actCodeBatch.setBatchNo(DateUtil.format(new Date(), "yyMMddHHmmssSSS") + RandomUtil.randomNumbers(4));
         actCodeBatch.setActId(actId);
         actCodeBatch.setFileMd5(md5);
@@ -96,11 +98,13 @@ public class AdminActCodeManageServiceImpl implements AdminActCodeManageService 
     }
 
     @Override
-    public Void actCodeImportCount(Integer actId, Integer count) throws ApiException {
+    public Void actCodeImportCount(Integer actId, Integer count, String spec) throws ApiException {
+        Asserts.assertNonNull(spec, 500, "请选择产品规格值！");
         Asserts.assertNonNull(actId, 500, "请选择关联的活动！");
         Asserts.assertNonNull(count, 500, "请输入生成活动码数量！");
         Asserts.assertTrue(count <= 200000, 500, "一次生成数量不能超过20万");
         ActCodeBatch actCodeBatch = new ActCodeBatch();
+        actCodeBatch.setSpec(spec);
         actCodeBatch.setBatchNo(DateUtil.format(new Date(), "yyMMddHHmmssSSS") + RandomUtil.randomNumbers(4));
         actCodeBatch.setActId(actId);
         actCodeBatch.setCreateTime(LocalDateTime.now());

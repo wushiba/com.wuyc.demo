@@ -82,6 +82,9 @@ public class ActCodeBatch extends Model<ActCodeBatch> {
     private Integer type;
 
 
+    private String spec;
+
+
     @Override
     protected Serializable pkVal() {
         return this.id;

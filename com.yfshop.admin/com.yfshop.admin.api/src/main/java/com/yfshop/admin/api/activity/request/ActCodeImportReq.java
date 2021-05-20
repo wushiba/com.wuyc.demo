@@ -14,4 +14,5 @@ public class ActCodeImportReq implements Serializable {
     private String md5;
     @Pattern(regexp = "/^(((ht|f)tps?):\\/\\/)?[\\w-]+(\\.[\\w-]+)+([\\w.,@?^=%&:/~+#-]*[\\w@?^=%&/~+#-])?$/",message = "url格式不正确！")
     private String url;
+    private String spec;
 }

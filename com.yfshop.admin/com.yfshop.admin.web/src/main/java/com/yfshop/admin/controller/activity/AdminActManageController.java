@@ -50,7 +50,7 @@ public class AdminActManageController implements BaseController {
     @ResponseBody
     public CommonResult<Void> actCodeImportUrl(ActCodeImportReq importReq) {
 
-        return CommonResult.success(adminActCodeManageService.actCodeImport(importReq.getActId(), importReq.getMd5(), importReq.getUrl()));
+        return CommonResult.success(adminActCodeManageService.actCodeImport(importReq.getActId(), importReq.getMd5(), importReq.getUrl(),));
     }
 
     @SaCheckLogin
@@ -59,7 +59,7 @@ public class AdminActManageController implements BaseController {
     @ApiOperation(value = "导入溯源码文件", httpMethod = "POST")
     @RequestMapping(value = "/actCodeImportCount", method = {RequestMethod.GET, RequestMethod.POST})
     @ResponseBody
-    public CommonResult<Void> actCodeImportCount(Integer actId,Integer count) {
+    public CommonResult<Void> actCodeImportCount(Integer actId,Integer count,String spec) {
 
         return CommonResult.success(adminActCodeManageService.actCodeImportCount(actId, count));
     }
