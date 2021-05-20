@@ -1,7 +1,10 @@
 package com.yfshop.admin.service.activity;
 
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.RandomUtil;
+import cn.hutool.http.HttpUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -34,6 +37,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.io.File;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
@@ -147,9 +151,13 @@ public class AdminActCodeManageServiceImpl implements AdminActCodeManageService 
         Asserts.assertStringNotBlank(actCodeBatch.getFileUrl(), 500, "文件不存在！");
         SourceFactory sourceFactory = sourceFactoryMapper.selectById(factoryId);
         String filePath = actCodeCodeDirs + actCodeBatch.getBatchNo() + ".txt";
+        if (!new File(filePath).exists()) {
+            String fileUrl = ossDownloader.privateDownloadUrl(actCodeBatch.getFileSrcUrl(), 60);
+            HttpUtil.downloadFileFromUrl(fileUrl, filePath);
+        }
         String msg = "<p>您好!</p>\n" +
                 "<p>&nbsp;&nbsp;&nbsp;&nbsp;此邮件内含光明活动码（溯源码+抽奖活动码），请妥善保管，切勿外传。雨帆</p>";
-        emailTask.sendAttachmentsMail(sourceFactory.getEmail(), "光明活动码（溯源码+抽奖活动码）"+actCodeBatch.getSpec()+"ml", msg, filePath);
+        emailTask.sendAttachmentsMail(sourceFactory.getEmail(), "光明活动码（溯源码+抽奖活动码）" + actCodeBatch.getSpec() + "ml", msg, filePath);
         actCodeBatch.setIsSend("Y");
         actCodeBatchMapper.updateById(actCodeBatch);
         ActCodeBatchRecord actCodeBatchRecord = new ActCodeBatchRecord();
