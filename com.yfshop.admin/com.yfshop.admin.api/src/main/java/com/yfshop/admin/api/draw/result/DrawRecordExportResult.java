@@ -2,11 +2,13 @@ package com.yfshop.admin.api.draw.result;
 
 import cn.afterturn.easypoi.excel.annotation.Excel;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.yfshop.common.util.DateUtil;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 /**
  * <p>
@@ -31,7 +33,7 @@ public class DrawRecordExportResult implements Serializable {
     /**
      * 创建时间
      */
-    @Excel(name = "抽奖时间", width = 18, format = "yyyy-MM-dd HH:mm:ss")
+    @Excel(name = "抽奖时间", width = 18)
     private LocalDateTime createTime;
 
 
@@ -75,7 +77,7 @@ public class DrawRecordExportResult implements Serializable {
     /**
      * 使用状态
      */
-    @Excel(name = "使用状态", width = 18, replace = {"未使用_'NO_USE'", "使用中_'IN_USE'", "已使用_'HAS_USE'"})
+    @Excel(name = "使用状态", width = 18)
     private String useStatus;
 
     /**
@@ -108,5 +110,25 @@ public class DrawRecordExportResult implements Serializable {
     @Excel(name = "经销商地址", width = 18)
     private String dealerAddress;
 
+
+    public String getCreateTime() {
+        return createTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+    }
+
+    public String getUseStatus() {
+        String use = "";
+        switch (useStatus) {
+            case "NO_USE":
+                use = "未使用";
+                break;
+            case "IN_USE":
+                use = "使用中";
+                break;
+            case "HAS_USE":
+                use = "已使用";
+                break;
+        }
+        return use;
+    }
 
 }
