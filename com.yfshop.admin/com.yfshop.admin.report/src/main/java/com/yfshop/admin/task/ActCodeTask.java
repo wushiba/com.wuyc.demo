@@ -185,11 +185,14 @@ public class ActCodeTask {
         if (ArrayUtil.isNotEmpty(cc)) {
             helper.setCc(cc);
         }
-        File file = new File(filePath);
-        FileSystemResource fileResource = new FileSystemResource(file);
-        helper.addAttachment(file.getName(), fileResource);
+        if (StringUtils.isNotBlank(filePath)) {
+            File file = new File(filePath);
+            FileSystemResource fileResource = new FileSystemResource(file);
+            helper.addAttachment(file.getName(), fileResource);
+        }
         mailSender.send(message);
     }
+
 
     @Async
     public void build(ActCodeBatch actCodeBatch) {
