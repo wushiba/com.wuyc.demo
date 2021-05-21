@@ -8,7 +8,6 @@ import java.io.Serializable;
 
 @Data
 public class WebsiteCodeExpressReq implements Serializable {
-    @NotNull(message = "id不能为空")
     private Integer id;
     @NotBlank(message = "快递名不能为空")
     private String expressName;
