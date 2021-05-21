@@ -161,7 +161,7 @@ public class AdminDrawController implements BaseController {
 
 
     @SneakyThrows
-    @RequestMapping(value = "/record/export", method = {RequestMethod.POST})
+    @RequestMapping(value = "/record/export", method = {RequestMethod.POST,RequestMethod.GET})
     @ResponseBody
     @SaCheckLogin
     @SaCheckRole(value = "sys")
