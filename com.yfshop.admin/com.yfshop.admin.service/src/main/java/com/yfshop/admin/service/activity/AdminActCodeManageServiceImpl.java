@@ -151,9 +151,9 @@ public class AdminActCodeManageServiceImpl implements AdminActCodeManageService 
         Asserts.assertStringNotBlank(actCodeBatch.getFileUrl(), 500, "文件不存在！");
         SourceFactory sourceFactory = sourceFactoryMapper.selectById(factoryId);
         String fileUrl = ossDownloader.privateDownloadUrl(actCodeBatch.getFileSrcUrl(), 60 * 60 * 24 * 7);
-
+        String targetFileName = String.format("%s(%sml).txt", actCodeBatch.getBatchNo(), actCodeBatch.getSpec());
         String msg = "<p>您好!</p>\n" +
-                "<p>&nbsp;&nbsp;&nbsp;&nbsp;此邮件内含光明活动码（溯源码+抽奖活动码）" + actCodeBatch.getSpec() + "ml，请妥善保管，切勿外传。<a href=\"" + fileUrl + "\">点击下载活动码</a>下载链接7天有效。雨帆</p>";
+                "<p>&nbsp;&nbsp;&nbsp;&nbsp;此邮件内含光明活动码（溯源码+抽奖活动码）" + actCodeBatch.getSpec() + "ml，请妥善保管，切勿外传。<a href=\"" + fileUrl + "\"download=\""+targetFileName+"\">点击下载活动码</a>下载链接7天有效。雨帆</p>";
         emailTask.sendAttachmentsMail(sourceFactory.getEmail(), "光明活动码（溯源码+抽奖活动码）" + actCodeBatch.getSpec() + "ml", msg, null);
         actCodeBatch.setIsSend("Y");
         actCodeBatchMapper.updateById(actCodeBatch);
