@@ -192,7 +192,9 @@ public class AdminMallManageServiceImpl implements AdminMallManageService {
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public Void deleteCategory(Integer categoryId) {
+    public Void deleteCategory(Integer categoryId) throws ApiException {
+        Integer count = itemMapper.selectCount(Wrappers.lambdaQuery(Item.class).eq(Item::getCategoryId, categoryId));
+        Asserts.assertTrue(count == 0, 500, "类别已被商品使用，不能删除");
         categoryMapper.deleteById(categoryId);
         return null;
     }

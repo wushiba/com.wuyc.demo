@@ -17,7 +17,6 @@ import com.yfshop.common.util.BeanUtil;
 import com.yfshop.shop.service.activity.result.YfActCodeBatchDetailResult;
 import com.yfshop.shop.service.activity.result.YfDrawActivityResult;
 import com.yfshop.shop.service.activity.result.YfDrawPrizeResult;
-import com.yfshop.shop.service.activity.service.FrontDrawRecordService;
 import com.yfshop.shop.service.activity.service.FrontDrawService;
 import com.yfshop.shop.service.coupon.result.YfUserCouponResult;
 import com.yfshop.shop.service.coupon.service.FrontUserCouponService;
@@ -230,16 +229,16 @@ public class FrontDrawServiceImpl implements FrontDrawService {
                     .lambdaQuery(ActCodeBatchDetail.class).eq(ActCodeBatchDetail::getActCode, actCode));
             if (actCodeBatchDetail != null) {
                 yfActCodeBatchDetailResult = BeanUtil.convert(actCodeBatchDetail, YfActCodeBatchDetailResult.class);
-                Trace trace = traceMapper.selectOne(Wrappers.<Trace>lambdaQuery().eq(Trace::getTraceNo, actCodeBatchDetail.getTraceNo()).orderByDesc());
+                yfActCodeBatchDetailResult.setBoxSpecVal("200".equals(actCodeBatchDetail.getSpec()) ? BoxSpecValEnum.SMALL.getCode() : BoxSpecValEnum.BIG.getCode());
+                Trace trace = traceMapper.selectOne(Wrappers.<Trace>lambdaQuery().eq(Trace::getTraceNo, actCodeBatchDetail.getTraceNo()).orderByDesc(Trace::getId));
                 if (trace != null) {
-                    yfActCodeBatchDetailResult.setBoxSpecVal("1002".equals(trace.getProductNo()) ? BoxSpecValEnum.BIG.getCode() : BoxSpecValEnum.SMALL.getCode());
-                    TraceDetails traceDetails = traceDetailsMapper.selectOne(Wrappers.<TraceDetails>lambdaQuery().eq(TraceDetails::getBoxNo, trace.getBoxNo()).orderByDesc());
+                    //yfActCodeBatchDetailResult.setBoxSpecVal("1002".equals(trace.getProductNo()) ? BoxSpecValEnum.BIG.getCode() : BoxSpecValEnum.SMALL.getCode());
+                    TraceDetails traceDetails = traceDetailsMapper.selectOne(Wrappers.<TraceDetails>lambdaQuery().eq(TraceDetails::getBoxNo, trace.getBoxNo()).orderByDesc(TraceDetails::getId));
                     if (traceDetails != null) {
                         yfActCodeBatchDetailResult.setDealerMobile(traceDetails.getDealerMobile());
                         yfActCodeBatchDetailResult.setDealerName(traceDetails.getDealerName());
                         yfActCodeBatchDetailResult.setDealerAddress(traceDetails.getDealerAddress());
                     }
-
                 }
             }
             redisService.set(CacheConstants.ACT_CODE_BATCH_ACT_NO + actCode,

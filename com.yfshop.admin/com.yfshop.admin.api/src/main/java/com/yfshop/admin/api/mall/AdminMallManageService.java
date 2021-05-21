@@ -89,7 +89,7 @@ public interface AdminMallManageService {
      * @param categoryId 类目id
      * @return void
      */
-    Void deleteCategory(Integer categoryId);
+    Void deleteCategory(Integer categoryId) throws ApiException;
 
     /**
      * 查询分类

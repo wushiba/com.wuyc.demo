@@ -24,6 +24,7 @@ import com.yfshop.shop.service.activity.service.FrontDrawRecordService;
 import com.yfshop.shop.service.activity.service.FrontDrawService;
 import com.yfshop.shop.service.coupon.result.YfUserCouponResult;
 import com.yfshop.shop.service.user.result.UserResult;
+import com.yfshop.shop.service.user.service.FrontUserService;
 import com.yfshop.shop.utils.Ip2regionUtil;
 import com.yfshop.shop.utils.ProxyUtil;
 import org.apache.dubbo.config.annotation.DubboService;
@@ -52,6 +53,8 @@ public class FrontDrawRecordServiceImpl implements FrontDrawRecordService {
     private DrawRecordMapper drawRecordMapper;
     @Resource
     private UserCouponMapper userCouponMapper;
+    @Resource
+    private FrontUserService frontUserService;
 
     /**
      * 保存中奖记录
@@ -70,6 +73,10 @@ public class FrontDrawRecordServiceImpl implements FrontDrawRecordService {
         drawRecord.setPrizeLevel(drawPrize.getPrizeLevel());
         drawRecord.setPrizeTitle(drawPrize.getPrizeTitle());
         drawRecord.setUserId(userId);
+        UserResult userResult = frontUserService.getUserById(userId);
+        if (userResult != null) {
+            drawRecord.setUserName(userResult.getNickname());
+        }
         drawRecord.setUserLocation(actCodeBatchDetailResult.getLocation());
         drawRecord.setUseStatus(UserCouponStatusEnum.NO_USE.getCode());
         drawRecord.setSpec(BoxSpecValEnum.BIG.getCode().equals(actCodeBatchDetailResult.getBoxSpecVal()) ? "大盒" : "小盒");

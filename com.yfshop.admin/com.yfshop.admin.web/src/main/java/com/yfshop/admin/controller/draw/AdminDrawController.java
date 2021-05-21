@@ -1,28 +1,30 @@
 package com.yfshop.admin.controller.draw;
 
+import cn.afterturn.easypoi.excel.ExcelExportUtil;
+import cn.afterturn.easypoi.excel.entity.ExportParams;
 import cn.dev33.satoken.annotation.SaCheckLogin;
 import cn.dev33.satoken.annotation.SaCheckRole;
+import cn.hutool.core.io.IoUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.yfshop.admin.api.coupon.request.QueryCouponReq;
 import com.yfshop.admin.api.coupon.result.YfCouponResult;
 import com.yfshop.admin.api.coupon.service.AdminCouponService;
-import com.yfshop.admin.api.draw.request.CreateDrawActivityReq;
-import com.yfshop.admin.api.draw.request.QueryDrawActivityReq;
-import com.yfshop.admin.api.draw.request.QueryDrawRecordReq;
-import com.yfshop.admin.api.draw.request.SaveProvinceRateReq;
-import com.yfshop.admin.api.draw.result.DrawActivityDetailsResult;
-import com.yfshop.admin.api.draw.result.DrawActivityResult;
-import com.yfshop.admin.api.draw.result.DrawProvinceResult;
-import com.yfshop.admin.api.draw.result.DrawRecordResult;
+import com.yfshop.admin.api.draw.request.*;
+import com.yfshop.admin.api.draw.result.*;
 import com.yfshop.admin.api.draw.service.AdminDrawActivityService;
 import com.yfshop.admin.api.draw.service.AdminDrawProvinceService;
+import com.yfshop.admin.api.draw.service.AdminDrawRecordExportService;
 import com.yfshop.admin.api.draw.service.AdminDrawRecordService;
 import com.yfshop.admin.api.mall.AdminMallManageService;
+import com.yfshop.admin.api.website.result.WebsiteCodeDetailExport;
 import com.yfshop.common.api.CommonResult;
 import com.yfshop.common.base.BaseController;
+import com.yfshop.common.util.ExcelUtils;
 import io.swagger.models.auth.In;
+import lombok.SneakyThrows;
 import org.apache.dubbo.config.annotation.DubboReference;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -31,7 +33,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.constraints.NotNull;
+import java.net.URLEncoder;
 import java.util.List;
 
 @Controller
@@ -53,6 +58,9 @@ public class AdminDrawController implements BaseController {
 
     @DubboReference
     private AdminDrawRecordService adminDrawRecordService;
+
+    @DubboReference
+    private AdminDrawRecordExportService adminDrawRecordExportService;
 
     @RequestMapping(value = "/findList", method = {RequestMethod.POST})
     @ResponseBody
@@ -149,6 +157,30 @@ public class AdminDrawController implements BaseController {
     public CommonResult<IPage<DrawRecordResult>> getDrawRecordList(QueryDrawRecordReq recordReq) {
 
         return CommonResult.success(adminDrawRecordService.getDrawRecordList(recordReq));
+    }
+
+
+    @SneakyThrows
+    @RequestMapping(value = "/record/export", method = {RequestMethod.POST})
+    @ResponseBody
+    @SaCheckLogin
+    @SaCheckRole(value = "sys")
+    public Void getDrawRecordExport(QueryDrawRecordExportReq recordReq, HttpServletResponse response) {
+        List<DrawRecordExportResult> exportList = adminDrawRecordExportService.getDrawRecordExport(recordReq);
+        Workbook writer = ExcelExportUtil.exportExcel(new ExportParams("抽奖记录详情", "网点码抽奖记录详情"), DrawRecordExportResult.class, exportList);
+        response.setContentType("application/vnd.ms-excel;charset=utf-8");
+        //test.xls是弹出下载对话框的文件名，不能为中文，中文请自行编码
+        String name = "抽奖记录详情";
+        response.setHeader("Content-Disposition", "attachment;filename=" + URLEncoder.encode(name, "UTF-8") + ".xls");
+        try (ServletOutputStream out = response.getOutputStream()) {
+            writer.write(out);
+            IoUtil.close(out);
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            writer.close();
+        }
+        return null;
     }
 
 }
