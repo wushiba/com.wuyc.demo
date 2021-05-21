@@ -115,7 +115,7 @@ public class WebsiteCodeTask {
                     String msg = "<p>您好!</p>\n" +
                             "<p>&nbsp;&nbsp;&nbsp;&nbsp;此邮件内含光明网点码，请妥善保管。雨帆</p>";
                     if (StringUtils.isNotBlank(websiteCode.getEmail())) {
-                        sendAttachmentsMail(websiteCode.getEmail(), "光明网点码", msg, fileZip.getPath());
+                        sendAttachmentsMail(websiteCode.getEmail(), "光明网点码", msg, fileZip.getPath(),"xuwei@51jujibao.com");
                     }
                 }else{
                     logger.info("上传文件失败！");
