@@ -572,23 +572,23 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
     }
 
     @Override
-    public void websitePayOrderNotify(WxPayOrderNotifyReq notifyResult) throws ApiException {
+    public void websitePayOrderNotify(String transactionId,String outTradeNo) throws ApiException {
         WebsiteCode websiteCode = new WebsiteCode();
         websiteCode.setPayMethod("WxPay");
         websiteCode.setPayTime(LocalDateTime.now());
         websiteCode.setOrderStatus("WAIT");
-        websiteCode.setBillno(notifyResult.getTransactionId());
+        websiteCode.setBillno(transactionId);
         int count = websiteCodeMapper.update(websiteCode, Wrappers.<WebsiteCode>lambdaQuery()
-                .eq(WebsiteCode::getOrderNo, notifyResult.getOutTradeNo())
+                .eq(WebsiteCode::getOrderNo, outTradeNo)
                 .eq(WebsiteCode::getOrderStatus, "PAYING"));
         if (count > 0) {
             WebsiteCodeGroup websiteCodeGroup = new WebsiteCodeGroup();
             websiteCodeGroup.setOrderStatus("WAIT");
             websiteCodeGroup.setPayTime(LocalDateTime.now());
-            websiteCodeGroup.setBillno(notifyResult.getTransactionId());
+            websiteCodeGroup.setBillno(transactionId);
             websiteCodeGroupMapper.update(websiteCodeGroup, Wrappers.<WebsiteCodeGroup>lambdaQuery()
-                    .eq(WebsiteCodeGroup::getOrderNo, notifyResult.getOutTradeNo()));
-            websiteCodeTask.doWorkWebsiteCodeFile(notifyResult.getOutTradeNo());
+                    .eq(WebsiteCodeGroup::getOrderNo, outTradeNo));
+            websiteCodeTask.doWorkWebsiteCodeFile(outTradeNo);
         }
     }
 

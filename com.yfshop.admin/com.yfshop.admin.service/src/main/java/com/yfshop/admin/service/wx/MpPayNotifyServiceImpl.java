@@ -32,7 +32,7 @@ public class MpPayNotifyServiceImpl implements MpPayNotifyService {
         PayPrefixEnum byBizType = PayPrefixEnum.getByBizType(bizType);
         switch (byBizType) {
             case WEBSITE_CODE:
-                merchantInfoService.websitePayOrderNotify(notifyResult);
+                merchantInfoService.websitePayOrderNotify(notifyResult.getTransactionId(),notifyResult.getOutTradeNo());
                 break;
             case USER_ORDER:
                 String outTradeNo = notifyResult.getOutTradeNo();

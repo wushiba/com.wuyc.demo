@@ -176,7 +176,7 @@ public interface MerchantInfoService {
      *
      * @param notifyResult
      */
-    void websitePayOrderNotify(WxPayOrderNotifyReq notifyResult) throws ApiException;
+    void websitePayOrderNotify(String transactionId,String outTradeNo) throws ApiException;
 
     /**
      * 获取商户层级数据
