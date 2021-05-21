@@ -29,7 +29,7 @@ public class Generator {
     //作者
     private static String authorName="yoush";
     //要生成的表名
-    private static String[] tables= {"yf_trace_details","yf_trace"};
+    private static String[] tables= {"yf_website_code_group"};
     private static String prefix="yf_";
 
     //数据库配置四要素

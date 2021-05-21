@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yfshop.code.mapper.WebsiteCodeGroupMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.yfshop.code.model.WebsiteCodeGroup">
+        <id column="id" property="id" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+        <result column="quantity" property="quantity" />
+        <result column="order_status" property="orderStatus" />
+        <result column="order_no" property="orderNo" />
+        <result column="billno" property="billno" />
+        <result column="pay_method" property="payMethod" />
+        <result column="pay_time" property="payTime" />
+        <result column="express_name" property="expressName" />
+        <result column="express_no" property="expressNo" />
+        <result column="address" property="address" />
+        <result column="mobile" property="mobile" />
+        <result column="contracts" property="contracts" />
+        <result column="merchant_id" property="merchantId" />
+        <result column="merchant_name" property="merchantName" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, create_time, update_time, quantity, order_status, order_no, billno, pay_method, pay_time, express_name, express_no, address, mobile, contracts, merchant_id, merchant_name
+    </sql>
+
+</mapper>

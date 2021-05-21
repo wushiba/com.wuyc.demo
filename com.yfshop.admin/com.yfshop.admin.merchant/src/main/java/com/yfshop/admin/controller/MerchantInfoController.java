@@ -326,6 +326,7 @@ class MerchantInfoController extends AbstractBaseController {
         Asserts.assertNonNull(openId, 605, "微信未授权");
         websiteCodePayReq.setOpenId(getCurrentOpenId());
         websiteCodePayReq.setUserId(getRequestIpStr());
+        websiteCodePayReq.setMerchantId(getCurrentAdminUserId());
         WxPayMpOrderResult wxPayMpOrderResult = merchantInfoService.applyWebsiteCodePay(websiteCodePayReq);
         return CommonResult.success(wxPayMpOrderResult);
     }

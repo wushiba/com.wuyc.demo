@@ -145,6 +145,9 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
     private String merchantUrl;
     @Resource
     private MerchantLogMapper merchantLogMapper;
+    @Resource
+    private WebsiteCodeGroupMapper websiteCodeGroupMapper;
+
 
     @Override
     public MerchantResult getWebsiteInfo(Integer merchantId) throws ApiException {
@@ -306,7 +309,7 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
                 .and(itemWrapper -> itemWrapper
                         .eq(WebsiteCodeDetail::getMerchantId, merchantId)
                         .or()
-                        .like(WebsiteCodeDetail::getPidPath, "."+merchantId + "."))
+                        .like(WebsiteCodeDetail::getPidPath, "." + merchantId + "."))
                 .eq(WebsiteCodeDetail::getIsActivate, status)
                 .ge(startTime != null, WebsiteCodeDetail::getCreateTime, startTime)
                 .lt(endTime != null, WebsiteCodeDetail::getCreateTime, endTime)
@@ -331,7 +334,7 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
                 .and(itemWrapper -> itemWrapper
                         .eq(WebsiteCode::getMerchantId, merchantId)
                         .or()
-                        .like(WebsiteCode::getPidPath, "."+merchantId + "."))
+                        .like(WebsiteCode::getPidPath, "." + merchantId + "."))
                 .in(CollectionUtil.isNotEmpty(allStatus), WebsiteCode::getOrderStatus, allStatus)
                 .orderByDesc(WebsiteCode::getId);
         IPage<WebsiteCode> websiteCodeIPage = websiteCodeMapper.selectPage(new Page<>(pageIndex, pageSize), lambdaQueryWrapper);
@@ -507,6 +510,20 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
         orderRequest.setTimeStart(DateFormatUtils.format(new Date(), "yyyyMMddHHmmss"));
         orderRequest.setTimeExpire(DateFormatUtils.format(new Date(System.currentTimeMillis() + (1000 * 60 * 15)), "yyyyMMddHHmmss"));
         try {
+            WebsiteCodeGroup websiteCodeGroup = new WebsiteCodeGroup();
+            websiteCodeGroup.setMerchantId(websiteCodePayReq.getMerchantId());
+            Merchant merchant = merchantMapper.selectById(websiteCodePayReq.getMerchantId());
+            if (merchant != null) {
+                websiteCodeGroup.setMerchantName(merchant.getMerchantName());
+            }
+            websiteCodeGroup.setAddress(websiteCode.getMobile());
+            websiteCodeGroup.setContracts(websiteCode.getContracts());
+            websiteCodeGroup.setAddress(websiteCode.getAddress());
+            websiteCodeGroup.setOrderNo(websiteCode.getOrderNo());
+            websiteCodeGroup.setMobile(websiteCode.getMobile());
+            websiteCodeGroup.setOrderStatus("PAYING");
+            websiteCodeGroup.setQuantity(websiteCodeAmountResult.getQuantity());
+            websiteCodeGroupMapper.insert(websiteCodeGroup);
             return mpPayService.createPayOrder(orderRequest);
         } catch (Exception e) {
             e.printStackTrace();
@@ -565,6 +582,12 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
                 .eq(WebsiteCode::getOrderNo, notifyResult.getOutTradeNo())
                 .eq(WebsiteCode::getOrderStatus, "PAYING"));
         if (count > 0) {
+            WebsiteCodeGroup websiteCodeGroup = new WebsiteCodeGroup();
+            websiteCodeGroup.setOrderStatus("WAIT");
+            websiteCodeGroup.setPayTime(LocalDateTime.now());
+            websiteCodeGroup.setBillno(notifyResult.getTransactionId());
+            websiteCodeGroupMapper.update(websiteCodeGroup, Wrappers.<WebsiteCodeGroup>lambdaQuery()
+                    .eq(WebsiteCodeGroup::getOrderNo, notifyResult.getOutTradeNo()));
             websiteCodeTask.doWorkWebsiteCodeFile(notifyResult.getOutTradeNo());
         }
     }
@@ -683,9 +706,20 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
     public void cancelWebsiteCodePay(WebsiteCodePayReq websiteCodePayReq) {
         WebsiteCode websiteCode = new WebsiteCode();
         websiteCode.setOrderStatus("PENDING");
-        websiteCodeMapper.update(websiteCode, Wrappers.<WebsiteCode>lambdaQuery()
-                .in(WebsiteCode::getId, websiteCodePayReq.getIds())
-                .eq(WebsiteCode::getOrderStatus, "PAYING"));
+        if (CollectionUtils.isNotEmpty(websiteCodePayReq.getIds())) {
+            int count = websiteCodeMapper.update(websiteCode, Wrappers.<WebsiteCode>lambdaQuery()
+                    .in(WebsiteCode::getId, websiteCodePayReq.getIds())
+                    .eq(WebsiteCode::getOrderStatus, "PAYING"));
+            if (count > 0) {
+                WebsiteCode w = websiteCodeMapper.selectById(websiteCodePayReq.getIds().get(0));
+                if (w != null && StringUtils.isNotBlank(w.getOrderNo())) {
+                    WebsiteCodeGroup websiteCodeGroup = new WebsiteCodeGroup();
+                    websiteCodeGroup.setOrderStatus("CANCEL");
+                    websiteCodeGroupMapper.update(websiteCodeGroup, Wrappers.<WebsiteCodeGroup>lambdaQuery()
+                            .eq(WebsiteCodeGroup::getOrderNo, w.getOrderNo()));
+                }
+            }
+        }
 
     }
 
@@ -730,7 +764,7 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
         List<WebsiteCodeDataResult> websiteCodeDataResults = new ArrayList<>();
         List<WebsiteCodeDetail> websiteCodeDetailList = websiteCodeDetailMapper.selectList(Wrappers.<WebsiteCodeDetail>lambdaQuery()
                 .eq(WebsiteCodeDetail::getMerchantId, websiteCodeDataReq.getMerchantId() == null ? merchantId : websiteCodeDataReq.getMerchantId())
-                .like(websiteCodeDataReq.getMerchantId() != null, WebsiteCodeDetail::getMerchantPidPath, "."+merchantId + ".")
+                .like(websiteCodeDataReq.getMerchantId() != null, WebsiteCodeDetail::getMerchantPidPath, "." + merchantId + ".")
                 .eq(WebsiteCodeDetail::getIsActivate, "Y"));
         AtomicInteger currentCurrentExchange = new AtomicInteger();
         AtomicInteger totalExchange = new AtomicInteger();
@@ -887,7 +921,7 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
     private Integer getCurrentWebsiteCodeCount(Integer merchantId, Integer currentMerchantId) {
         LambdaQueryWrapper lambdaQueryWrapper = Wrappers.<WebsiteCodeDetail>lambdaQuery()
                 .eq(WebsiteCodeDetail::getMerchantId, merchantId)
-                .like(WebsiteCodeDetail::getMerchantPidPath, "."+currentMerchantId + ".")
+                .like(WebsiteCodeDetail::getMerchantPidPath, "." + currentMerchantId + ".")
                 .eq(WebsiteCodeDetail::getIsActivate, "Y");
         return websiteCodeDetailMapper.selectCount(lambdaQueryWrapper);
     }
@@ -895,7 +929,7 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
 
     private Integer getAllWebsiteCodeCount(Integer merchantId) {
         LambdaQueryWrapper lambdaQueryWrapper = Wrappers.<WebsiteCodeDetail>lambdaQuery()
-                .like(WebsiteCodeDetail::getMerchantPidPath, "."+merchantId + ".")
+                .like(WebsiteCodeDetail::getMerchantPidPath, "." + merchantId + ".")
                 .eq(WebsiteCodeDetail::getIsActivate, "Y");
         return websiteCodeDetailMapper.selectCount(lambdaQueryWrapper);
     }
@@ -912,7 +946,7 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
 
     private Integer getCurrentExchange(Integer merchantId, Date startTime, Date endTime) {
         LambdaQueryWrapper lambdaQueryWrapper = Wrappers.<WebsiteBill>lambdaQuery()
-                .like(WebsiteBill::getPidPath, "."+merchantId + ".")
+                .like(WebsiteBill::getPidPath, "." + merchantId + ".")
                 .ge(startTime != null, WebsiteBill::getCreateTime, startTime)
                 .lt(endTime != null, WebsiteBill::getCreateTime, endTime);
         return websiteBillMapper.selectCount(lambdaQueryWrapper);

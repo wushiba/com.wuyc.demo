@@ -64,6 +64,8 @@ public class WebsiteCodeResult implements Serializable {
      */
     private String orderStatus;
 
+
+    private String orderNo;
     /**
      * 流水单号
      */

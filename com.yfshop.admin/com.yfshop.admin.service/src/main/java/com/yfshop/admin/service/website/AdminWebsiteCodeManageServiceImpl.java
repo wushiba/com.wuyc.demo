@@ -15,9 +15,11 @@ import com.yfshop.admin.api.website.result.WebsiteCodeResult;
 import com.yfshop.admin.dao.WebsiteCodeDao;
 import com.yfshop.admin.task.OssDownloader;
 import com.yfshop.code.mapper.WebsiteCodeDetailMapper;
+import com.yfshop.code.mapper.WebsiteCodeGroupMapper;
 import com.yfshop.code.mapper.WebsiteCodeMapper;
 import com.yfshop.code.model.WebsiteCode;
 import com.yfshop.code.model.WebsiteCodeDetail;
+import com.yfshop.code.model.WebsiteCodeGroup;
 import com.yfshop.common.exception.ApiException;
 import com.yfshop.common.exception.Asserts;
 import com.yfshop.common.util.BeanUtil;
@@ -44,6 +46,8 @@ public class AdminWebsiteCodeManageServiceImpl implements AdminWebsiteCodeManage
     private OssDownloader ossDownloader;
     @DubboReference
     private WebsiteCodeTaskService websiteCodeTaskService;
+    @Resource
+    private WebsiteCodeGroupMapper websiteCodeGroupMapper;
 
     @Override
     public IPage<WebsiteCodeResult> queryWebsiteCodeList(WebsiteCodeQueryReq req) throws ApiException {
@@ -56,11 +60,25 @@ public class AdminWebsiteCodeManageServiceImpl implements AdminWebsiteCodeManage
 
     @Override
     public IPage<WebsiteCodeResult> queryWebsiteCodeByWl(WebsiteCodeQueryReq req) throws ApiException {
+        List<String> orderStatus = new ArrayList<>();
+        if ("UNSHIPPED".equals(req.getOrderStatus())) {
+            orderStatus.add("WAIT");
+        } else if ("SHIPPED".equals(req.getOrderStatus())) {
+            orderStatus.add("DELIVERY");
+            orderStatus.add("SUCCESS");
+        }
         IPage page = new Page<WebsiteCodeQueryReq>(req.getPageIndex(), req.getPageSize());
-        List<WebsiteCodeResult> list = websiteCodeDao.queryWebsiteCodeByWl(page, req);
-        page.setTotal(websiteCodeDao.queryWebsiteCodeCountByWl(req));
-        page.setRecords(list);
-        return page;
+        LambdaQueryWrapper queryWrapper = Wrappers.lambdaQuery(WebsiteCodeGroup.class)
+                .eq(req.getId() != null, WebsiteCodeGroup::getId, req.getId())
+                .like(StringUtils.isNotBlank(req.getMerchantName()), WebsiteCodeGroup::getMerchantName, req.getMerchantName())
+                .like(StringUtils.isNotBlank(req.getExpressNo()), WebsiteCodeGroup::getExpressNo, req.getExpressNo())
+                .like(StringUtils.isNotBlank(req.getAddress()), WebsiteCodeGroup::getAddress, req.getAddress())
+                .in(!orderStatus.isEmpty(), WebsiteCodeGroup::getOrderStatus, orderStatus)
+                .notIn(WebsiteCodeGroup::getOrderStatus, "PENDING", "PAYING", "CANCEL")
+                .ge(req.getStartTime() != null, WebsiteCodeGroup::getCreateTime, req.getStartTime())
+                .lt(req.getEndTime() != null, WebsiteCodeGroup::getCreateTime, req.getEndTime()).orderByDesc(WebsiteCodeGroup::getPayTime);
+        IPage<WebsiteCodeGroup> websiteCodeGroupIPage = websiteCodeGroupMapper.selectPage(page, queryWrapper);
+        return BeanUtil.iPageConvert(websiteCodeGroupIPage, WebsiteCodeResult.class);
     }
 
     @Override
@@ -69,7 +87,7 @@ public class AdminWebsiteCodeManageServiceImpl implements AdminWebsiteCodeManage
                 .and(req.getMerchantId() != null, wrapper -> wrapper
                         .eq(WebsiteCodeDetail::getPid, req.getMerchantId())
                         .or()
-                        .like(WebsiteCodeDetail::getPidPath, "."+req.getMerchantId() + "."))
+                        .like(WebsiteCodeDetail::getPidPath, "." + req.getMerchantId() + "."))
                 .eq(StringUtils.isNotBlank(req.getAlias()), WebsiteCodeDetail::getAlias, req.getAlias())
                 .eq(req.getBatchId() != null, WebsiteCodeDetail::getBatchId, req.getBatchId())
                 .eq(StringUtils.isNotBlank(req.getIsActivate()), WebsiteCodeDetail::getIsActivate, req.getIsActivate())
@@ -88,7 +106,7 @@ public class AdminWebsiteCodeManageServiceImpl implements AdminWebsiteCodeManage
                 .and(wrapper -> wrapper
                         .eq(WebsiteCodeDetail::getPid, req.getMerchantId())
                         .or()
-                        .like(WebsiteCodeDetail::getPidPath, "."+req.getMerchantId() + "."))
+                        .like(WebsiteCodeDetail::getPidPath, "." + req.getMerchantId() + "."))
                 .eq(StringUtils.isNotBlank(req.getAlias()), WebsiteCodeDetail::getAlias, req.getAlias())
                 .eq(req.getBatchId() != null, WebsiteCodeDetail::getBatchId, req.getBatchId())
                 .eq(StringUtils.isNotBlank(req.getIsActivate()), WebsiteCodeDetail::getIsActivate, req.getIsActivate())
@@ -119,12 +137,34 @@ public class AdminWebsiteCodeManageServiceImpl implements AdminWebsiteCodeManage
         Integer count = websiteCode.getDownloadCount();
         websiteCode.setDownloadCount(count == null ? 1 : count + 1);
         websiteCodeMapper.updateById(websiteCode);
-        return ossDownloader.privateDownloadUrl(websiteCode.getFileUrl(), 60,null);
+        return ossDownloader.privateDownloadUrl(websiteCode.getFileUrl(), 60, null);
     }
 
     @Override
     public Void retryWebsiteCode(Integer websiteCodeId) {
         websiteCodeTaskService.buildWebSiteCode(websiteCodeId);
+        return null;
+    }
+
+    @Override
+    public List<WebsiteCodeResult> queryWebsiteDetailsCodeByWl(String orderNo) {
+        LambdaQueryWrapper wrapper = Wrappers.lambdaQuery(WebsiteCode.class)
+                .eq(WebsiteCode::getOrderNo, orderNo);
+        List<WebsiteCode> websiteCodeList = websiteCodeMapper.selectList(wrapper);
+        return BeanUtil.convertList(websiteCodeList, WebsiteCodeResult.class);
+    }
+
+    @Override
+    public Void updateWebsiteCodeGroupExpress(WebsiteCodeExpressReq websiteCodeExpressReq) {
+        WebsiteCodeGroup websiteCodeGroup = BeanUtil.convert(websiteCodeExpressReq, WebsiteCodeGroup.class);
+        websiteCodeGroup.setOrderStatus("DELIVERY");
+        websiteCodeGroupMapper.updateById(websiteCodeGroup);
+        websiteCodeGroup = websiteCodeGroupMapper.selectById(websiteCodeExpressReq.getId());
+        if (websiteCodeGroup != null && StringUtils.isNotBlank(websiteCodeGroup.getOrderNo())) {
+            WebsiteCode websiteCode = new WebsiteCode();
+            websiteCode.setOrderStatus("DELIVERY");
+            websiteCodeMapper.update(websiteCode, Wrappers.lambdaQuery(WebsiteCode.class).eq(WebsiteCode::getOrderNo, websiteCodeGroup.getOrderNo()));
+        }
         return null;
     }
 }

@@ -1,7 +1,5 @@
 package com.yfshop.admin.task;
 
-import cn.hutool.core.date.DateTime;
-import cn.hutool.core.date.DateUtil;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.github.binarywang.wxpay.bean.result.WxPayOrderQueryResult;
@@ -9,11 +7,14 @@ import com.yfshop.admin.api.order.service.AdminUserOrderService;
 import com.yfshop.admin.api.website.WebsiteCodeTaskService;
 import com.yfshop.admin.utils.ProxyUtil;
 import com.yfshop.code.mapper.OrderMapper;
+import com.yfshop.code.mapper.WebsiteCodeGroupMapper;
 import com.yfshop.code.mapper.WebsiteCodeMapper;
 import com.yfshop.code.model.Order;
 import com.yfshop.code.model.WebsiteCode;
+import com.yfshop.code.model.WebsiteCodeGroup;
 import com.yfshop.common.enums.PayPrefixEnum;
 import com.yfshop.wx.api.service.MpPayService;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
@@ -42,6 +43,8 @@ public class OrderTask {
     @DubboReference
     private AdminUserOrderService adminUserService;
 
+    @Resource
+    private WebsiteCodeGroupMapper websiteCodeGroupMapper;
 
     /**
      * 同步网点码未支付的订单
@@ -83,9 +86,18 @@ public class OrderTask {
         if (CollectionUtils.isNotEmpty(failIds)) {
             WebsiteCode websiteCode = new WebsiteCode();
             websiteCode.setOrderStatus("PENDING");
-            websiteCodeMapper.update(websiteCode, Wrappers.<WebsiteCode>lambdaQuery()
+            int count =websiteCodeMapper.update(websiteCode, Wrappers.<WebsiteCode>lambdaQuery()
                     .in(WebsiteCode::getId, failIds)
                     .eq(WebsiteCode::getOrderStatus, "PAYING"));
+            if (count>0) {
+                WebsiteCode w = websiteCodeMapper.selectById(failIds.get(0));
+                if (w != null && StringUtils.isNotBlank(w.getOrderNo())) {
+                    WebsiteCodeGroup websiteCodeGroup = new WebsiteCodeGroup();
+                    websiteCodeGroup.setOrderStatus("CANCEL");
+                    websiteCodeGroupMapper.update(websiteCodeGroup, Wrappers.<WebsiteCodeGroup>lambdaQuery()
+                            .eq(WebsiteCodeGroup::getOrderNo, w.getOrderNo()));
+                }
+            }
         }
 
     }
@@ -102,6 +114,12 @@ public class OrderTask {
                     .eq(WebsiteCode::getOrderNo, wxPayOrderQueryResult.getOutTradeNo())
                     .eq(WebsiteCode::getOrderStatus, "PAYING"));
             if (count > 0) {
+                WebsiteCodeGroup websiteCodeGroup = new WebsiteCodeGroup();
+                websiteCodeGroup.setOrderStatus("WAIT");
+                websiteCodeGroup.setPayTime(LocalDateTime.now());
+                websiteCodeGroup.setBillno(wxPayOrderQueryResult.getTransactionId());
+                websiteCodeGroupMapper.update(websiteCodeGroup, Wrappers.<WebsiteCodeGroup>lambdaQuery()
+                        .eq(WebsiteCodeGroup::getOrderNo, wxPayOrderQueryResult.getOutTradeNo()));
                 websiteCodeTask.doWorkWebsiteCodeFile(wxPayOrderQueryResult.getOutTradeNo());
             }
         } catch (Exception e) {

@@ -10,6 +10,7 @@ import java.util.Date;
 public class WebsiteCodeQueryReq implements Serializable {
     private Date startTime;
     private Date endTime;
+    private Integer id;
     private String batchNo;
     private Integer merchantId;
     private String merchantName;
@@ -17,6 +18,7 @@ public class WebsiteCodeQueryReq implements Serializable {
     private String mobile;
     private String orderStatus;
     private String expressNo;
+    private String address;
     private Integer pageIndex = 1;
     private Integer pageSize = 10;
 

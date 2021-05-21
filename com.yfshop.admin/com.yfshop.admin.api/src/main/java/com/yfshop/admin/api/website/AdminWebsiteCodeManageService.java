@@ -60,4 +60,8 @@ public interface AdminWebsiteCodeManageService {
     String getWebsiteCodeUrl(Integer id) throws ApiException;
 
     Void retryWebsiteCode(Integer websiteCodeId);
+
+    List<WebsiteCodeResult> queryWebsiteDetailsCodeByWl(String orderNo);
+
+    Void updateWebsiteCodeGroupExpress(WebsiteCodeExpressReq websiteCodeQueryExpressReq);
 }

@@ -10,6 +10,7 @@ import com.yfshop.admin.api.website.request.WebsiteCodeQueryDetailsReq;
 import com.yfshop.admin.api.website.request.WebsiteCodeExpressReq;
 import com.yfshop.admin.api.website.request.WebsiteCodeQueryReq;
 import com.yfshop.admin.api.website.result.WebsiteCodeDetailExport;
+import com.yfshop.admin.api.website.result.WebsiteCodeResult;
 import com.yfshop.common.api.CommonResult;
 import com.yfshop.common.base.BaseController;
 import io.swagger.annotations.ApiOperation;
@@ -68,6 +69,15 @@ public class AdminWebsiteManageController implements BaseController {
 
 
     @SaCheckLogin
+    @ApiOperation(value = "查询全部的网点码", httpMethod = "POST")
+    @RequestMapping(value = "/queryWebsiteCodeDetailsByWl", method = {RequestMethod.GET, RequestMethod.POST})
+    @ResponseBody
+    public CommonResult<List<WebsiteCodeResult>> queryWebsiteDetailsCodeByWl(String orderNo) {
+        return CommonResult.success(adminWebsiteCodeManageService.queryWebsiteDetailsCodeByWl(orderNo));
+    }
+
+
+    @SaCheckLogin
     @ApiOperation(value = "查询网点码详情", httpMethod = "POST")
     @RequestMapping(value = "/queryWebsiteCodeDetails", method = {RequestMethod.GET, RequestMethod.POST})
     @ResponseBody
@@ -90,6 +100,15 @@ public class AdminWebsiteManageController implements BaseController {
     public CommonResult<Void> updateWebsiteCodeExpress(WebsiteCodeExpressReq websiteCodeQueryExpressReq) {
         return CommonResult.success(adminWebsiteCodeManageService.updateWebsiteCodeExpress(websiteCodeQueryExpressReq));
     }
+
+    @SaCheckLogin
+    @ApiOperation(value = "更新网点码更新物流", httpMethod = "POST")
+    @RequestMapping(value = "/updateWebsiteCodeGroupExpress", method = {RequestMethod.GET, RequestMethod.POST})
+    @ResponseBody
+    public CommonResult<Void> updateWebsiteCodeGroupExpress(WebsiteCodeExpressReq websiteCodeQueryExpressReq) {
+        return CommonResult.success(adminWebsiteCodeManageService.updateWebsiteCodeGroupExpress(websiteCodeQueryExpressReq));
+    }
+
 
     @SaCheckLogin
     @SneakyThrows
