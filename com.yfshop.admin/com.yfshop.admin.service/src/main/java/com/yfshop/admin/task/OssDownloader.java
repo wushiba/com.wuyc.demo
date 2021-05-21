@@ -5,6 +5,7 @@ import com.aliyun.oss.OSSClientBuilder;
 import com.aliyun.oss.model.GeneratePresignedUrlRequest;
 import com.aliyun.oss.model.ResponseHeaderOverrides;
 import com.yfshop.admin.config.OssConfig;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -29,18 +30,22 @@ public class OssDownloader {
     }
 
 
-    public String privateDownloadUrl(String baseUrl, long expires) {
+    public String privateDownloadUrl(String baseUrl, long expires, String fileName) {
         // 设置URL过期时间为1小时
         String kye = baseUrl.substring(baseUrl.lastIndexOf("/") + 1);
         Date expiration = new Date(System.currentTimeMillis() + expires * 1000);
         GeneratePresignedUrlRequest generatePresignedUrlRequest = new GeneratePresignedUrlRequest(config.getBucket(), kye);
         //设置响应头强制下载
         ResponseHeaderOverrides responseHeaders = new ResponseHeaderOverrides();
-        responseHeaders.setContentDisposition("attachment;");
+        if (StringUtils.isBlank(fileName)) {
+            responseHeaders.setContentDisposition("attachment;");
+        } else {
+            responseHeaders.setContentDisposition("attachment;filename=" + fileName);
+        }
         generatePresignedUrlRequest.setResponseHeaders(responseHeaders);
         generatePresignedUrlRequest.setExpiration(expiration);
         URL url = ossClient.generatePresignedUrl(generatePresignedUrlRequest);
-        return url.toString() + "&attname=";
+        return url.toString();
     }
 
 }

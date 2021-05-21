@@ -139,7 +139,8 @@ public class AdminActCodeManageServiceImpl implements AdminActCodeManageService 
         actCodeBatchRecord.setMerchantId(merchantId);
         actCodeBatchRecord.setType("DOWNLOAD");
         actCodeBatchRecordMapper.insert(actCodeBatchRecord);
-        return ossDownloader.privateDownloadUrl(actCodeBatch.getFileUrl(), 60);
+        String fileName = actCodeBatch.getBatchNo() + "(内盒码" + actCodeBatch.getQuantity() / 10000f + "万个" + actCodeBatch.getSpec() + "ml).txt";
+        return ossDownloader.privateDownloadUrl(actCodeBatch.getFileUrl(), 60,fileName);
     }
 
     @SneakyThrows
@@ -150,10 +151,11 @@ public class AdminActCodeManageServiceImpl implements AdminActCodeManageService 
         Asserts.assertEquals(actCodeBatch.getIsSend(), "N", 500, "溯源码文件已被发送过！");
         Asserts.assertStringNotBlank(actCodeBatch.getFileUrl(), 500, "文件不存在！");
         SourceFactory sourceFactory = sourceFactoryMapper.selectById(factoryId);
-        String fileUrl = ossDownloader.privateDownloadUrl(actCodeBatch.getFileUrl(), 60 * 60 * 24 * 7);
+        String fileName = actCodeBatch.getBatchNo() + "(内盒码" + actCodeBatch.getQuantity() / 10000f + "万个" + actCodeBatch.getSpec() + "ml).txt";
+        String fileUrl = ossDownloader.privateDownloadUrl(actCodeBatch.getFileUrl(), 60 * 60 * 24 * 7, fileName);
         String msg = "<p>您好!</p>\n" +
-                "<p>&nbsp;&nbsp;&nbsp;&nbsp;此邮件内含光明活动码（溯源码+抽奖活动码）" + actCodeBatch.getSpec() + "ml，请妥善保管，切勿外传。<a href=\"" + fileUrl + "\">点击下载活动码</a>下载链接7天有效。雨帆</p>";
-        emailTask.sendAttachmentsMail(sourceFactory.getEmail(), "光明活动码（溯源码+抽奖活动码）" + actCodeBatch.getSpec() + "ml", msg, null,"xuwei@51jujibao.com");
+                "<p>&nbsp;&nbsp;&nbsp;&nbsp;此邮件内含光明活动码（溯源码+抽奖活动码）内盒码" + actCodeBatch.getQuantity() / 10000f + "万个" + actCodeBatch.getSpec() + "ml，请妥善保管，切勿外传。<a href=\"" + fileUrl + "\">点击下载活动码</a>下载链接7天有效。雨帆</p>";
+        emailTask.sendAttachmentsMail(sourceFactory.getEmail(), "光明活动码（溯源码+抽奖活动码）内盒码" + actCodeBatch.getQuantity() / 10000f + "万个" + actCodeBatch.getSpec() + "ml", msg, null, "xuwei@51jujibao.com");
         actCodeBatch.setIsSend("Y");
         actCodeBatchMapper.updateById(actCodeBatch);
         ActCodeBatchRecord actCodeBatchRecord = new ActCodeBatchRecord();

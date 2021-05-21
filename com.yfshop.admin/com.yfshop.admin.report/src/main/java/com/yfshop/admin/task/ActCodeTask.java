@@ -142,7 +142,7 @@ public class ActCodeTask {
             String fileUrl;
             if (!file.exists()) {
                 logger.info("正则下载溯源码文件");
-                fileUrl = ossDownloader.privateDownloadUrl(actCodeBatch.getFileSrcUrl(), 60);
+                fileUrl = ossDownloader.privateDownloadUrl(actCodeBatch.getFileSrcUrl(), 60,null);
                 file = HttpUtil.downloadFileFromUrl(fileUrl, file);
                 logger.info("载溯源码文件下载完成");
                 Asserts.assertEquals(actCodeBatch.getFileMd5(), SecureUtil.md5(file), 500, "下载文件md5不匹配");

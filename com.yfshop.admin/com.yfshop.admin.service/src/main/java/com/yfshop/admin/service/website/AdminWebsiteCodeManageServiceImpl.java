@@ -119,7 +119,7 @@ public class AdminWebsiteCodeManageServiceImpl implements AdminWebsiteCodeManage
         Integer count = websiteCode.getDownloadCount();
         websiteCode.setDownloadCount(count == null ? 1 : count + 1);
         websiteCodeMapper.updateById(websiteCode);
-        return ossDownloader.privateDownloadUrl(websiteCode.getFileUrl(), 60);
+        return ossDownloader.privateDownloadUrl(websiteCode.getFileUrl(), 60,null);
     }
 
     @Override
