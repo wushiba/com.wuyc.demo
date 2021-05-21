@@ -328,7 +328,7 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
             allStatus.add("PENDING");
             allStatus.add("PAYING");
         } else {
-            allStatus.add("status");
+            allStatus.add(status);
         }
         LambdaQueryWrapper<WebsiteCode> lambdaQueryWrapper = Wrappers.<WebsiteCode>lambdaQuery()
                 .and(itemWrapper -> itemWrapper
