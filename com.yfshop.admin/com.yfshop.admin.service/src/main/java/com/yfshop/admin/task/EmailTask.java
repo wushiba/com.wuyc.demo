@@ -1,6 +1,7 @@
 package com.yfshop.admin.task;
 
 import cn.hutool.core.util.ArrayUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,9 +39,11 @@ public class EmailTask {
         if (ArrayUtil.isNotEmpty(cc)) {
             helper.setCc(cc);
         }
-        File file = new File(filePath);
-        FileSystemResource fileResource = new FileSystemResource(file);
-        helper.addAttachment(file.getName(), fileResource);
+        if (StringUtils.isNotBlank(filePath)) {
+            File file = new File(filePath);
+            FileSystemResource fileResource = new FileSystemResource(file);
+            helper.addAttachment(file.getName(), fileResource);
+        }
         mailSender.send(message);
     }
 
