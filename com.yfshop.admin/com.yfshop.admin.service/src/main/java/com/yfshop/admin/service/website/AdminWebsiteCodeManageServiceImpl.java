@@ -163,6 +163,8 @@ public class AdminWebsiteCodeManageServiceImpl implements AdminWebsiteCodeManage
         if (websiteCodeGroup != null && StringUtils.isNotBlank(websiteCodeGroup.getOrderNo())) {
             WebsiteCode websiteCode = new WebsiteCode();
             websiteCode.setOrderStatus("DELIVERY");
+            websiteCode.setExpressName(websiteCodeExpressReq.getExpressName());
+            websiteCode.setExpressNo(websiteCodeExpressReq.getExpressNo());
             websiteCodeMapper.update(websiteCode, Wrappers.lambdaQuery(WebsiteCode.class).eq(WebsiteCode::getOrderNo, websiteCodeGroup.getOrderNo()));
         }
         return null;
