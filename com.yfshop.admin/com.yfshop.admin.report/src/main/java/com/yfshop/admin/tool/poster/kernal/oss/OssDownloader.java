@@ -3,6 +3,7 @@ package com.yfshop.admin.tool.poster.kernal.oss;
 import com.aliyun.oss.OSS;
 import com.aliyun.oss.OSSClientBuilder;
 import com.aliyun.oss.model.GeneratePresignedUrlRequest;
+import com.aliyun.oss.model.ResponseHeaderOverrides;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -32,6 +33,10 @@ public class OssDownloader {
         String kye = baseUrl.substring(baseUrl.lastIndexOf("/") + 1);
         Date expiration = new Date(System.currentTimeMillis() + expires * 1000);
         GeneratePresignedUrlRequest generatePresignedUrlRequest = new GeneratePresignedUrlRequest(config.getBucket(), kye);
+        //设置响应头强制下载
+        ResponseHeaderOverrides responseHeaders = new ResponseHeaderOverrides();
+        responseHeaders.setContentDisposition("attachment;");
+        generatePresignedUrlRequest.setResponseHeaders(responseHeaders);
         generatePresignedUrlRequest.setExpiration(expiration);
         URL url = ossClient.generatePresignedUrl(generatePresignedUrlRequest);
         return url.toString() + "&attname=";
