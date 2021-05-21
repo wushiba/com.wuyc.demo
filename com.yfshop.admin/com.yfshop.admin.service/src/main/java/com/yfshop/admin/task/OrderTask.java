@@ -116,6 +116,7 @@ public class OrderTask {
             if (count > 0) {
                 WebsiteCodeGroup websiteCodeGroup = new WebsiteCodeGroup();
                 websiteCodeGroup.setOrderStatus("WAIT");
+                websiteCodeGroup.setPayMethod("WxPay");
                 websiteCodeGroup.setPayTime(LocalDateTime.now());
                 websiteCodeGroup.setBillno(wxPayOrderQueryResult.getTransactionId());
                 websiteCodeGroupMapper.update(websiteCodeGroup, Wrappers.<WebsiteCodeGroup>lambdaQuery()

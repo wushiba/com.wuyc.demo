@@ -584,6 +584,7 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
         if (count > 0) {
             WebsiteCodeGroup websiteCodeGroup = new WebsiteCodeGroup();
             websiteCodeGroup.setOrderStatus("WAIT");
+            websiteCodeGroup.setPayMethod("WxPay");
             websiteCodeGroup.setPayTime(LocalDateTime.now());
             websiteCodeGroup.setBillno(transactionId);
             websiteCodeGroupMapper.update(websiteCodeGroup, Wrappers.<WebsiteCodeGroup>lambdaQuery()
