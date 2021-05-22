@@ -79,7 +79,7 @@ public class AdminWebsiteCodeManageServiceImpl implements AdminWebsiteCodeManage
                 .notIn(WebsiteCode::getOrderStatus, "PENDING", "PAYING", "CANCEL")
                 .ge(req.getStartTime() != null, WebsiteCode::getCreateTime, req.getStartTime())
                 .lt(req.getEndTime() != null, WebsiteCode::getCreateTime, req.getEndTime()).orderByDesc(WebsiteCode::getCreateTime);
-        IPage<WebsiteCode> websiteCodeIPage = websiteCodeGroupMapper.selectPage(page, queryWrapper);
+        IPage<WebsiteCode> websiteCodeIPage = websiteCodeMapper.selectPage(page, queryWrapper);
         return BeanUtil.iPageConvert(websiteCodeIPage, WebsiteCodeResult.class);
     }
 
