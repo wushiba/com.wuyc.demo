@@ -76,6 +76,7 @@ public class AdminWebsiteCodeManageServiceImpl implements AdminWebsiteCodeManage
                 .like(StringUtils.isNotBlank(req.getRoleName()), WebsiteCode::getContracts, req.getRoleName())
                 .like(StringUtils.isNotBlank(req.getAddress()), WebsiteCode::getAddress, req.getAddress())
                 .in(!orderStatus.isEmpty(), WebsiteCode::getOrderStatus, orderStatus)
+                .isNotNull(WebsiteCode::getBillno)
                 .notIn(WebsiteCode::getOrderStatus, "PENDING", "PAYING", "CANCEL")
                 .ge(req.getStartTime() != null, WebsiteCode::getCreateTime, req.getStartTime())
                 .lt(req.getEndTime() != null, WebsiteCode::getCreateTime, req.getEndTime()).orderByDesc(WebsiteCode::getCreateTime);
@@ -99,7 +100,6 @@ public class AdminWebsiteCodeManageServiceImpl implements AdminWebsiteCodeManage
                 .like(StringUtils.isNotBlank(req.getExpressNo()), WebsiteCodeGroup::getExpressNo, req.getExpressNo())
                 .like(StringUtils.isNotBlank(req.getAddress()), WebsiteCodeGroup::getAddress, req.getAddress())
                 .in(!orderStatus.isEmpty(), WebsiteCodeGroup::getOrderStatus, orderStatus)
-                .isNotNull(WebsiteCodeGroup::getBillno)
                 .notIn(WebsiteCodeGroup::getOrderStatus, "PENDING", "PAYING", "CANCEL")
                 .ge(req.getStartTime() != null, WebsiteCodeGroup::getCreateTime, req.getStartTime())
                 .lt(req.getEndTime() != null, WebsiteCodeGroup::getCreateTime, req.getEndTime()).orderByDesc(WebsiteCodeGroup::getCreateTime);
