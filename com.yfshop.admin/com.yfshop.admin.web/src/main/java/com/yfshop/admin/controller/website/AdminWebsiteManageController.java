@@ -58,6 +58,14 @@ public class AdminWebsiteManageController implements BaseController {
     }
 
 
+    @SaCheckLogin
+    @ApiOperation(value = "查询全部的网点码", httpMethod = "POST")
+    @RequestMapping(value = "/queryWebsiteCodeByOlderWl", method = {RequestMethod.GET, RequestMethod.POST})
+    @ResponseBody
+    public CommonResult<IPage> queryWebsiteCodeByOlderWl(WebsiteCodeQueryReq websiteCodeQueryReq) {
+        return CommonResult.success(adminWebsiteCodeManageService.queryWebsiteCodeByOlderWl(websiteCodeQueryReq));
+    }
+
 
     @SaCheckLogin
     @ApiOperation(value = "查询全部的网点码", httpMethod = "POST")
@@ -66,6 +74,8 @@ public class AdminWebsiteManageController implements BaseController {
     public CommonResult<IPage> queryWebsiteCodeByWl(WebsiteCodeQueryReq websiteCodeQueryReq) {
         return CommonResult.success(adminWebsiteCodeManageService.queryWebsiteCodeByWl(websiteCodeQueryReq));
     }
+
+
 
 
     @SaCheckLogin

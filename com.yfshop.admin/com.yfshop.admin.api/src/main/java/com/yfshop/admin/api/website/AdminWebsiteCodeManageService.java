@@ -24,6 +24,8 @@ public interface AdminWebsiteCodeManageService {
      */
     IPage<WebsiteCodeResult> queryWebsiteCodeList(WebsiteCodeQueryReq websiteCodeQueryReq) throws ApiException;
 
+    IPage<WebsiteCodeResult> queryWebsiteCodeByOlderWl(WebsiteCodeQueryReq websiteCodeQueryReq);
+
 
     IPage<WebsiteCodeResult> queryWebsiteCodeByWl(WebsiteCodeQueryReq websiteCodeQueryReq) throws ApiException;
 
@@ -64,4 +66,5 @@ public interface AdminWebsiteCodeManageService {
     List<WebsiteCodeResult> queryWebsiteDetailsCodeByWl(String orderNo);
 
     Void updateWebsiteCodeGroupExpress(WebsiteCodeExpressReq websiteCodeQueryExpressReq);
+
 }

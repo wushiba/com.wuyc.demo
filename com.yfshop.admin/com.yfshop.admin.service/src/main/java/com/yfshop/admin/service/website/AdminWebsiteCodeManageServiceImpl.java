@@ -58,6 +58,31 @@ public class AdminWebsiteCodeManageServiceImpl implements AdminWebsiteCodeManage
         return page;
     }
 
+
+    @Override
+    public IPage<WebsiteCodeResult> queryWebsiteCodeByOlderWl(WebsiteCodeQueryReq req) throws ApiException {
+        List<String> orderStatus = new ArrayList<>();
+        if ("UNSHIPPED".equals(req.getOrderStatus())) {
+            orderStatus.add("WAIT");
+        } else if ("SHIPPED".equals(req.getOrderStatus())) {
+            orderStatus.add("DELIVERY");
+            orderStatus.add("SUCCESS");
+        }
+        IPage page = new Page<WebsiteCodeQueryReq>(req.getPageIndex(), req.getPageSize());
+        LambdaQueryWrapper queryWrapper = Wrappers.lambdaQuery(WebsiteCode.class)
+                .eq(StringUtils.isNotBlank(req.getBatchNo()), WebsiteCode::getBatchNo, req.getBatchNo())
+                .like(StringUtils.isNotBlank(req.getMerchantName()), WebsiteCode::getMerchantName, req.getMerchantName())
+                .like(StringUtils.isNotBlank(req.getExpressNo()), WebsiteCode::getExpressNo, req.getExpressNo())
+                .like(StringUtils.isNotBlank(req.getRoleName()), WebsiteCode::getContracts, req.getRoleName())
+                .like(StringUtils.isNotBlank(req.getAddress()), WebsiteCode::getAddress, req.getAddress())
+                .in(!orderStatus.isEmpty(), WebsiteCode::getOrderStatus, orderStatus)
+                .notIn(WebsiteCode::getOrderStatus, "PENDING", "PAYING", "CANCEL")
+                .ge(req.getStartTime() != null, WebsiteCode::getCreateTime, req.getStartTime())
+                .lt(req.getEndTime() != null, WebsiteCode::getCreateTime, req.getEndTime()).orderByDesc(WebsiteCode::getPayTime);
+        IPage<WebsiteCode> websiteCodeIPage = websiteCodeGroupMapper.selectPage(page, queryWrapper);
+        return BeanUtil.iPageConvert(websiteCodeIPage, WebsiteCodeResult.class);
+    }
+
     @Override
     public IPage<WebsiteCodeResult> queryWebsiteCodeByWl(WebsiteCodeQueryReq req) throws ApiException {
         List<String> orderStatus = new ArrayList<>();
