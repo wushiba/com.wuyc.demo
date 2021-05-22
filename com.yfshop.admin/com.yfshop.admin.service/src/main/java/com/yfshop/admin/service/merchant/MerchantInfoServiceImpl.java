@@ -365,6 +365,7 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
         websiteCode.setMerchantId(merchant.getId());
         websiteCode.setMerchantName(merchant.getMerchantName());
         websiteCode.setMobile(merchant.getMobile());
+        websiteCode.setContracts(merchant.getContacts());
         websiteCode.setPidPath(merchant.getPidPath());
         websiteCode.setQuantity(count);
         if (StringUtils.isBlank(email)) {
@@ -483,9 +484,9 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
         Asserts.assertCollectionNotEmpty(websiteCodePayReq.getIds(), 500, "请选择你要付款的订单！");
         WebsiteCodeAddress websiteCodeAddress = websiteCodeAddressMapper.selectById(websiteCodePayReq.getAddressId());
         WebsiteCode websiteCode = new WebsiteCode();
-        websiteCode.setMobile(websiteCodeAddress.getMobile());
-        websiteCode.setContracts(websiteCodeAddress.getContracts());
-        websiteCode.setAddress(websiteCodeAddress.getProvince() + websiteCodeAddress.getCity() + websiteCodeAddress.getDistrict() + websiteCodeAddress.getAddress());
+//        websiteCode.setMobile(websiteCodeAddress.getMobile());
+//        websiteCode.setContracts(websiteCodeAddress.getContracts());
+        websiteCode.setAddress(websiteCodeAddress.getProvince() + websiteCodeAddress.getCity() + websiteCodeAddress.getDistrict() + websiteCodeAddress.getAddress()+","+websiteCodeAddress.getContracts()+","+websiteCodeAddress.getMobile());
         websiteCode.setOrderNo(String.format("%06d", websiteCodeAddress.getMerchantId()) + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyMMddHHmmssSSS")));
         websiteCode.setOrderStatus("PAYING");
         WebsiteCodeAmountResult websiteCodeAmountResult = applyWebsiteCodeAmount(websiteCodePayReq.getIds());
@@ -516,11 +517,10 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
             if (merchant != null) {
                 websiteCodeGroup.setMerchantName(merchant.getMerchantName());
             }
-            websiteCodeGroup.setAddress(websiteCode.getMobile());
-            websiteCodeGroup.setContracts(websiteCode.getContracts());
+            websiteCodeGroup.setContracts(websiteCodeAddress.getContracts());
             websiteCodeGroup.setAddress(websiteCode.getAddress());
             websiteCodeGroup.setOrderNo(websiteCode.getOrderNo());
-            websiteCodeGroup.setMobile(websiteCode.getMobile());
+            websiteCodeGroup.setMobile(websiteCodeAddress.getMobile());
             websiteCodeGroup.setOrderStatus("PAYING");
             websiteCodeGroup.setQuantity(websiteCodeAmountResult.getQuantity());
             websiteCodeGroupMapper.insert(websiteCodeGroup);
