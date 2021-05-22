@@ -78,7 +78,7 @@ public class AdminWebsiteCodeManageServiceImpl implements AdminWebsiteCodeManage
                 .in(!orderStatus.isEmpty(), WebsiteCode::getOrderStatus, orderStatus)
                 .notIn(WebsiteCode::getOrderStatus, "PENDING", "PAYING", "CANCEL")
                 .ge(req.getStartTime() != null, WebsiteCode::getCreateTime, req.getStartTime())
-                .lt(req.getEndTime() != null, WebsiteCode::getCreateTime, req.getEndTime()).orderByDesc(WebsiteCode::getPayTime);
+                .lt(req.getEndTime() != null, WebsiteCode::getCreateTime, req.getEndTime()).orderByDesc(WebsiteCode::getCreateTime);
         IPage<WebsiteCode> websiteCodeIPage = websiteCodeGroupMapper.selectPage(page, queryWrapper);
         return BeanUtil.iPageConvert(websiteCodeIPage, WebsiteCodeResult.class);
     }
@@ -101,7 +101,7 @@ public class AdminWebsiteCodeManageServiceImpl implements AdminWebsiteCodeManage
                 .in(!orderStatus.isEmpty(), WebsiteCodeGroup::getOrderStatus, orderStatus)
                 .notIn(WebsiteCodeGroup::getOrderStatus, "PENDING", "PAYING", "CANCEL")
                 .ge(req.getStartTime() != null, WebsiteCodeGroup::getCreateTime, req.getStartTime())
-                .lt(req.getEndTime() != null, WebsiteCodeGroup::getCreateTime, req.getEndTime()).orderByDesc(WebsiteCodeGroup::getPayTime);
+                .lt(req.getEndTime() != null, WebsiteCodeGroup::getCreateTime, req.getEndTime()).orderByDesc(WebsiteCodeGroup::getCreateTime);
         IPage<WebsiteCodeGroup> websiteCodeGroupIPage = websiteCodeGroupMapper.selectPage(page, queryWrapper);
         return BeanUtil.iPageConvert(websiteCodeGroupIPage, WebsiteCodeResult.class);
     }
