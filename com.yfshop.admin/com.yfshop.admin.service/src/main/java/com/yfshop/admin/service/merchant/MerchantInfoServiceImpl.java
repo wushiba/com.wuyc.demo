@@ -1,6 +1,9 @@
 package com.yfshop.admin.service.merchant;
 
+import cn.hutool.Hutool;
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.lang.PatternPool;
+import cn.hutool.core.lang.Validator;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.crypto.SecureUtil;
 import cn.hutool.extra.spring.SpringUtil;
@@ -352,6 +355,9 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
 
     @Override
     public Integer applyWebsiteCode(Integer merchantId, Integer count, String email) throws ApiException {
+        if (StringUtils.isNotBlank(email)) {
+            Asserts.assertTrue(Validator.isMatchRegex(PatternPool.EMAIL, email), 500, "请正确填写邮箱地址");
+        }
         WebsiteCode last = websiteCodeMapper.selectOne(Wrappers.<WebsiteCode>lambdaQuery().eq(WebsiteCode::getMerchantId, merchantId).orderByDesc());
         if (last != null) {
             int sumCount = websiteCodeDao.sumWebsiteCodeByBeforeId(last.getId(), merchantId);
@@ -486,7 +492,7 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
         WebsiteCode websiteCode = new WebsiteCode();
 //        websiteCode.setMobile(websiteCodeAddress.getMobile());
 //        websiteCode.setContracts(websiteCodeAddress.getContracts());
-        websiteCode.setAddress(websiteCodeAddress.getProvince() + websiteCodeAddress.getCity() + websiteCodeAddress.getDistrict() + websiteCodeAddress.getAddress()+","+websiteCodeAddress.getContracts()+","+websiteCodeAddress.getMobile());
+        websiteCode.setAddress(websiteCodeAddress.getProvince() + websiteCodeAddress.getCity() + websiteCodeAddress.getDistrict() + websiteCodeAddress.getAddress() + "," + websiteCodeAddress.getContracts() + "," + websiteCodeAddress.getMobile());
         websiteCode.setOrderNo(String.format("%06d", websiteCodeAddress.getMerchantId()) + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyMMddHHmmssSSS")));
         websiteCode.setOrderStatus("PAYING");
         WebsiteCodeAmountResult websiteCodeAmountResult = applyWebsiteCodeAmount(websiteCodePayReq.getIds());
@@ -572,7 +578,7 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
     }
 
     @Override
-    public void websitePayOrderNotify(String transactionId,String outTradeNo) throws ApiException {
+    public void websitePayOrderNotify(String transactionId, String outTradeNo) throws ApiException {
         WebsiteCode websiteCode = new WebsiteCode();
         websiteCode.setPayMethod("WxPay");
         websiteCode.setPayTime(LocalDateTime.now());
