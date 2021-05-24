@@ -35,7 +35,7 @@
         group by r.prize_level
     </select>
 
-    <select id="satsByProvince" resultType="com.yfshop.admin.api.draw.result.DrawRecordSatsByLevelResult">
+    <select id="satsByProvince" resultType="com.yfshop.admin.api.draw.result.DrawRecordSatsByProvinceResult">
         select r.user_location as province,count(1) as draw_count,sum(if(use_status='NO_USE',0,1)) as use_count
         from yf_draw_record r
         where 1=1
