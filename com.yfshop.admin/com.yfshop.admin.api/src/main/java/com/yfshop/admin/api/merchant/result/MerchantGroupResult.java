@@ -11,6 +11,7 @@ public class MerchantGroupResult implements Serializable {
     private int count;
     private Integer merchantId;
     private String merchantName;
+    private String contacts;
     private boolean isHaveWebsite;
     private Integer currentExchange;
     private Integer totalExchange;
