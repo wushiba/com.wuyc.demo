@@ -15,7 +15,7 @@
         <if test="req.province!=null and req.province!=''">
             and r.user_location = #{req.province}
         </if>
-        group by r.create_time
+        group by date(r.create_time)
     </select>
 
     <select id="satsByLeve" resultType="com.yfshop.admin.api.draw.result.DrawRecordSatsByLevelResult">
