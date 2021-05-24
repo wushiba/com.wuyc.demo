@@ -2,7 +2,13 @@ package com.yfshop.admin.api.draw.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.yfshop.admin.api.draw.request.QueryDrawRecordReq;
+import com.yfshop.admin.api.draw.request.QueryDrawRecordSatsReq;
 import com.yfshop.admin.api.draw.result.DrawRecordResult;
+import com.yfshop.admin.api.draw.result.DrawRecordSatsByDayResult;
+import com.yfshop.admin.api.draw.result.DrawRecordSatsByLevelResult;
+import com.yfshop.admin.api.draw.result.DrawRecordSatsByProvinceResult;
+
+import java.util.List;
 
 /**
  * @Title:抽奖记录接口
@@ -13,4 +19,10 @@ import com.yfshop.admin.api.draw.result.DrawRecordResult;
 public interface AdminDrawRecordService {
 
     IPage<DrawRecordResult> getDrawRecordList(QueryDrawRecordReq queryDrawRecordReq);
+
+    List<DrawRecordSatsByDayResult> satsByDay(QueryDrawRecordSatsReq recordReq);
+
+    List<DrawRecordSatsByLevelResult> satsByLeve(QueryDrawRecordSatsReq recordReq);
+
+    List<DrawRecordSatsByProvinceResult> satsByProvince(QueryDrawRecordSatsReq recordReq);
 }

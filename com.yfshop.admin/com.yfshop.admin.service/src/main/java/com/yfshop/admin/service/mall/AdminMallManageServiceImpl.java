@@ -231,8 +231,13 @@ public class AdminMallManageServiceImpl implements AdminMallManageService {
                 .like(StringUtils.isNotBlank(req.getItemTitle()), Item::getItemTitle, req.getItemTitle())
                 .orderByDesc(Item::getCreateTime);
         Page<Item> itemPage = itemMapper.selectPage(new Page<>(req.getPageIndex(), req.getPageSize()), queryWrapper);
+        List<Integer> categoryIds = itemPage.getRecords().stream().map(Item::getCategoryId).distinct().collect(Collectors.toList());
+        Map<Integer, String> categoryMap = categoryMapper.selectBatchIds(categoryIds).stream().collect(Collectors.toMap((item) -> item.getId(), (item) -> item.getCategoryName()));
         Page<ItemResult> page = new Page<>(itemPage.getCurrent(), itemPage.getSize(), itemPage.getTotal());
         page.setRecords(BeanUtil.convertList(itemPage.getRecords(), ItemResult.class));
+        page.getRecords().forEach(itemResult -> {
+            itemResult.setCategoryName(categoryMap.get(itemResult.getCategoryId()));
+        });
         return page;
     }
 

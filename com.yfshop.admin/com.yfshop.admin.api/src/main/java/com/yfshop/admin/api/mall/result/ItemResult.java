@@ -40,6 +40,9 @@ public class ItemResult implements Serializable {
      */
     private Integer categoryId;
 
+
+    private String categoryName;
+
     /**
      * 配送方式 ALL(配送自提都支持), ZT(自提) | PS(配送)
      *

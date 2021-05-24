@@ -2,8 +2,10 @@ package com.yfshop.common.util;
 
 import java.time.*;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 /**
  * 日期工具类
@@ -88,7 +90,7 @@ public class DateUtil {
     }
 
 
-    public static Date plusDays(Date date,int days) {
+    public static Date plusDays(Date date, int days) {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(date);
         calendar.set(Calendar.HOUR_OF_DAY, 0);
@@ -96,6 +98,26 @@ public class DateUtil {
         calendar.set(Calendar.SECOND, 0);
         calendar.add(Calendar.DATE, days);
         return calendar.getTime();
+    }
+
+    public static List<Date> getRangeDate(Date startTime, Date endTime) {
+        List<Date> rangeList = new ArrayList<>();
+        rangeList.add(startTime);
+        Date date;
+        int i = 0;
+        while (true) {
+            date = plusDays(startTime, 1);
+            if (date.compareTo(endTime) < 0) {
+                rangeList.add(date);
+            } else {
+                break;
+            }
+            i++;
+            if (i > 31) {
+                return rangeList;
+            }
+        }
+        return rangeList;
     }
 
 

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yfshop.admin.dao.DrawRecordDao">
+
+    <select id="satsByDay" resultType="com.yfshop.admin.api.draw.result.DrawRecordSatsByDayResult">
+        select date(r.create_time) as date_time,count(1) as draw_count,sum(if(use_status='NO_USE',0,1)) as use_count
+        from yf_draw_record r
+        where 1=1
+        <if test="req.startTime!=null">
+            and r.create_time &gt;= #{req.startTime}
+        </if>
+        <if test="req.endTime!=null">
+            and r.create_time &lt; #{req.endTime}
+        </if>
+        <if test="req.province!=null and req.province!=''">
+            and r.user_location = #{req.province}
+        </if>
+        group by r.create_time
+    </select>
+
+    <select id="satsByLeve" resultType="com.yfshop.admin.api.draw.result.DrawRecordSatsByLevelResult">
+        select CASE r.prize_level WHEN 1 THEN '一等奖' WHEN 2 THEN '二等奖' ELSE '三等奖' END
+        as level,count(1) as draw_count,sum(if(use_status='NO_USE',0,1)) as use_count
+        from yf_draw_record r
+        where 1=1
+        <if test="req.startTime!=null">
+            and r.create_time &gt;= #{req.startTime}
+        </if>
+        <if test="req.endTime!=null">
+            and r.create_time &lt; #{req.endTime}
+        </if>
+        <if test="req.province!=null and req.province!=''">
+            and r.user_location = #{req.province}
+        </if>
+        group by r.prize_level
+    </select>
+
+    <select id="satsByProvince" resultType="com.yfshop.admin.api.draw.result.DrawRecordSatsByLevelResult">
+        select r.user_location as province,count(1) as draw_count,sum(if(use_status='NO_USE',0,1)) as use_count
+        from yf_draw_record r
+        where 1=1
+        <if test="req.startTime!=null">
+            and r.create_time &gt;= #{req.startTime}
+        </if>
+        <if test="req.endTime!=null">
+            and r.create_time &lt; #{req.endTime}
+        </if>
+        <if test="req.province!=null and req.province!=''">
+            and r.user_location = #{req.province}
+        </if>
+        group by r.user_location
+    </select>
+
+</mapper>

@@ -1,4 +1,4 @@
-package com.yfshop.admin.service.draw;
+package com.yfshop.admin.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -6,19 +6,33 @@ import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.yfshop.admin.api.draw.request.QueryDrawRecordReq;
+import com.yfshop.admin.api.draw.request.QueryDrawRecordSatsReq;
 import com.yfshop.admin.api.draw.result.DrawRecordResult;
+import com.yfshop.admin.api.draw.result.DrawRecordSatsByDayResult;
+import com.yfshop.admin.api.draw.result.DrawRecordSatsByLevelResult;
+import com.yfshop.admin.api.draw.result.DrawRecordSatsByProvinceResult;
 import com.yfshop.admin.api.draw.service.AdminDrawRecordService;
+import com.yfshop.admin.dao.DrawRecordDao;
 import com.yfshop.code.mapper.DrawRecordMapper;
 import com.yfshop.code.model.DrawRecord;
 import com.yfshop.common.util.BeanUtil;
+import com.yfshop.common.util.DateUtil;
 import org.apache.dubbo.config.annotation.DubboService;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @DubboService
 public class AdminDrawRecordServiceImpl implements AdminDrawRecordService {
     @Resource
     DrawRecordMapper drawRecordMapper;
+
+    @Resource
+    DrawRecordDao drawRecordDao;
 
     @Override
     public IPage<DrawRecordResult> getDrawRecordList(QueryDrawRecordReq queryDrawRecordReq) {
@@ -42,5 +56,31 @@ public class AdminDrawRecordServiceImpl implements AdminDrawRecordService {
         IPage<DrawRecordResult> result = BeanUtil.iPageConvert(iPage, DrawRecordResult.class);
         //result.setTotal(drawRecordMapper.selectCount(wrapper));
         return result;
+    }
+
+    @Override
+    public List<DrawRecordSatsByDayResult> satsByDay(QueryDrawRecordSatsReq recordReq) {
+        Map<Date, DrawRecordSatsByDayResult> dayResultMap = drawRecordDao.satsByDay(recordReq).stream().collect(Collectors.toMap(item -> item.getDateTime(), item -> item));
+        List<Date> dateList = DateUtil.getRangeDate(recordReq.getStartTime(), recordReq.getEndTime());
+        List<DrawRecordSatsByDayResult> dayResults = new ArrayList<>();
+        dateList.forEach(item -> {
+            DrawRecordSatsByDayResult dayResult = dayResultMap.get(item);
+            if (dateList == null) {
+                dayResult = new DrawRecordSatsByDayResult();
+                dayResult.setDateTime(item);
+            }
+            dayResults.add(dayResult);
+        });
+        return dayResults;
+    }
+
+    @Override
+    public List<DrawRecordSatsByLevelResult> satsByLeve(QueryDrawRecordSatsReq recordReq) {
+        return drawRecordDao.satsByLeve(recordReq);
+    }
+
+    @Override
+    public List<DrawRecordSatsByProvinceResult> satsByProvince(QueryDrawRecordSatsReq recordReq) {
+        return drawRecordDao.satsByProvince(recordReq);
     }
 }
