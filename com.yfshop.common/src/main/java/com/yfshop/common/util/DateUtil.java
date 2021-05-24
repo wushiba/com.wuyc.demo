@@ -103,7 +103,7 @@ public class DateUtil {
     public static List<Date> getRangeDate(Date startTime, Date endTime) {
         List<Date> rangeList = new ArrayList<>();
         rangeList.add(startTime);
-        Date date=startTime;
+        Date date = startTime;
         int i = 0;
         while (true) {
             date = plusDays(date, 1);

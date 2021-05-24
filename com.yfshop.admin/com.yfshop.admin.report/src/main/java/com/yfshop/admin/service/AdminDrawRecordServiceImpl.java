@@ -62,11 +62,11 @@ public class AdminDrawRecordServiceImpl implements AdminDrawRecordService {
     @Override
     public List<DrawRecordSatsByDayResult> satsByDay(QueryDrawRecordSatsReq recordReq) {
         Map<String, DrawRecordSatsByDayResult> dayResultMap = drawRecordDao.satsByDay(recordReq).stream().collect(Collectors.toMap(item -> item.getDateTime(), item -> item));
-        List<Date> dateList = DateUtil.getRangeDate(recordReq.getStartTime(), recordReq.getEndTime());
+        List<Date> dateList = DateUtil.getRangeDate(recordReq.getStartTime(), DateUtil.plusDays(recordReq.getEndTime(), -1));
         List<DrawRecordSatsByDayResult> dayResults = new ArrayList<>();
         dateList.forEach(item -> {
             String date = cn.hutool.core.date.DateUtil.format(item, "yyyy-MM-dd");
-            DrawRecordSatsByDayResult dayResult = dayResultMap.get(item);
+            DrawRecordSatsByDayResult dayResult = dayResultMap.get(date);
             if (dayResult == null) {
                 dayResult = new DrawRecordSatsByDayResult();
                 dayResult.setDateTime(date);
