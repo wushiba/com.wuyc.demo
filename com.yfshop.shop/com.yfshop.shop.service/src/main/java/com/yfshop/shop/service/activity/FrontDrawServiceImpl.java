@@ -146,7 +146,7 @@ public class FrontDrawServiceImpl implements FrontDrawService {
         Asserts.assertCollectionNotEmpty(prizeList, 500, "活动暂未配置奖品，请稍微再试");
 
         // 一个用户只能抽奖一次
-        Long canDrawCount = redisService.incr("DAY_CAN_DRAW_COUNT", 0);
+        Long canDrawCount = redisService.incr("DAY_CAN_DRAW_COUNT", "2bfdd1cc48ac96a9".equals(actCode)?0:1);//测试码计数器用0
         logger.info("======缓存可抽奖次数" + canDrawCount);
         if (canDrawCount == null || canDrawCount <= 0) {
             canDrawCount = 1L;
@@ -170,6 +170,9 @@ public class FrontDrawServiceImpl implements FrontDrawService {
         result.setCouponTitle(thirdPrize.getPrizeTitle());
         result.setDrawPrizeIcon(thirdPrize.getPrizeIcon());
         String region = Ip2regionUtil.getRegionByIp(ipStr);
+        actCodeBatchDetail.setActTitle(yfDrawActivityResult.getActTitle());
+        actCodeBatchDetail.setIp(ipStr);
+        actCodeBatchDetail.setIpRegion(region);
         String location = "";
         Integer provinceId = null;
         if (StringUtils.isNotBlank(region)) {
@@ -182,7 +185,6 @@ public class FrontDrawServiceImpl implements FrontDrawService {
             }
             if (provinceId == null) {
                 logger.info("======抽奖用户userId=" + userId + ",actCode=" + actCode + ",抽奖结果=" + JSON.toJSONString(result));
-                actCodeBatchDetail.setActTitle(yfDrawActivityResult.getActTitle());
                 actCodeBatchDetail.setLocation(location);
                 frontUserCouponService.createUserCouponByPrize(userId, actCodeBatchDetail, thirdPrize);
                 return result;
@@ -210,7 +212,6 @@ public class FrontDrawServiceImpl implements FrontDrawService {
         result.setDrawPrizeIcon(drawPrize.getPrizeIcon());
 
         logger.info("======抽奖用户userId=" + userId + ",actCode=" + actCode + ",抽奖结果=" + JSON.toJSONString(result));
-        actCodeBatchDetail.setActTitle(yfDrawActivityResult.getActTitle());
         actCodeBatchDetail.setLocation(location);
         frontUserCouponService.createUserCouponByPrize(userId, actCodeBatchDetail, drawPrize);
         return result;

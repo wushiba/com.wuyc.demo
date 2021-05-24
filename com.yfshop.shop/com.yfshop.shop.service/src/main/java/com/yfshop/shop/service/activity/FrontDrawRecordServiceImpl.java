@@ -84,6 +84,8 @@ public class FrontDrawRecordServiceImpl implements FrontDrawRecordService {
         drawRecord.setTraceNo(actCodeBatchDetailResult.getTraceNo());
         drawRecord.setDealerName(actCodeBatchDetailResult.getDealerName());
         drawRecord.setDealerAddress(actCodeBatchDetailResult.getDealerAddress());
+        drawRecord.setIp(actCodeBatchDetailResult.getIp());
+        drawRecord.setIpRegion(actCodeBatchDetailResult.getIpRegion());
         drawRecordMapper.insert(drawRecord);
     }
 

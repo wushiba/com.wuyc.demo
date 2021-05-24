@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
  * </p>
  *
  * @author yoush
- * @since 2021-05-08
+ * @since 2021-05-24
  */
 @Service
 public class DrawRecordManagerImpl extends ServiceImpl<DrawRecordMapper, DrawRecord> implements DrawRecordManager {

@@ -15,7 +15,7 @@ import lombok.EqualsAndHashCode;
  * </p>
  *
  * @author yoush
- * @since 2021-05-08
+ * @since 2021-05-24
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -64,10 +64,6 @@ public class DrawRecord extends Model<DrawRecord> {
      */
     private Integer userId;
 
-
-    /**
-     * 用户姓名
-     */
     private String userName;
 
     /**
@@ -109,6 +105,10 @@ public class DrawRecord extends Model<DrawRecord> {
      * 经销商地址
      */
     private String dealerAddress;
+
+    private String ip;
+
+    private String ipRegion;
 
 
     @Override

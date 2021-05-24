@@ -11,7 +11,9 @@
         <result column="act_title" property="actTitle" />
         <result column="prize_level" property="prizeLevel" />
         <result column="prize_title" property="prizeTitle" />
+        <result column="user_coupon_id" property="userCouponId" />
         <result column="user_id" property="userId" />
+        <result column="user_name" property="userName" />
         <result column="user_mobile" property="userMobile" />
         <result column="user_location" property="userLocation" />
         <result column="use_status" property="useStatus" />
@@ -20,11 +22,13 @@
         <result column="trace_no" property="traceNo" />
         <result column="dealer_name" property="dealerName" />
         <result column="dealer_address" property="dealerAddress" />
+        <result column="ip" property="ip" />
+        <result column="ip_region" property="ipRegion" />
     </resultMap>
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        id, create_time, update_time, act_id, act_title, prize_level, prize_title, user_id, user_mobile, user_location, use_status, spec, act_code, trace_no, dealer_name, dealer_address
+        id, create_time, update_time, act_id, act_title, prize_level, prize_title, user_coupon_id, user_id, user_name, user_mobile, user_location, use_status, spec, act_code, trace_no, dealer_name, dealer_address, ip, ip_region
     </sql>
 
 </mapper>

@@ -9,7 +9,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
  * </p>
  *
  * @author yoush
- * @since 2021-05-08
+ * @since 2021-05-24
  */
 public interface DrawRecordManager extends IService<DrawRecord> {
 

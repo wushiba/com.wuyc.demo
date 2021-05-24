@@ -9,7 +9,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  * </p>
  *
  * @author yoush
- * @since 2021-05-08
+ * @since 2021-05-24
  */
 public interface DrawRecordMapper extends BaseMapper<DrawRecord> {
 

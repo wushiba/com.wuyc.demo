@@ -61,4 +61,8 @@ public class YfActCodeBatchDetailResult implements Serializable {
      */
     private String dealerAddress;
 
+    private String ip;
+
+    private String ipRegion;
+
 }
