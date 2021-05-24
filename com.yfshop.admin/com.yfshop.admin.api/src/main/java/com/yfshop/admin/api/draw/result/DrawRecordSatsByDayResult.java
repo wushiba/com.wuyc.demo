@@ -20,11 +20,8 @@ import java.util.Date;
 @EqualsAndHashCode(callSuper = false)
 public class DrawRecordSatsByDayResult implements Serializable {
 
-    /**
-     * 创建时间
-     */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", locale = "zh", timezone = "GMT+8")
-    private Date dateTime;
+
+    private String dateTime;
 
     private Integer drawCount = 0;
 

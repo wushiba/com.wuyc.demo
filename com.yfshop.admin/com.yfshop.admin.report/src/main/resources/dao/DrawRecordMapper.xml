@@ -3,7 +3,7 @@
 <mapper namespace="com.yfshop.admin.dao.DrawRecordDao">
 
     <select id="satsByDay" resultType="com.yfshop.admin.api.draw.result.DrawRecordSatsByDayResult">
-        select date(r.create_time) as date_time,count(1) as draw_count,sum(if(use_status='NO_USE',0,1)) as use_count
+        select DATE_FORMAT(r.create_time,'%Y-%m-%d') as date_time,count(1) as draw_count,sum(if(use_status='NO_USE',0,1)) as use_count
         from yf_draw_record r
         where 1=1
         <if test="req.startTime!=null">
