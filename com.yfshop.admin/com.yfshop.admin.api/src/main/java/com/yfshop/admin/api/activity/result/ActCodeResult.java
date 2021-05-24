@@ -1,8 +1,10 @@
 package com.yfshop.admin.api.activity.result;
 
+import cn.hutool.core.io.FileUtil;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -49,6 +51,8 @@ public class ActCodeResult implements Serializable {
      */
     private String actTitle;
 
+    private String fileSrcUrl;
+
     /**
      * 文件地址
      */
@@ -71,5 +75,19 @@ public class ActCodeResult implements Serializable {
     private Integer type;
 
     private String spec;
+
+
+    private String fileName;
+
+
+    public String getFileName() {
+        String fileName = "光明活动码";
+        if (StringUtils.isNotBlank(this.getFileSrcUrl())) {
+            fileName = fileName + FileUtil.getName(this.getFileSrcUrl());
+        } else {
+            fileName = fileName + getBatchNo() + "(内盒码" + getQuantity() / 10000f + "万个" + getSpec() + "ml).txt";
+        }
+        return fileName;
+    }
 
 }
