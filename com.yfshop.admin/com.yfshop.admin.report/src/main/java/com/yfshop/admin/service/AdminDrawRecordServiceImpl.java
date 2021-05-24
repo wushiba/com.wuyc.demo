@@ -65,7 +65,7 @@ public class AdminDrawRecordServiceImpl implements AdminDrawRecordService {
         List<DrawRecordSatsByDayResult> dayResults = new ArrayList<>();
         dateList.forEach(item -> {
             DrawRecordSatsByDayResult dayResult = dayResultMap.get(item);
-            if (dateList == null) {
+            if (dayResult == null) {
                 dayResult = new DrawRecordSatsByDayResult();
                 dayResult.setDateTime(item);
             }
