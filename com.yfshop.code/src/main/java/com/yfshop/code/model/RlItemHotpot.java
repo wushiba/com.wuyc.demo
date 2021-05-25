@@ -51,6 +51,8 @@ public class RlItemHotpot extends Model<RlItemHotpot> {
      */
     private String outSkuNo;
 
+    private String remark;
+
 
     @Override
     protected Serializable pkVal() {

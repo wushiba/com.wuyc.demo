@@ -177,6 +177,12 @@ public class OrderResult implements Serializable {
          */
         private BigDecimal price;
 
+
+        /**
+         * 货品备注
+         */
+        private String remark;
+
     }
 
 }

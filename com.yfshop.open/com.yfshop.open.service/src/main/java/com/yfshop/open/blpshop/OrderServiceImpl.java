@@ -107,6 +107,7 @@ public class OrderServiceImpl implements OrderService {
                         goodInfo.setTradeGoodsSpec(jsonFormatText(detail.getSpecNameValueJson()));
                         goodInfo.setGoodsCount(detail.getItemCount());
                         goodInfo.setPrice(detail.getItemPrice());
+                        goodInfo.setRemark(rlItemHotpot.getRemark());
                         goodInfos.add(goodInfo);
                     }
                     order.setGoodInfos(goodInfos);
