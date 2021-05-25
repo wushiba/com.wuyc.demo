@@ -59,5 +59,5 @@ public class CreateSourceFactoryReq implements Serializable {
     @CandidateValue(candidateValue = {"Y", "N"}, message = "是否可用值必须是Y|N")
     private String isEnable = "Y";
 
-    private Integer fType = 0;
+    private Integer fType;
 }

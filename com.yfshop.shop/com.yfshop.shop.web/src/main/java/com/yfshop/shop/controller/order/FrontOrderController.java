@@ -1,6 +1,7 @@
 package com.yfshop.shop.controller.order;
 
 import cn.dev33.satoken.annotation.SaCheckLogin;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.github.binarywang.wxpay.bean.order.WxPayMpOrderResult;
 import com.github.binarywang.wxpay.exception.WxPayException;
 import com.yfshop.common.api.CommonResult;
@@ -11,6 +12,7 @@ import com.yfshop.shop.service.cart.result.UserCartResult;
 import com.yfshop.shop.service.coupon.request.QueryUserCouponReq;
 import com.yfshop.shop.service.coupon.result.YfUserCouponResult;
 import com.yfshop.shop.service.coupon.service.FrontUserCouponService;
+import com.yfshop.shop.service.merchant.req.QueryMerchant;
 import com.yfshop.shop.service.merchant.result.MerchantResult;
 import com.yfshop.shop.service.merchant.service.FrontMerchantService;
 import com.yfshop.shop.service.order.result.YfUserOrderDetailResult;
@@ -59,10 +61,11 @@ public class FrontOrderController implements BaseController {
 
     /**
      * 查询附近的商户
-     * @param districtId    区id
-     * @param longitude     经度
-     * @param latitude      纬度
-     * @return  List<MerchantResult>
+     *
+     * @param districtId 区id
+     * @param longitude  经度
+     * @param latitude   纬度
+     * @return List<MerchantResult>
      */
     @RequestMapping(value = "/findNearMerchantList", method = {RequestMethod.GET, RequestMethod.POST})
     @ResponseBody
@@ -70,6 +73,21 @@ public class FrontOrderController implements BaseController {
     public CommonResult<List<MerchantResult>> findNearMerchantList(Integer districtId, Double longitude, Double latitude) {
         return CommonResult.success(frontMerchantService.findNearMerchantList(districtId, longitude, latitude));
     }
+
+
+    /**
+     * 查询附近的商户
+     *
+     * @return List<MerchantResult>
+     */
+    @RequestMapping(value = "/findMerchantList", method = {RequestMethod.GET, RequestMethod.POST})
+    @ResponseBody
+    @SaCheckLogin
+    public CommonResult<IPage<MerchantResult>> findMerchantList(QueryMerchant queryMerchant) {
+        queryMerchant.setIpStr(getRequestIpStr());
+        return CommonResult.success(frontMerchantService.findMerchantList(queryMerchant));
+    }
+
 
     @RequestMapping(value = "/coupon/findList", method = {RequestMethod.GET, RequestMethod.POST})
     @ResponseBody
@@ -80,9 +98,10 @@ public class FrontOrderController implements BaseController {
 
     /**
      * 订单结算页商品信息列表
-     * @param skuId     skuId
-     * @param num       商品数量
-     * @param cartIds   购物车ids
+     *
+     * @param skuId   skuId
+     * @param num     商品数量
+     * @param cartIds 购物车ids
      * @return
      */
     @RequestMapping(value = "/order/calc/findItemList", method = {RequestMethod.GET, RequestMethod.POST})
@@ -93,10 +112,11 @@ public class FrontOrderController implements BaseController {
 
     /**
      * 根据skuId提交订单
-     * @param skuId             skuId
-     * @param num               商品数量
-     * @param userCouponId      用户优惠券id
-     * @param addressId         地址id
+     *
+     * @param skuId        skuId
+     * @param num          商品数量
+     * @param userCouponId 用户优惠券id
+     * @param addressId    地址id
      * @return
      */
     @RequestMapping(value = "/order/submitOrderBySkuId", method = {RequestMethod.GET, RequestMethod.POST})
@@ -108,9 +128,10 @@ public class FrontOrderController implements BaseController {
 
     /**
      * 根据购物车提交订单
-     * @param cartIds           购物车ids
-     * @param userCouponId      用户优惠券id
-     * @param addressId         用户地址id
+     *
+     * @param cartIds      购物车ids
+     * @param userCouponId 用户优惠券id
+     * @param addressId    用户地址id
      * @return
      */
     @RequestMapping(value = "/order/submitOrderByCart", method = {RequestMethod.GET, RequestMethod.POST})
@@ -122,9 +143,10 @@ public class FrontOrderController implements BaseController {
 
     /**
      * 优惠券购买提交订单
-     * @param userCouponIds	用户优惠券ids
-     * @param userMobile	用户手机号
-     * @param websiteCode	商户网点码
+     *
+     * @param userCouponIds 用户优惠券ids
+     * @param userMobile    用户手机号
+     * @param websiteCode   商户网点码
      * @return
      * @throws ApiException
      */
@@ -137,8 +159,9 @@ public class FrontOrderController implements BaseController {
 
     /**
      * 查询用户订单列表
-     * @param   orderStatus   订单状态, 对应订单枚举 UserOrderStatusEnum
-     * @return  List<YfUserOrderListResult>
+     *
+     * @param orderStatus 订单状态, 对应订单枚举 UserOrderStatusEnum
+     * @return List<YfUserOrderListResult>
      */
     @RequestMapping(value = "/order/findList", method = {RequestMethod.GET, RequestMethod.POST})
     @ResponseBody
@@ -149,9 +172,10 @@ public class FrontOrderController implements BaseController {
 
     /**
      * 用户订单详情
-     * @param   orderId           订单id
-     * @param   orderDetailId     订单详情id
-     * @return  YfUserOrderDetailResult
+     *
+     * @param orderId       订单id
+     * @param orderDetailId 订单详情id
+     * @return YfUserOrderDetailResult
      */
     @RequestMapping(value = "/order/getOrderDetail", method = {RequestMethod.GET, RequestMethod.POST})
     @ResponseBody
@@ -162,8 +186,9 @@ public class FrontOrderController implements BaseController {
 
     /**
      * 用户撤销订单
-     * @param   orderId   订单id
-     * @return  Void
+     *
+     * @param orderId 订单id
+     * @return Void
      */
     @RequestMapping(value = "/order/cancelOrder", method = {RequestMethod.GET, RequestMethod.POST})
     @ResponseBody
@@ -174,8 +199,9 @@ public class FrontOrderController implements BaseController {
 
     /**
      * 用户确认订单
-     * @param   orderDetailId   订单详情id
-     * @return  Void
+     *
+     * @param orderDetailId 订单详情id
+     * @return Void
      */
     @RequestMapping(value = "/order/confirmOrder", method = {RequestMethod.GET, RequestMethod.POST})
     @ResponseBody
@@ -186,8 +212,9 @@ public class FrontOrderController implements BaseController {
 
     /**
      * 用户确认订单
-     * @param   orderId   订单id
-     * @return  WxPayMpOrderResult
+     *
+     * @param orderId 订单id
+     * @return WxPayMpOrderResult
      */
     @RequestMapping(value = "/order/toPay", method = {RequestMethod.GET, RequestMethod.POST})
     @ResponseBody
@@ -203,7 +230,6 @@ public class FrontOrderController implements BaseController {
     public CommonResult<Void> cancelPay(Long orderId) throws WxPayException {
         return CommonResult.success(frontUserOrderService.userOrderCancelPay(orderId));
     }
-
 
 
 }

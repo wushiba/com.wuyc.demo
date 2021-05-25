@@ -3,8 +3,10 @@ package com.yfshop.shop.service.merchant;
 import java.time.LocalDateTime;
 
 import com.alibaba.fastjson.JSON;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.yfshop.code.mapper.*;
 import com.yfshop.code.model.*;
 import com.yfshop.common.constants.CacheConstants;
@@ -14,8 +16,10 @@ import com.yfshop.common.exception.ApiException;
 import com.yfshop.common.exception.Asserts;
 import com.yfshop.common.service.RedisService;
 import com.yfshop.common.util.BeanUtil;
+import com.yfshop.shop.service.merchant.req.QueryMerchant;
 import com.yfshop.shop.service.merchant.result.MerchantResult;
 import com.yfshop.shop.service.merchant.service.FrontMerchantService;
+import com.yfshop.shop.utils.Ip2regionUtil;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,6 +64,9 @@ public class FrontMerchantServiceImpl implements FrontMerchantService {
 
     @Resource
     private WebsiteCodeDetailMapper websiteCodeDetailMapper;
+
+    @Resource
+    private RegionMapper regionMapper;
 
     /**
      * 根据当前位置查询附近门店
@@ -177,6 +184,31 @@ public class FrontMerchantServiceImpl implements FrontMerchantService {
             websiteBillMapper.insert(websiteBill);
         });
         return null;
+    }
+
+    @Override
+    public IPage<MerchantResult> findMerchantList(QueryMerchant queryMerchant) throws ApiException {
+        if (queryMerchant.getProvinceId() == null) {
+            try {
+                String city = Ip2regionUtil.getRegionByIp(queryMerchant.getIpStr()).split("|")[3];
+                Region region = regionMapper.selectOne(Wrappers.lambdaQuery(Region.class).eq(Region::getType, 2)
+                        .like(Region::getName, city));
+                if (region != null) {
+                    queryMerchant.setCityId(region.getId());
+                }
+            } catch (Exception e) {
+
+            }
+        }
+        Page<Merchant> page=merchantMapper.selectPage(new Page<>(queryMerchant.getPageIndex(), queryMerchant.getPageSize()),
+                Wrappers.lambdaQuery(Merchant.class)
+                        .eq(Merchant::getRoleAlias, "wd")
+                        .eq(Merchant::getIsEnable, "Y")
+                        .eq(Merchant::getIsDelete, "N")
+                        .eq(queryMerchant.getProvinceId() != null, Merchant::getProvinceId, queryMerchant.getProvinceId())
+                        .eq(queryMerchant.getCityId() != null, Merchant::getCity, queryMerchant.getCityId())
+                        .eq(queryMerchant.getDistrictId() != null, Merchant::getDistrictId, queryMerchant.getDistrictId()));
+        return BeanUtil.iPageConvert(page,MerchantResult.class);
     }
 
 
