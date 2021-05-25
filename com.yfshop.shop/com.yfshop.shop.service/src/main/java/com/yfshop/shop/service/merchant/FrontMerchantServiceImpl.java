@@ -206,7 +206,7 @@ public class FrontMerchantServiceImpl implements FrontMerchantService {
                         .eq(Merchant::getIsEnable, "Y")
                         .eq(Merchant::getIsDelete, "N")
                         .eq(queryMerchant.getProvinceId() != null, Merchant::getProvinceId, queryMerchant.getProvinceId())
-                        .eq(queryMerchant.getCityId() != null, Merchant::getCity, queryMerchant.getCityId())
+                        .eq(queryMerchant.getCityId() != null, Merchant::getCityId, queryMerchant.getCityId())
                         .eq(queryMerchant.getDistrictId() != null, Merchant::getDistrictId, queryMerchant.getDistrictId()));
         return BeanUtil.iPageConvert(page,MerchantResult.class);
     }
