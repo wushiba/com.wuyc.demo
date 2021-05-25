@@ -1,6 +1,5 @@
 package com.yfshop.admin.service.merchant;
 
-import cn.hutool.Hutool;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.lang.PatternPool;
 import cn.hutool.core.lang.Validator;
@@ -23,6 +22,7 @@ import com.yfshop.admin.api.merchant.request.MerchantReq;
 import com.yfshop.admin.api.merchant.request.QueryGoodsRecordReq;
 import com.yfshop.admin.api.merchant.result.GoodsRecordResult;
 import com.yfshop.admin.api.merchant.result.MerchantGroupResult;
+import com.yfshop.admin.api.merchant.result.MerchantMyselfResult;
 import com.yfshop.admin.api.merchant.result.MerchantResult;
 import com.yfshop.admin.api.website.WebsiteCodeTaskService;
 import com.yfshop.admin.api.website.request.WebsiteCodeAddressReq;
@@ -49,7 +49,6 @@ import com.yfshop.common.service.RedisService;
 import com.yfshop.common.util.AddressUtil;
 import com.yfshop.common.util.BeanUtil;
 import com.yfshop.common.util.GeoUtils;
-import com.yfshop.wx.api.request.WxPayOrderNotifyReq;
 import com.yfshop.wx.api.service.MpPayService;
 import com.yfshop.wx.api.service.MpService;
 import me.chanjar.weixin.mp.bean.template.WxMpTemplateData;
@@ -76,6 +75,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -618,15 +618,16 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
         List<Merchant> merchantList = merchantMapper.selectList(lambdaQueryWrapper);
         List<MerchantGroupResult> merchantGroupResults = new ArrayList<>();
         if (myselfCount > 0) {
+            MerchantMyselfResult myselfResult=getMyselfWebsite(merchant.getId(),merchantGroupReq.getStartTime(), merchantGroupReq.getEndTime());
             MerchantGroupResult myself = new MerchantGroupResult();
             myself.setHaveWebsite(true);
             myself.setMerchantId(merchant.getId());
             myself.setMerchantName(merchant.getMerchantName());
             myself.setContacts(merchant.getContacts());
-            myself.setCurrentExchange(getCurrentExchange(merchant.getId(), merchantGroupReq.getStartTime(), merchantGroupReq.getEndTime()));
-            myself.setTotalExchange(getCurrentExchange(merchant.getId(), null, null));
-            myself.setCurrentGoodsRecord(websiteGoodsRecordDao.sumCurrentGoodsRecord(merchant.getId(), merchantGroupReq.getStartTime(), merchantGroupReq.getEndTime()));
-            myself.setCount(getWebsiteCount(merchantGroupReq.getMerchantId()));
+            myself.setCurrentExchange(myselfResult.getCurrentExchange());
+            myself.setTotalExchange(myselfResult.getTotalExchange());
+            myself.setCurrentGoodsRecord(myselfResult.getCurrentGoodsRecord());
+            myself.setCount(myselfResult.getCount());
             merchantGroupResults.add(myself);
         }
         merchantList.forEach(item -> {
@@ -921,19 +922,36 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
     }
 
 
-    public Integer getWebsiteCount(Integer merchantId) {
-        AtomicInteger count = new AtomicInteger();
+    public MerchantMyselfResult getMyselfWebsite(Integer merchantId, Date stareTime, Date endTime) {
+        MerchantMyselfResult myselfResult = new MerchantMyselfResult();
+        AtomicReference<Integer> count= new AtomicReference<>(0);
+        AtomicReference<Integer> currentExchange = new AtomicReference<>(0);
+        AtomicReference<Integer> totalExchange = new AtomicReference<>(0);
+        AtomicReference<Integer> currentGoodsRecord = new AtomicReference<>(0);
         LambdaQueryWrapper lambdaQueryWrapper = Wrappers.<Merchant>lambdaQuery()
                 .eq(Merchant::getPid, merchantId)
                 .eq(Merchant::getRoleAlias, "wd")
                 .eq(Merchant::getIsEnable, "Y")
                 .eq(Merchant::getIsDelete, "N");
         List<Merchant> merchantList = merchantMapper.selectList(lambdaQueryWrapper);
-        count.addAndGet(getWebsiteCodeBindCount(merchantId));
+        /**
+         * 判断自己有没有绑定网点码，如果有将自己插入到第一个
+         */
+        if (getWebsiteCodeBindCount(merchantId) > 0) {
+            Merchant merchant = merchantMapper.selectById(merchantId);
+            merchantList.add(0, merchant);
+        }
         merchantList.forEach(item -> {
-            count.addAndGet(getCurrentWebsiteCodeCount(item.getId(), merchantId));
+            count.updateAndGet(v -> v + getWebsiteCodeBindCount(item.getId()));
+            currentExchange.updateAndGet(v -> v + getCurrentExchangeByPid(item.getId(), stareTime, endTime));
+            totalExchange.updateAndGet(v -> v + getCurrentExchangeByPid(item.getId(), null, null));
+            currentGoodsRecord.updateAndGet(v -> v + websiteGoodsRecordDao.sumGoodsRecordByMerchantId(item.getId(), stareTime, endTime));
         });
-        return count.get();
+        myselfResult.setCurrentExchange(currentExchange.get());
+        myselfResult.setTotalExchange(totalExchange.get());
+        myselfResult.setCurrentGoodsRecord(currentGoodsRecord.get());
+        myselfResult.setCount(count.get());
+        return myselfResult;
     }
 
     private Integer getCurrentWebsiteCodeCount(Integer merchantId, Date startTime, Date endTime) {

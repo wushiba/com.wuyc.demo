@@ -216,7 +216,7 @@ public class UserCartServiceImpl implements UserCartService {
         QueryUserCouponReq userCouponReq = new QueryUserCouponReq();
         userCouponReq.setUserId(userId);
         userCouponReq.setIsCanUse("Y");
-        List<YfUserCouponResult> availableCoupons = frontUserCouponService.findUserCouponList(userCouponReq);
+       // List<YfUserCouponResult> availableCoupons = frontUserCouponService.findUserCouponList(userCouponReq);
 
         // 封装数据
         UserCartSummary cartSummary = new UserCartSummary();

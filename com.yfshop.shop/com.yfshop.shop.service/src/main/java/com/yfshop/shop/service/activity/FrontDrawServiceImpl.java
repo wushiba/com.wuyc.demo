@@ -146,7 +146,7 @@ public class FrontDrawServiceImpl implements FrontDrawService {
         Asserts.assertCollectionNotEmpty(prizeList, 500, "活动暂未配置奖品，请稍微再试");
 
         // 一个用户只能抽奖一次
-        Long canDrawCount = redisService.incr("DAY_CAN_DRAW_COUNT", "2bfdd1cc48ac96a9".equals(actCode)?0:1);//测试码计数器用0
+        Long canDrawCount = redisService.incr("DAY_CAN_DRAW_COUNT", "2bfdd1cc48ac96a9".equals(actCode) ? 0 : 1);//测试码计数器用0
         logger.info("======缓存可抽奖次数" + canDrawCount);
         if (canDrawCount == null || canDrawCount <= 0) {
             canDrawCount = 1L;
