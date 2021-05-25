@@ -626,7 +626,7 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
             myself.setCurrentExchange(getCurrentExchange(merchant.getId(), merchantGroupReq.getStartTime(), merchantGroupReq.getEndTime()));
             myself.setTotalExchange(getCurrentExchange(merchant.getId(), null, null));
             myself.setCurrentGoodsRecord(websiteGoodsRecordDao.sumCurrentGoodsRecord(merchant.getId(), merchantGroupReq.getStartTime(), merchantGroupReq.getEndTime()));
-            myself.setCount(count);
+            myself.setCount(getWebsiteCount(merchantGroupReq.getMerchantId()));
             merchantGroupResults.add(myself);
         }
         merchantList.forEach(item -> {
@@ -918,6 +918,22 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
             merchant.setUpdateTime(LocalDateTime.now());
             merchantMapper.updateById(merchant);
         }
+    }
+
+
+    public Integer getWebsiteCount(Integer merchantId) {
+        AtomicInteger count = new AtomicInteger();
+        LambdaQueryWrapper lambdaQueryWrapper = Wrappers.<Merchant>lambdaQuery()
+                .eq(Merchant::getPid, merchantId)
+                .eq(Merchant::getRoleAlias, "wd")
+                .eq(Merchant::getIsEnable, "Y")
+                .eq(Merchant::getIsDelete, "N");
+        List<Merchant> merchantList = merchantMapper.selectList(lambdaQueryWrapper);
+        count.addAndGet(getWebsiteCodeBindCount(merchantId));
+        merchantList.forEach(item -> {
+            count.addAndGet(getCurrentWebsiteCodeCount(item.getId(), merchantId));
+        });
+        return count.get();
     }
 
     private Integer getCurrentWebsiteCodeCount(Integer merchantId, Date startTime, Date endTime) {
