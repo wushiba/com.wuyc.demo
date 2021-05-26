@@ -327,6 +327,7 @@ class MerchantInfoController extends AbstractBaseController {
         websiteCodePayReq.setOpenId(getCurrentOpenId());
         websiteCodePayReq.setUserId(getRequestIpStr());
         websiteCodePayReq.setMerchantId(getCurrentAdminUserId());
+        websiteCodePayReq.setIp(getRequestIpStr());
         WxPayMpOrderResult wxPayMpOrderResult = merchantInfoService.applyWebsiteCodePay(websiteCodePayReq);
         return CommonResult.success(wxPayMpOrderResult);
     }

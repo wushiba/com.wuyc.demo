@@ -54,6 +54,8 @@ public class HealthyOrder extends Model<HealthyOrder> {
      */
     private Integer itemCount;
 
+    private Integer itemSpec;
+
     /**
      * 用户id
      */
@@ -135,6 +137,10 @@ public class HealthyOrder extends Model<HealthyOrder> {
      */
     private String contracts;
 
+    /**
+     * 配送规则
+     */
+    private String postRule;
 
     @Override
     protected Serializable pkVal() {

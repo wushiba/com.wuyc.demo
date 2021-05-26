@@ -513,7 +513,7 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
         }
         orderRequest.setOpenid(websiteCodePayReq.getOpenId());
         orderRequest.setTradeType("JSAPI");
-        orderRequest.setSpbillCreateIp(websiteCodePayReq.getUserId());
+        orderRequest.setSpbillCreateIp(websiteCodePayReq.getIp());
         orderRequest.setTimeStart(DateFormatUtils.format(new Date(), "yyyyMMddHHmmss"));
         orderRequest.setTimeExpire(DateFormatUtils.format(new Date(System.currentTimeMillis() + (1000 * 60 * 15)), "yyyyMMddHHmmss"));
         try {

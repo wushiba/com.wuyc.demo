@@ -1,13 +1,14 @@
 package com.yfshop.code.model;
 
-import java.math.BigDecimal;
 import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.extension.activerecord.Model;
 import com.baomidou.mybatisplus.annotation.TableId;
-import java.time.LocalDateTime;
-import java.io.Serializable;
+import com.baomidou.mybatisplus.extension.activerecord.Model;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+
+import java.io.Serializable;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 /**
  * <p>
@@ -78,15 +79,22 @@ public class HealthyItem extends Model<HealthyItem> {
     private String isDelete;
 
     /**
-     * 商品规格数量(颜色,尺寸)
-     */
-    private Integer specNum;
-
-    /**
      * 排序字段
      */
     private Integer sort;
 
+    /**
+     * 商品中瓶数
+     */
+    private Integer spec;
+
+    /**
+     * 配送规则
+     * 周期-每次配送数量
+     * W表示每周
+     * M表示每月
+     */
+    private String postRule;
 
     @Override
     protected Serializable pkVal() {

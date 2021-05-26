@@ -14,4 +14,5 @@ public class WebsiteCodePayReq implements Serializable {
     private String openId;
     private List<Integer> ids;
     private Integer addressId;
+    private String ip;
 }
