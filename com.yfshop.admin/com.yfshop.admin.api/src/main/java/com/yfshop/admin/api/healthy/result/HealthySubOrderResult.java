@@ -1,28 +1,18 @@
-package com.yfshop.code.model;
+package com.yfshop.admin.api.healthy.result;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.extension.activerecord.Model;
-import com.baomidou.mybatisplus.annotation.TableId;
-import java.time.LocalDateTime;
-import java.io.Serializable;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import io.swagger.annotations.ApiModel;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 
-/**
- * <p>
- * 
- * </p>
- *
- * @author yoush
- * @since 2021-05-26
- */
+import java.io.Serializable;
+import java.time.LocalDateTime;
+
+@ApiModel
 @Data
-@EqualsAndHashCode(callSuper = false)
-public class HealthySubOrder extends Model<HealthySubOrder> {
+public class HealthySubOrderResult implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @TableId(value = "id", type = IdType.AUTO)
     private Long id;
 
     private LocalDateTime createTime;
@@ -44,6 +34,7 @@ public class HealthySubOrder extends Model<HealthySubOrder> {
     private String pOrderNo;
 
     private String orderNo;
+
     /**
      * 指派商户
      */
@@ -62,11 +53,13 @@ public class HealthySubOrder extends Model<HealthySubOrder> {
     /**
      * 订单确认收货时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", locale = "zh", timezone = "GMT+8")
     private LocalDateTime confirmTime;
 
     /**
      * 订单发货时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", locale = "zh", timezone = "GMT+8")
     private LocalDateTime shipTime;
 
     /**
@@ -115,10 +108,5 @@ public class HealthySubOrder extends Model<HealthySubOrder> {
      */
     private String contracts;
 
-
-    @Override
-    protected Serializable pkVal() {
-        return this.id;
-    }
 
 }
