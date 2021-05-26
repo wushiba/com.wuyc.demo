@@ -1,9 +1,8 @@
 ---
 logging:
   level:
-    org.springframework.web: debug
-    com.yfshop.code.mapper: debug
-    com.yfshop: debug
+    com.yfshop.code.mapper: INFO
+    com.yfshop: INFO
 server:
   port: 9093
 spring:

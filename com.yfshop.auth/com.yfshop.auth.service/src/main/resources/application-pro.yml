@@ -3,7 +3,7 @@ server:
   port: 9999
 logging:
   level:
-    com.yfshop: debug
+    com.yfshop: INFO
 
 dubbo:
   registry:
