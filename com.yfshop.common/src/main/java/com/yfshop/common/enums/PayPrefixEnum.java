@@ -9,7 +9,9 @@ public enum PayPrefixEnum {
 
     WEBSITE_CODE("websiteCode-", "websiteCode", "网点码支付前缀"),
 
-    USER_ORDER("userOrder-", "userOrder", "用户订单支付前缀");
+    USER_ORDER("userOrder-", "userOrder", "用户订单支付前缀"),
+
+    HEALTHY_ORDER("healthyOrder-", "healthyOrder", "健康订单支付前缀");
 
     private final String prefix;
 

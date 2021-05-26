@@ -29,17 +29,26 @@ public class MpPayNotifyServiceImpl implements MpPayNotifyService {
     @Override
     @Async
     public void payOrderNotify(String bizType, WxPayOrderNotifyReq notifyResult) {
-        PayPrefixEnum byBizType = PayPrefixEnum.getByBizType(bizType);
-        switch (byBizType) {
-            case WEBSITE_CODE:
-                merchantInfoService.websitePayOrderNotify(notifyResult.getTransactionId(),notifyResult.getOutTradeNo());
-                break;
-            case USER_ORDER:
-                String outTradeNo = notifyResult.getOutTradeNo();
-                String billNo = notifyResult.getTransactionId();
-                String[] split = outTradeNo.split("-");
-                adminUserOrderService.updateOrderPayStatus(Long.valueOf(split[1]), billNo);
-                break;
+        try {
+            PayPrefixEnum byBizType = PayPrefixEnum.getByBizType(bizType);
+            switch (byBizType) {
+                case WEBSITE_CODE:
+                    merchantInfoService.websitePayOrderNotify(notifyResult.getTransactionId(),notifyResult.getOutTradeNo());
+                    break;
+                case USER_ORDER:
+                    String outTradeNo = notifyResult.getOutTradeNo();
+                    String billNo = notifyResult.getTransactionId();
+                    String[] split = outTradeNo.split("-");
+                    adminUserOrderService.updateOrderPayStatus(Long.valueOf(split[1]), billNo);
+                    break;
+                case HEALTHY_ORDER:
+                    // TODO 2021/5/26 ......
+                    break;
+                default:
+                    throw new IllegalStateException("Unexpected byBizType value: " + byBizType);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         savePayOrderNotify(bizType, notifyResult);
     }
