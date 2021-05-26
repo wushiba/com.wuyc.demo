@@ -208,7 +208,8 @@ public class HealthyServiceImpl implements HealthyService {
                 subOrder.setPostWay(null);
                 subOrder.setOrderStatus("gkjgjkgjhghjghjgjy");
                 subOrder.setConfirmTime(null);
-                subOrder.setShipTime(LocalDateTime.ofInstant(postDateTime.toInstant(), ZoneId.systemDefault()));
+                subOrder.setExpectShipTime(LocalDateTime.ofInstant(postDateTime.toInstant(), ZoneId.systemDefault()));
+                subOrder.setShipTime(null);
                 subOrder.setExpressCompany(null);
                 subOrder.setExpressNo(null);
                 subOrder.setProvince(healthyOrder.getProvince());

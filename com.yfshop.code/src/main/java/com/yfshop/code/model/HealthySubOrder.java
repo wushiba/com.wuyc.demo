@@ -70,6 +70,11 @@ public class HealthySubOrder extends Model<HealthySubOrder> {
     private LocalDateTime shipTime;
 
     /**
+     * 预计发货时间
+     */
+    private LocalDateTime expectShipTime;
+
+    /**
      * 快递公司名称
      */
     private String expressCompany;
