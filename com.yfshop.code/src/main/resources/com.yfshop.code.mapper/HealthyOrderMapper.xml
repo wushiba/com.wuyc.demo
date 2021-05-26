@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yfshop.code.mapper.HealthyOrderMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.yfshop.code.model.HealthyOrder">
+        <id column="id" property="id" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+        <result column="order_no" property="orderNo" />
+        <result column="item_id" property="itemId" />
+        <result column="item_title" property="itemTitle" />
+        <result column="item_price" property="itemPrice" />
+        <result column="item_cover" property="itemCover" />
+        <result column="item_count" property="itemCount" />
+        <result column="user_id" property="userId" />
+        <result column="child_order_count" property="childOrderCount" />
+        <result column="order_price" property="orderPrice" />
+        <result column="freight" property="freight" />
+        <result column="pay_price" property="payPrice" />
+        <result column="order_status" property="orderStatus" />
+        <result column="bill_no" property="billNo" />
+        <result column="pay_time" property="payTime" />
+        <result column="cancel_time" property="cancelTime" />
+        <result column="province" property="province" />
+        <result column="city" property="city" />
+        <result column="district" property="district" />
+        <result column="province_id" property="provinceId" />
+        <result column="city_id" property="cityId" />
+        <result column="district_id" property="districtId" />
+        <result column="address" property="address" />
+        <result column="mobile" property="mobile" />
+        <result column="contracts" property="contracts" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, create_time, update_time, order_no, item_id, item_title, item_price, item_cover, item_count, user_id, child_order_count, order_price, freight, pay_price, order_status, bill_no, pay_time, cancel_time, province, city, district, province_id, city_id, district_id, address, mobile, contracts
+    </sql>
+
+</mapper>
