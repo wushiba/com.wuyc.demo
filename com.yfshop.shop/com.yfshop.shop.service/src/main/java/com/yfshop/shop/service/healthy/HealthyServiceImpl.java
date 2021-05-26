@@ -1,6 +1,7 @@
 package com.yfshop.shop.service.healthy;
 
 import cn.hutool.core.date.DateTime;
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -26,6 +27,7 @@ import com.yfshop.shop.service.healthy.req.SubmitHealthyOrderReq;
 import com.yfshop.wx.api.service.MpPayService;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.DateUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.slf4j.Logger;
@@ -39,8 +41,12 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author Xulg
@@ -86,7 +92,7 @@ public class HealthyServiceImpl implements HealthyService {
         BigDecimal orderPrice = new BigDecimal(buyCount).multiply(healthyItem.getItemPrice());
         BigDecimal payPrice = orderPrice.add(BigDecimal.ZERO);
         BigDecimal freight = BigDecimal.ZERO;
-        String orderNo = this.generateOrderNo(userId);
+        String orderNo = generateOrderNo(userId);
 
         // create pay order
         HealthyOrder healthyOrder = new HealthyOrder();
@@ -101,7 +107,7 @@ public class HealthyServiceImpl implements HealthyService {
         healthyOrder.setItemSpec(healthyItem.getSpec());
         healthyOrder.setPostRule(null);
         healthyOrder.setUserId(user.getId());
-        healthyOrder.setChildOrderCount(0);
+        healthyOrder.setChildOrderCount(healthyItem.getSpec() / Integer.parseInt(StringUtils.split(healthyItem.getPostRule(), "-")[1]));
         healthyOrder.setOrderPrice(orderPrice);
         healthyOrder.setPayPrice(payPrice);
         healthyOrder.setFreight(freight);
@@ -159,9 +165,63 @@ public class HealthyServiceImpl implements HealthyService {
         if (rows > 0) {
             // create sub order
             String[] postRule = StringUtils.split(healthyOrder.getPostRule(), "-");
-            String period = postRule[0], count = postRule[1];
-            
-            HealthySubOrder subOrder = new HealthySubOrder();
+            int count = Integer.parseInt(postRule[1]);
+
+            // 今日11点时刻
+            LocalDateTime today11Clock = LocalDateTime.of(LocalDate.now().getYear(), LocalDate.now().getMonth(),
+                    LocalDate.now().getDayOfMonth(), 11, 0, 0, 0);
+
+            // 第一次配送时间
+            Date firstPostTime;
+            if (bean.getPayTime().isAfter(today11Clock)) {
+                // 第3天开始
+                firstPostTime = DateUtil.parse(DateTime.of(DateUtils.addDays(new Date(), 2)).toDateStr());
+            } else {
+                // 第2天开始
+                firstPostTime = DateUtil.parse(DateTime.of(DateUtils.addDays(new Date(), 1)).toDateStr());
+            }
+
+            // 配送时间列表
+            List<Date> postDateTimes = new ArrayList<>();
+            postDateTimes.add(firstPostTime);
+            Date temp = firstPostTime;
+            for (int time = 1, total = healthyOrder.getItemSpec() / count; time < total; time++) {
+                if ("W".equals(postRule[0])) {
+                    temp = DateUtils.addWeeks(temp, 1);
+                    postDateTimes.add(temp);
+                } else if ("M".equals(postRule[0])) {
+                    temp = DateUtils.addMonths(temp, 1);
+                    postDateTimes.add(temp);
+                }
+            }
+            for (int i = 0; i < postDateTimes.size(); i++) {
+                Date postDateTime = postDateTimes.get(i);
+                HealthySubOrder subOrder = new HealthySubOrder();
+                subOrder.setCreateTime(LocalDateTime.now());
+                subOrder.setUpdateTime(LocalDateTime.now());
+                subOrder.setUserId(healthyOrder.getUserId());
+                subOrder.setUserName(null);
+                subOrder.setPOrderId(healthyOrder.getId());
+                subOrder.setPOrderNo(healthyOrder.getOrderNo());
+                subOrder.setOrderNo(healthyOrder.getOrderNo() + i);
+                subOrder.setMerchantId(null);
+                subOrder.setPostWay(null);
+                subOrder.setOrderStatus("gkjgjkgjhghjghjgjy");
+                subOrder.setConfirmTime(null);
+                subOrder.setShipTime(LocalDateTime.ofInstant(postDateTime.toInstant(), ZoneId.systemDefault()));
+                subOrder.setExpressCompany(null);
+                subOrder.setExpressNo(null);
+                subOrder.setProvince(healthyOrder.getProvince());
+                subOrder.setCity(healthyOrder.getCity());
+                subOrder.setDistrict(healthyOrder.getDistrict());
+                subOrder.setProvinceId(healthyOrder.getProvinceId());
+                subOrder.setCityId(healthyOrder.getCityId());
+                subOrder.setDistrictId(healthyOrder.getDistrictId());
+                subOrder.setAddress(healthyOrder.getAddress());
+                subOrder.setMobile(healthyOrder.getMobile());
+                subOrder.setContracts(healthyOrder.getContracts());
+                subOrderMapper.insert(subOrder);
+            }
         }
         return null;
     }
