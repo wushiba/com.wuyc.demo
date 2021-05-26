@@ -3,10 +3,10 @@ server:
   port: 9097
 logging:
   level:
-    com.yfshop.code.mapper: debug
-    com.yfshop: debug
-    me.chanjar.weixin: DEBUG
-    com.github.binarywang.wxpay: DEBUG
+    com.yfshop.code.mapper: INFO
+    com.yfshop: INFO
+    me.chanjar.weixin: INFO
+    com.github.binarywang.wxpay: INFO
 spring:
   datasource:
     connectionProperties: druid.stat.mergeSql=true;druid.stat.slowSqlMillis=5000
