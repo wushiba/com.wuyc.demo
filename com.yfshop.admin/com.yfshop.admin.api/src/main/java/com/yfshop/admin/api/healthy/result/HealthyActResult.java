@@ -1,13 +1,9 @@
-package com.yfshop.admin.api.healthy.request;
+package com.yfshop.admin.api.healthy.result;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.extension.activerecord.Model;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
 
 /**
  * <p>
@@ -19,8 +15,7 @@ import java.time.LocalDateTime;
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class HealthyActReq implements Serializable {
-
+public class HealthyActResult implements Serializable {
 
     private Integer id;
 
@@ -45,9 +40,5 @@ public class HealthyActReq implements Serializable {
     private Integer sort;
 
     private String isEnable;
-
-    private Integer pageIndex = 1;
-
-    private Integer pageSize = 10;
 
 }

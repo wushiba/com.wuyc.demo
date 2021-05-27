@@ -8,18 +8,12 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.yfshop.admin.api.healthy.AdminHealthyService;
 import com.yfshop.admin.api.healthy.request.HealthyActReq;
+import com.yfshop.admin.api.healthy.request.HealthyItemReq;
 import com.yfshop.admin.api.healthy.request.QueryHealthyOrderReq;
 import com.yfshop.admin.api.healthy.request.QueryHealthySubOrderReq;
-import com.yfshop.admin.api.healthy.result.HealthyOrderDetailResult;
-import com.yfshop.admin.api.healthy.result.HealthyOrderResult;
-import com.yfshop.admin.api.healthy.result.HealthySubOrderResult;
-import com.yfshop.code.mapper.HealthyActMapper;
-import com.yfshop.code.mapper.HealthyItemImageMapper;
-import com.yfshop.code.mapper.HealthyOrderMapper;
-import com.yfshop.code.mapper.HealthySubOrderMapper;
-import com.yfshop.code.model.HealthyItemImage;
-import com.yfshop.code.model.HealthyOrder;
-import com.yfshop.code.model.HealthySubOrder;
+import com.yfshop.admin.api.healthy.result.*;
+import com.yfshop.code.mapper.*;
+import com.yfshop.code.model.*;
 import com.yfshop.common.exception.ApiException;
 import com.yfshop.common.exception.Asserts;
 import com.yfshop.common.healthy.enums.HealthyOrderStatusEnum;
@@ -45,10 +39,13 @@ public class AdminHealthyServiceImpl implements AdminHealthyService {
     private HealthySubOrderMapper healthySubOrderMapper;
 
     @Resource
-    private HealthyActMapper healthyActImageMapper;
+    private HealthyActMapper healthyActMapper;
 
     @Resource
     private HealthyItemImageMapper healthyItemImageMapper;
+
+    @Resource
+    private HealthyItemMapper healthyItemMapper;
 
     @Override
     public IPage<HealthyOrderResult> findOrderList(QueryHealthyOrderReq req) {
@@ -91,13 +88,48 @@ public class AdminHealthyServiceImpl implements AdminHealthyService {
     }
 
 
-
-   @Override
+    @Override
     public Void addAct(HealthyActReq req) {
-        HealthyItemImage healthyItemImage = BeanUtil.convert(req, HealthyItemImage.class);
-        healthyItemImageMapper.insert(healthyItemImage);
+        HealthyAct healthyAct = BeanUtil.convert(req, HealthyAct.class);
+        healthyActMapper.insert(healthyAct);
         return null;
     }
+
+    @Override
+    public IPage<HealthyActResult> getActList(HealthyActReq req) {
+        IPage<HealthyAct> healthyActIPage = healthyActMapper.selectPage(new Page<>(req.getPageIndex(), req.getPageSize()), Wrappers.lambdaQuery());
+        return BeanUtil.iPageConvert(healthyActIPage, HealthyActResult.class);
+    }
+
+    @Override
+    public Void updateAct(HealthyActReq req) {
+        HealthyAct healthyAct = BeanUtil.convert(req, HealthyAct.class);
+        healthyActMapper.updateById(healthyAct);
+        return null;
+    }
+
+    @Override
+    public Void addItem(HealthyItemReq req) {
+        HealthyItem healthyItem = BeanUtil.convert(req, HealthyItem.class);
+        healthyItemMapper.insert(healthyItem);
+        return null;
+    }
+
+    @Override
+    public IPage<HealthyItemResult> getItemList(HealthyItemReq req) {
+        IPage<HealthyItem> healthyItemIPage = healthyItemMapper.selectPage(new Page<>(req.getPageIndex(), req.getPageSize()), Wrappers.lambdaQuery(HealthyItem.class)
+                .eq(req.getId() != null, HealthyItem::getId, req.getId())
+                .eq(StringUtils.isNotBlank(req.getItemTitle()), HealthyItem::getItemTitle, req.getItemTitle()));
+        return BeanUtil.iPageConvert(healthyItemIPage, HealthyItemResult.class);
+    }
+
+    @Override
+    public Void updateItem(HealthyItemReq req) {
+        HealthyItem healthyItem = BeanUtil.convert(req, HealthyItem.class);
+        healthyItemMapper.updateById(healthyItem);
+        return null;
+    }
+
     @Transactional(rollbackFor = Exception.class)
     @Override
     public Void notifyByWechatPay(String orderNo, String wechatBillNo) throws ApiException {
