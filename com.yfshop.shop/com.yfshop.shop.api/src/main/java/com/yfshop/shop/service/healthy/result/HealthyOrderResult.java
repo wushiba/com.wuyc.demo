@@ -1,10 +1,6 @@
-package com.yfshop.code.model;
+package com.yfshop.shop.service.healthy.result;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.extension.activerecord.Model;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -19,12 +15,9 @@ import java.time.LocalDateTime;
  * @since 2021-05-26
  */
 @Data
-@EqualsAndHashCode(callSuper = false)
-public class HealthyOrder extends Model<HealthyOrder> {
-
+public class HealthyOrderResult implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    @TableId(value = "id", type = IdType.AUTO)
     private Long id;
 
     private LocalDateTime createTime;
@@ -147,10 +140,4 @@ public class HealthyOrder extends Model<HealthyOrder> {
      * 配送规则
      */
     private String postRule;
-
-    @Override
-    protected Serializable pkVal() {
-        return this.id;
-    }
-
 }

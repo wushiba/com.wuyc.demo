@@ -97,9 +97,13 @@ public class HealthyItem extends Model<HealthyItem> {
      */
     private String postRule;
 
+    /**
+     * 商品描述：口味，尺寸......
+     */
+    private String itemDesc;
+
     @Override
     protected Serializable pkVal() {
         return this.id;
     }
-
 }
