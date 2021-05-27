@@ -1,6 +1,5 @@
 package com.yfshop.shop.service.healthy;
 
-import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.extra.spring.SpringUtil;
@@ -194,8 +193,7 @@ public class HealthyServiceImpl implements HealthyService {
         return list;
     }
 
-    @Cacheable(cacheManager = CacheConstants.CACHE_MANAGE_NAME,
-            cacheNames = CacheConstants.HEALTHY_CACHE_NAME,
+    @Cacheable(cacheManager = CacheConstants.CACHE_MANAGE_NAME, cacheNames = CacheConstants.HEALTHY_CACHE_NAME,
             key = "'" + CacheConstants.HEALTHY_ITEM_DETAIL_KEY_PREFIX + "' + #root.args[0]")
     @Override
     public HealthyItemResult findHealthyItemDetail(Integer itemId) {
@@ -206,17 +204,14 @@ public class HealthyServiceImpl implements HealthyService {
         if (healthyItem == null) {
             return null;
         }
-        HealthyItemContent healthyItemContent = healthyItemContentMapper.selectList(Wrappers.lambdaQuery(HealthyItemContent.class)
+        HealthyItemContent content = healthyItemContentMapper.selectList(Wrappers.lambdaQuery(HealthyItemContent.class)
                 .eq(HealthyItemContent::getItemId, itemId)).stream().findFirst().orElse(null);
-        List<HealthyItemImage> healthyItemImages = healthyItemImageMapper.selectList(Wrappers.lambdaQuery(HealthyItemImage.class)
+        List<HealthyItemImage> images = healthyItemImageMapper.selectList(Wrappers.lambdaQuery(HealthyItemImage.class)
                 .eq(HealthyItemImage::getItemId, itemId).orderByAsc(HealthyItemImage::getSort));
         HealthyItemResult healthyItemResult = BeanUtil.convert(healthyItem, HealthyItemResult.class);
-        if (healthyItemContent != null) {
-            healthyItemResult.setContent(healthyItemContent.getContent());
-        }
-        if (CollectionUtil.isNotEmpty(healthyItemImages)) {
-            healthyItemResult.setImages(healthyItemImages.stream().map(HealthyItemImage::getImageUrl).collect(Collectors.toList()));
-        }
+        healthyItemResult.setPostRules(Arrays.asList(StringUtils.split(healthyItemResult.getPostRule(), ",")));
+        healthyItemResult.setContent(content != null ? content.getContent() : null);
+        healthyItemResult.setImages(images.stream().map(HealthyItemImage::getImageUrl).collect(Collectors.toList()));
         return healthyItemResult;
     }
 
@@ -225,8 +220,7 @@ public class HealthyServiceImpl implements HealthyService {
     @Override
     public List<HealthyActResult> queryHealthyActivities() {
         List<HealthyAct> acts = healthyActMapper.selectList(Wrappers.lambdaQuery(HealthyAct.class)
-                .eq(HealthyAct::getIsEnable, "Y")
-                .orderByAsc(HealthyAct::getSort));
+                .eq(HealthyAct::getIsEnable, "Y").orderByAsc(HealthyAct::getSort));
         return acts.stream().map(act -> BeanUtil.convert(act, HealthyActResult.class))
                 .collect(Collectors.toList());
     }
