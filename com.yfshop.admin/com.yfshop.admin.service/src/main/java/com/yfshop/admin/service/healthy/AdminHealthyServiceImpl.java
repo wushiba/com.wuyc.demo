@@ -1,5 +1,7 @@
 package com.yfshop.admin.service.healthy;
 
+import cn.hutool.core.date.DateTime;
+import cn.hutool.core.date.DateUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -18,11 +20,21 @@ import com.yfshop.code.mapper.HealthySubOrderMapper;
 import com.yfshop.code.model.HealthyItemImage;
 import com.yfshop.code.model.HealthyOrder;
 import com.yfshop.code.model.HealthySubOrder;
+import com.yfshop.common.exception.ApiException;
+import com.yfshop.common.exception.Asserts;
+import com.yfshop.common.healthy.enums.HealthyOrderStatusEnum;
 import com.yfshop.common.util.BeanUtil;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.DateUtils;
 import org.apache.dubbo.config.annotation.DubboService;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @DubboService
@@ -78,10 +90,101 @@ public class AdminHealthyServiceImpl implements AdminHealthyService {
         return BeanUtil.iPageConvert(iPage, HealthySubOrderResult.class);
     }
 
-    @Override
+
+
+   @Override
     public Void addAct(HealthyActReq req) {
         HealthyItemImage healthyItemImage = BeanUtil.convert(req, HealthyItemImage.class);
         healthyItemImageMapper.insert(healthyItemImage);
         return null;
     }
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public Void notifyByWechatPay(String orderNo, String wechatBillNo) throws ApiException {
+        Asserts.assertStringNotBlank(orderNo, 500, "订单ID不能为空");
+        Asserts.assertStringNotBlank(wechatBillNo, 500, "支付流水号不能为空");
+        HealthyOrder order = healthyOrderMapper.selectOne(Wrappers.lambdaQuery(HealthyOrder.class).eq(HealthyOrder::getOrderNo, orderNo));
+        Asserts.assertNonNull(order, 500, "订单不存在");
+        HealthyOrder bean = new HealthyOrder();
+        bean.setOrderNo(orderNo);
+        bean.setBillNo(wechatBillNo);
+        bean.setOrderStatus(HealthyOrderStatusEnum.SERVICING.getCode());
+        bean.setPayTime(LocalDateTime.now());
+        int rows = healthyOrderMapper.update(bean, Wrappers.lambdaQuery(HealthyOrder.class).eq(HealthyOrder::getOrderNo, orderNo)
+                .eq(HealthyOrder::getOrderStatus, HealthyOrderStatusEnum.PAYING.getCode()));
+        if (rows <= 0) {
+            return null;
+        }
+
+        String[] postRule = StringUtils.split(order.getPostRule(), "-");
+        int count = Integer.parseInt(postRule[1]);
+
+        // 今日11点时刻
+        LocalDateTime today11Clock = LocalDateTime.of(LocalDate.now().getYear(), LocalDate.now().getMonth(),
+                LocalDate.now().getDayOfMonth(), 11, 0, 0, 0);
+
+        // 第一次配送时间
+        Date firstPostTime;
+        if (bean.getPayTime().isAfter(today11Clock)) {
+            // 第3天开始
+            firstPostTime = DateUtil.parse(DateTime.of(DateUtils.addDays(new Date(), 2)).toDateStr());
+        } else {
+            // 第2天开始
+            firstPostTime = DateUtil.parse(DateTime.of(DateUtils.addDays(new Date(), 1)).toDateStr());
+        }
+
+        // 配送时间列表
+        List<Date> postDateTimes = new ArrayList<>();
+        postDateTimes.add(firstPostTime);
+        Date temp = firstPostTime;
+        for (int time = 1; time < order.getChildOrderCount(); time++) {
+            if ("W".equals(postRule[0])) {
+                temp = DateUtils.addWeeks(temp, 1);
+                postDateTimes.add(temp);
+            } else if ("M".equals(postRule[0])) {
+                temp = DateUtils.addMonths(temp, 1);
+                postDateTimes.add(temp);
+            }
+        }
+
+        // 每次配送商品数量
+        int per = order.getItemSpec() / order.getChildOrderCount();
+        int remain = order.getItemSpec() % order.getChildOrderCount();
+
+        // create sub order
+        for (int i = 0; i < postDateTimes.size(); i++) {
+            LocalDateTime expectShipTime = LocalDateTime.ofInstant(postDateTimes.get(i).toInstant(), ZoneId.systemDefault());
+            // 最后一次配送加上余量
+            int postItemCount = (i == postDateTimes.size() - 1) ? per + remain : per;
+            HealthySubOrder subOrder = new HealthySubOrder();
+            subOrder.setCreateTime(LocalDateTime.now());
+            subOrder.setUpdateTime(LocalDateTime.now());
+            subOrder.setUserId(order.getUserId());
+            subOrder.setUserName(null);
+            subOrder.setPOrderId(order.getId());
+            subOrder.setPOrderNo(order.getOrderNo());
+            subOrder.setOrderNo(order.getOrderNo() + i);
+            subOrder.setMerchantId(null);
+            subOrder.setPostWay(null);
+            subOrder.setOrderStatus("gkjgjkgjhghjghjgjy");
+            subOrder.setConfirmTime(null);
+            subOrder.setExpectShipTime(expectShipTime);
+            subOrder.setShipTime(null);
+            subOrder.setExpressCompany(null);
+            subOrder.setExpressNo(null);
+            subOrder.setProvince(order.getProvince());
+            subOrder.setCity(order.getCity());
+            subOrder.setDistrict(order.getDistrict());
+            subOrder.setProvinceId(order.getProvinceId());
+            subOrder.setCityId(order.getCityId());
+            subOrder.setDistrictId(order.getDistrictId());
+            subOrder.setAddress(order.getAddress());
+            subOrder.setMobile(order.getMobile());
+            subOrder.setContracts(order.getContracts());
+            subOrder.setPostItemCount(postItemCount);
+            healthySubOrderMapper.insert(subOrder);
+        }
+        return null;
+    }
+
 }

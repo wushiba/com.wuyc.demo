@@ -15,14 +15,16 @@ import com.yfshop.code.mapper.UserAddressMapper;
 import com.yfshop.code.mapper.UserMapper;
 import com.yfshop.code.model.HealthyItem;
 import com.yfshop.code.model.HealthyOrder;
-import com.yfshop.code.model.HealthySubOrder;
 import com.yfshop.code.model.User;
 import com.yfshop.code.model.UserAddress;
+import com.yfshop.common.constants.CacheConstants;
 import com.yfshop.common.enums.PayPrefixEnum;
 import com.yfshop.common.exception.ApiException;
 import com.yfshop.common.exception.Asserts;
-import com.yfshop.shop.service.healthy.enums.HealthyOrderStatusEnum;
+import com.yfshop.common.healthy.enums.HealthyOrderStatusEnum;
+import com.yfshop.common.util.BeanUtil;
 import com.yfshop.shop.service.healthy.req.SubmitHealthyOrderReq;
+import com.yfshop.shop.service.healthy.result.HealthyItemResult;
 import com.yfshop.wx.api.service.MpPayService;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -31,16 +33,19 @@ import org.apache.dubbo.config.annotation.DubboService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author Xulg
@@ -72,13 +77,17 @@ public class HealthyServiceImpl implements HealthyService {
     public WxPayMpOrderResult submitOrder(@NotNull(message = "用户ID不能为空") Integer userId,
                                           @Valid @NotNull SubmitHealthyOrderReq req) throws ApiException {
         Integer itemId = req.getItemId(), addressId = req.getAddressId(), buyCount = req.getBuyCount();
+        String postRule = req.getPostRule();
 
         User user = userMapper.selectById(userId);
         Asserts.assertNonNull(user, 500, "用户不存在");
+
         HealthyItem healthyItem = itemMapper.selectById(itemId);
         Asserts.assertNonNull(healthyItem, 500, "商品不存在");
         Asserts.assertTrue("Y".equalsIgnoreCase(healthyItem.getIsEnable()), 500, "商品已下架");
         Asserts.assertTrue("N".equalsIgnoreCase(healthyItem.getIsDelete()), 500, "商品已删除");
+        Asserts.assertTrue(healthyItem.getPostRule().contains(postRule), 500, "未知的配送规格");
+
         UserAddress userAddress = addressMapper.selectById(addressId);
         Asserts.assertNonNull(userAddress, 500, "收货地址不存在");
         Asserts.assertTrue(userAddress.getUserId().equals(userId), 500, "错误的收货地址");
@@ -86,7 +95,8 @@ public class HealthyServiceImpl implements HealthyService {
         BigDecimal orderPrice = new BigDecimal(buyCount).multiply(healthyItem.getItemPrice());
         BigDecimal payPrice = orderPrice.add(BigDecimal.ZERO);
         BigDecimal freight = BigDecimal.ZERO;
-        String orderNo = this.generateOrderNo(userId);
+        String orderNo = generateOrderNo(userId);
+        int subOrderCount = healthyItem.getSpec() / Integer.parseInt(StringUtils.split(healthyItem.getPostRule(), "-")[1]);
 
         // create pay order
         HealthyOrder healthyOrder = new HealthyOrder();
@@ -99,9 +109,9 @@ public class HealthyServiceImpl implements HealthyService {
         healthyOrder.setItemCover(healthyItem.getItemCover());
         healthyOrder.setItemCount(buyCount);
         healthyOrder.setItemSpec(healthyItem.getSpec());
-        healthyOrder.setPostRule(null);
+        healthyOrder.setPostRule(postRule);
         healthyOrder.setUserId(user.getId());
-        healthyOrder.setChildOrderCount(0);
+        healthyOrder.setChildOrderCount(subOrderCount);
         healthyOrder.setOrderPrice(orderPrice);
         healthyOrder.setPayPrice(payPrice);
         healthyOrder.setFreight(freight);
@@ -143,26 +153,22 @@ public class HealthyServiceImpl implements HealthyService {
         }
     }
 
-    @Transactional(rollbackFor = Exception.class)
+    @Cacheable(cacheManager = CacheConstants.CACHE_MANAGE_NAME, cacheNames = CacheConstants.HEALTHY_CACHE_NAME,
+            key = "'" + CacheConstants.HEALTHY_ITEMS_KEY_PREFIX + "' + #root.methodName")
     @Override
-    public Void notifyByWechatPay(@NotBlank(message = "订单ID不能为空") String orderNo,
-                                  @NotBlank(message = "支付流水号不能为空") String wechatBillNo) throws ApiException {
-        HealthyOrder healthyOrder = orderMapper.selectOne(Wrappers.lambdaQuery(HealthyOrder.class).eq(HealthyOrder::getOrderNo, orderNo));
-        Asserts.assertNonNull(healthyOrder, 500, "订单不存在");
-        HealthyOrder bean = new HealthyOrder();
-        bean.setOrderNo(orderNo);
-        bean.setBillNo(wechatBillNo);
-        bean.setOrderStatus(HealthyOrderStatusEnum.SERVICING.getCode());
-        bean.setPayTime(LocalDateTime.now());
-        int rows = orderMapper.update(bean, Wrappers.lambdaQuery(HealthyOrder.class).eq(HealthyOrder::getOrderNo, orderNo)
-                .eq(HealthyOrder::getOrderStatus, HealthyOrderStatusEnum.PAYING.getCode()));
-        if (rows > 0) {
-            // create sub order
-            String[] postRule = StringUtils.split(healthyOrder.getPostRule(), "-");
-            String period = postRule[0], count = postRule[1];
-            
-            HealthySubOrder subOrder = new HealthySubOrder();
-        }
+    public List<HealthyItemResult> queryHealthyItems() {
+        List<HealthyItem> items = itemMapper.selectList(Wrappers.lambdaQuery(HealthyItem.class)
+                .eq(HealthyItem::getIsDelete, "N")
+                .eq(HealthyItem::getIsEnable, "Y")
+                .orderByDesc(HealthyItem::getSort));
+        List<HealthyItemResult> list = items.stream().map(item -> BeanUtil.convert(item, HealthyItemResult.class))
+                .collect(Collectors.toList());
+        list.forEach(item -> item.setPostRules(Arrays.asList(StringUtils.split(item.getPostRule(), ","))));
+        return list;
+    }
+
+    @Override
+    public List<Object> queryHealthyActivities() {
         return null;
     }
 
