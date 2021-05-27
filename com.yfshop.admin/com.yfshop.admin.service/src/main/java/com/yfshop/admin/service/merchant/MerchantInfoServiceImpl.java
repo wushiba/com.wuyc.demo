@@ -219,8 +219,8 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
             merchantDetailMapper.insert(merchantDetail);
             roleAlias = GroupRoleEnum.WD.getCode();
         } else {
+            String pidPath = merchant.getPidPath();
             merchantId = merchant.getId();
-            merchant.setHeadImgUrl(headImageUrl);
             roleAlias = merchant.getRoleAlias();
             if (GroupRoleEnum.WD.getCode().equals(roleAlias)) {
                 Asserts.assertTrue(websiteCodeDetail.getPid().equals(merchant.getPid()), 500, "该网点码不是你的上级申请的，无法绑定！");
@@ -229,6 +229,8 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
             Asserts.assertEquals(merchant.getMobile(), websiteReq.getMobile(), 500, "手机号不允许被修改！");
             String openId = merchant.getOpenId();
             merchant = BeanUtil.convert(websiteReq, Merchant.class);
+            merchant.setHeadImgUrl(headImageUrl);
+            merchant.setPidPath(pidPath);
             if (StringUtils.isNotBlank(openId)) {
                 //只保存第一次的openId,不更新openId
                 merchant.setOpenId(null);
@@ -618,7 +620,7 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
         List<Merchant> merchantList = merchantMapper.selectList(lambdaQueryWrapper);
         List<MerchantGroupResult> merchantGroupResults = new ArrayList<>();
         if (myselfCount > 0) {
-            MerchantMyselfResult myselfResult=getMyselfWebsite(merchant.getId(),merchantGroupReq.getStartTime(), merchantGroupReq.getEndTime());
+            MerchantMyselfResult myselfResult = getMyselfWebsite(merchant.getId(), merchantGroupReq.getStartTime(), merchantGroupReq.getEndTime());
             MerchantGroupResult myself = new MerchantGroupResult();
             myself.setHaveWebsite(true);
             myself.setMerchantId(merchant.getId());
@@ -924,7 +926,7 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
 
     public MerchantMyselfResult getMyselfWebsite(Integer merchantId, Date stareTime, Date endTime) {
         MerchantMyselfResult myselfResult = new MerchantMyselfResult();
-        AtomicReference<Integer> count= new AtomicReference<>(0);
+        AtomicReference<Integer> count = new AtomicReference<>(0);
         AtomicReference<Integer> currentExchange = new AtomicReference<>(0);
         AtomicReference<Integer> totalExchange = new AtomicReference<>(0);
         AtomicReference<Integer> currentGoodsRecord = new AtomicReference<>(0);
