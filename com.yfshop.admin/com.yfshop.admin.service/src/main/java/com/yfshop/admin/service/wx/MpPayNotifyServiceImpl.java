@@ -1,5 +1,6 @@
 package com.yfshop.admin.service.wx;
 
+import com.yfshop.admin.api.healthy.AdminHealthyService;
 import com.yfshop.admin.api.merchant.MerchantInfoService;
 import com.yfshop.admin.api.order.service.AdminUserOrderService;
 import com.yfshop.code.mapper.WxPayNotifyMapper;
@@ -10,13 +11,14 @@ import com.yfshop.wx.api.service.MpPayNotifyService;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
-import org.springframework.scheduling.annotation.EnableAsync;
 
 import javax.annotation.Resource;
 
 @DubboService
 public class MpPayNotifyServiceImpl implements MpPayNotifyService {
 
+    @Resource
+    private AdminHealthyService adminHealthyService;
     @Autowired
     private MerchantInfoService merchantInfoService;
 
@@ -33,7 +35,7 @@ public class MpPayNotifyServiceImpl implements MpPayNotifyService {
             PayPrefixEnum byBizType = PayPrefixEnum.getByBizType(bizType);
             switch (byBizType) {
                 case WEBSITE_CODE:
-                    merchantInfoService.websitePayOrderNotify(notifyResult.getTransactionId(),notifyResult.getOutTradeNo());
+                    merchantInfoService.websitePayOrderNotify(notifyResult.getTransactionId(), notifyResult.getOutTradeNo());
                     break;
                 case USER_ORDER:
                     String outTradeNo = notifyResult.getOutTradeNo();
@@ -42,7 +44,7 @@ public class MpPayNotifyServiceImpl implements MpPayNotifyService {
                     adminUserOrderService.updateOrderPayStatus(Long.valueOf(split[1]), billNo);
                     break;
                 case HEALTHY_ORDER:
-                    // TODO 2021/5/26 ......
+                    adminHealthyService.notifyByWechatPay(notifyResult.getOutTradeNo(), notifyResult.getTransactionId());
                     break;
                 default:
                     throw new IllegalStateException("Unexpected byBizType value: " + byBizType);
