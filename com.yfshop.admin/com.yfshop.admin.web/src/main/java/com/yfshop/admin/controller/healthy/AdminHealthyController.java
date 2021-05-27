@@ -5,8 +5,10 @@ import cn.dev33.satoken.annotation.SaCheckRole;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.yfshop.admin.api.healthy.AdminHealthyService;
 import com.yfshop.admin.api.healthy.request.HealthyActReq;
+import com.yfshop.admin.api.healthy.request.HealthyItemReq;
 import com.yfshop.admin.api.healthy.request.QueryHealthyOrderReq;
 import com.yfshop.admin.api.healthy.request.QueryHealthySubOrderReq;
+import com.yfshop.admin.api.healthy.result.HealthyActResult;
 import com.yfshop.admin.api.healthy.result.HealthyOrderDetailResult;
 import com.yfshop.admin.api.healthy.result.HealthyOrderResult;
 import com.yfshop.admin.api.healthy.result.HealthySubOrderResult;
@@ -55,12 +57,56 @@ public class AdminHealthyController implements BaseController {
     }
 
 
-    @RequestMapping(value = "/addActImage", method = {RequestMethod.POST})
+    @RequestMapping(value = "/addAct", method = {RequestMethod.POST})
     @ResponseBody
     @SaCheckLogin
     @SaCheckRole(value = "sys")
     public CommonResult<Void> addActImage(HealthyActReq req) {
         return CommonResult.success(adminHealthyService.addAct(req));
+    }
+
+
+    @RequestMapping(value = "/getActList", method = {RequestMethod.POST})
+    @ResponseBody
+    @SaCheckLogin
+    @SaCheckRole(value = "sys")
+    public CommonResult<IPage<HealthyActResult>> getActList(HealthyActReq req) {
+        return CommonResult.success(adminHealthyService.getActList(req));
+    }
+
+
+    @RequestMapping(value = "/getActList", method = {RequestMethod.POST})
+    @ResponseBody
+    @SaCheckLogin
+    @SaCheckRole(value = "sys")
+    public CommonResult<Void> updateAct(HealthyActReq req) {
+        return CommonResult.success(adminHealthyService.updateAct(req));
+    }
+
+    @RequestMapping(value = "/addItem", method = {RequestMethod.POST})
+    @ResponseBody
+    @SaCheckLogin
+    @SaCheckRole(value = "sys")
+    public CommonResult<Void> addItem(HealthyItemReq req) {
+        return CommonResult.success(adminHealthyService.addItem(req));
+    }
+
+
+
+    @RequestMapping(value = "/getItemList", method = {RequestMethod.POST})
+    @ResponseBody
+    @SaCheckLogin
+    @SaCheckRole(value = "sys")
+    public CommonResult<IPage<HealthyItemResult>> getItemList(HealthyItemReq req) {
+        return CommonResult.success(adminHealthyService.getItemList(req));
+    }
+
+    @RequestMapping(value = "/updateItem", method = {RequestMethod.POST})
+    @ResponseBody
+    @SaCheckLogin
+    @SaCheckRole(value = "sys")
+    public CommonResult<Void> updateItem(HealthyItemReq req) {
+        return CommonResult.success(adminHealthyService.updateItem(req));
     }
 
 }
