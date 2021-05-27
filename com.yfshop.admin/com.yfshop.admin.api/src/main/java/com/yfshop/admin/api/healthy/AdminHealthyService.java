@@ -1,6 +1,7 @@
 package com.yfshop.admin.api.healthy;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.yfshop.admin.api.healthy.request.HealthyActReq;
 import com.yfshop.admin.api.healthy.request.QueryHealthyOrderReq;
 import com.yfshop.admin.api.healthy.request.QueryHealthySubOrderReq;
 import com.yfshop.admin.api.healthy.result.HealthyOrderDetailResult;
@@ -15,4 +16,6 @@ public interface AdminHealthyService {
     HealthyOrderDetailResult getOrderDetail(Integer id);
 
     IPage<HealthySubOrderResult> findSubOrderList(QueryHealthySubOrderReq req);
+
+    Void addAct(HealthyActReq req);
 }
