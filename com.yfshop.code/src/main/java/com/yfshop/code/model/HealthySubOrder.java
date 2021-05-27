@@ -120,6 +120,10 @@ public class HealthySubOrder extends Model<HealthySubOrder> {
      */
     private String contracts;
 
+    /**
+     * 配送商品数量
+     */
+    private Integer postItemCount;
 
     @Override
     protected Serializable pkVal() {

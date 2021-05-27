@@ -1,4 +1,4 @@
-package com.yfshop.shop.service.healthy.enums;
+package com.yfshop.common.healthy.enums;
 
 /**
  * @author Xulg

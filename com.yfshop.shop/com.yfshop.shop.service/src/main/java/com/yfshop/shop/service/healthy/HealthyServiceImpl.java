@@ -1,7 +1,6 @@
 package com.yfshop.shop.service.healthy;
 
 import cn.hutool.core.date.DateTime;
-import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -16,37 +15,37 @@ import com.yfshop.code.mapper.UserAddressMapper;
 import com.yfshop.code.mapper.UserMapper;
 import com.yfshop.code.model.HealthyItem;
 import com.yfshop.code.model.HealthyOrder;
-import com.yfshop.code.model.HealthySubOrder;
 import com.yfshop.code.model.User;
 import com.yfshop.code.model.UserAddress;
+import com.yfshop.common.constants.CacheConstants;
 import com.yfshop.common.enums.PayPrefixEnum;
 import com.yfshop.common.exception.ApiException;
 import com.yfshop.common.exception.Asserts;
-import com.yfshop.shop.service.healthy.enums.HealthyOrderStatusEnum;
+import com.yfshop.common.healthy.enums.HealthyOrderStatusEnum;
+import com.yfshop.common.util.BeanUtil;
 import com.yfshop.shop.service.healthy.req.SubmitHealthyOrderReq;
+import com.yfshop.shop.service.healthy.result.HealthyItemResult;
 import com.yfshop.wx.api.service.MpPayService;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.time.DateUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author Xulg
@@ -78,13 +77,17 @@ public class HealthyServiceImpl implements HealthyService {
     public WxPayMpOrderResult submitOrder(@NotNull(message = "用户ID不能为空") Integer userId,
                                           @Valid @NotNull SubmitHealthyOrderReq req) throws ApiException {
         Integer itemId = req.getItemId(), addressId = req.getAddressId(), buyCount = req.getBuyCount();
+        String postRule = req.getPostRule();
 
         User user = userMapper.selectById(userId);
         Asserts.assertNonNull(user, 500, "用户不存在");
+
         HealthyItem healthyItem = itemMapper.selectById(itemId);
         Asserts.assertNonNull(healthyItem, 500, "商品不存在");
         Asserts.assertTrue("Y".equalsIgnoreCase(healthyItem.getIsEnable()), 500, "商品已下架");
         Asserts.assertTrue("N".equalsIgnoreCase(healthyItem.getIsDelete()), 500, "商品已删除");
+        Asserts.assertTrue(healthyItem.getPostRule().contains(postRule), 500, "未知的配送规格");
+
         UserAddress userAddress = addressMapper.selectById(addressId);
         Asserts.assertNonNull(userAddress, 500, "收货地址不存在");
         Asserts.assertTrue(userAddress.getUserId().equals(userId), 500, "错误的收货地址");
@@ -93,6 +96,7 @@ public class HealthyServiceImpl implements HealthyService {
         BigDecimal payPrice = orderPrice.add(BigDecimal.ZERO);
         BigDecimal freight = BigDecimal.ZERO;
         String orderNo = generateOrderNo(userId);
+        int subOrderCount = healthyItem.getSpec() / Integer.parseInt(StringUtils.split(healthyItem.getPostRule(), "-")[1]);
 
         // create pay order
         HealthyOrder healthyOrder = new HealthyOrder();
@@ -105,9 +109,9 @@ public class HealthyServiceImpl implements HealthyService {
         healthyOrder.setItemCover(healthyItem.getItemCover());
         healthyOrder.setItemCount(buyCount);
         healthyOrder.setItemSpec(healthyItem.getSpec());
-        healthyOrder.setPostRule(null);
+        healthyOrder.setPostRule(postRule);
         healthyOrder.setUserId(user.getId());
-        healthyOrder.setChildOrderCount(healthyItem.getSpec() / Integer.parseInt(StringUtils.split(healthyItem.getPostRule(), "-")[1]));
+        healthyOrder.setChildOrderCount(subOrderCount);
         healthyOrder.setOrderPrice(orderPrice);
         healthyOrder.setPayPrice(payPrice);
         healthyOrder.setFreight(freight);
@@ -149,81 +153,22 @@ public class HealthyServiceImpl implements HealthyService {
         }
     }
 
-    @Transactional(rollbackFor = Exception.class)
+    @Cacheable(cacheManager = CacheConstants.CACHE_MANAGE_NAME, cacheNames = CacheConstants.HEALTHY_CACHE_NAME,
+            key = "'" + CacheConstants.HEALTHY_ITEMS_KEY_PREFIX + "' + #root.methodName")
     @Override
-    public Void notifyByWechatPay(@NotBlank(message = "订单ID不能为空") String orderNo,
-                                  @NotBlank(message = "支付流水号不能为空") String wechatBillNo) throws ApiException {
-        HealthyOrder healthyOrder = orderMapper.selectOne(Wrappers.lambdaQuery(HealthyOrder.class).eq(HealthyOrder::getOrderNo, orderNo));
-        Asserts.assertNonNull(healthyOrder, 500, "订单不存在");
-        HealthyOrder bean = new HealthyOrder();
-        bean.setOrderNo(orderNo);
-        bean.setBillNo(wechatBillNo);
-        bean.setOrderStatus(HealthyOrderStatusEnum.SERVICING.getCode());
-        bean.setPayTime(LocalDateTime.now());
-        int rows = orderMapper.update(bean, Wrappers.lambdaQuery(HealthyOrder.class).eq(HealthyOrder::getOrderNo, orderNo)
-                .eq(HealthyOrder::getOrderStatus, HealthyOrderStatusEnum.PAYING.getCode()));
-        if (rows > 0) {
-            // create sub order
-            String[] postRule = StringUtils.split(healthyOrder.getPostRule(), "-");
-            int count = Integer.parseInt(postRule[1]);
+    public List<HealthyItemResult> queryHealthyItems() {
+        List<HealthyItem> items = itemMapper.selectList(Wrappers.lambdaQuery(HealthyItem.class)
+                .eq(HealthyItem::getIsDelete, "N")
+                .eq(HealthyItem::getIsEnable, "Y")
+                .orderByDesc(HealthyItem::getSort));
+        List<HealthyItemResult> list = items.stream().map(item -> BeanUtil.convert(item, HealthyItemResult.class))
+                .collect(Collectors.toList());
+        list.forEach(item -> item.setPostRules(Arrays.asList(StringUtils.split(item.getPostRule(), ","))));
+        return list;
+    }
 
-            // 今日11点时刻
-            LocalDateTime today11Clock = LocalDateTime.of(LocalDate.now().getYear(), LocalDate.now().getMonth(),
-                    LocalDate.now().getDayOfMonth(), 11, 0, 0, 0);
-
-            // 第一次配送时间
-            Date firstPostTime;
-            if (bean.getPayTime().isAfter(today11Clock)) {
-                // 第3天开始
-                firstPostTime = DateUtil.parse(DateTime.of(DateUtils.addDays(new Date(), 2)).toDateStr());
-            } else {
-                // 第2天开始
-                firstPostTime = DateUtil.parse(DateTime.of(DateUtils.addDays(new Date(), 1)).toDateStr());
-            }
-
-            // 配送时间列表
-            List<Date> postDateTimes = new ArrayList<>();
-            postDateTimes.add(firstPostTime);
-            Date temp = firstPostTime;
-            for (int time = 1, total = healthyOrder.getItemSpec() / count; time < total; time++) {
-                if ("W".equals(postRule[0])) {
-                    temp = DateUtils.addWeeks(temp, 1);
-                    postDateTimes.add(temp);
-                } else if ("M".equals(postRule[0])) {
-                    temp = DateUtils.addMonths(temp, 1);
-                    postDateTimes.add(temp);
-                }
-            }
-            for (int i = 0; i < postDateTimes.size(); i++) {
-                Date postDateTime = postDateTimes.get(i);
-                HealthySubOrder subOrder = new HealthySubOrder();
-                subOrder.setCreateTime(LocalDateTime.now());
-                subOrder.setUpdateTime(LocalDateTime.now());
-                subOrder.setUserId(healthyOrder.getUserId());
-                subOrder.setUserName(null);
-                subOrder.setPOrderId(healthyOrder.getId());
-                subOrder.setPOrderNo(healthyOrder.getOrderNo());
-                subOrder.setOrderNo(healthyOrder.getOrderNo() + i);
-                subOrder.setMerchantId(null);
-                subOrder.setPostWay(null);
-                subOrder.setOrderStatus("gkjgjkgjhghjghjgjy");
-                subOrder.setConfirmTime(null);
-                subOrder.setExpectShipTime(LocalDateTime.ofInstant(postDateTime.toInstant(), ZoneId.systemDefault()));
-                subOrder.setShipTime(null);
-                subOrder.setExpressCompany(null);
-                subOrder.setExpressNo(null);
-                subOrder.setProvince(healthyOrder.getProvince());
-                subOrder.setCity(healthyOrder.getCity());
-                subOrder.setDistrict(healthyOrder.getDistrict());
-                subOrder.setProvinceId(healthyOrder.getProvinceId());
-                subOrder.setCityId(healthyOrder.getCityId());
-                subOrder.setDistrictId(healthyOrder.getDistrictId());
-                subOrder.setAddress(healthyOrder.getAddress());
-                subOrder.setMobile(healthyOrder.getMobile());
-                subOrder.setContracts(healthyOrder.getContracts());
-                subOrderMapper.insert(subOrder);
-            }
-        }
+    @Override
+    public List<Object> queryHealthyActivities() {
         return null;
     }
 

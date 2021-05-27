@@ -6,6 +6,7 @@ import com.yfshop.admin.api.healthy.request.QueryHealthySubOrderReq;
 import com.yfshop.admin.api.healthy.result.HealthyOrderDetailResult;
 import com.yfshop.admin.api.healthy.result.HealthyOrderResult;
 import com.yfshop.admin.api.healthy.result.HealthySubOrderResult;
+import com.yfshop.common.exception.ApiException;
 
 public interface AdminHealthyService {
 
@@ -15,4 +16,6 @@ public interface AdminHealthyService {
     HealthyOrderDetailResult getOrderDetail(Integer id);
 
     IPage<HealthySubOrderResult> findSubOrderList(QueryHealthySubOrderReq req);
+
+    Void notifyByWechatPay(String orderNo, String wechatBillNo) throws ApiException;
 }

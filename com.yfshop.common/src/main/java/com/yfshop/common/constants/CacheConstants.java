@@ -91,4 +91,6 @@ public interface CacheConstants {
     /** 抽奖跑马灯缓存 */
     String ALL_USER_COUPON_RECORD_LIST = "all_user_coupon_record_list";
 
+    String HEALTHY_CACHE_NAME = "HealthyCacheName";
+    String HEALTHY_ITEMS_KEY_PREFIX = "healthy_items";
 }
