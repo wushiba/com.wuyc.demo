@@ -8,10 +8,7 @@ import com.yfshop.admin.api.healthy.request.HealthyActReq;
 import com.yfshop.admin.api.healthy.request.HealthyItemReq;
 import com.yfshop.admin.api.healthy.request.QueryHealthyOrderReq;
 import com.yfshop.admin.api.healthy.request.QueryHealthySubOrderReq;
-import com.yfshop.admin.api.healthy.result.HealthyActResult;
-import com.yfshop.admin.api.healthy.result.HealthyOrderDetailResult;
-import com.yfshop.admin.api.healthy.result.HealthyOrderResult;
-import com.yfshop.admin.api.healthy.result.HealthySubOrderResult;
+import com.yfshop.admin.api.healthy.result.*;
 import com.yfshop.common.api.CommonResult;
 import com.yfshop.common.base.BaseController;
 import org.apache.dubbo.config.annotation.DubboReference;
@@ -90,7 +87,6 @@ public class AdminHealthyController implements BaseController {
     public CommonResult<Void> addItem(HealthyItemReq req) {
         return CommonResult.success(adminHealthyService.addItem(req));
     }
-
 
 
     @RequestMapping(value = "/getItemList", method = {RequestMethod.POST})

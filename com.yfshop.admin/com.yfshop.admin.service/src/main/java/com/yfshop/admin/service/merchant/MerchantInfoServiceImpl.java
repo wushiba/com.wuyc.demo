@@ -619,8 +619,8 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
                 .eq(Merchant::getIsDelete, "N");
         List<Merchant> merchantList = merchantMapper.selectList(lambdaQueryWrapper);
         List<MerchantGroupResult> merchantGroupResults = new ArrayList<>();
-        if (myselfCount > 0) {
-            MerchantMyselfResult myselfResult = getMyselfWebsite(merchant.getId(), merchantGroupReq.getStartTime(), merchantGroupReq.getEndTime());
+        MerchantMyselfResult myselfResult = getMyselfWebsite(merchant.getId(), merchantGroupReq.getStartTime(), merchantGroupReq.getEndTime());
+        if (myselfResult.getCount() > 0) {
             MerchantGroupResult myself = new MerchantGroupResult();
             myself.setHaveWebsite(true);
             myself.setMerchantId(merchant.getId());
