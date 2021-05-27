@@ -5,7 +5,10 @@ import com.github.binarywang.wxpay.bean.order.WxPayMpOrderResult;
 import com.yfshop.common.api.CommonResult;
 import com.yfshop.common.base.BaseController;
 import com.yfshop.shop.service.healthy.HealthyService;
+import com.yfshop.shop.service.healthy.req.QueryHealthyOrdersReq;
 import com.yfshop.shop.service.healthy.req.SubmitHealthyOrderReq;
+import com.yfshop.shop.service.healthy.result.HealthyActResult;
+import com.yfshop.shop.service.healthy.result.HealthyItemResult;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import java.util.List;
 
 /**
  * @author Xulg
@@ -36,4 +40,28 @@ public class HealthyController implements BaseController {
         return CommonResult.success(healthyService.submitOrder(getCurrentUserId(), req));
     }
 
+    @RequestMapping(value = "/queryHealthyItems", method = {RequestMethod.GET, RequestMethod.POST})
+    @ResponseBody
+    public CommonResult<List<HealthyItemResult>> queryHealthyItems() {
+        return CommonResult.success(healthyService.queryHealthyItems());
+    }
+
+    @RequestMapping(value = "/queryHealthyActivities", method = {RequestMethod.GET, RequestMethod.POST})
+    @ResponseBody
+    public CommonResult<List<HealthyActResult>> queryHealthyActivities() {
+        return CommonResult.success(healthyService.queryHealthyActivities());
+    }
+
+    @RequestMapping(value = "/pageQueryUserHealthyOrders", method = {RequestMethod.GET, RequestMethod.POST})
+    @ResponseBody
+    public CommonResult<Object> pageQueryUserHealthyOrders(QueryHealthyOrdersReq req) {
+        req.setUserId(getCurrentUserId());
+        return CommonResult.success(healthyService.pageQueryUserHealthyOrders(req));
+    }
+
+    @RequestMapping(value = "/pageQueryHealthyOrderDetail", method = {RequestMethod.GET, RequestMethod.POST})
+    @ResponseBody
+    public CommonResult<Object> pageQueryHealthyOrderDetail(@NotNull(message = "订单ID不能为空") Integer orderId) {
+        return CommonResult.success(healthyService.pageQueryHealthyOrderDetail(getCurrentUserId(), orderId));
+    }
 }

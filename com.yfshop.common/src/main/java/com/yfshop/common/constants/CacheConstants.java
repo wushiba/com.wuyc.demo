@@ -92,5 +92,7 @@ public interface CacheConstants {
     String ALL_USER_COUPON_RECORD_LIST = "all_user_coupon_record_list";
 
     String HEALTHY_CACHE_NAME = "HealthyCacheName";
-    String HEALTHY_ITEMS_KEY_PREFIX = "healthy_items";
+    String HEALTHY_ITEMS_KEY_PREFIX = "healthy_items_";
+    String HEALTHY_ITEM_DETAIL_KEY_PREFIX = "healthy_item_detail_";
+    String HEALTHY_ACTIVITIES_KEY_PREFIX = "healthy_activities_";
 }

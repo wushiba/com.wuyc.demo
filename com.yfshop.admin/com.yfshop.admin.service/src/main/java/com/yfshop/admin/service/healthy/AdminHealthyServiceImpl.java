@@ -149,6 +149,7 @@ public class AdminHealthyServiceImpl implements AdminHealthyService {
         }
 
         String[] postRule = StringUtils.split(order.getPostRule(), "-");
+        // 每次配送数量
         int count = Integer.parseInt(postRule[1]);
 
         // 今日11点时刻
@@ -179,15 +180,12 @@ public class AdminHealthyServiceImpl implements AdminHealthyService {
             }
         }
 
-        // 每次配送商品数量
-        int per = order.getItemSpec() / order.getChildOrderCount();
-        int remain = order.getItemSpec() % order.getChildOrderCount();
-
         // create sub order
+        int remain = order.getItemSpec() % count;
         for (int i = 0; i < postDateTimes.size(); i++) {
             LocalDateTime expectShipTime = LocalDateTime.ofInstant(postDateTimes.get(i).toInstant(), ZoneId.systemDefault());
             // 最后一次配送加上余量
-            int postItemCount = (i == postDateTimes.size() - 1) ? per + remain : per;
+            int postItemCount = (i == postDateTimes.size() - 1) ? count + remain : count;
             HealthySubOrder subOrder = new HealthySubOrder();
             subOrder.setCreateTime(LocalDateTime.now());
             subOrder.setUpdateTime(LocalDateTime.now());
@@ -198,7 +196,7 @@ public class AdminHealthyServiceImpl implements AdminHealthyService {
             subOrder.setOrderNo(order.getOrderNo() + i);
             subOrder.setMerchantId(null);
             subOrder.setPostWay(null);
-            subOrder.setOrderStatus("gkjgjkgjhghjghjgjy");
+            subOrder.setOrderStatus("fdfd");
             subOrder.setConfirmTime(null);
             subOrder.setExpectShipTime(expectShipTime);
             subOrder.setShipTime(null);

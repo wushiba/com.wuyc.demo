@@ -94,4 +94,8 @@ public class HealthyItemResult implements Serializable {
     private String postRule;
 
     private List<String> postRules;
+
+    private String content;
+
+    private List<String> images;
 }
