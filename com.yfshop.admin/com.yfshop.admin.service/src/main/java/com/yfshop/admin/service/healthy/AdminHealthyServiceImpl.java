@@ -14,6 +14,7 @@ import com.yfshop.code.model.*;
 import com.yfshop.common.exception.ApiException;
 import com.yfshop.common.exception.Asserts;
 import com.yfshop.common.healthy.enums.HealthyOrderStatusEnum;
+import com.yfshop.common.healthy.enums.HealthySubOrderStatusEnum;
 import com.yfshop.common.util.BeanUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
@@ -223,7 +224,8 @@ public class AdminHealthyServiceImpl implements AdminHealthyService {
             subOrder.setOrderNo(order.getOrderNo() + i);
             subOrder.setMerchantId(null);
             subOrder.setPostWay(null);
-            subOrder.setOrderStatus("fdfd");
+            // 待分配
+            subOrder.setOrderStatus(HealthySubOrderStatusEnum.WAIT_ALLOCATE.getCode());
             subOrder.setConfirmTime(null);
             subOrder.setExpectShipTime(expectShipTime);
             subOrder.setShipTime(null);
