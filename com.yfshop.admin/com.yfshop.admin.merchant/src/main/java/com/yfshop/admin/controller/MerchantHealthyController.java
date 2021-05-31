@@ -56,6 +56,7 @@ public class MerchantHealthyController extends AbstractBaseController {
     @RequestMapping(value = "/getJxsSubOrderList", method = {RequestMethod.GET, RequestMethod.POST})
     @ResponseBody
     @SaCheckLogin
+    @SaCheckRole(value = {"jxs"}, mode = SaMode.OR)
     public CommonResult<IPage<HealthySubOrderResult>> pageJxsSubOrderList(QueryJxsHealthySubOrderReq req) {
         req.setMerchantId(getCurrentUserId());
         return CommonResult.success(merchantHealthyService.pageJxsSubOrderList(req));
@@ -65,6 +66,7 @@ public class MerchantHealthyController extends AbstractBaseController {
     @RequestMapping(value = "/getMerchantHealthyList", method = {RequestMethod.GET, RequestMethod.POST})
     @ResponseBody
     @SaCheckLogin
+    @SaCheckRole(value = {"jxs"}, mode = SaMode.OR)
     public CommonResult<IPage<MerchantResult>> pageMerchantHealthyList(QueryMerchantReq req) {
         req.setMerchantId(getCurrentUserId());
         return CommonResult.success(merchantHealthyService.pageMerchantHealthyList(getRequestIpStr(),req));
@@ -74,6 +76,7 @@ public class MerchantHealthyController extends AbstractBaseController {
     @RequestMapping(value = "/updatePostWaySubOrder", method = {RequestMethod.GET, RequestMethod.POST})
     @ResponseBody
     @SaCheckLogin
+    @SaCheckRole(value = {"jxs"}, mode = SaMode.OR)
     public CommonResult<Void> updatePostWaySubOrder(PostWayHealthySubOrderReq req) {
         req.setMerchantId(getCurrentUserId());
         return CommonResult.success(merchantHealthyService.updatePostWaySubOrder(req));
