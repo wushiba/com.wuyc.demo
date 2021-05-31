@@ -1,6 +1,7 @@
 package com.yfshop.shop.controller.healthy;
 
 import cn.dev33.satoken.annotation.SaCheckLogin;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.github.binarywang.wxpay.bean.order.WxPayMpOrderResult;
 import com.yfshop.common.api.CommonResult;
 import com.yfshop.common.base.BaseController;
@@ -9,6 +10,8 @@ import com.yfshop.shop.service.healthy.req.QueryHealthyOrdersReq;
 import com.yfshop.shop.service.healthy.req.SubmitHealthyOrderReq;
 import com.yfshop.shop.service.healthy.result.HealthyActResult;
 import com.yfshop.shop.service.healthy.result.HealthyItemResult;
+import com.yfshop.shop.service.healthy.result.HealthyOrderResult;
+import com.yfshop.shop.service.healthy.result.HealthySubOrderResult;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,7 +30,7 @@ import java.util.List;
  */
 @Validated
 @RestController
-@RequestMapping("healthy")
+@RequestMapping("front/healthy")
 public class HealthyController implements BaseController {
 
     @DubboReference(check = false)
@@ -54,14 +57,14 @@ public class HealthyController implements BaseController {
 
     @RequestMapping(value = "/pageQueryUserHealthyOrders", method = {RequestMethod.GET, RequestMethod.POST})
     @ResponseBody
-    public CommonResult<Object> pageQueryUserHealthyOrders(QueryHealthyOrdersReq req) {
+    public CommonResult<IPage<HealthyOrderResult>> pageQueryUserHealthyOrders(QueryHealthyOrdersReq req) {
         req.setUserId(getCurrentUserId());
         return CommonResult.success(healthyService.pageQueryUserHealthyOrders(req));
     }
 
     @RequestMapping(value = "/pageQueryHealthyOrderDetail", method = {RequestMethod.GET, RequestMethod.POST})
     @ResponseBody
-    public CommonResult<Object> pageQueryHealthyOrderDetail(@NotNull(message = "订单ID不能为空") Integer orderId) {
+    public CommonResult<List<HealthySubOrderResult>> pageQueryHealthyOrderDetail(@NotNull(message = "订单ID不能为空") Long orderId) {
         return CommonResult.success(healthyService.pageQueryHealthyOrderDetail(getCurrentUserId(), orderId));
     }
 }
