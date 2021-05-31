@@ -1,14 +1,13 @@
 package com.yfshop.code.model;
 
 import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.extension.activerecord.Model;
 import com.baomidou.mybatisplus.annotation.TableId;
-
-import java.time.LocalDateTime;
-import java.io.Serializable;
-
+import com.baomidou.mybatisplus.extension.activerecord.Model;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+
+import java.io.Serializable;
+import java.time.LocalDateTime;
 
 /**
  * <p>
@@ -35,6 +34,11 @@ public class HealthySubOrder extends Model<HealthySubOrder> {
      * 用户id编号
      */
     private Integer userId;
+
+    /**
+     * 用户公众号openId
+     */
+    private String openId;
 
     private String userName;
 
@@ -75,6 +79,11 @@ public class HealthySubOrder extends Model<HealthySubOrder> {
      * 订单发货时间
      */
     private LocalDateTime shipTime;
+
+    /**
+     * 订单完成时间
+     */
+    private LocalDateTime completedTime;
 
     /**
      * 预计发货时间

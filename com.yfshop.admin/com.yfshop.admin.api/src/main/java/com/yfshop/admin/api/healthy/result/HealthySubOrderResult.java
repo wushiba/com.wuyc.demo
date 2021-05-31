@@ -24,6 +24,8 @@ public class HealthySubOrderResult implements Serializable {
      */
     private Integer userId;
 
+    private String openId;
+
     private String userName;
 
     /**
@@ -66,6 +68,12 @@ public class HealthySubOrderResult implements Serializable {
      */
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", locale = "zh", timezone = "GMT+8")
     private LocalDateTime shipTime;
+
+    /**
+     * 订单完成时间
+     */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", locale = "zh", timezone = "GMT+8")
+    private LocalDateTime completedTime;
 
     /**
      * 快递公司名称

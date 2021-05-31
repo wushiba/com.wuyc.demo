@@ -220,6 +220,7 @@ public class AdminHealthyServiceImpl implements AdminHealthyService {
             subOrder.setCreateTime(LocalDateTime.now());
             subOrder.setUpdateTime(LocalDateTime.now());
             subOrder.setUserId(order.getUserId());
+            subOrder.setOpenId(order.getOpenId());
             subOrder.setUserName(null);
             subOrder.setPOrderId(order.getId());
             subOrder.setPOrderNo(order.getOrderNo());

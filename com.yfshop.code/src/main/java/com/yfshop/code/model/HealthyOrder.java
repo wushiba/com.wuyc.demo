@@ -68,6 +68,11 @@ public class HealthyOrder extends Model<HealthyOrder> {
     private Integer userId;
 
     /**
+     * 用户公众号openId
+     */
+    private String openId;
+
+    /**
      * 子订单数量
      */
     private Integer childOrderCount;

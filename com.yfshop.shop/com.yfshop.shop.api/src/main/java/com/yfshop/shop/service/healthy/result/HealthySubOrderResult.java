@@ -1,5 +1,6 @@
 package com.yfshop.shop.service.healthy.result;
 
+import com.yfshop.shop.service.merchant.result.MerchantResult;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -69,6 +70,11 @@ public class HealthySubOrderResult implements Serializable {
     private LocalDateTime shipTime;
 
     /**
+     * 订单完成时间
+     */
+    private LocalDateTime completedTime;
+
+    /**
      * 预计发货时间
      */
     private LocalDateTime expectShipTime;
@@ -123,4 +129,8 @@ public class HealthySubOrderResult implements Serializable {
      * 配送商品数量
      */
     private Integer postItemCount;
+
+    private Integer currentMerchantId;
+
+    private MerchantResult deliveryMan;
 }

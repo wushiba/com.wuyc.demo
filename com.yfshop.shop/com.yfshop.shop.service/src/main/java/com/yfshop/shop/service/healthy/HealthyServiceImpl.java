@@ -17,6 +17,7 @@ import com.yfshop.code.mapper.HealthyItemImageMapper;
 import com.yfshop.code.mapper.HealthyItemMapper;
 import com.yfshop.code.mapper.HealthyOrderMapper;
 import com.yfshop.code.mapper.HealthySubOrderMapper;
+import com.yfshop.code.mapper.MerchantMapper;
 import com.yfshop.code.mapper.UserMapper;
 import com.yfshop.code.model.HealthyAct;
 import com.yfshop.code.model.HealthyItem;
@@ -24,12 +25,14 @@ import com.yfshop.code.model.HealthyItemContent;
 import com.yfshop.code.model.HealthyItemImage;
 import com.yfshop.code.model.HealthyOrder;
 import com.yfshop.code.model.HealthySubOrder;
+import com.yfshop.code.model.Merchant;
 import com.yfshop.code.model.User;
 import com.yfshop.common.constants.CacheConstants;
 import com.yfshop.common.enums.PayPrefixEnum;
 import com.yfshop.common.exception.ApiException;
 import com.yfshop.common.exception.Asserts;
 import com.yfshop.common.healthy.enums.HealthyOrderStatusEnum;
+import com.yfshop.common.healthy.enums.HealthySubOrderStatusEnum;
 import com.yfshop.common.util.BeanUtil;
 import com.yfshop.shop.service.address.UserAddressService;
 import com.yfshop.shop.service.address.result.UserAddressResult;
@@ -39,6 +42,7 @@ import com.yfshop.shop.service.healthy.result.HealthyActResult;
 import com.yfshop.shop.service.healthy.result.HealthyItemResult;
 import com.yfshop.shop.service.healthy.result.HealthyOrderResult;
 import com.yfshop.shop.service.healthy.result.HealthySubOrderResult;
+import com.yfshop.shop.service.merchant.result.MerchantResult;
 import com.yfshop.wx.api.service.MpPayService;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -88,6 +92,8 @@ public class HealthyServiceImpl implements HealthyService {
     @Resource
     private HealthyItemImageMapper healthyItemImageMapper;
     @Resource
+    private MerchantMapper merchantMapper;
+    @Resource
     private UserMapper userMapper;
     @DubboReference(check = false)
     private MpPayService mpPayService;
@@ -135,6 +141,7 @@ public class HealthyServiceImpl implements HealthyService {
         healthyOrder.setItemSpec(healthyItem.getSpec());
         healthyOrder.setPostRule(postRule);
         healthyOrder.setUserId(user.getId());
+        healthyOrder.setOpenId(user.getOpenId());
         healthyOrder.setChildOrderCount(subOrderCount);
         healthyOrder.setOrderPrice(orderPrice);
         healthyOrder.setPayPrice(payPrice);
@@ -251,8 +258,15 @@ public class HealthyServiceImpl implements HealthyService {
                 .eq(HealthySubOrder::getPOrderId, orderId)
                 .eq(HealthySubOrder::getUserId, userId)
                 .orderByAsc(HealthySubOrder::getExpectShipTime));
-        return subOrders.stream().map(subOrder -> BeanUtil.convert(subOrder, HealthySubOrderResult.class))
+        List<HealthySubOrderResult> list = subOrders.stream().map(subOrder -> BeanUtil.convert(subOrder, HealthySubOrderResult.class))
                 .collect(Collectors.toList());
+        for (HealthySubOrderResult subOrderResult : list) {
+            if (HealthySubOrderStatusEnum.IN_DELIVERY.getCode().equals(subOrderResult.getOrderStatus())) {
+                Merchant deliveryMan = merchantMapper.selectById(subOrderResult.getCurrentMerchantId());
+                subOrderResult.setDeliveryMan(BeanUtil.convert(deliveryMan, MerchantResult.class));
+            }
+        }
+        return list;
     }
 
     private String generateOrderNo(Integer userId) {
