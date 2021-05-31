@@ -1,17 +1,24 @@
 package com.yfshop.admin.controller;
 
 import cn.dev33.satoken.annotation.SaCheckLogin;
+import cn.dev33.satoken.annotation.SaCheckRole;
+import cn.dev33.satoken.annotation.SaMode;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.yfshop.admin.api.healthy.MerchantHealthyService;
 import com.yfshop.admin.api.healthy.request.QueryMerchantHealthySubOrdersReq;
 import com.yfshop.admin.api.healthy.result.HealthySubOrderResult;
 import com.yfshop.common.api.CommonResult;
+import com.yfshop.common.validate.annotation.CandidateValue;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 /**
  * @author Xulg
@@ -26,16 +33,36 @@ public class MerchantHealthyController extends AbstractBaseController {
     @DubboReference(check = false)
     private MerchantHealthyService merchantHealthyService;
 
-    @RequestMapping(value = "/saveMerchant", method = {RequestMethod.GET, RequestMethod.POST})
+    @RequestMapping(value = "/pageQueryMerchantHealthySubOrders", method = {RequestMethod.GET, RequestMethod.POST})
     @ResponseBody
     @SaCheckLogin
-    public CommonResult<IPage<HealthySubOrderResult>> pageQueryMerchantHealthySubOrders() {
+    @SaCheckRole(value = {"fxs", "ywy", "cxy"}, mode = SaMode.OR)
+    public CommonResult<IPage<HealthySubOrderResult>> pageQueryMerchantHealthySubOrders(
+            @RequestParam(name = "pageIndex", required = false, defaultValue = "1") Integer pageIndex,
+            @RequestParam(name = "pageSize", required = false, defaultValue = "10") Integer pageSize,
+            @NotBlank(message = "订单状态不能为空") @CandidateValue(candidateValue = {"ALL", "WAIT_ALLOCATE", "COMPLETE_DELIVERY"}) String orderStatus) {
         QueryMerchantHealthySubOrdersReq req = new QueryMerchantHealthySubOrdersReq();
-        req.setPageIndex(1);
-        req.setPageSize(0);
-        req.setMerchantId(0);
-        req.setOrderStatus("");
+        req.setPageIndex(pageIndex);
+        req.setPageSize(pageSize);
+        req.setMerchantId(getCurrentAdminUserId());
+        req.setOrderStatus(orderStatus);
         return CommonResult.success(merchantHealthyService.pageQueryMerchantHealthySubOrders(req));
+    }
+
+    @RequestMapping(value = "/startDelivery", method = {RequestMethod.GET, RequestMethod.POST})
+    @ResponseBody
+    @SaCheckLogin
+    @SaCheckRole(value = {"fxs", "ywy", "cxy"}, mode = SaMode.OR)
+    public CommonResult<Void> startDelivery(@NotNull(message = "订单ID不能为空") Integer subOrderId) {
+        return CommonResult.success(merchantHealthyService.startDelivery(subOrderId, getCurrentAdminUserId()));
+    }
+
+    @RequestMapping(value = "/completeDelivery", method = {RequestMethod.GET, RequestMethod.POST})
+    @ResponseBody
+    @SaCheckLogin
+    @SaCheckRole(value = {"fxs", "ywy", "cxy"}, mode = SaMode.OR)
+    public CommonResult<Void> completeDelivery(@NotNull(message = "订单ID不能为空") Integer subOrderId) {
+        return CommonResult.success(merchantHealthyService.completeDelivery(subOrderId, getCurrentAdminUserId()));
     }
 
 }
