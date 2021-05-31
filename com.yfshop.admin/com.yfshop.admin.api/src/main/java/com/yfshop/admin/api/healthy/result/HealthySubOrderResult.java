@@ -41,6 +41,11 @@ public class HealthySubOrderResult implements Serializable {
     private Integer merchantId;
 
     /**
+     * 订单分配路径
+     */
+    private String allocateMerchantPath;
+
+    /**
      * 配送方式：物流|配送
      */
     private String postWay;
