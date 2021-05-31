@@ -1,5 +1,6 @@
 package com.yfshop.admin.service.healthy;
 
+import com.yfshop.admin.api.healthy.MerchantHealthyService;
 import org.apache.dubbo.config.annotation.DubboService;
 
 /**
@@ -8,5 +9,5 @@ import org.apache.dubbo.config.annotation.DubboService;
  * Created in 2021-05-31 10:47
  */
 @DubboService
-public class MerchantHealthyServiceImpl {
+public class MerchantHealthyServiceImpl implements MerchantHealthyService {
 }
