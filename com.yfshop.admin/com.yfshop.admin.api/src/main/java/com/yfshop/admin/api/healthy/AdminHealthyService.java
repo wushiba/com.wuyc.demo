@@ -1,10 +1,7 @@
 package com.yfshop.admin.api.healthy;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.yfshop.admin.api.healthy.request.HealthyActReq;
-import com.yfshop.admin.api.healthy.request.HealthyItemReq;
-import com.yfshop.admin.api.healthy.request.QueryHealthyOrderReq;
-import com.yfshop.admin.api.healthy.request.QueryHealthySubOrderReq;
+import com.yfshop.admin.api.healthy.request.*;
 import com.yfshop.admin.api.healthy.result.*;
 import com.yfshop.common.exception.ApiException;
 
@@ -30,5 +27,10 @@ public interface AdminHealthyService {
     Void addItem(HealthyItemReq req);
 
     Void updateItem(HealthyItemReq req);
+
     IPage<HealthyItemResult> getItemList(HealthyItemReq req);
+
+    IPage<JxsMerchantResult> findJxsMerchant(QueryJxsMerchantReq req);
+
+    Void updateSubOrderPostWay(SubOrderPostWay req);
 }

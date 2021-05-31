@@ -7,10 +7,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.yfshop.admin.api.healthy.AdminHealthyService;
-import com.yfshop.admin.api.healthy.request.HealthyActReq;
-import com.yfshop.admin.api.healthy.request.HealthyItemReq;
-import com.yfshop.admin.api.healthy.request.QueryHealthyOrderReq;
-import com.yfshop.admin.api.healthy.request.QueryHealthySubOrderReq;
+import com.yfshop.admin.api.healthy.request.*;
 import com.yfshop.admin.api.healthy.result.*;
 import com.yfshop.code.mapper.*;
 import com.yfshop.code.model.*;
@@ -42,10 +39,10 @@ public class AdminHealthyServiceImpl implements AdminHealthyService {
     private HealthyActMapper healthyActMapper;
 
     @Resource
-    private HealthyItemImageMapper healthyItemImageMapper;
+    private HealthyItemMapper healthyItemMapper;
 
     @Resource
-    private HealthyItemMapper healthyItemMapper;
+    private MerchantMapper merchantMapper;
 
     @Override
     public IPage<HealthyOrderResult> findOrderList(QueryHealthyOrderReq req) {
@@ -121,6 +118,36 @@ public class AdminHealthyServiceImpl implements AdminHealthyService {
                 .eq(req.getId() != null, HealthyItem::getId, req.getId())
                 .eq(StringUtils.isNotBlank(req.getItemTitle()), HealthyItem::getItemTitle, req.getItemTitle()));
         return BeanUtil.iPageConvert(healthyItemIPage, HealthyItemResult.class);
+    }
+
+    @Override
+    public IPage<JxsMerchantResult> findJxsMerchant(QueryJxsMerchantReq req) {
+        LambdaQueryWrapper<Merchant> wrapper = Wrappers.lambdaQuery(Merchant.class)
+                .eq(req.getProvinceId() != null, Merchant::getProvinceId, req.getProvinceId())
+                .eq(req.getCityId() != null, Merchant::getCityId, req.getCityId())
+                .eq(req.getDistrictId() != null, Merchant::getDistrictId, req.getDistrictId())
+                .eq(Merchant::getRoleAlias, "jxs")
+                .eq(Merchant::getIsEnable, "Y")
+                .eq(Merchant::getIsDelete, "N")
+                .like(StringUtils.isNotBlank(req.getMobile()), Merchant::getMobile, req.getMobile())
+                .like(StringUtils.isNotBlank(req.getMerchantName()), Merchant::getMerchantName, req.getMerchantName())
+                .like(StringUtils.isNotBlank(req.getAddress()), Merchant::getAddress, req.getAddress())
+                .like(StringUtils.isNotBlank(req.getContracts()), Merchant::getContacts, req.getContracts())
+                .like(StringUtils.isNotBlank(req.getMobile()), Merchant::getMobile, req.getMobile());
+        IPage<Merchant> iPage = merchantMapper.selectPage(new Page<>(req.getPageIndex(), req.getPageSize()), wrapper);
+        return BeanUtil.iPageConvert(iPage, JxsMerchantResult.class);
+    }
+
+    @Override
+    public Void updateSubOrderPostWay(SubOrderPostWay req) {
+        Asserts.assertTrue(!req.getIds().isEmpty(), 500, "请选择你要指派的订单！");
+        HealthySubOrder subOrder = new HealthySubOrder();
+        subOrder.setMerchantId(req.getMerchantId());
+        subOrder.setPostWay(req.getPostWay());
+        subOrder.setExpressCompany(req.getExpressCompany());
+        subOrder.setExpressNo(req.getExpressNo());
+        healthySubOrderMapper.update(subOrder, Wrappers.lambdaQuery(HealthySubOrder.class).in(HealthySubOrder::getId, req.getIds()));
+        return null;
     }
 
     @Override
