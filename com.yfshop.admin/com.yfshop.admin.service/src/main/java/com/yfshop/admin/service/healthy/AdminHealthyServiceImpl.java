@@ -147,6 +147,8 @@ public class AdminHealthyServiceImpl implements AdminHealthyService {
         subOrder.setPostWay(req.getPostWay());
         subOrder.setExpressCompany(req.getExpressCompany());
         subOrder.setExpressNo(req.getExpressNo());
+        subOrder.setCurrentMerchantId(req.getMerchantId());
+        subOrder.setAllocateMerchantPath(req.getMerchantId() + "");
         healthySubOrderMapper.update(subOrder, Wrappers.lambdaQuery(HealthySubOrder.class).in(HealthySubOrder::getId, req.getIds()));
         return null;
     }

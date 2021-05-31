@@ -3,14 +3,16 @@ package com.yfshop.code.model;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.extension.activerecord.Model;
 import com.baomidou.mybatisplus.annotation.TableId;
+
 import java.time.LocalDateTime;
 import java.io.Serializable;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 /**
  * <p>
- * 
+ *
  * </p>
  *
  * @author yoush
@@ -129,6 +131,8 @@ public class HealthySubOrder extends Model<HealthySubOrder> {
      * 配送商品数量
      */
     private Integer postItemCount;
+
+    private Integer currentMerchantId;
 
     @Override
     protected Serializable pkVal() {
