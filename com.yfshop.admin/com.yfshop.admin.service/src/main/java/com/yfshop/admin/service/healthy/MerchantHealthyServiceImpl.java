@@ -21,6 +21,8 @@ import me.chanjar.weixin.mp.bean.template.WxMpTemplateData;
 import me.chanjar.weixin.mp.bean.template.WxMpTemplateMessage;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
@@ -36,6 +38,7 @@ import java.util.List;
  * Created in 2021-05-31 10:47
  */
 @DubboService
+@Validated
 public class MerchantHealthyServiceImpl implements MerchantHealthyService {
 
     private static final List<String> FIT_ROLES = new ArrayList<>(Arrays.asList(GroupRoleEnum.FXS.getCode(), GroupRoleEnum.YWY.getCode(), GroupRoleEnum.CXY.getCode()));
@@ -67,6 +70,7 @@ public class MerchantHealthyServiceImpl implements MerchantHealthyService {
         return BeanUtil.iPageConvert(page, HealthySubOrderResult.class);
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public Void startDelivery(@NotNull(message = "订单ID不能为空") Integer subOrderId,
                               @NotNull(message = "配送商户ID不能为空") Integer merchantId) throws ApiException {
@@ -97,6 +101,7 @@ public class MerchantHealthyServiceImpl implements MerchantHealthyService {
         return null;
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public Void completeDelivery(@NotNull(message = "订单ID不能为空") Integer subOrderId,
                                  @NotNull(message = "配送商户ID不能为空") Integer merchantId) throws ApiException {
@@ -104,7 +109,7 @@ public class MerchantHealthyServiceImpl implements MerchantHealthyService {
         Asserts.assertNonNull(subOrder, 500, "订单不存在");
         Merchant merchant = merchantMapper.selectById(merchantId);
         Asserts.assertNonNull(merchant, 500, "商户不存在");
-        Asserts.assertTrue(subOrder.getCurrentMerchantId().equals(merchantId), 500, "您不能配送别人的订单");
+        Asserts.assertTrue(subOrder.getCurrentMerchantId().equals(merchantId), 500, "您不能确认别人的订单");
         Asserts.assertTrue(subOrder.getOrderStatus().equals(HealthySubOrderStatusEnum.IN_DELIVERY.getCode()), 500, "非配送中的订单");
 
         // modify order status
@@ -115,6 +120,14 @@ public class MerchantHealthyServiceImpl implements MerchantHealthyService {
                 .eq(HealthySubOrder::getId, subOrder).eq(HealthySubOrder::getOrderStatus, HealthySubOrderStatusEnum.IN_DELIVERY.getCode()));
         if (rows > 0) {
             // 通知用户已完成配送
+            List<WxMpTemplateData> data = new ArrayList<>();
+            data.add(new WxMpTemplateData("first", "您已成功兑换椰岛135ml鹿龟酒1瓶，恭喜恭喜~"));
+            data.add(new WxMpTemplateData("keyword1", ""));
+            data.add(new WxMpTemplateData("keyword2", "2元"));
+            data.add(new WxMpTemplateData("remark", "点击查阅订单"));
+            WxMpTemplateMessage wxMpTemplateMessage = WxMpTemplateMessage.builder().templateId("kEnXD9LGvWpcWud99dUu_A85vc5w1vT9-rMzqybrQaw")
+                    .toUser(subOrder.getOpenId()).data(data).url("tgsdfghjksdfhgsdhaks").build();
+            mpService.sendWxMpTemplateMsg(wxMpTemplateMessage);
         }
         return null;
     }
