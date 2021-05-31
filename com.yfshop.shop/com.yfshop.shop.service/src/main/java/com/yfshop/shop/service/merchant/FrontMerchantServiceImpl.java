@@ -190,7 +190,7 @@ public class FrontMerchantServiceImpl implements FrontMerchantService {
     public IPage<MerchantResult> findMerchantList(QueryMerchant queryMerchant) throws ApiException {
         if (queryMerchant.getProvinceId() == null) {
             try {
-                String city = Ip2regionUtil.getRegionByIp(queryMerchant.getIpStr()).split("|")[3];
+                String city = Ip2regionUtil.getRegionByIp(queryMerchant.getIpStr()).split("\\|")[3];
                 Region region = regionMapper.selectOne(Wrappers.lambdaQuery(Region.class).eq(Region::getType, 2)
                         .like(Region::getName, city));
                 if (region != null) {

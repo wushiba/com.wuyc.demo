@@ -5,12 +5,19 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.yfshop.admin.api.healthy.MerchantHealthyService;
+import com.yfshop.admin.api.healthy.request.PostWayHealthySubOrderReq;
+import com.yfshop.admin.api.healthy.request.QueryJxsHealthySubOrderReq;
 import com.yfshop.admin.api.healthy.request.QueryMerchantHealthySubOrdersReq;
 import com.yfshop.admin.api.healthy.result.HealthySubOrderResult;
+import com.yfshop.admin.api.merchant.request.QueryMerchantReq;
+import com.yfshop.admin.api.merchant.result.MerchantResult;
+import com.yfshop.admin.utils.Ip2regionUtil;
 import com.yfshop.code.mapper.HealthySubOrderMapper;
 import com.yfshop.code.mapper.MerchantMapper;
+import com.yfshop.code.mapper.RegionMapper;
 import com.yfshop.code.model.HealthySubOrder;
 import com.yfshop.code.model.Merchant;
+import com.yfshop.code.model.Region;
 import com.yfshop.common.enums.GroupRoleEnum;
 import com.yfshop.common.exception.ApiException;
 import com.yfshop.common.exception.Asserts;
@@ -19,6 +26,7 @@ import com.yfshop.common.util.BeanUtil;
 import com.yfshop.wx.api.service.MpService;
 import me.chanjar.weixin.mp.bean.template.WxMpTemplateData;
 import me.chanjar.weixin.mp.bean.template.WxMpTemplateMessage;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.transaction.annotation.Transactional;
@@ -49,6 +57,8 @@ public class MerchantHealthyServiceImpl implements MerchantHealthyService {
     private HealthySubOrderMapper healthySubOrderMapper;
     @DubboReference(check = false)
     private MpService mpService;
+    @Resource
+    private RegionMapper regionMapper;
 
     @Override
     public IPage<HealthySubOrderResult> pageQueryMerchantHealthySubOrders(@Valid @NotNull QueryMerchantHealthySubOrdersReq req) throws ApiException {
@@ -129,6 +139,57 @@ public class MerchantHealthyServiceImpl implements MerchantHealthyService {
                     .toUser(subOrder.getOpenId()).data(data).url("tgsdfghjksdfhgsdhaks").build();
             mpService.sendWxMpTemplateMsg(wxMpTemplateMessage);
         }
+        return null;
+    }
+
+    @Override
+    public IPage<HealthySubOrderResult> pageJxsSubOrderList(QueryJxsHealthySubOrderReq req) throws ApiException {
+        LambdaQueryWrapper<HealthySubOrder> queryWrapper = Wrappers.lambdaQuery(HealthySubOrder.class)
+                .eq(HealthySubOrder::getMerchantId, req.getMerchantId())
+                .eq(HealthySubOrder::getOrderStatus, req.getOrderStatus());
+        Page<HealthySubOrder> page = healthySubOrderMapper.selectPage(new Page<>(req.getPageIndex(), req.getPageSize()), queryWrapper);
+        return BeanUtil.iPageConvert(page, HealthySubOrderResult.class);
+    }
+
+    @Override
+    public IPage<MerchantResult> pageMerchantHealthyList(String requestIpStr, QueryMerchantReq req) {
+        Merchant merchant = merchantMapper.selectById(req.getMerchantId());
+        if (req.getProvinceId() == null) {
+            try {
+                String city = Ip2regionUtil.getRegionByIp(requestIpStr).split("\\|")[3];
+                Region region = regionMapper.selectOne(Wrappers.lambdaQuery(Region.class).eq(Region::getType, 2)
+                        .like(Region::getName, city));
+                if (region != null) {
+                    req.setCityId(region.getId());
+                }
+            } catch (Exception e) {
+
+            }
+        }
+        LambdaQueryWrapper lambdaQueryWrapper = Wrappers.lambdaQuery(Merchant.class)
+                .eq(req.getProvinceId() != null, Merchant::getProvinceId, req.getProvinceId())
+                .eq(req.getCityId() != null, Merchant::getCityId, req.getCityId())
+                .eq(req.getDistrictId() != null, Merchant::getDistrictId, req.getDistrictId())
+                .likeLeft(Merchant::getPidPath, merchant.getPidPath())
+                .and(StringUtils.isNotBlank(req.getContacts()), wrapper -> {
+                    wrapper.like(Merchant::getContacts, req.getContacts()).or().like(Merchant::getMerchantName, req.getMerchantName());
+                })
+                .ne(Merchant::getRoleAlias, "wd")
+                .eq(Merchant::getIsEnable, "Y")
+                .eq(Merchant::getIsDelete, "N");
+
+        IPage<Merchant> merchantIPage = healthySubOrderMapper.selectPage(new Page<>(req.getPageIndex(), req.getPageSize()), lambdaQueryWrapper);
+        return BeanUtil.iPageConvert(merchantIPage, MerchantResult.class);
+    }
+
+    @Override
+    public Void updatePostWaySubOrder(PostWayHealthySubOrderReq req) {
+        HealthySubOrder healthySubOrder = new HealthySubOrder();
+        healthySubOrder.setId(req.getId());
+        healthySubOrder.setAllocateMerchantPath(req.getMerchantId() + "," + req.getCurrentMerchantId());
+        healthySubOrder.setCurrentMerchantId(req.getCurrentMerchantId());
+        healthySubOrder.setOrderStatus(HealthySubOrderStatusEnum.WAIT_DELIVERY.getCode());
+        healthySubOrderMapper.updateById(healthySubOrder);
         return null;
     }
 }

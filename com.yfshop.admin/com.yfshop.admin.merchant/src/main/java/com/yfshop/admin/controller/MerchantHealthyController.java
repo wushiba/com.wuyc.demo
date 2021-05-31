@@ -3,8 +3,12 @@ package com.yfshop.admin.controller;
 import cn.dev33.satoken.annotation.SaCheckLogin;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.yfshop.admin.api.healthy.MerchantHealthyService;
+import com.yfshop.admin.api.healthy.request.PostWayHealthySubOrderReq;
+import com.yfshop.admin.api.healthy.request.QueryJxsHealthySubOrderReq;
 import com.yfshop.admin.api.healthy.request.QueryMerchantHealthySubOrdersReq;
 import com.yfshop.admin.api.healthy.result.HealthySubOrderResult;
+import com.yfshop.admin.api.merchant.request.QueryMerchantReq;
+import com.yfshop.admin.api.merchant.result.MerchantResult;
 import com.yfshop.common.api.CommonResult;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.stereotype.Controller;
@@ -38,4 +42,29 @@ public class MerchantHealthyController extends AbstractBaseController {
         return CommonResult.success(merchantHealthyService.pageQueryMerchantHealthySubOrders(req));
     }
 
+    @RequestMapping(value = "/getJxsSubOrderList", method = {RequestMethod.GET, RequestMethod.POST})
+    @ResponseBody
+    @SaCheckLogin
+    public CommonResult<IPage<HealthySubOrderResult>> pageJxsSubOrderList(QueryJxsHealthySubOrderReq req) {
+        req.setMerchantId(getCurrentUserId());
+        return CommonResult.success(merchantHealthyService.pageJxsSubOrderList(req));
+    }
+
+
+    @RequestMapping(value = "/getMerchantHealthyList", method = {RequestMethod.GET, RequestMethod.POST})
+    @ResponseBody
+    @SaCheckLogin
+    public CommonResult<IPage<MerchantResult>> pageMerchantHealthyList(QueryMerchantReq req) {
+        req.setMerchantId(getCurrentUserId());
+        return CommonResult.success(merchantHealthyService.pageMerchantHealthyList(getRequestIpStr(),req));
+    }
+
+
+    @RequestMapping(value = "/updatePostWaySubOrder", method = {RequestMethod.GET, RequestMethod.POST})
+    @ResponseBody
+    @SaCheckLogin
+    public CommonResult<Void> updatePostWaySubOrder(PostWayHealthySubOrderReq req) {
+        req.setMerchantId(getCurrentUserId());
+        return CommonResult.success(merchantHealthyService.updatePostWaySubOrder(req));
+    }
 }

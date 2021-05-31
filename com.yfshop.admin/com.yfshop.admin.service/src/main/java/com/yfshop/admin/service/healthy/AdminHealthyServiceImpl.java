@@ -143,12 +143,19 @@ public class AdminHealthyServiceImpl implements AdminHealthyService {
     public Void updateSubOrderPostWay(SubOrderPostWay req) {
         Asserts.assertTrue(!req.getIds().isEmpty(), 500, "请选择你要指派的订单！");
         HealthySubOrder subOrder = new HealthySubOrder();
-        subOrder.setMerchantId(req.getMerchantId());
         subOrder.setPostWay(req.getPostWay());
         subOrder.setExpressCompany(req.getExpressCompany());
         subOrder.setExpressNo(req.getExpressNo());
-        subOrder.setCurrentMerchantId(req.getMerchantId());
-        subOrder.setAllocateMerchantPath(req.getMerchantId() + "");
+        if (req.getMerchantId() != null) {
+            subOrder.setMerchantId(req.getMerchantId());
+            subOrder.setCurrentMerchantId(req.getMerchantId());
+            subOrder.setAllocateMerchantPath(req.getMerchantId() + "");
+            subOrder.setOrderStatus(HealthySubOrderStatusEnum.IN_CIRCULATION.getCode());
+        } else {
+            Asserts.assertStringNotBlank(req.getExpressNo(),500,"请填写快递信息");
+            subOrder.setOrderStatus(HealthySubOrderStatusEnum.IN_DELIVERY.getCode());
+        }
+
         healthySubOrderMapper.update(subOrder, Wrappers.lambdaQuery(HealthySubOrder.class).in(HealthySubOrder::getId, req.getIds()));
         return null;
     }
