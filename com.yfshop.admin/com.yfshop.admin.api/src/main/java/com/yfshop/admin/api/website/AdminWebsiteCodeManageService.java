@@ -1,6 +1,7 @@
 package com.yfshop.admin.api.website;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.github.binarywang.wxpay.exception.WxPayException;
 import com.yfshop.admin.api.website.request.WebsiteCodeQueryDetailsReq;
 import com.yfshop.admin.api.website.request.WebsiteCodeExpressReq;
 import com.yfshop.admin.api.website.request.WebsiteCodeQueryReq;
@@ -67,5 +68,5 @@ public interface AdminWebsiteCodeManageService {
 
     Void updateWebsiteCodeGroupExpress(WebsiteCodeExpressReq websiteCodeQueryExpressReq);
 
-    Void closeWebsiteCode(Integer id) throws ApiException;
+    Void closeWebsiteCode(Integer id) throws ApiException, WxPayException;
 }

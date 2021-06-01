@@ -2,6 +2,7 @@ package com.yfshop.admin.service.order;
 
 import java.math.BigDecimal;
 
+import com.github.binarywang.wxpay.bean.request.WxPayRefundRequest;
 import com.google.common.collect.Lists;
 
 import java.time.LocalDateTime;
@@ -26,6 +27,7 @@ import com.yfshop.common.enums.UserOrderStatusEnum;
 import com.yfshop.common.exception.ApiException;
 import com.yfshop.common.exception.Asserts;
 import com.yfshop.common.util.BeanUtil;
+import com.yfshop.wx.api.request.WxPayRefundReq;
 import com.yfshop.wx.api.service.MpService;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
@@ -63,6 +65,8 @@ public class AdminUserOrderServiceImpl implements AdminUserOrderService {
     private OrderAddressMapper orderAddressMapper;
     @Resource
     private WxPayNotifyMapper wxPayNotifyMapper;
+    @Resource
+    private WxPayRefundMapper wxPayRefundMapper;
     @DubboReference
     private MpService mpService;
 
@@ -178,7 +182,19 @@ public class AdminUserOrderServiceImpl implements AdminUserOrderService {
                 orderDetailMapper.updateById(newOrderDetail);
                 Order order = orderMapper.selectById(orderDetail.getOrderId());
                 if (order != null && StringUtils.isNotBlank(order.getBillNo())) {
-                    mpService.refund(id, order.getBillNo());
+                    WxPayNotify wxPayNotify = wxPayNotifyMapper.selectOne(Wrappers.lambdaUpdate(WxPayNotify.class).eq(WxPayNotify::getTransactionId, order.getBillNo()));
+                    orderDetail = orderDetailMapper.selectById(id);
+                    if (orderDetail != null && wxPayNotify != null) {
+                        WxPayRefund wxPayRefund = new WxPayRefund();
+                        wxPayRefund.setCreateTime(LocalDateTime.now());
+                        wxPayRefund.setOpenId(wxPayNotify.getOpenId());
+                        wxPayRefund.setTotalFee(orderDetail.getPayPrice().multiply(new BigDecimal("100")).intValue());
+                        wxPayRefund.setTransactionId(wxPayNotify.getTransactionId());
+                        wxPayRefund.setOuttradeNo(wxPayNotify.getOuttradeNo());
+                        wxPayRefund.setRefundNo("refundNo-shopOrder-" + id);
+                        wxPayRefundMapper.insert(wxPayRefund);
+                        this.mpService.refund(BeanUtil.convert(wxPayRefund, WxPayRefundReq.class));
+                    }
                 }
                 break;
 

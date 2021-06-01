@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.github.binarywang.wxpay.exception.WxPayException;
 import com.yfshop.admin.api.website.AdminWebsiteCodeManageService;
 import com.yfshop.admin.api.website.WebsiteCodeTaskService;
 import com.yfshop.admin.api.website.request.WebsiteCodeExpressReq;
@@ -14,22 +15,25 @@ import com.yfshop.admin.api.website.result.WebsiteCodeDetailResult;
 import com.yfshop.admin.api.website.result.WebsiteCodeResult;
 import com.yfshop.admin.dao.WebsiteCodeDao;
 import com.yfshop.admin.task.OssDownloader;
-import com.yfshop.code.mapper.WebsiteCodeDetailMapper;
-import com.yfshop.code.mapper.WebsiteCodeGroupMapper;
-import com.yfshop.code.mapper.WebsiteCodeMapper;
-import com.yfshop.code.model.WebsiteCode;
-import com.yfshop.code.model.WebsiteCodeDetail;
-import com.yfshop.code.model.WebsiteCodeGroup;
+import com.yfshop.code.mapper.*;
+import com.yfshop.code.model.*;
 import com.yfshop.common.exception.ApiException;
 import com.yfshop.common.exception.Asserts;
 import com.yfshop.common.util.BeanUtil;
 import com.yfshop.common.util.DateUtil;
+import com.yfshop.wx.api.request.WxPayRefundReq;
+import com.yfshop.wx.api.service.MpService;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
+import java.math.MathContext;
+import java.math.RoundingMode;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -48,6 +52,12 @@ public class AdminWebsiteCodeManageServiceImpl implements AdminWebsiteCodeManage
     private WebsiteCodeTaskService websiteCodeTaskService;
     @Resource
     private WebsiteCodeGroupMapper websiteCodeGroupMapper;
+    @Resource
+    private WxPayNotifyMapper wxPayNotifyMapper;
+    @Resource
+    private WxPayRefundMapper wxPayRefundMapper;
+    @DubboReference
+    private MpService mpService;
 
     @Override
     public IPage<WebsiteCodeResult> queryWebsiteCodeList(WebsiteCodeQueryReq req) throws ApiException {
@@ -77,7 +87,7 @@ public class AdminWebsiteCodeManageServiceImpl implements AdminWebsiteCodeManage
                 .like(StringUtils.isNotBlank(req.getAddress()), WebsiteCode::getAddress, req.getAddress())
                 .in(!orderStatus.isEmpty(), WebsiteCode::getOrderStatus, orderStatus)
                 .isNotNull(WebsiteCode::getBillno)
-                .notIn(WebsiteCode::getOrderStatus, "PENDING", "PAYING", "CANCEL")
+                .notIn(WebsiteCode::getOrderStatus, "PENDING", "PAYING", "CANCEL", "CLOSED")
                 .ge(req.getStartTime() != null, WebsiteCode::getCreateTime, req.getStartTime())
                 .lt(req.getEndTime() != null, WebsiteCode::getCreateTime, req.getEndTime()).orderByDesc(WebsiteCode::getCreateTime);
         IPage<WebsiteCode> websiteCodeIPage = websiteCodeMapper.selectPage(page, queryWrapper);
@@ -100,7 +110,7 @@ public class AdminWebsiteCodeManageServiceImpl implements AdminWebsiteCodeManage
                 .like(StringUtils.isNotBlank(req.getExpressNo()), WebsiteCodeGroup::getExpressNo, req.getExpressNo())
                 .like(StringUtils.isNotBlank(req.getAddress()), WebsiteCodeGroup::getAddress, req.getAddress())
                 .in(!orderStatus.isEmpty(), WebsiteCodeGroup::getOrderStatus, orderStatus)
-                .notIn(WebsiteCodeGroup::getOrderStatus, "PENDING", "PAYING", "CANCEL")
+                .notIn(WebsiteCodeGroup::getOrderStatus, "PENDING", "PAYING", "CANCEL", "CLOSED")
                 .ge(req.getStartTime() != null, WebsiteCodeGroup::getCreateTime, req.getStartTime())
                 .lt(req.getEndTime() != null, WebsiteCodeGroup::getCreateTime, req.getEndTime()).orderByDesc(WebsiteCodeGroup::getCreateTime);
         IPage<WebsiteCodeGroup> websiteCodeGroupIPage = websiteCodeGroupMapper.selectPage(page, queryWrapper);
@@ -197,13 +207,44 @@ public class AdminWebsiteCodeManageServiceImpl implements AdminWebsiteCodeManage
     }
 
     @Override
-    public Void closeWebsiteCode(Integer id) throws ApiException {
+    @Transactional(rollbackFor = Exception.class)
+    public Void closeWebsiteCode(Integer id) throws ApiException, WxPayException {
         WebsiteCodeGroup websiteCodeGroup = websiteCodeGroupMapper.selectById(id);
         Asserts.assertNonNull(websiteCodeGroup, 500, "没有查询到改订单");
         String orderStatus = websiteCodeGroup.getOrderStatus();
         Asserts.assertTrue("WAIT".equals(orderStatus) || "DELIVERY".equals(orderStatus), 500, "当前订单不支持关闭");
-
-
+        websiteCodeGroup.setOrderStatus("CLOSED");
+        websiteCodeGroupMapper.updateById(websiteCodeGroup);
+        WebsiteCode websiteCode = new WebsiteCode();
+        if (StringUtils.isNotBlank(websiteCodeGroup.getBillno())) {
+            websiteCode.setOrderStatus("CLOSED");
+            websiteCodeMapper.update(websiteCode, Wrappers.lambdaQuery(WebsiteCode.class).eq(WebsiteCode::getBillno, websiteCodeGroup.getBillno()));
+            WxPayNotify wxPayNotify = wxPayNotifyMapper.selectOne(Wrappers.lambdaUpdate(WxPayNotify.class).eq(WxPayNotify::getTransactionId, websiteCodeGroup.getBillno()));
+            if (wxPayNotify != null) {
+                WxPayRefund wxPayRefund = new WxPayRefund();
+                wxPayRefund.setCreateTime(LocalDateTime.now());
+                wxPayRefund.setOpenId(wxPayNotify.getOpenId());
+                BigDecimal totalFee = new BigDecimal(String.valueOf(wxPayNotify.getTotalFee()));
+                //扣除0.6%的手续费
+                BigDecimal subtractFee = totalFee.multiply(new BigDecimal("0.006")).setScale(0, RoundingMode.CEILING);
+                wxPayRefund.setTotalFee(totalFee.subtract(subtractFee).intValue());
+                wxPayRefund.setTransactionId(wxPayNotify.getTransactionId());
+                wxPayRefund.setOuttradeNo(wxPayNotify.getOuttradeNo());
+                wxPayRefund.setRefundNo("refundNo-websiteCode-" + id);
+                wxPayRefundMapper.insert(wxPayRefund);
+                this.mpService.refund(BeanUtil.convert(wxPayRefund, WxPayRefundReq.class));
+            }
+        }
         return null;
+    }
+
+    public static void main(String[] args) {
+        BigDecimal totalFee = new BigDecimal(100);
+        BigDecimal subtractFee = totalFee.multiply(new BigDecimal("0.006")).setScale(0, RoundingMode.CEILING);
+        ;
+        System.out.println(subtractFee);
+        BigDecimal otherFee = totalFee.subtract(subtractFee);
+        System.out.println(totalFee);
+        System.out.println(otherFee);
     }
 }

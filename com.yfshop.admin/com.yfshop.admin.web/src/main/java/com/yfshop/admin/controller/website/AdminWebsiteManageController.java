@@ -77,6 +77,7 @@ public class AdminWebsiteManageController implements BaseController {
 
 
 
+    @SneakyThrows
     @SaCheckLogin
     @ApiOperation(value = "查询全部的网点码", httpMethod = "POST")
     @RequestMapping(value = "/queryWebsiteCodeByWl", method = {RequestMethod.GET, RequestMethod.POST})

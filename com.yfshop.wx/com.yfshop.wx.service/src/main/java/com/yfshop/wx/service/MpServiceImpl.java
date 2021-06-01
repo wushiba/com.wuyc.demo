@@ -17,6 +17,7 @@ import com.yfshop.code.model.WxPayNotify;
 import com.yfshop.code.model.WxPayRefund;
 import com.yfshop.code.model.WxTemplateMessage;
 import com.yfshop.common.util.DateUtil;
+import com.yfshop.wx.api.request.WxPayRefundReq;
 import com.yfshop.wx.api.service.MpService;
 import lombok.AllArgsConstructor;
 import me.chanjar.weixin.common.error.WxErrorException;
@@ -41,12 +42,7 @@ public class MpServiceImpl implements MpService {
     private WxMpService wxMpService;
     @Resource
     private WxTemplateMessageMapper wxTemplateMessageMapper;
-    @Resource
-    private WxPayNotifyMapper wxPayNotifyMapper;
-    @Resource
-    private OrderDetailMapper orderDetailMapper;
-    @Resource
-    private WxPayRefundMapper wxPayRefundMapper;
+
     @Autowired
     private WxPayService wxService;
 
@@ -102,27 +98,15 @@ public class MpServiceImpl implements MpService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Void refund(Long orderId, String transactionId) throws WxPayException {
-        WxPayNotify wxPayNotify = wxPayNotifyMapper.selectOne(Wrappers.lambdaUpdate(WxPayNotify.class).eq(WxPayNotify::getTransactionId, transactionId));
-        OrderDetail orderDetail = orderDetailMapper.selectById(orderId);
-        if (orderDetail != null && wxPayNotify != null) {
-            WxPayRefund wxPayRefund = new WxPayRefund();
-            wxPayRefund.setCreateTime(LocalDateTime.now());
-            wxPayRefund.setOpenId(wxPayNotify.getOpenId());
-            wxPayRefund.setTotalFee(orderDetail.getPayPrice().multiply(new BigDecimal("100")).intValue());
-            wxPayRefund.setTransactionId(wxPayNotify.getTransactionId());
-            wxPayRefund.setOuttradeNo(wxPayNotify.getOuttradeNo());
-            wxPayRefund.setRefundNo("refundNo-shopOrder-" + orderId);
-            wxPayRefundMapper.insert(wxPayRefund);
-            WxPayRefundRequest wxPayRefundRequest = new WxPayRefundRequest();
-            wxPayRefundRequest.setTransactionId(wxPayNotify.getTransactionId());
-            wxPayRefundRequest.setRefundFee(wxPayRefund.getTotalFee());
-            wxPayRefundRequest.setTotalFee(wxPayNotify.getTotalFee());
-            wxPayRefundRequest.setOutTradeNo(wxPayNotify.getOuttradeNo());
-            wxPayRefundRequest.setOutRefundNo(wxPayRefund.getRefundNo());
-            wxPayRefundRequest.setRefundDesc("订单关闭");
-            this.wxService.refund(wxPayRefundRequest);
-        }
+    public Void refund(WxPayRefundReq wxPayRefundReq) throws WxPayException {
+        WxPayRefundRequest wxPayRefundRequest = new WxPayRefundRequest();
+        wxPayRefundRequest.setTransactionId(wxPayRefundReq.getTransactionId());
+        wxPayRefundRequest.setRefundFee(wxPayRefundReq.getTotalFee());
+        wxPayRefundRequest.setTotalFee(wxPayRefundReq.getTotalFee());
+        wxPayRefundRequest.setOutTradeNo(wxPayRefundReq.getOuttradeNo());
+        wxPayRefundRequest.setOutRefundNo(wxPayRefundReq.getRefundNo());
+        wxPayRefundRequest.setRefundDesc("订单关闭");
+        this.wxService.refund(wxPayRefundRequest);
         return null;
     }
 
