@@ -237,14 +237,4 @@ public class AdminWebsiteCodeManageServiceImpl implements AdminWebsiteCodeManage
         }
         return null;
     }
-
-    public static void main(String[] args) {
-        BigDecimal totalFee = new BigDecimal(100);
-        BigDecimal subtractFee = totalFee.multiply(new BigDecimal("0.006")).setScale(0, RoundingMode.CEILING);
-        ;
-        System.out.println(subtractFee);
-        BigDecimal otherFee = totalFee.subtract(subtractFee);
-        System.out.println(totalFee);
-        System.out.println(otherFee);
-    }
 }
