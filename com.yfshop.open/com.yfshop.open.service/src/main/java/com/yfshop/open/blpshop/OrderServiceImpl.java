@@ -97,10 +97,10 @@ public class OrderServiceImpl implements OrderService {
                         RlItemHotpot rlItemHotpot = skuMap.get(detail.getSkuId());
                         OrderResult.GoodInfo goodInfo = new OrderResult.GoodInfo();
                         goodInfo.setProductId(detail.getSkuId() + "");
-                        goodInfo.setSubOrderNo(detail.getSkuId() + "");
+                        goodInfo.setSubOrderNo(detail.getOrderNo());
                         goodInfo.setTradeGoodsNo(rlItemHotpot.getOutSkuNo());
-                        goodInfo.setPlatGoodsId(rlItemHotpot.getOutItemNo());
-                        goodInfo.setPlatSkuId(rlItemHotpot.getOutSkuNo());
+                        goodInfo.setPlatGoodsId(rlItemHotpot.getItemId()+"");
+                        goodInfo.setPlatSkuId(rlItemHotpot.getSkuId()+"");
                         goodInfo.setOutItemId(rlItemHotpot.getOutItemNo());
                         goodInfo.setOutSkuId(rlItemHotpot.getOutSkuNo());
                         goodInfo.setTradeGoodsName(detail.getItemTitle());
