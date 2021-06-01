@@ -79,8 +79,8 @@ public class AdminWebsiteManageController implements BaseController {
 
     @SneakyThrows
     @SaCheckLogin
-    @ApiOperation(value = "查询全部的网点码", httpMethod = "POST")
-    @RequestMapping(value = "/queryWebsiteCodeByWl", method = {RequestMethod.GET, RequestMethod.POST})
+    @ApiOperation(value = "关闭订单", httpMethod = "POST")
+    @RequestMapping(value = "/closeWebsiteCode", method = {RequestMethod.GET, RequestMethod.POST})
     @ResponseBody
     public CommonResult<Void> closeWebsiteCode(Integer id) {
         return CommonResult.success(adminWebsiteCodeManageService.closeWebsiteCode(id));
