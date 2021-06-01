@@ -76,7 +76,7 @@ public class AdminHealthyController implements BaseController {
     }
 
 
-    @RequestMapping(value = "/getActList", method = {RequestMethod.POST})
+    @RequestMapping(value = "/updateAct", method = {RequestMethod.POST})
     @ResponseBody
     @SaCheckLogin
     @SaCheckRole(value = "sys")

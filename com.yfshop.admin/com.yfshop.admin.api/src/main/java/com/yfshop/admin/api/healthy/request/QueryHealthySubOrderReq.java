@@ -33,6 +33,10 @@ public class QueryHealthySubOrderReq implements Serializable {
 
     private Integer districtId;
 
+    private Date startTime;
+
+    private Date endTime;
+
     private Integer pageIndex = 1;
 
     private Integer pageSize = 10;

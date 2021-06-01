@@ -51,7 +51,7 @@ public class AdminHealthyServiceImpl implements AdminHealthyService {
                 .eq(StringUtils.isNotBlank(req.getOrderNo()), HealthyOrder::getOrderNo, req.getOrderNo())
                 .eq(StringUtils.isNotBlank(req.getContracts()), HealthyOrder::getContracts, req.getContracts())
                 .eq(StringUtils.isNotBlank(req.getOrderStatus()), HealthyOrder::getOrderStatus, req.getOrderStatus())
-                .ne(HealthyOrder::getOrderStatus, "CANCEL")
+                .notIn(HealthyOrder::getOrderStatus, "CANCEL","PAYING")
                 .ge(req.getStartTime() != null, HealthyOrder::getPayTime, req.getStartTime())
                 .lt(req.getEndTime() != null, HealthyOrder::getPayTime, req.getEndTime());
         IPage<HealthyOrder> iPage = healthyOrderMapper.selectPage(new Page<>(req.getPageIndex(), req.getPageSize()), queryWrapper);
@@ -64,7 +64,7 @@ public class AdminHealthyServiceImpl implements AdminHealthyService {
         HealthyOrderDetailResult healthyOrderDetailResult = BeanUtil.convert(healthyOrder, HealthyOrderDetailResult.class);
         List<HealthySubOrder> list = healthySubOrderMapper.selectList(Wrappers.lambdaQuery(HealthySubOrder.class).eq(HealthySubOrder::getPOrderId, id));
         healthyOrderDetailResult.setList(BeanUtil.convertList(list, HealthySubOrderResult.class));
-        return null;
+        return healthyOrderDetailResult;
     }
 
     @Override
@@ -80,6 +80,8 @@ public class AdminHealthyServiceImpl implements AdminHealthyService {
                 .eq(req.getProvinceId() != null, HealthySubOrder::getProvinceId, req.getProvinceId())
                 .eq(req.getCityId() != null, HealthySubOrder::getCityId, req.getCityId())
                 .eq(req.getDistrictId() != null, HealthySubOrder::getDistrictId, req.getDistrictId())
+                .ge(req.getStartTime() != null, HealthySubOrder::getExpectShipTime, req.getStartTime())
+                .lt(req.getEndTime() != null, HealthySubOrder::getExpectShipTime, req.getEndTime())
                 .ne(HealthySubOrder::getOrderStatus, "CANCEL");
         IPage<HealthySubOrder> iPage = healthyOrderMapper.selectPage(new Page<>(req.getPageIndex(), req.getPageSize()), queryWrapper);
         return BeanUtil.iPageConvert(iPage, HealthySubOrderResult.class);
@@ -152,7 +154,7 @@ public class AdminHealthyServiceImpl implements AdminHealthyService {
             subOrder.setAllocateMerchantPath(req.getMerchantId() + "");
             subOrder.setOrderStatus(HealthySubOrderStatusEnum.IN_CIRCULATION.getCode());
         } else {
-            Asserts.assertStringNotBlank(req.getExpressNo(),500,"请填写快递信息");
+            Asserts.assertStringNotBlank(req.getExpressNo(), 500, "请填写快递信息");
             subOrder.setOrderStatus(HealthySubOrderStatusEnum.IN_DELIVERY.getCode());
         }
 

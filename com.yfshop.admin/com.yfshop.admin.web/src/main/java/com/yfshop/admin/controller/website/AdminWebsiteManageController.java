@@ -77,6 +77,14 @@ public class AdminWebsiteManageController implements BaseController {
 
 
 
+    @SaCheckLogin
+    @ApiOperation(value = "查询全部的网点码", httpMethod = "POST")
+    @RequestMapping(value = "/queryWebsiteCodeByWl", method = {RequestMethod.GET, RequestMethod.POST})
+    @ResponseBody
+    public CommonResult<Void> closeWebsiteCode(Integer id) {
+        return CommonResult.success(adminWebsiteCodeManageService.closeWebsiteCode(id));
+    }
+
 
     @SaCheckLogin
     @ApiOperation(value = "查询全部的网点码", httpMethod = "POST")
@@ -118,6 +126,10 @@ public class AdminWebsiteManageController implements BaseController {
     public CommonResult<Void> updateWebsiteCodeGroupExpress(WebsiteCodeExpressReq websiteCodeQueryExpressReq) {
         return CommonResult.success(adminWebsiteCodeManageService.updateWebsiteCodeGroupExpress(websiteCodeQueryExpressReq));
     }
+
+
+
+
 
 
     @SaCheckLogin

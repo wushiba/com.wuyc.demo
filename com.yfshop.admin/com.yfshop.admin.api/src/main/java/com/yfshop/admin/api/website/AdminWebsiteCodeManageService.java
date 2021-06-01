@@ -67,4 +67,5 @@ public interface AdminWebsiteCodeManageService {
 
     Void updateWebsiteCodeGroupExpress(WebsiteCodeExpressReq websiteCodeQueryExpressReq);
 
+    Void closeWebsiteCode(Integer id) throws ApiException;
 }

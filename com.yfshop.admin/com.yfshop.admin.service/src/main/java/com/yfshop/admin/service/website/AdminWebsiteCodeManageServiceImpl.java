@@ -195,4 +195,15 @@ public class AdminWebsiteCodeManageServiceImpl implements AdminWebsiteCodeManage
         }
         return null;
     }
+
+    @Override
+    public Void closeWebsiteCode(Integer id) throws ApiException {
+        WebsiteCodeGroup websiteCodeGroup = websiteCodeGroupMapper.selectById(id);
+        Asserts.assertNonNull(websiteCodeGroup, 500, "没有查询到改订单");
+        String orderStatus = websiteCodeGroup.getOrderStatus();
+        Asserts.assertTrue("WAIT".equals(orderStatus) || "DELIVERY".equals(orderStatus), 500, "当前订单不支持关闭");
+
+
+        return null;
+    }
 }

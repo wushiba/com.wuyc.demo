@@ -5,8 +5,6 @@ import com.yfshop.admin.api.healthy.request.*;
 import com.yfshop.admin.api.healthy.result.*;
 import com.yfshop.common.exception.ApiException;
 
-import java.util.List;
-
 public interface AdminHealthyService {
 
     IPage<HealthyOrderResult> findOrderList(QueryHealthyOrderReq req);
