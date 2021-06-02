@@ -193,7 +193,9 @@ public class AdminUserOrderServiceImpl implements AdminUserOrderService {
                         wxPayRefund.setOuttradeNo(wxPayNotify.getOuttradeNo());
                         wxPayRefund.setRefundNo("refundNo-shopOrder-" + id);
                         wxPayRefundMapper.insert(wxPayRefund);
-                        this.mpService.refund(BeanUtil.convert(wxPayRefund, WxPayRefundReq.class));
+                        WxPayRefundReq wxPayRefundReq = BeanUtil.convert(wxPayRefund, WxPayRefundReq.class);
+                        wxPayRefundReq.setRefundFee(wxPayRefund.getTotalFee());
+                        this.mpService.refund(wxPayRefundReq);
                     }
                 }
                 break;

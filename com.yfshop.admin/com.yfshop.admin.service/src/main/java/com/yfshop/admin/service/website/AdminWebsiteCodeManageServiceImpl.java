@@ -227,14 +227,25 @@ public class AdminWebsiteCodeManageServiceImpl implements AdminWebsiteCodeManage
                 BigDecimal totalFee = new BigDecimal(String.valueOf(wxPayNotify.getTotalFee()));
                 //扣除0.6%的手续费
                 BigDecimal subtractFee = totalFee.multiply(new BigDecimal("0.006")).setScale(0, RoundingMode.CEILING);
+                int refundFee = totalFee.subtract(subtractFee).intValue();
                 wxPayRefund.setTotalFee(totalFee.subtract(subtractFee).intValue());
                 wxPayRefund.setTransactionId(wxPayNotify.getTransactionId());
                 wxPayRefund.setOuttradeNo(wxPayNotify.getOuttradeNo());
                 wxPayRefund.setRefundNo("refundNo-websiteCode-" + id);
                 wxPayRefundMapper.insert(wxPayRefund);
-                this.mpService.refund(BeanUtil.convert(wxPayRefund, WxPayRefundReq.class));
+                WxPayRefundReq wxPayRefundReq = BeanUtil.convert(wxPayRefund, WxPayRefundReq.class);
+                wxPayRefundReq.setTotalFee(wxPayNotify.getTotalFee());
+                wxPayRefundReq.setRefundFee(refundFee);
+                this.mpService.refund(wxPayRefundReq);
             }
         }
         return null;
+    }
+
+    public static void main(String[] args) {
+        BigDecimal totalFee = new BigDecimal("830");
+        //扣除0.6%的手续费
+        BigDecimal subtractFee = totalFee.multiply(new BigDecimal("0.006")).setScale(0, RoundingMode.CEILING);
+        System.out.println(totalFee.subtract(subtractFee).intValue());
     }
 }

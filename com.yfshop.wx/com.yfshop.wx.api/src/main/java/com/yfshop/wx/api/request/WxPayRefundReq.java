@@ -19,6 +19,8 @@ public class WxPayRefundReq implements Serializable {
      */
     private Integer totalFee;
 
+
+    private Integer refundFee;
     /**
      * 微信支付订单号
      */

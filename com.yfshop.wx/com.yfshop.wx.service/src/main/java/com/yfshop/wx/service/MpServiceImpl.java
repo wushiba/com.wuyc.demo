@@ -101,7 +101,7 @@ public class MpServiceImpl implements MpService {
     public Void refund(WxPayRefundReq wxPayRefundReq) throws WxPayException {
         WxPayRefundRequest wxPayRefundRequest = new WxPayRefundRequest();
         wxPayRefundRequest.setTransactionId(wxPayRefundReq.getTransactionId());
-        wxPayRefundRequest.setRefundFee(wxPayRefundReq.getTotalFee());
+        wxPayRefundRequest.setRefundFee(wxPayRefundReq.getRefundFee());
         wxPayRefundRequest.setTotalFee(wxPayRefundReq.getTotalFee());
         wxPayRefundRequest.setOutTradeNo(wxPayRefundReq.getOuttradeNo());
         wxPayRefundRequest.setOutRefundNo(wxPayRefundReq.getRefundNo());
