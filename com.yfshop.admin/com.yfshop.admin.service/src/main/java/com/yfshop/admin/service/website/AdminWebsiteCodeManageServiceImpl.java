@@ -241,11 +241,4 @@ public class AdminWebsiteCodeManageServiceImpl implements AdminWebsiteCodeManage
         }
         return null;
     }
-
-    public static void main(String[] args) {
-        BigDecimal totalFee = new BigDecimal("830");
-        //扣除0.6%的手续费
-        BigDecimal subtractFee = totalFee.multiply(new BigDecimal("0.006")).setScale(0, RoundingMode.CEILING);
-        System.out.println(totalFee.subtract(subtractFee).intValue());
-    }
 }
