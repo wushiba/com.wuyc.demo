@@ -324,8 +324,13 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
 
     @Override
     public IPage<WebsiteCodeResult> applyWebsiteCodeStatus(Integer merchantId, String status, Integer pageIndex, Integer pageSize) {
+        Merchant merchant = merchantMapper.selectById(merchantId);
         List<String> allStatus = new ArrayList<>();
         if ("ALL".equals(status)) {
+            if (!GroupRoleEnum.JXS.getCode().equals(merchant.getRoleAlias())) {
+                allStatus.add("PENDING");
+                allStatus.add("PAYING");
+            }
             allStatus.add("WAIT");
             allStatus.add("DELIVERY");
             allStatus.add("SUCCESS");
