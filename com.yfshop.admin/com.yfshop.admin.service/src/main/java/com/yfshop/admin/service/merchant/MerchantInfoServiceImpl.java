@@ -242,12 +242,12 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
             if (merchantDetail != null) {
                 Integer merchantDetailId = merchantDetail.getId();
                 merchantDetail = BeanUtil.convert(websiteReq, MerchantDetail.class);
-                merchantDetail.setMerchantId(merchant.getId());
+                merchantDetail.setMerchantId(merchantId);
                 merchantDetail.setId(merchantDetailId);
                 merchantDetailMapper.updateById(merchantDetail);
             } else {
                 merchantDetail = BeanUtil.convert(websiteReq, MerchantDetail.class);
-                merchantDetail.setMerchantId(merchant.getId());
+                merchantDetail.setMerchantId(merchantId);
                 merchantDetailMapper.insert(merchantDetail);
             }
         }
