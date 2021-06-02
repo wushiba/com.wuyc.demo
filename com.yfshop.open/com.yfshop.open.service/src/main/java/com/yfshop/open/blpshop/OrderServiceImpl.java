@@ -1,5 +1,7 @@
 package com.yfshop.open.blpshop;
 
+import com.google.common.collect.Lists;
+
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
@@ -17,6 +19,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -99,8 +102,8 @@ public class OrderServiceImpl implements OrderService {
                         goodInfo.setProductId(detail.getSkuId() + "");
                         goodInfo.setSubOrderNo(detail.getOrderNo());
                         goodInfo.setTradeGoodsNo(rlItemHotpot.getOutSkuNo());
-                        goodInfo.setPlatGoodsId(rlItemHotpot.getItemId()+"");
-                        goodInfo.setPlatSkuId(rlItemHotpot.getSkuId()+"");
+                        goodInfo.setPlatGoodsId(rlItemHotpot.getItemId() + "");
+                        goodInfo.setPlatSkuId(rlItemHotpot.getSkuId() + "");
                         goodInfo.setOutItemId(rlItemHotpot.getOutItemNo());
                         goodInfo.setOutSkuId(rlItemHotpot.getOutSkuNo());
                         goodInfo.setTradeGoodsName(detail.getItemTitle());
@@ -144,12 +147,38 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public CheckRefundStatusResult checkRefundStatus(CheckRefundStatusReq checkRefundStatusReq) throws ApiException {
         CheckRefundStatusResult checkRefundStatusResult = new CheckRefundStatusResult();
+        Order order = orderMapper.selectById(Integer.parseInt(checkRefundStatusReq.getOrderId()));
+        if (order != null) {
+            List<OrderDetail> list = orderDetailMapper.selectList(Wrappers.lambdaQuery(OrderDetail.class)
+                    .eq(OrderDetail::getOrderId, order.getId())
+                    .eq(OrderDetail::getOrderStatus, UserOrderStatusEnum.CLOSED));
+            List<CheckRefundStatusResult.ChildrenRefundStatus> refundStatusList = new ArrayList<>();
+            checkRefundStatusResult.setChildrenRefundStatus(refundStatusList);
+            list.forEach(item -> {
+                CheckRefundStatusResult.ChildrenRefundStatus childrenRefundStatus = new CheckRefundStatusResult.ChildrenRefundStatus();
+                refundStatusList.add(childrenRefundStatus);
+                childrenRefundStatus.setRefundStatus("JH_06");
+                childrenRefundStatus.setRefundNo("refundNo-shopSubOrder-" + item.getId());
+                childrenRefundStatus.setSuborderNo(item.getOrderNo());
+                childrenRefundStatus.setRefundStatusDescription("退款成功");
+            });
+            if (list.size() == order.getChildOrderCount()) {
+                checkRefundStatusResult.setSubMessage("退款成功");
+                checkRefundStatusResult.setRefundStatus("JH_06");
+            } else if (list.size() == 0) {
+                checkRefundStatusResult.setSubMessage("没有退款");
+                checkRefundStatusResult.setRefundStatus("JH_07");
+            } else {
+                checkRefundStatusResult.setSubMessage("部分退款");
+                checkRefundStatusResult.setRefundStatus("JH_09");
+            }
+        } else {
+            checkRefundStatusResult.setSubMessage("没有退款");
+            checkRefundStatusResult.setRefundStatus("JH_07");
+        }
         checkRefundStatusResult.setCode("10000");
         checkRefundStatusResult.setMessage("SUCCESS");
-        checkRefundStatusResult.setSubMessage("没有退款");
-        checkRefundStatusResult.setRefundStatus("JH_07");
         checkRefundStatusResult.setRefundStatusDescription("退款成功");
-
         return checkRefundStatusResult;
     }
 
@@ -221,12 +250,88 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public RefundResult getRefund(RefundReq refundReq) throws ApiException {
+        List<RlItemHotpot> list = rlItemHotpotMapper.selectList(Wrappers.emptyWrapper());
+        Map<Integer, RlItemHotpot> skuMap = list.stream().collect(Collectors.toMap(RlItemHotpot::getSkuId, Function.identity()));
+        List<Integer> skuIds = new ArrayList<>();
+        list.stream().forEach(item -> {
+            skuIds.add(item.getSkuId());
+        });
         RefundResult refundResult = new RefundResult();
-        refundResult.setRefunds(new ArrayList<>());
+        List<RefundResult.Refunds> orderList = new ArrayList<>();
+        int numTotalOrder = 0;
+        if (!CollectionUtils.isEmpty(skuIds)) {
+            LambdaQueryWrapper<OrderDetail> lambdaQueryWrapper = Wrappers.<OrderDetail>lambdaQuery()
+                    .in(OrderDetail::getSkuId, skuIds)
+                    .eq(OrderDetail::getOrderStatus, UserOrderStatusEnum.CLOSED.getCode())
+                    .ge(refundReq.getBeginTime() != null, OrderDetail::getUpdateTime, refundReq.getBeginTime())
+                    .le(refundReq.getEndTime() != null, OrderDetail::getUpdateTime, refundReq.getEndTime());
+            IPage<OrderDetail> iPage = orderDetailMapper.selectPage(new Page(refundReq.getPageIndex(), refundReq.getPageSize()), lambdaQueryWrapper);
+            List<OrderDetail> orderDetails = iPage.getRecords();
+            Map<Long, List<OrderDetail>> OrderDetailList = orderDetails.stream().collect(Collectors.groupingBy(OrderDetail::getOrderId));
+            List<Long> orderIds = new ArrayList<>();
+            OrderDetailList.forEach((key, value) -> {
+                orderIds.add(key);
+            });
+            if (!CollectionUtils.isEmpty(orderIds)) {
+                List<Order> orders = orderMapper.selectBatchIds(orderIds);
+                List<OrderAddress> orderAddresses = orderAddressMapper.selectList(Wrappers.<OrderAddress>lambdaQuery().in(OrderAddress::getOrderId, orderIds));
+                Map<Long, Order> orderMap = orders.stream().collect(Collectors.toMap(Order::getId, Function.identity()));
+                Map<Long, OrderAddress> orderAddressMap = orderAddresses.stream().collect(Collectors.toMap(OrderAddress::getOrderId, Function.identity()));
+                numTotalOrder=OrderDetailList.size();
+                OrderDetailList.forEach((key, value) -> {
+                    List<RefundResult.RefundGoods> goodInfos = new ArrayList<>();
+                    OrderAddress orderAddress = orderAddressMap.get(key);
+                    Order o = orderMap.get(key);
+                    RefundResult.Refunds order = new RefundResult.Refunds();
+                    order.setRefundNo("refundNo-shopOrder-" + key);
+                    order.setPlatOrderNo(key + "");
+                    List<String> subOrderNos = new ArrayList<>();
+                    for (OrderDetail detail : value) {
+                        subOrderNos.add(detail.getOrderNo());
+                    }
+                    order.setSubPlatOrderNo(org.apache.commons.lang.StringUtils.join(subOrderNos, "|"));
+                    order.setTotalAmount(o.getPayPrice().toString());
+                    order.setPayAmount(o.getPayPrice().toString());
+                    order.setBuyerNick(orderAddress.getRealname());
+                    order.setSellerNick("雨凡帆健康家");
+                    order.setCreateTime(cn.hutool.core.date.DateUtil.format(o.getUpdateTime(), "yyyy-MM-dd HH:mm:ss"));
+                    order.setUpdateTime(cn.hutool.core.date.DateUtil.format(o.getUpdateTime(), "yyyy-MM-dd HH:mm:ss"));
+                    order.setOrderStatus("JH_05");
+                    order.setOrderStatusDesc("已关闭订单，并退款");
+                    order.setRefundStatus("JH_06");
+                    order.setRefundStatusDesc("已关闭订单，并退款");
+                    order.setGoodsStatus("JH_98");
+                    order.setGoodsStatusDesc("已关闭订单，并退款");
+                    order.setHasGoodsReturn("false");
+                    order.setReason("已关闭订单，并退款");
+                    order.setDesc("已关闭订单，并退款");
+                    order.setProductNum(value.size());
+                    order.setLogisticName("");
+                    order.setLogisticNo("");
+                    order.setRefundGoods(goodInfos);
+                    for (OrderDetail detail : value) {
+                        RlItemHotpot rlItemHotpot = skuMap.get(detail.getSkuId());
+                        RefundResult.RefundGoods goodInfo = new RefundResult.RefundGoods();
+                        goodInfo.setPlatProductId(detail.getSkuId() + "");
+                        goodInfo.setOuterID(rlItemHotpot.getOutItemNo());
+                        goodInfo.setSku(rlItemHotpot.getSkuId() + "");
+                        goodInfo.setProductName(detail.getItemTitle());
+                        goodInfo.setRefundAmount(detail.getPayPrice().toString());
+                        goodInfo.setReason("已关闭订单，并退款");
+                        goodInfo.setProductNum(detail.getItemCount());
+                        goodInfos.add(goodInfo);
+                    }
+                    orderList.add(order);
+                });
+            }
+        }
+
+
+        refundResult.setRefunds(orderList);
         refundResult.setMessage("SUCCESS");
         refundResult.setCode("10000");
         refundResult.setIsSuccess(true);
-        refundResult.setTotalCount(0);
+        refundResult.setTotalCount(numTotalOrder);
         return refundResult;
     }
 
@@ -236,4 +341,5 @@ public class OrderServiceImpl implements OrderService {
         }
         return json;
     }
+    
 }

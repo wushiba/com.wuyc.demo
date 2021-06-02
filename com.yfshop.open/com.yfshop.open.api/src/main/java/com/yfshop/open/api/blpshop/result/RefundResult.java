@@ -37,7 +37,9 @@ public class RefundResult implements Serializable {
         private String goodsStatus;
         private String goodsStatusDesc;
         private String hasGoodsReturn;
+        private String reason;
         private String desc;
+        private Integer productNum;
         private String logisticName;
         private String logisticNo;
         private List<RefundGoods> refundGoods;
@@ -51,7 +53,7 @@ public class RefundResult implements Serializable {
         private String productName;
         private String refundAmount;
         private String reason;
-        private String productNum;
+        private Integer productNum;
         private String poNo;
     }
 }

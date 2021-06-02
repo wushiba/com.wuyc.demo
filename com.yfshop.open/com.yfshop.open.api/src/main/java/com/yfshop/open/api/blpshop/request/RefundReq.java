@@ -11,6 +11,6 @@ import java.util.Date;
 public class RefundReq implements Serializable {
     private Date beginTime;
     private Date endTime;
-    private String pageIndex;
-    private String pageSize;
+    private Integer pageIndex;
+    private Integer pageSize;
 }
