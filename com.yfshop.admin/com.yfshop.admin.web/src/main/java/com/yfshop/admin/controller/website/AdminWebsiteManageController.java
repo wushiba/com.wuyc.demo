@@ -3,6 +3,7 @@ package com.yfshop.admin.controller.website;
 import cn.afterturn.easypoi.excel.ExcelExportUtil;
 import cn.afterturn.easypoi.excel.entity.ExportParams;
 import cn.dev33.satoken.annotation.SaCheckLogin;
+import cn.dev33.satoken.annotation.SaCheckRole;
 import cn.hutool.core.io.IoUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.yfshop.admin.api.website.AdminWebsiteCodeManageService;
@@ -76,11 +77,11 @@ public class AdminWebsiteManageController implements BaseController {
     }
 
 
-
     @SneakyThrows
     @SaCheckLogin
     @ApiOperation(value = "关闭订单", httpMethod = "POST")
     @RequestMapping(value = "/closeWebsiteCode", method = {RequestMethod.GET, RequestMethod.POST})
+    @SaCheckRole(value = "sys")
     @ResponseBody
     public CommonResult<Void> closeWebsiteCode(Integer id) {
         return CommonResult.success(adminWebsiteCodeManageService.closeWebsiteCode(id));
@@ -129,10 +130,6 @@ public class AdminWebsiteManageController implements BaseController {
     }
 
 
-
-
-
-
     @SaCheckLogin
     @SneakyThrows
     @ApiOperation(value = "导出网点码详情", httpMethod = "POST")
@@ -162,6 +159,7 @@ public class AdminWebsiteManageController implements BaseController {
     @ApiOperation(value = "重新生成网点码", httpMethod = "POST")
     @RequestMapping(value = "/retryWebsiteCode", method = {RequestMethod.GET, RequestMethod.POST})
     @ResponseBody
+    @SaCheckRole(value = "sys")
     public CommonResult<Void> retryWebsiteCode(Integer websiteCodeId) {
         return CommonResult.success(adminWebsiteCodeManageService.retryWebsiteCode(websiteCodeId));
     }
