@@ -214,7 +214,7 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
             merchantMapper.insert(merchant);
             merchantId = merchant.getId();
             MerchantDetail merchantDetail = BeanUtil.convert(websiteReq, MerchantDetail.class);
-            merchantDetail.setMerchantId(merchant.getId());
+            merchantDetail.setMerchantId(merchantId);
             merchantDetail.setGeoHash(GeoUtils.toBase32(websiteReq.getLatitude(), websiteReq.getLongitude(), 12));
             merchantDetailMapper.insert(merchantDetail);
             roleAlias = GroupRoleEnum.WD.getCode();
@@ -255,10 +255,10 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
             Merchant merchantPid = merchantMapper.selectById(websiteCodeDetail.getPid());
             if (merchantPid != null) {
                 merchant.setPid(merchantPid.getId());
-                merchant.setPidPath(merchantPid.getPidPath() + merchant.getId() + ".");
+                merchant.setPidPath(merchantPid.getPidPath() + merchantId + ".");
                 merchant.setPMerchantName(merchantPid.getMerchantName());
             } else {
-                merchant.setPidPath(merchant.getId() + ".");
+                merchant.setPidPath(merchantId + ".");
             }
         }
         if (StringUtils.isNotBlank(websiteReq.getOpenId())) {
@@ -270,7 +270,7 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
         }
         merchant.setId(merchantId);
         merchantMapper.updateById(merchant);
-        websiteCodeDetail.setMerchantId(merchant.getId());
+        websiteCodeDetail.setMerchantId(merchantId);
         websiteCodeDetail.setActivityTime(LocalDateTime.now());
         websiteCodeDetail.setMerchantName(merchant.getMerchantName());
         websiteCodeDetail.setMerchantPidPath(merchant.getPidPath());
