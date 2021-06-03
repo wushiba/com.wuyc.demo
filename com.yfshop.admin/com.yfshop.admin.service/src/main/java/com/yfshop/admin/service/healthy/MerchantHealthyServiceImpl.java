@@ -1,5 +1,7 @@
 package com.yfshop.admin.service.healthy;
 
+import cn.hutool.core.date.DateUtil;
+import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -11,7 +13,9 @@ import com.yfshop.admin.api.healthy.request.QueryMerchantHealthySubOrdersReq;
 import com.yfshop.admin.api.healthy.result.HealthySubOrderResult;
 import com.yfshop.admin.api.merchant.request.QueryMerchantReq;
 import com.yfshop.admin.api.merchant.result.MerchantResult;
+import com.yfshop.admin.databean.DeliveryMan;
 import com.yfshop.admin.utils.Ip2regionUtil;
+import com.yfshop.code.mapper.HealthyOrderMapper;
 import com.yfshop.code.mapper.HealthySubOrderMapper;
 import com.yfshop.code.mapper.MerchantMapper;
 import com.yfshop.code.mapper.RegionMapper;
@@ -29,6 +33,9 @@ import me.chanjar.weixin.mp.bean.template.WxMpTemplateMessage;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
@@ -48,6 +55,7 @@ import java.util.List;
 @DubboService
 @Validated
 public class MerchantHealthyServiceImpl implements MerchantHealthyService {
+    private static final Logger logger = LoggerFactory.getLogger(MerchantHealthyServiceImpl.class);
 
     private static final List<String> FIT_ROLES = new ArrayList<>(Arrays.asList(GroupRoleEnum.FXS.getCode(), GroupRoleEnum.YWY.getCode(), GroupRoleEnum.CXY.getCode()));
 
@@ -55,10 +63,14 @@ public class MerchantHealthyServiceImpl implements MerchantHealthyService {
     private MerchantMapper merchantMapper;
     @Resource
     private HealthySubOrderMapper healthySubOrderMapper;
+    @Resource
+    private HealthyOrderMapper healthyOrderMapper;
     @DubboReference(check = false)
     private MpService mpService;
     @Resource
     private RegionMapper regionMapper;
+    @Value("${shop.url}")
+    private String shopUrl;
 
     @Override
     public IPage<HealthySubOrderResult> pageQueryMerchantHealthySubOrders(@Valid @NotNull QueryMerchantHealthySubOrdersReq req) throws ApiException {
@@ -94,21 +106,31 @@ public class MerchantHealthyServiceImpl implements MerchantHealthyService {
 
         // modify order status
         HealthySubOrder entity = new HealthySubOrder();
-        entity.setOrderStatus(HealthySubOrderStatusEnum.IN_CIRCULATION.getCode());
+        entity.setOrderStatus(HealthySubOrderStatusEnum.IN_DELIVERY.getCode());
         entity.setShipTime(LocalDateTime.now());
+        // 配送员信息
+        entity.setDeliveryMan(JSON.toJSONString(DeliveryMan.builder().merchantId(merchantId).mobile(merchant.getMobile()).name(merchant.getMerchantName()).build()));
         int rows = healthySubOrderMapper.update(entity, Wrappers.lambdaQuery(HealthySubOrder.class)
                 .eq(HealthySubOrder::getId, subOrder).eq(HealthySubOrder::getOrderStatus, HealthySubOrderStatusEnum.WAIT_DELIVERY.getCode()));
         if (rows > 0) {
             // 通知用户已开始配送
-            // TODO 2021/6/3 ......
-            List<WxMpTemplateData> data = new ArrayList<>();
-            data.add(new WxMpTemplateData("first", "您已成功兑换椰岛135ml鹿龟酒1瓶，恭喜恭喜~"));
-            data.add(new WxMpTemplateData("keyword1", ""));
-            data.add(new WxMpTemplateData("keyword2", "2元"));
-            data.add(new WxMpTemplateData("remark", "点击查阅订单"));
-            WxMpTemplateMessage wxMpTemplateMessage = WxMpTemplateMessage.builder().templateId("kEnXD9LGvWpcWud99dUu_A85vc5w1vT9-rMzqybrQaw")
-                    .toUser(subOrder.getOpenId()).data(data).url("tgsdfghjksdfhgsdhaks").build();
-            mpService.sendWxMpTemplateMsg(wxMpTemplateMessage);
+            try {
+                List<WxMpTemplateData> data = new ArrayList<>();
+                data.add(new WxMpTemplateData("first", "您的订单开始配送"));
+                data.add(new WxMpTemplateData("keyword1", subOrder.getOrderNo()));
+                data.add(new WxMpTemplateData("keyword2", HealthySubOrderStatusEnum.IN_DELIVERY.getDescription()));
+                data.add(new WxMpTemplateData("keyword3", DateUtil.formatLocalDateTime(entity.getShipTime())));
+                data.add(new WxMpTemplateData("remark", "感谢您的使用"));
+                WxMpTemplateMessage wxMpTemplateMessage = WxMpTemplateMessage.builder()
+                        .templateId("DPsaeQLsjHPbdcLGAOngLahwVoFlp6I9fB4iB_c-k5U")
+                        .toUser(subOrder.getOpenId())
+                        .data(data)
+                        .url(shopUrl + "/orderdetailForXxd?id=" + subOrder.getPOrderId())
+                        .build();
+                mpService.sendWxMpTemplateMsg(wxMpTemplateMessage);
+            } catch (Exception e) {
+                logger.error("发送微信推送通知用户已开始配送失败", e);
+            }
         }
         return null;
     }
@@ -117,6 +139,7 @@ public class MerchantHealthyServiceImpl implements MerchantHealthyService {
     @Override
     public Void completeDelivery(@NotNull(message = "订单ID不能为空") Integer subOrderId,
                                  @NotNull(message = "配送商户ID不能为空") Integer merchantId) throws ApiException {
+
         HealthySubOrder subOrder = healthySubOrderMapper.selectById(subOrderId);
         Asserts.assertNonNull(subOrder, 500, "订单不存在");
         Merchant merchant = merchantMapper.selectById(merchantId);
@@ -131,16 +154,30 @@ public class MerchantHealthyServiceImpl implements MerchantHealthyService {
         int rows = healthySubOrderMapper.update(entity, Wrappers.lambdaQuery(HealthySubOrder.class)
                 .eq(HealthySubOrder::getId, subOrder).eq(HealthySubOrder::getOrderStatus, HealthySubOrderStatusEnum.IN_DELIVERY.getCode()));
         if (rows > 0) {
-            // 通知用户已完成配送
-            // TODO 2021/6/3 ......
-            List<WxMpTemplateData> data = new ArrayList<>();
-            data.add(new WxMpTemplateData("first", "您已成功兑换椰岛135ml鹿龟酒1瓶，恭喜恭喜~"));
-            data.add(new WxMpTemplateData("keyword1", ""));
-            data.add(new WxMpTemplateData("keyword2", "2元"));
-            data.add(new WxMpTemplateData("remark", "点击查阅订单"));
-            WxMpTemplateMessage wxMpTemplateMessage = WxMpTemplateMessage.builder().templateId("kEnXD9LGvWpcWud99dUu_A85vc5w1vT9-rMzqybrQaw")
-                    .toUser(subOrder.getOpenId()).data(data).url("tgsdfghjksdfhgsdhaks").build();
-            mpService.sendWxMpTemplateMsg(wxMpTemplateMessage);
+            try {
+                // 配送次序
+                int sequence = Integer.parseInt(subOrder.getOrderNo().substring(subOrder.getPOrderNo().length()));
+                // 配送员信息
+                DeliveryMan deliveryMan = JSON.parseObject(subOrder.getDeliveryMan(), DeliveryMan.class);
+                // 通知用户配送完成
+                List<WxMpTemplateData> data = new ArrayList<>();
+                data.add(new WxMpTemplateData("first", "如您对本次配送有疑问，请直接致电配送人员。"));
+                data.add(new WxMpTemplateData("keyword1", subOrder.getOrderNo()));
+                data.add(new WxMpTemplateData("keyword2", subOrder.getItemTitle()));
+                data.add(new WxMpTemplateData("keyword3", DateUtil.formatLocalDateTime(entity.getCompletedTime())));
+                data.add(new WxMpTemplateData("keyword4", "已完成第" + sequence + "次配送"));
+                data.add(new WxMpTemplateData("keyword5", deliveryMan.getName()));
+                data.add(new WxMpTemplateData("remark", "点击查看订单详情"));
+                WxMpTemplateMessage wxMpTemplateMessage = WxMpTemplateMessage.builder()
+                        .templateId("Ds7L4eiqrpSbsvWE3-Bp-BjHxTUVA0D_79P0Q7ZkUIA")
+                        .toUser(subOrder.getOpenId())
+                        .data(data)
+                        .url(shopUrl + "/orderdetailForXxd?id=" + subOrder.getPOrderId())
+                        .build();
+                mpService.sendWxMpTemplateMsg(wxMpTemplateMessage);
+            } catch (Exception e) {
+                logger.error("发送微信推送通知用户已完成配送失败", e);
+            }
         }
         return null;
     }

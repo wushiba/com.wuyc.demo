@@ -5,6 +5,7 @@ import lombok.Data;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.Map;
 
 /**
  * <p>
@@ -132,5 +133,19 @@ public class HealthySubOrderResult implements Serializable {
 
     private Integer currentMerchantId;
 
-    private MerchantResult deliveryMan;
+    /**
+     * 配送员信息
+     */
+    private Map<String, Object> deliveryMan;
+
+    /**
+     * 商品ID
+     */
+    private Integer itemId;
+
+    /**
+     * 商品名称
+     */
+    private String itemTitle;
+
 }

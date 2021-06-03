@@ -51,7 +51,7 @@ public class AdminHealthyServiceImpl implements AdminHealthyService {
                 .eq(StringUtils.isNotBlank(req.getOrderNo()), HealthyOrder::getOrderNo, req.getOrderNo())
                 .eq(StringUtils.isNotBlank(req.getContracts()), HealthyOrder::getContracts, req.getContracts())
                 .eq(StringUtils.isNotBlank(req.getOrderStatus()), HealthyOrder::getOrderStatus, req.getOrderStatus())
-                .notIn(HealthyOrder::getOrderStatus, HealthyOrderStatusEnum.CANCEL.getCode(),HealthyOrderStatusEnum.PAYING.getCode())
+                .notIn(HealthyOrder::getOrderStatus, HealthyOrderStatusEnum.CANCEL.getCode(), HealthyOrderStatusEnum.PAYING.getCode())
                 .ge(req.getStartTime() != null, HealthyOrder::getPayTime, req.getStartTime())
                 .lt(req.getEndTime() != null, HealthyOrder::getPayTime, req.getEndTime());
         IPage<HealthyOrder> iPage = healthyOrderMapper.selectPage(new Page<>(req.getPageIndex(), req.getPageSize()), queryWrapper);
@@ -232,7 +232,7 @@ public class AdminHealthyServiceImpl implements AdminHealthyService {
             subOrder.setUserName(null);
             subOrder.setPOrderId(order.getId());
             subOrder.setPOrderNo(order.getOrderNo());
-            subOrder.setOrderNo(order.getOrderNo() + i);
+            subOrder.setOrderNo(order.getOrderNo() + (i + 1));
             subOrder.setMerchantId(null);
             subOrder.setPostWay(null);
             // 待分配
@@ -252,6 +252,8 @@ public class AdminHealthyServiceImpl implements AdminHealthyService {
             subOrder.setMobile(order.getMobile());
             subOrder.setContracts(order.getContracts());
             subOrder.setPostItemCount(postItemCount);
+            subOrder.setItemId(order.getItemId());
+            subOrder.setItemTitle(order.getItemTitle());
             healthySubOrderMapper.insert(subOrder);
         }
         return null;
