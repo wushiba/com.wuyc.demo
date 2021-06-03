@@ -167,7 +167,7 @@ public class AdminWebsiteManageController implements BaseController {
 
     @SaCheckLogin
     @ApiOperation(value = "补发网点码邮件", httpMethod = "POST")
-    @RequestMapping(value = "/retryWebsiteCode", method = {RequestMethod.GET, RequestMethod.POST})
+    @RequestMapping(value = "/sendEmailWebsiteCode", method = {RequestMethod.GET, RequestMethod.POST})
     @ResponseBody
     @SaCheckRole(value = "sys")
     public CommonResult<Void> sendEmailWebsiteCode(Integer websiteCodeId,String email) {
