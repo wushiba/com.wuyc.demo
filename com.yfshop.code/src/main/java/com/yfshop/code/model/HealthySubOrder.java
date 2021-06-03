@@ -143,6 +143,22 @@ public class HealthySubOrder extends Model<HealthySubOrder> {
 
     private Integer currentMerchantId;
 
+    /**
+     * 商品ID
+     */
+    private Integer itemId;
+
+    /**
+     * 商品名称
+     */
+    private String itemTitle;
+
+    /**
+     * 配送员信息
+     * json串
+     */
+    private String deliveryMan;
+
     @Override
     protected Serializable pkVal() {
         return this.id;

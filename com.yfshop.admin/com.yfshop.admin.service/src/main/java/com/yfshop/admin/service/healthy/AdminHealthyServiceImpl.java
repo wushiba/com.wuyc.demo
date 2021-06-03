@@ -264,7 +264,7 @@ public class AdminHealthyServiceImpl implements AdminHealthyService {
             subOrder.setUserName(null);
             subOrder.setPOrderId(order.getId());
             subOrder.setPOrderNo(order.getOrderNo());
-            subOrder.setOrderNo(order.getOrderNo() + i);
+            subOrder.setOrderNo(order.getOrderNo() + (i + 1));
             subOrder.setMerchantId(null);
             subOrder.setPostWay(null);
             // 待分配
@@ -284,6 +284,8 @@ public class AdminHealthyServiceImpl implements AdminHealthyService {
             subOrder.setMobile(order.getMobile());
             subOrder.setContracts(order.getContracts());
             subOrder.setPostItemCount(postItemCount);
+            subOrder.setItemId(order.getItemId());
+            subOrder.setItemTitle(order.getItemTitle());
             healthySubOrderMapper.insert(subOrder);
         }
         return null;

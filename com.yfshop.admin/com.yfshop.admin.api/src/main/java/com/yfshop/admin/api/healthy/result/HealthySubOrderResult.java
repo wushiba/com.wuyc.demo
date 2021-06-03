@@ -121,5 +121,19 @@ public class HealthySubOrderResult implements Serializable {
      */
     private String contracts;
 
+    /**
+     * 商品ID
+     */
+    private Integer itemId;
+
+    /**
+     * 商品名称
+     */
+    private String itemTitle;
+
+    /**
+     * 配送员信息
+     */
+    private String deliveryMan;
 
 }
