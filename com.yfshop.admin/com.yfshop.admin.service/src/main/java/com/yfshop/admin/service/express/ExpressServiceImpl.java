@@ -15,12 +15,15 @@ import com.yfshop.admin.api.express.result.StoExpressResult;
 import com.yfshop.code.mapper.OrderDetailMapper;
 import com.yfshop.code.model.OrderDetail;
 import com.yfshop.common.exception.ApiException;
+import com.yfshop.common.util.JuHeExpressDeliveryUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.dubbo.config.annotation.DubboService;
 
 import javax.annotation.Resource;
 import java.util.*;
+
+import static com.yfshop.common.util.JuHeExpressDeliveryUtils.findExpressDeliveryInfo;
 
 @DubboService
 public class ExpressServiceImpl implements ExpressService {
@@ -66,7 +69,7 @@ public class ExpressServiceImpl implements ExpressService {
         if (stoExpressResult.getSuccess().equals("true")) {
             JSONObject dataJson = JSONUtil.parseObj(stoExpressResult.getData());
             JSONArray jsonArray = dataJson.getJSONArray(wayBillNo);
-            if (jsonArray!=null) {
+            if (jsonArray != null) {
                 jsonArray.forEach(item -> {
                     StoExpressResult.WaybillNoDTO sto = JSONUtil.toBean((JSONObject) item, StoExpressResult.WaybillNoDTO.class);
                     ExpressResult expressResult = new ExpressResult();
@@ -101,6 +104,22 @@ public class ExpressServiceImpl implements ExpressService {
                     expressResult.setDateTime(item.getAcceptTime());
                     expressResultList.add(expressResult);
                 });
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return expressResultList;
+    }
+
+
+    private List<ExpressResult> queryCommExpress(String expressDeliveryCompanyNumber,
+                                                 String expressDeliveryNumber,
+                                                 String receiverPhone) {
+        List<ExpressResult> expressResultList = new ArrayList<>();
+        try {
+            JuHeExpressDeliveryUtils.JuHeExpressDeliveryInfoResponse juHeExpressDeliveryInfoResponse = JuHeExpressDeliveryUtils.findExpressDeliveryInfo(expressDeliveryCompanyNumber, expressDeliveryNumber, "", receiverPhone);
+            if (juHeExpressDeliveryInfoResponse.getSuccess()) {
+
             }
         } catch (Exception e) {
             e.printStackTrace();

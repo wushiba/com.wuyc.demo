@@ -163,4 +163,14 @@ public class AdminWebsiteManageController implements BaseController {
     public CommonResult<Void> retryWebsiteCode(Integer websiteCodeId) {
         return CommonResult.success(adminWebsiteCodeManageService.retryWebsiteCode(websiteCodeId));
     }
+
+
+    @SaCheckLogin
+    @ApiOperation(value = "补发网点码邮件", httpMethod = "POST")
+    @RequestMapping(value = "/retryWebsiteCode", method = {RequestMethod.GET, RequestMethod.POST})
+    @ResponseBody
+    @SaCheckRole(value = "sys")
+    public CommonResult<Void> sendEmailWebsiteCode(Integer websiteCodeId,String email) {
+        return CommonResult.success(adminWebsiteCodeManageService.sendEmailWebsiteCode(websiteCodeId,email));
+    }
 }

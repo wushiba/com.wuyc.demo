@@ -1,5 +1,10 @@
 package com.yfshop.admin.service.website;
 
+import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.io.IoUtil;
+import cn.hutool.core.lang.PatternPool;
+import cn.hutool.core.lang.Validator;
+import cn.hutool.http.HttpUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -14,6 +19,7 @@ import com.yfshop.admin.api.website.result.WebsiteCodeDetailExport;
 import com.yfshop.admin.api.website.result.WebsiteCodeDetailResult;
 import com.yfshop.admin.api.website.result.WebsiteCodeResult;
 import com.yfshop.admin.dao.WebsiteCodeDao;
+import com.yfshop.admin.task.EmailTask;
 import com.yfshop.admin.task.OssDownloader;
 import com.yfshop.code.mapper.*;
 import com.yfshop.code.model.*;
@@ -23,15 +29,18 @@ import com.yfshop.common.util.BeanUtil;
 import com.yfshop.common.util.DateUtil;
 import com.yfshop.wx.api.request.WxPayRefundReq;
 import com.yfshop.wx.api.service.MpService;
+import lombok.SneakyThrows;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.io.File;
 import java.math.BigDecimal;
-import java.math.MathContext;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -58,6 +67,12 @@ public class AdminWebsiteCodeManageServiceImpl implements AdminWebsiteCodeManage
     private WxPayRefundMapper wxPayRefundMapper;
     @DubboReference
     private MpService mpService;
+    @Autowired
+    private EmailTask emailTask;
+
+    @Value("${websiteCode.dir}")
+    private String websiteCodeDir;
+
 
     @Override
     public IPage<WebsiteCodeResult> queryWebsiteCodeList(WebsiteCodeQueryReq req) throws ApiException {
@@ -238,6 +253,27 @@ public class AdminWebsiteCodeManageServiceImpl implements AdminWebsiteCodeManage
                 wxPayRefundReq.setRefundFee(refundFee);
                 this.mpService.refund(wxPayRefundReq);
             }
+        }
+        return null;
+    }
+
+    @SneakyThrows
+    @Override
+    @Async
+    public Void sendEmailWebsiteCode(Integer websiteCodeId, String email) {
+        if (StringUtils.isNotBlank(email)) {
+            Asserts.assertTrue(Validator.isMatchRegex(PatternPool.EMAIL, email), 500, "请正确填写邮箱地址");
+        }
+        WebsiteCode websiteCode = websiteCodeMapper.selectById(websiteCodeId);
+        File fileZip = new File(websiteCodeDir + "/" + websiteCode.getMerchantId() + "/" + websiteCode.getBatchNo() + ".zip");
+        if (!fileZip.exists()) {
+            String fileUrl = ossDownloader.privateDownloadUrl(websiteCode.getFileUrl(), 60 * 5, null);
+            HttpUtil.downloadFileFromUrl(fileUrl, fileZip);
+        }
+        String msg = "<p>您好!</p>\n" +
+                "<p>&nbsp;&nbsp;&nbsp;&nbsp;此邮件内含光明网点码，请妥善保管。雨帆</p>";
+        if (StringUtils.isNotBlank(email) || StringUtils.isNotBlank(websiteCode.getEmail())) {
+            emailTask.sendAttachmentsMail(StringUtils.isNotBlank(email) ? email : websiteCode.getEmail(), "光明网点码", msg, fileZip.getPath(), "xuwei@51jujibao.com");
         }
         return null;
     }
