@@ -28,6 +28,7 @@ import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @DubboService
 public class AdminHealthyServiceImpl implements AdminHealthyService {
@@ -43,6 +44,9 @@ public class AdminHealthyServiceImpl implements AdminHealthyService {
     private HealthyItemMapper healthyItemMapper;
 
     @Resource
+    private HealthyItemImageMapper healthyItemImageMapper;
+
+    @Resource
     private MerchantMapper merchantMapper;
 
     @Override
@@ -51,7 +55,7 @@ public class AdminHealthyServiceImpl implements AdminHealthyService {
                 .eq(StringUtils.isNotBlank(req.getOrderNo()), HealthyOrder::getOrderNo, req.getOrderNo())
                 .eq(StringUtils.isNotBlank(req.getContracts()), HealthyOrder::getContracts, req.getContracts())
                 .eq(StringUtils.isNotBlank(req.getOrderStatus()), HealthyOrder::getOrderStatus, req.getOrderStatus())
-                .notIn(HealthyOrder::getOrderStatus, HealthyOrderStatusEnum.CANCEL.getCode(),HealthyOrderStatusEnum.PAYING.getCode())
+                .notIn(HealthyOrder::getOrderStatus, HealthyOrderStatusEnum.CANCEL.getCode(), HealthyOrderStatusEnum.PAYING.getCode())
                 .ge(req.getStartTime() != null, HealthyOrder::getPayTime, req.getStartTime())
                 .lt(req.getEndTime() != null, HealthyOrder::getPayTime, req.getEndTime());
         IPage<HealthyOrder> iPage = healthyOrderMapper.selectPage(new Page<>(req.getPageIndex(), req.getPageSize()), queryWrapper);
@@ -111,6 +115,15 @@ public class AdminHealthyServiceImpl implements AdminHealthyService {
     public Void addItem(HealthyItemReq req) {
         HealthyItem healthyItem = BeanUtil.convert(req, HealthyItem.class);
         healthyItemMapper.insert(healthyItem);
+        req.getItemImages().forEach(item -> {
+            HealthyItemImage itemImage = new HealthyItemImage();
+            itemImage.setCreateTime(LocalDateTime.now());
+            itemImage.setUpdateTime(LocalDateTime.now());
+            itemImage.setItemId(healthyItem.getId());
+            itemImage.setImageUrl(item);
+            itemImage.setSort(0);
+            healthyItemImageMapper.insert(itemImage);
+        });
         return null;
     }
 
@@ -162,9 +175,28 @@ public class AdminHealthyServiceImpl implements AdminHealthyService {
     }
 
     @Override
+    public HealthyItemResult getItemDetail(Integer id) {
+        HealthyItem healthyItem = healthyItemMapper.selectById(id);
+        HealthyItemResult result = BeanUtil.convert(healthyItem, HealthyItemResult.class);
+        List<String> images = healthyItemImageMapper.selectList(Wrappers.lambdaQuery(HealthyItemImage.class).eq(HealthyItemImage::getItemId, id)).stream().map(HealthyItemImage::getImageUrl).collect(Collectors.toList());
+        result.setItemImages(images);
+        return result;
+    }
+
+    @Override
     public Void updateItem(HealthyItemReq req) {
         HealthyItem healthyItem = BeanUtil.convert(req, HealthyItem.class);
         healthyItemMapper.updateById(healthyItem);
+        healthyItemImageMapper.delete(Wrappers.lambdaQuery(HealthyItemImage.class).eq(HealthyItemImage::getItemId, req.getId()));
+        req.getItemImages().forEach(item -> {
+            HealthyItemImage itemImage = new HealthyItemImage();
+            itemImage.setCreateTime(LocalDateTime.now());
+            itemImage.setUpdateTime(LocalDateTime.now());
+            itemImage.setItemId(healthyItem.getId());
+            itemImage.setImageUrl(item);
+            itemImage.setSort(0);
+            healthyItemImageMapper.insert(itemImage);
+        });
         return null;
     }
 

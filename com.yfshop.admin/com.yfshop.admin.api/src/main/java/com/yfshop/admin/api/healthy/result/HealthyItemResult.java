@@ -5,6 +5,7 @@ import lombok.EqualsAndHashCode;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.List;
 
 /**
  * <p>
@@ -89,5 +90,6 @@ public class HealthyItemResult implements Serializable {
      */
     private String postRule;
 
+    private List<String> itemImages;
 
 }

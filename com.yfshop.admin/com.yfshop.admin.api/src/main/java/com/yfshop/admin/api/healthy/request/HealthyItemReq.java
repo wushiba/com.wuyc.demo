@@ -9,6 +9,7 @@ import lombok.EqualsAndHashCode;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * <p>
@@ -83,6 +84,8 @@ public class HealthyItemReq implements Serializable {
      * 商品中瓶数
      */
     private Integer spec;
+
+    private List<String> itemImages;
 
     /**
      * 配送规则

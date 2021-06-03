@@ -1,8 +1,11 @@
 package com.yfshop.admin.service.express;
 
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
+import com.alibaba.fastjson.JSON;
+import com.google.common.collect.Lists;
 import com.sf.csim.express.service.CallExpressServiceTools;
 import com.sf.csim.express.service.HttpClientUtil;
 import com.sto.link.request.LinkRequest;
@@ -12,9 +15,12 @@ import com.yfshop.admin.api.express.result.ExpressOrderResult;
 import com.yfshop.admin.api.express.result.ExpressResult;
 import com.yfshop.admin.api.express.result.SfExpressResult;
 import com.yfshop.admin.api.express.result.StoExpressResult;
+import com.yfshop.admin.api.merchant.result.MerchantResult;
 import com.yfshop.code.mapper.OrderDetailMapper;
 import com.yfshop.code.model.OrderDetail;
+import com.yfshop.common.constants.CacheConstants;
 import com.yfshop.common.exception.ApiException;
+import com.yfshop.common.service.RedisService;
 import com.yfshop.common.util.JuHeExpressDeliveryUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
@@ -29,6 +35,8 @@ import static com.yfshop.common.util.JuHeExpressDeliveryUtils.findExpressDeliver
 public class ExpressServiceImpl implements ExpressService {
     @Resource
     private OrderDetailMapper orderDetailMapper;
+    @Resource
+    private RedisService redisService;
 
     @Override
     public ExpressOrderResult queryExpress(Long id) throws ApiException {
@@ -115,12 +123,24 @@ public class ExpressServiceImpl implements ExpressService {
     private List<ExpressResult> queryCommExpress(String expressDeliveryCompanyNumber,
                                                  String expressDeliveryNumber,
                                                  String receiverPhone) {
+        String key = CacheConstants.EXPRESS_KEY_PREFIX + expressDeliveryCompanyNumber + "_" + expressDeliveryNumber;
+        Object expressListObject = redisService.get(key);
+        if (expressListObject != null) {
+            redisService.expire(key, 60 * 60 * 12);
+            return JSON.parseArray(expressListObject.toString(), ExpressResult.class);
+        }
         List<ExpressResult> expressResultList = new ArrayList<>();
         try {
             JuHeExpressDeliveryUtils.JuHeExpressDeliveryInfoResponse juHeExpressDeliveryInfoResponse = JuHeExpressDeliveryUtils.findExpressDeliveryInfo(expressDeliveryCompanyNumber, expressDeliveryNumber, "", receiverPhone);
             if (juHeExpressDeliveryInfoResponse.getSuccess()) {
-
+                Lists.reverse(juHeExpressDeliveryInfoResponse.getList()).forEach(item -> {
+                    ExpressResult expressResult = new ExpressResult();
+                    expressResult.setDateTime(DateUtil.format(item.getDatetime(), "yyyy-MM-dd HH:mm:SS"));
+                    expressResult.setContext(item.getRemark());
+                    expressResultList.add(expressResult);
+                });
             }
+            redisService.set(key, JSON.toJSONString(expressResultList), 60 * 60 * 12);
         } catch (Exception e) {
             e.printStackTrace();
         }
