@@ -826,6 +826,9 @@ public class AdminMallManageServiceImpl implements AdminMallManageService {
             targetSku.setIsEnable(candidateSku.getIsEnable());
             targetSku.setSkuStock(candidateSku.getStock());
             targetSku.setFreight(candidateSku.getFreight());
+            if (StringUtils.isNotBlank(candidateSku.getSkuCover())) {
+                targetSku.setSkuCover(candidateSku.getSkuCover());
+            }
         }
         skuManager.saveBatch(targetSkuList);
         return null;

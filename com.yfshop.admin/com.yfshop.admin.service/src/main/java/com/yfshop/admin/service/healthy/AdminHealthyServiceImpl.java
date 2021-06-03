@@ -51,7 +51,7 @@ public class AdminHealthyServiceImpl implements AdminHealthyService {
                 .eq(StringUtils.isNotBlank(req.getOrderNo()), HealthyOrder::getOrderNo, req.getOrderNo())
                 .eq(StringUtils.isNotBlank(req.getContracts()), HealthyOrder::getContracts, req.getContracts())
                 .eq(StringUtils.isNotBlank(req.getOrderStatus()), HealthyOrder::getOrderStatus, req.getOrderStatus())
-                .notIn(HealthyOrder::getOrderStatus, "CANCEL","PAYING")
+                .notIn(HealthyOrder::getOrderStatus, HealthyOrderStatusEnum.CANCEL.getCode(),HealthyOrderStatusEnum.PAYING.getCode())
                 .ge(req.getStartTime() != null, HealthyOrder::getPayTime, req.getStartTime())
                 .lt(req.getEndTime() != null, HealthyOrder::getPayTime, req.getEndTime());
         IPage<HealthyOrder> iPage = healthyOrderMapper.selectPage(new Page<>(req.getPageIndex(), req.getPageSize()), queryWrapper);
@@ -81,8 +81,7 @@ public class AdminHealthyServiceImpl implements AdminHealthyService {
                 .eq(req.getCityId() != null, HealthySubOrder::getCityId, req.getCityId())
                 .eq(req.getDistrictId() != null, HealthySubOrder::getDistrictId, req.getDistrictId())
                 .ge(req.getStartTime() != null, HealthySubOrder::getExpectShipTime, req.getStartTime())
-                .lt(req.getEndTime() != null, HealthySubOrder::getExpectShipTime, req.getEndTime())
-                .ne(HealthySubOrder::getOrderStatus, "CANCEL");
+                .lt(req.getEndTime() != null, HealthySubOrder::getExpectShipTime, req.getEndTime());
         IPage<HealthySubOrder> iPage = healthyOrderMapper.selectPage(new Page<>(req.getPageIndex(), req.getPageSize()), queryWrapper);
         return BeanUtil.iPageConvert(iPage, HealthySubOrderResult.class);
     }

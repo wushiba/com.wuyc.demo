@@ -75,6 +75,10 @@ public class SaveItemSkuReq implements Serializable {
         @NotNull(message = "运费不能为空")
         @DecimalMin(value = "0", message = "运费不能为负")
         private BigDecimal freight = BigDecimal.ZERO;
+
+        @ApiModelProperty(value = "SKU封面图片", required = true)
+        @NotBlank(message = "SKU封面图片不能为空")
+        private String skuCover;
     }
 
 }
