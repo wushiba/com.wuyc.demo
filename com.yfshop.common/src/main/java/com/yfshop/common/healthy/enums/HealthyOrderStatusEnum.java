@@ -10,6 +10,7 @@ public enum HealthyOrderStatusEnum {
     PAYING("PAYING", "支付中"),
     SERVICING("SERVICING", "服务中"),
     COMPLETED("COMPLETED", "已完成"),
+    CANCEL("CANCEL", "未支付取消"),
     CLOSED("CLOSED", "已关闭"),
     ;
 

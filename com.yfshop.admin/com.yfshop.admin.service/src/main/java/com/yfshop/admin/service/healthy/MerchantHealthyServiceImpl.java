@@ -100,6 +100,7 @@ public class MerchantHealthyServiceImpl implements MerchantHealthyService {
                 .eq(HealthySubOrder::getId, subOrder).eq(HealthySubOrder::getOrderStatus, HealthySubOrderStatusEnum.WAIT_DELIVERY.getCode()));
         if (rows > 0) {
             // 通知用户已开始配送
+            // TODO 2021/6/3 ......
             List<WxMpTemplateData> data = new ArrayList<>();
             data.add(new WxMpTemplateData("first", "您已成功兑换椰岛135ml鹿龟酒1瓶，恭喜恭喜~"));
             data.add(new WxMpTemplateData("keyword1", ""));
@@ -131,6 +132,7 @@ public class MerchantHealthyServiceImpl implements MerchantHealthyService {
                 .eq(HealthySubOrder::getId, subOrder).eq(HealthySubOrder::getOrderStatus, HealthySubOrderStatusEnum.IN_DELIVERY.getCode()));
         if (rows > 0) {
             // 通知用户已完成配送
+            // TODO 2021/6/3 ......
             List<WxMpTemplateData> data = new ArrayList<>();
             data.add(new WxMpTemplateData("first", "您已成功兑换椰岛135ml鹿龟酒1瓶，恭喜恭喜~"));
             data.add(new WxMpTemplateData("keyword1", ""));
