@@ -194,16 +194,18 @@ public class AdminHealthyServiceImpl implements AdminHealthyService {
             healthyItem.setItemCover(req.getItemImages().get(0));
         }
         healthyItemMapper.updateById(healthyItem);
-        healthyItemImageMapper.delete(Wrappers.lambdaQuery(HealthyItemImage.class).eq(HealthyItemImage::getItemId, req.getId()));
-        req.getItemImages().forEach(item -> {
-            HealthyItemImage itemImage = new HealthyItemImage();
-            itemImage.setCreateTime(LocalDateTime.now());
-            itemImage.setUpdateTime(LocalDateTime.now());
-            itemImage.setItemId(healthyItem.getId());
-            itemImage.setImageUrl(item);
-            itemImage.setSort(0);
-            healthyItemImageMapper.insert(itemImage);
-        });
+        if (!CollectionUtils.isEmpty(req.getItemImages())) {
+            healthyItemImageMapper.delete(Wrappers.lambdaQuery(HealthyItemImage.class).eq(HealthyItemImage::getItemId, req.getId()));
+            req.getItemImages().forEach(item -> {
+                HealthyItemImage itemImage = new HealthyItemImage();
+                itemImage.setCreateTime(LocalDateTime.now());
+                itemImage.setUpdateTime(LocalDateTime.now());
+                itemImage.setItemId(healthyItem.getId());
+                itemImage.setImageUrl(item);
+                itemImage.setSort(0);
+                healthyItemImageMapper.insert(itemImage);
+            });
+        }
         return null;
     }
 

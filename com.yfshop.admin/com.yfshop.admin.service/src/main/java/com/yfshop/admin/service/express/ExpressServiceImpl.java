@@ -15,8 +15,9 @@ import com.yfshop.admin.api.express.result.ExpressOrderResult;
 import com.yfshop.admin.api.express.result.ExpressResult;
 import com.yfshop.admin.api.express.result.SfExpressResult;
 import com.yfshop.admin.api.express.result.StoExpressResult;
-import com.yfshop.admin.api.merchant.result.MerchantResult;
+import com.yfshop.code.mapper.ExpressMapper;
 import com.yfshop.code.mapper.OrderDetailMapper;
+import com.yfshop.code.model.Express;
 import com.yfshop.code.model.OrderDetail;
 import com.yfshop.common.constants.CacheConstants;
 import com.yfshop.common.exception.ApiException;
@@ -28,8 +29,7 @@ import org.apache.dubbo.config.annotation.DubboService;
 
 import javax.annotation.Resource;
 import java.util.*;
-
-import static com.yfshop.common.util.JuHeExpressDeliveryUtils.findExpressDeliveryInfo;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 @DubboService
 public class ExpressServiceImpl implements ExpressService {
@@ -37,6 +37,8 @@ public class ExpressServiceImpl implements ExpressService {
     private OrderDetailMapper orderDetailMapper;
     @Resource
     private RedisService redisService;
+    @Resource
+    private ExpressMapper expressMapper;
 
     @Override
     public ExpressOrderResult queryExpress(Long id) throws ApiException {
@@ -132,15 +134,24 @@ public class ExpressServiceImpl implements ExpressService {
         List<ExpressResult> expressResultList = new ArrayList<>();
         try {
             JuHeExpressDeliveryUtils.JuHeExpressDeliveryInfoResponse juHeExpressDeliveryInfoResponse = JuHeExpressDeliveryUtils.findExpressDeliveryInfo(expressDeliveryCompanyNumber, expressDeliveryNumber, "", receiverPhone);
+            AtomicBoolean isSuccess = new AtomicBoolean(false);
             if (juHeExpressDeliveryInfoResponse.getSuccess()) {
                 Lists.reverse(juHeExpressDeliveryInfoResponse.getList()).forEach(item -> {
                     ExpressResult expressResult = new ExpressResult();
                     expressResult.setDateTime(DateUtil.format(item.getDatetime(), "yyyy-MM-dd HH:mm:SS"));
                     expressResult.setContext(item.getRemark());
+                    if (item.getRemark().contains("签收")) {
+                        isSuccess.set(true);
+                    }
                     expressResultList.add(expressResult);
                 });
             }
             redisService.set(key, JSON.toJSONString(expressResultList), 60 * 60 * 12);
+            if (isSuccess.get()) {
+                Express express=new Express();
+//                express
+                expressMapper.insert(express);
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
