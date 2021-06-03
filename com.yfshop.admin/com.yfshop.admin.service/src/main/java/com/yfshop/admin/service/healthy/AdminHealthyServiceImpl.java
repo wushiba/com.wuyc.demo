@@ -20,6 +20,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
 import java.time.LocalDate;
@@ -114,6 +115,9 @@ public class AdminHealthyServiceImpl implements AdminHealthyService {
     @Override
     public Void addItem(HealthyItemReq req) {
         HealthyItem healthyItem = BeanUtil.convert(req, HealthyItem.class);
+        if (!CollectionUtils.isEmpty(req.getItemImages())) {
+            healthyItem.setItemCover(req.getItemImages().get(0));
+        }
         healthyItemMapper.insert(healthyItem);
         req.getItemImages().forEach(item -> {
             HealthyItemImage itemImage = new HealthyItemImage();
@@ -186,6 +190,9 @@ public class AdminHealthyServiceImpl implements AdminHealthyService {
     @Override
     public Void updateItem(HealthyItemReq req) {
         HealthyItem healthyItem = BeanUtil.convert(req, HealthyItem.class);
+        if (!CollectionUtils.isEmpty(req.getItemImages())) {
+            healthyItem.setItemCover(req.getItemImages().get(0));
+        }
         healthyItemMapper.updateById(healthyItem);
         healthyItemImageMapper.delete(Wrappers.lambdaQuery(HealthyItemImage.class).eq(HealthyItemImage::getItemId, req.getId()));
         req.getItemImages().forEach(item -> {
