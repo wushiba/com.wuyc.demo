@@ -23,33 +23,7 @@ public class TraceController {
     @DubboReference
     TraceService traceService;
 
-    /**
-     * 保存溯源码数据
-     *
-     * @param traceReqs
-     * @return
-     */
-    @RequestMapping(value = "/saveTrace", method = {RequestMethod.POST})
-    public CommonResult saveTrace(@RequestBody List<TraceReq> traceReqs) {
-        //logger.info("saveTrace->{}", traceReqs.toString());
-        traceService.syncTrace(traceReqs);
-        return CommonResult.success(1, "接收成功");
-    }
-
-    /**
-     * 保存入库数据
-     *
-     * @param storageReqs
-     * @return
-     */
-    @RequestMapping(value = "/saveStorage", method = {RequestMethod.POST})
-    public CommonResult saveStorage(@RequestBody List<StorageReq> storageReqs) {
-        //logger.info("saveStorage->{}", storageReqs.toString());
-        traceService.syncStorage(storageReqs);
-        return CommonResult.success(1, "接收成功");
-    }
-
-
+    
     /**
      * 保存溯源码数据
      *
