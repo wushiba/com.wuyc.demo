@@ -1,5 +1,6 @@
 package com.yfshop.open.controller;
 
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.io.IoUtil;
 import com.yfshop.common.api.CommonResult;
@@ -50,7 +51,9 @@ public class TraceController {
             }
         });
         Asserts.assertCollectionNotEmpty(traceReqs, 500, "文件数据为空！");
-        traceService.syncTrace(traceReqs);
+        CollectionUtil.split(traceReqs, 20000).forEach(item -> {
+            traceService.syncTrace(item);
+        });
         return CommonResult.success(1, "接收成功");
     }
 
@@ -80,7 +83,9 @@ public class TraceController {
             }
         });
         Asserts.assertCollectionNotEmpty(storageReqs, 500, "文件数据为空！");
-        traceService.syncStorage(storageReqs);
+        CollectionUtil.split(storageReqs, 20000).forEach(item -> {
+            traceService.syncStorage(item);
+        });
         return CommonResult.success(1, "接收成功");
     }
 }
