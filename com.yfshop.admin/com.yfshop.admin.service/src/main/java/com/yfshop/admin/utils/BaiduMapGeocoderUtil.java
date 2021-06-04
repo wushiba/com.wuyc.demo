@@ -1,10 +1,18 @@
 package com.yfshop.admin.utils;
 
+import cn.hutool.core.io.FileUtil;
 import cn.hutool.http.HttpUtil;
 import com.alibaba.fastjson.JSONObject;
+import com.google.common.collect.Lists;
+import com.yfshop.common.util.JuHeExpressDeliveryUtils;
+import org.apache.commons.lang.StringUtils;
 
+import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class BaiduMapGeocoderUtil {
 
@@ -14,7 +22,10 @@ public class BaiduMapGeocoderUtil {
     private final static String BAIDU_MAP_AK = "gzwaiTL0UHG0rwYtDUo5CaD7HxnSm1lf";
 
     private static void main(String[] args) {
-        getAddressInfoByLngAndLat("120.2027200000", "30.1834890000");
+        // getAddressInfoByLngAndLat("120.2027200000", "30.1834890000");
+
+
+
     }
 
     /**
