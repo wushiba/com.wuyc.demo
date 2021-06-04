@@ -1,6 +1,7 @@
 package com.yfshop.admin.service.express;
 
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.io.FileUtil;
 import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
@@ -29,8 +30,10 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.dubbo.config.annotation.DubboService;
 
 import javax.annotation.Resource;
+import java.io.File;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
 @DubboService
 public class ExpressServiceImpl implements ExpressService {
@@ -163,5 +166,40 @@ public class ExpressServiceImpl implements ExpressService {
             e.printStackTrace();
         }
         return expressResultList;
+    }
+
+
+    public static void main(String[] args) {
+        Map<String, String> map = new HashMap<>();
+        map.put("中通", "zto");
+        map.put("韵达", "yd");
+        map.put("圆通", "yt");
+        map.put("申通", "sto");
+        map.put("顺丰", "sf");
+        List<String> list = FileUtil.readUtf8Lines(new File("H://3.txt"));
+        List<String> tag = new ArrayList<>();
+        list.forEach(item -> {
+            String[] s = item.split(",");
+            String value = map.get(s[0]);
+            if (value == null) {
+                tag.add(item + ",未知");
+                return;
+            }
+            AtomicReference<String> status = new AtomicReference<>(",未送达");
+            try {
+                JuHeExpressDeliveryUtils.JuHeExpressDeliveryInfoResponse juHeExpressDeliveryInfoResponse = JuHeExpressDeliveryUtils.findExpressDeliveryInfo(value, s[1], "", StringUtils.isEmpty(s[4]) ? "" : s[4].substring(s[4].length() - 4));
+                if (juHeExpressDeliveryInfoResponse.getSuccess()) {
+                    Lists.reverse(juHeExpressDeliveryInfoResponse.getList()).forEach(i -> {
+                        if (i.getRemark().contains("签收")) {
+                            status.set(",已签收");
+                        }
+                    });
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            tag.add(item + status.get());
+        });
+        FileUtil.writeLines(tag, new File("H://2.txt"), "UTF-8");
     }
 }
