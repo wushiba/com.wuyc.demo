@@ -209,6 +209,9 @@ public class HealthyServiceImpl implements HealthyService {
         if (healthyItem == null) {
             return null;
         }
+        if ("Y".equalsIgnoreCase(healthyItem.getIsDelete())) {
+            return null;
+        }
         HealthyItemContent content = healthyItemContentMapper.selectList(Wrappers.lambdaQuery(HealthyItemContent.class)
                 .eq(HealthyItemContent::getItemId, itemId)).stream().findFirst().orElse(null);
         List<HealthyItemImage> images = healthyItemImageMapper.selectList(Wrappers.lambdaQuery(HealthyItemImage.class)
