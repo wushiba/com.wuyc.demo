@@ -38,6 +38,7 @@ import com.yfshop.admin.api.website.result.WebsiteCodeResult;
 import com.yfshop.admin.api.website.result.WebsiteTypeResult;
 import com.yfshop.admin.dao.WebsiteCodeDao;
 import com.yfshop.admin.dao.WebsiteGoodsRecordDao;
+import com.yfshop.admin.utils.BaiduMapGeocoderUtil;
 import com.yfshop.code.mapper.*;
 import com.yfshop.code.model.*;
 import com.yfshop.common.constants.CacheConstants;
@@ -281,7 +282,7 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
     }
 
 
-    public void buildAddress(WebsiteCodeBindReq websiteCodeBindReq) {
+    private void buildAddress(WebsiteCodeBindReq websiteCodeBindReq) {
         if (StringUtils.isNotBlank(websiteCodeBindReq.getAddress())) {
             Map<String, String> maps = AddressUtil.addressResolution(websiteCodeBindReq.getAddress());
             websiteCodeBindReq.setProvince(maps.get("province"));
@@ -301,15 +302,42 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
                         websiteCodeBindReq.setDistrictId(county.getId());
                     }
                 }
+                websiteCodeBindReq.setCity(maps.get("city"));
+                websiteCodeBindReq.setDistrict(maps.get("county"));
+            } else {
+                if (websiteCodeBindReq.getLatitude() != null && websiteCodeBindReq.getLongitude() != null) {
+                    Map<String, String> temp = BaiduMapGeocoderUtil.getAddressInfoByLngAndLat(websiteCodeBindReq.getLongitude() + "", websiteCodeBindReq.getLatitude() + "");
+                    if (temp != null) {
+                        websiteCodeBindReq.setProvince(temp.get("province"));
+                        province = regionMapper.selectOne(Wrappers.<Region>lambdaQuery()
+                                .eq(Region::getName, temp.get("province")));
+                        if (province != null) {
+                            websiteCodeBindReq.setProvinceId(province.getId());
+                            Region city = regionMapper.selectOne(Wrappers.<Region>lambdaQuery()
+                                    .eq(Region::getName, temp.get("city"))
+                                    .eq(Region::getPid, province.getId()));
+                            if (city != null) {
+                                websiteCodeBindReq.setCityId(city.getId());
+                                Region county = regionMapper.selectOne(Wrappers.<Region>lambdaQuery()
+                                        .eq(Region::getName, temp.get("district"))
+                                        .eq(Region::getPid, city.getId()));
+                                if (county != null) {
+                                    websiteCodeBindReq.setDistrictId(county.getId());
+                                }
+                            }
+                            websiteCodeBindReq.setCity(temp.get("city"));
+                            websiteCodeBindReq.setDistrict(temp.get("district"));
+                        }
+                    }
+                }
             }
-            websiteCodeBindReq.setCity(maps.get("city"));
-            websiteCodeBindReq.setDistrict(maps.get("county"));
             websiteCodeBindReq.setAddress(maps.get("town"));
         }
     }
 
     @Override
-    public List<WebsiteCodeDetailResult> getMyWebsiteCode(Integer merchantId, String status, Date startTime, Date endTime) throws ApiException {
+    public List<WebsiteCodeDetailResult> getMyWebsiteCode(Integer merchantId, String status, Date startTime, Date
+            endTime) throws ApiException {
         List<WebsiteCodeDetail> websiteCodeDetails = websiteCodeDetailMapper.selectList(Wrappers.<WebsiteCodeDetail>lambdaQuery()
                 .and(itemWrapper -> itemWrapper
                         .eq(WebsiteCodeDetail::getMerchantId, merchantId)
@@ -323,7 +351,8 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
     }
 
     @Override
-    public IPage<WebsiteCodeResult> applyWebsiteCodeStatus(Integer merchantId, String status, Integer pageIndex, Integer pageSize) {
+    public IPage<WebsiteCodeResult> applyWebsiteCodeStatus(Integer merchantId, String status, Integer
+            pageIndex, Integer pageSize) {
         Merchant merchant = merchantMapper.selectById(merchantId);
         List<String> allStatus = new ArrayList<>();
         if ("ALL".equals(status)) {
@@ -808,7 +837,8 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
     }
 
     @Override
-    public List<MerchantResult> findNearMerchantList(Integer merchantId, Integer districtId, Double longitude, Double latitude) {
+    public List<MerchantResult> findNearMerchantList(Integer merchantId, Integer districtId, Double
+            longitude, Double latitude) {
         List<MerchantResult> merchantResultList = initWdMerchantList();
         if (CollectionUtils.isEmpty(merchantResultList)) {
             return null;
