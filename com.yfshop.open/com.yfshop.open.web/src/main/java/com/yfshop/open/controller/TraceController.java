@@ -23,7 +23,7 @@ public class TraceController {
     @DubboReference
     TraceService traceService;
 
-    
+
     /**
      * 保存溯源码数据
      *

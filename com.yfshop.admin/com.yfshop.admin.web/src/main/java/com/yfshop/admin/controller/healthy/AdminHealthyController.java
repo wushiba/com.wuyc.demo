@@ -67,6 +67,15 @@ public class AdminHealthyController implements BaseController {
     }
 
 
+    @RequestMapping(value = "/deleteAct", method = {RequestMethod.POST})
+    @ResponseBody
+    @SaCheckLogin
+    @SaCheckRole(value = "sys")
+    public CommonResult<Void> deleteAct(Integer id) {
+        return CommonResult.success(adminHealthyService.deleteAct(id));
+    }
+
+
     @RequestMapping(value = "/getActList", method = {RequestMethod.POST})
     @ResponseBody
     @SaCheckLogin

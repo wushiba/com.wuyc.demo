@@ -190,6 +190,12 @@ public class AdminHealthyServiceImpl implements AdminHealthyService {
     }
 
     @Override
+    public Void deleteAct(Integer id) {
+        healthyActMapper.deleteById(id);
+        return null;
+    }
+
+    @Override
     public Void updateItem(HealthyItemReq req) {
         HealthyItem healthyItem = BeanUtil.convert(req, HealthyItem.class);
         if (!CollectionUtils.isEmpty(req.getItemImages())) {

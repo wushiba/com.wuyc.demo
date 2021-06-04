@@ -33,4 +33,6 @@ public interface AdminHealthyService {
     Void updateSubOrderPostWay(SubOrderPostWay req);
 
     HealthyItemResult getItemDetail(Integer id);
+
+    Void deleteAct(Integer id);
 }
