@@ -168,7 +168,7 @@ public class AdminDrawActivityServiceImpl implements AdminDrawActivityService {
         drawActivity.setStartTime(DateUtil.dateToLocalDateTime(req.getStartTime()));
         drawActivity.setEndTime(DateUtil.dateToLocalDateTime(req.getEndTime()));
         drawActivityMapper.updateById(drawActivity);
-
+        drawActivity=drawActivityMapper.selectById(req.getId());
         // 编辑奖品
         Map<Integer, DrawPrize> prizeMap = new HashMap<>(6);
         List<DrawPrize> drawPrizeList = new ArrayList<>();
@@ -200,7 +200,6 @@ public class AdminDrawActivityServiceImpl implements AdminDrawActivityService {
 //                provinceRateList.add(provinceRate);
 //            });
 //        }
-
         // 存入缓存，设置半年有效期有效
         redisService.set(CacheConstants.DRAW_ACTIVITY_PREFIX + drawActivity.getId(),
                 JSON.toJSONString(drawActivity), 60 * 60 * 24 * 30);
