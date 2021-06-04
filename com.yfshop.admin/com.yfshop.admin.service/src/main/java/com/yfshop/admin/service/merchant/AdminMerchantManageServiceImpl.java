@@ -1,5 +1,7 @@
 package com.yfshop.admin.service.merchant;
 
+import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.SecureUtil;
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -7,7 +9,6 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.yfshop.admin.api.merchant.AdminMerchantManageService;
-import com.yfshop.admin.api.merchant.MerchantExcel;
 import com.yfshop.admin.api.merchant.request.CreateMerchantReq;
 import com.yfshop.admin.api.merchant.request.MerchantExcelReq;
 import com.yfshop.admin.api.merchant.request.QueryMerchantReq;
@@ -15,13 +16,17 @@ import com.yfshop.admin.api.merchant.request.UpdateMerchantReq;
 import com.yfshop.admin.api.merchant.result.MerchantResult;
 import com.yfshop.admin.dao.MerchantDao;
 import com.yfshop.admin.dto.query.QueryMerchantDetail;
+import com.yfshop.code.manager.MerchantManager;
+import com.yfshop.code.manager.WebsiteCodeDetailManager;
 import com.yfshop.code.mapper.MerchantDetailMapper;
 import com.yfshop.code.mapper.MerchantLogMapper;
 import com.yfshop.code.mapper.RegionMapper;
+import com.yfshop.code.mapper.WebsiteCodeDetailMapper;
 import com.yfshop.code.model.Merchant;
 import com.yfshop.code.model.MerchantDetail;
 import com.yfshop.code.model.MerchantLog;
 import com.yfshop.code.model.Region;
+import com.yfshop.code.model.WebsiteCodeDetail;
 import com.yfshop.common.enums.GroupRoleEnum;
 import com.yfshop.common.exception.ApiException;
 import com.yfshop.common.exception.Asserts;
@@ -61,11 +66,17 @@ public class AdminMerchantManageServiceImpl implements AdminMerchantManageServic
     @Resource
     private com.yfshop.code.mapper.MerchantMapper merchantMapper;
     @Resource
+    private MerchantManager merchantManager;
+    @Resource
     private MerchantDetailMapper merchantDetailMapper;
     @Resource
     private MerchantDao customMerchantMapper;
     @Resource
     private MerchantLogMapper merchantLogMapper;
+    @Resource
+    private WebsiteCodeDetailMapper websiteCodeDetailMapper;
+    @Resource
+    private WebsiteCodeDetailManager websiteCodeDetailManager;
 
     @Transactional(rollbackFor = Exception.class)
     @Override
@@ -133,8 +144,13 @@ public class AdminMerchantManageServiceImpl implements AdminMerchantManageServic
         Asserts.assertTrue("Y".equalsIgnoreCase(currentLoginMerchant.getIsEnable()), 500, "当前登录商户已被禁用");
         Asserts.assertTrue("N".equalsIgnoreCase(currentLoginMerchant.getIsDelete()), 500, "当前登录商户已被删除");
 
-        // 查询上级
-        Merchant pm = getParentMerchantThenCheck(currentLoginMerchant, req.getPid(), req.getRoleAlias());
+        // 上级变了
+        Merchant pm = null;
+        if (req.getPid() != null && !req.getPid().equals(existMerchant.getPid())) {
+            // 查询上级
+            pm = getParentMerchantThenCheck(currentLoginMerchant, req.getPid(), req.getRoleAlias());
+            Asserts.assertTrue(!req.getMerchantId().equals(pm.getId()), 500, "上级商户不能选择自己");
+        }
 
         // 网点类型的商户
         if (GroupRoleEnum.WD.getCode().equals(req.getRoleAlias())) {
@@ -171,9 +187,13 @@ public class AdminMerchantManageServiceImpl implements AdminMerchantManageServic
         merchant.setCityId(req.getCityId());
         merchant.setDistrictId(req.getDistrictId());
         merchant.setAddress(req.getAddress());
-        merchant.setPid(pm.getId());
-        merchant.setPMerchantName(pm.getMerchantName());
-        merchant.setPidPath(this.generatePidPath(pm.getId(), merchant.getId()));
+        if (req.getPid() != null && !req.getPid().equals(existMerchant.getPid())) {
+            // 上级发生变化
+            assert pm != null;
+            merchant.setPid(pm.getId());
+            merchant.setPMerchantName(pm.getMerchantName());
+            merchant.setPidPath(this.generatePidPath(pm.getId(), merchant.getId()));
+        }
         try {
             int rows = merchantMapper.updateById(merchant);
             Asserts.assertTrue(rows > 0, 500, "编辑商户信息失败");
@@ -187,6 +207,53 @@ public class AdminMerchantManageServiceImpl implements AdminMerchantManageServic
             entity.setPMerchantName(req.getMerchantName());
             merchantMapper.update(entity, Wrappers.lambdaQuery(Merchant.class).eq(Merchant::getPid, req.getMerchantId()));
         }
+
+        // 上级发生变化
+        if (req.getPid() != null && !existMerchant.getPid().equals(req.getPid())) {
+            // 修改下级商户的pid_path
+            List<Merchant> subMerchants = merchantMapper.selectList(Wrappers.lambdaQuery(Merchant.class)
+                    .likeRight(Merchant::getPidPath, req.getMerchantId()).ne(Merchant::getId, req.getMerchantId()));
+            Map<Integer, Merchant> subMerchantEntitiesMap = subMerchants.stream()
+                    .map(subMerchant -> {
+                        String newPidPath = merchant.getPidPath() + StrUtil.subAfter(subMerchant.getPidPath(),
+                                req.getMerchantId().toString() + ".", true);
+                        Merchant entity = new Merchant();
+                        entity.setId(subMerchant.getId());
+                        entity.setPidPath(newPidPath);
+                        return entity;
+                    })
+                    .collect(Collectors.toMap(Merchant::getId, m -> m));
+            merchantManager.updateBatchById(subMerchantEntitiesMap.values());
+
+            // 修改网点码的pid_path
+            List<Integer> mIds = subMerchants.stream().map(Merchant::getId).collect(Collectors.toList());
+            mIds.add(req.getMerchantId());
+            List<WebsiteCodeDetail> websiteCodeDetails = websiteCodeDetailMapper.selectList(Wrappers
+                    .lambdaQuery(WebsiteCodeDetail.class).in(WebsiteCodeDetail::getMerchantId, mIds));
+            if (CollectionUtil.isNotEmpty(websiteCodeDetails)) {
+                List<Integer> parentIds = websiteCodeDetails.stream().map(WebsiteCodeDetail::getPid).distinct().collect(Collectors.toList());
+                Map<Integer, Merchant> parentMerchantMap = merchantMapper.selectBatchIds(parentIds).stream().collect(Collectors.toMap(Merchant::getId, m -> m));
+                List<WebsiteCodeDetail> es = new LinkedList<>();
+                for (WebsiteCodeDetail wcd : websiteCodeDetails) {
+                    WebsiteCodeDetail entity = new WebsiteCodeDetail();
+                    entity.setId(wcd.getId());
+                    boolean flag = false;
+                    if (subMerchantEntitiesMap.containsKey(wcd.getMerchantId())) {
+                        entity.setMerchantPidPath(subMerchantEntitiesMap.get(wcd.getMerchantId()).getPidPath());
+                        flag = true;
+                    }
+                    if (parentMerchantMap.containsKey(wcd.getPid())) {
+                        entity.setPidPath(parentMerchantMap.get(wcd.getPid()).getPidPath());
+                        flag = true;
+                    }
+                    if (flag) {
+                        es.add(entity);
+                    }
+                }
+                websiteCodeDetailManager.updateBatchById(es);
+            }
+        }
+
         Merchant newM = merchantMapper.selectById(existMerchant.getId());
         MerchantLog merchantLog = new MerchantLog();
         merchantLog.setMerchantId(existMerchant.getId());
@@ -329,7 +396,7 @@ public class AdminMerchantManageServiceImpl implements AdminMerchantManageServic
     }
 
 
-    private String generatePidPath(Integer pid, Integer id) {
+    private String generatePidPath(Integer pid, Integer id) throws ApiException {
         if (pid == null || pid == 0) {
             return null;
         }
@@ -337,6 +404,9 @@ public class AdminMerchantManageServiceImpl implements AdminMerchantManageServic
         path.addFirst(id);
         Merchant parent = this.getParent(pid);
         while (parent.getPid() != null && parent.getPid() != 0) {
+            if (parent.getId().equals(parent.getPid())) {
+                throw new ApiException(500, "err_merchant_" + parent.getId());
+            }
             path.addFirst(parent.getId());
             parent = this.getParent(parent.getPid());
         }
