@@ -20,6 +20,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
 import java.time.LocalDate;
@@ -28,6 +29,7 @@ import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @DubboService
 public class AdminHealthyServiceImpl implements AdminHealthyService {
@@ -41,6 +43,9 @@ public class AdminHealthyServiceImpl implements AdminHealthyService {
 
     @Resource
     private HealthyItemMapper healthyItemMapper;
+
+    @Resource
+    private HealthyItemImageMapper healthyItemImageMapper;
 
     @Resource
     private MerchantMapper merchantMapper;
@@ -110,7 +115,19 @@ public class AdminHealthyServiceImpl implements AdminHealthyService {
     @Override
     public Void addItem(HealthyItemReq req) {
         HealthyItem healthyItem = BeanUtil.convert(req, HealthyItem.class);
+        if (!CollectionUtils.isEmpty(req.getItemImages())) {
+            healthyItem.setItemCover(req.getItemImages().get(0));
+        }
         healthyItemMapper.insert(healthyItem);
+        req.getItemImages().forEach(item -> {
+            HealthyItemImage itemImage = new HealthyItemImage();
+            itemImage.setCreateTime(LocalDateTime.now());
+            itemImage.setUpdateTime(LocalDateTime.now());
+            itemImage.setItemId(healthyItem.getId());
+            itemImage.setImageUrl(item);
+            itemImage.setSort(0);
+            healthyItemImageMapper.insert(itemImage);
+        });
         return null;
     }
 
@@ -118,7 +135,9 @@ public class AdminHealthyServiceImpl implements AdminHealthyService {
     public IPage<HealthyItemResult> getItemList(HealthyItemReq req) {
         IPage<HealthyItem> healthyItemIPage = healthyItemMapper.selectPage(new Page<>(req.getPageIndex(), req.getPageSize()), Wrappers.lambdaQuery(HealthyItem.class)
                 .eq(req.getId() != null, HealthyItem::getId, req.getId())
-                .eq(StringUtils.isNotBlank(req.getItemTitle()), HealthyItem::getItemTitle, req.getItemTitle()));
+                .eq(StringUtils.isNotBlank(req.getItemTitle()), HealthyItem::getItemTitle, req.getItemTitle())
+                .eq(HealthyItem::getIsDelete, "N"));
+
         return BeanUtil.iPageConvert(healthyItemIPage, HealthyItemResult.class);
     }
 
@@ -162,9 +181,39 @@ public class AdminHealthyServiceImpl implements AdminHealthyService {
     }
 
     @Override
+    public HealthyItemResult getItemDetail(Integer id) {
+        HealthyItem healthyItem = healthyItemMapper.selectById(id);
+        HealthyItemResult result = BeanUtil.convert(healthyItem, HealthyItemResult.class);
+        List<String> images = healthyItemImageMapper.selectList(Wrappers.lambdaQuery(HealthyItemImage.class).eq(HealthyItemImage::getItemId, id)).stream().map(HealthyItemImage::getImageUrl).collect(Collectors.toList());
+        result.setItemImages(images);
+        return result;
+    }
+
+    @Override
+    public Void deleteAct(Integer id) {
+        healthyActMapper.deleteById(id);
+        return null;
+    }
+
+    @Override
     public Void updateItem(HealthyItemReq req) {
         HealthyItem healthyItem = BeanUtil.convert(req, HealthyItem.class);
+        if (!CollectionUtils.isEmpty(req.getItemImages())) {
+            healthyItem.setItemCover(req.getItemImages().get(0));
+        }
         healthyItemMapper.updateById(healthyItem);
+        if (!CollectionUtils.isEmpty(req.getItemImages())) {
+            healthyItemImageMapper.delete(Wrappers.lambdaQuery(HealthyItemImage.class).eq(HealthyItemImage::getItemId, req.getId()));
+            req.getItemImages().forEach(item -> {
+                HealthyItemImage itemImage = new HealthyItemImage();
+                itemImage.setCreateTime(LocalDateTime.now());
+                itemImage.setUpdateTime(LocalDateTime.now());
+                itemImage.setItemId(healthyItem.getId());
+                itemImage.setImageUrl(item);
+                itemImage.setSort(0);
+                healthyItemImageMapper.insert(itemImage);
+            });
+        }
         return null;
     }
 

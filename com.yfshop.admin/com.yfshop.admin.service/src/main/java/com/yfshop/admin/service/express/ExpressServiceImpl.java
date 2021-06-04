@@ -1,8 +1,12 @@
 package com.yfshop.admin.service.express;
 
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
+import com.alibaba.fastjson.JSON;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.google.common.collect.Lists;
 import com.sf.csim.express.service.CallExpressServiceTools;
 import com.sf.csim.express.service.HttpClientUtil;
 import com.sto.link.request.LinkRequest;
@@ -12,9 +16,13 @@ import com.yfshop.admin.api.express.result.ExpressOrderResult;
 import com.yfshop.admin.api.express.result.ExpressResult;
 import com.yfshop.admin.api.express.result.SfExpressResult;
 import com.yfshop.admin.api.express.result.StoExpressResult;
+import com.yfshop.code.mapper.ExpressMapper;
 import com.yfshop.code.mapper.OrderDetailMapper;
+import com.yfshop.code.model.Express;
 import com.yfshop.code.model.OrderDetail;
+import com.yfshop.common.constants.CacheConstants;
 import com.yfshop.common.exception.ApiException;
+import com.yfshop.common.service.RedisService;
 import com.yfshop.common.util.JuHeExpressDeliveryUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
@@ -22,13 +30,16 @@ import org.apache.dubbo.config.annotation.DubboService;
 
 import javax.annotation.Resource;
 import java.util.*;
-
-import static com.yfshop.common.util.JuHeExpressDeliveryUtils.findExpressDeliveryInfo;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 @DubboService
 public class ExpressServiceImpl implements ExpressService {
     @Resource
     private OrderDetailMapper orderDetailMapper;
+    @Resource
+    private RedisService redisService;
+    @Resource
+    private ExpressMapper expressMapper;
 
     @Override
     public ExpressOrderResult queryExpress(Long id) throws ApiException {
@@ -115,11 +126,38 @@ public class ExpressServiceImpl implements ExpressService {
     private List<ExpressResult> queryCommExpress(String expressDeliveryCompanyNumber,
                                                  String expressDeliveryNumber,
                                                  String receiverPhone) {
+        String no = expressDeliveryCompanyNumber + "_" + expressDeliveryNumber;
+        Express express = expressMapper.selectOne(Wrappers.lambdaQuery(Express.class).eq(Express::getExpressNo, no));
+        if (express != null) {
+            return JSON.parseArray(express.getDatajson(), ExpressResult.class);
+        }
+        String key = CacheConstants.EXPRESS_KEY_PREFIX + no;
+        Object expressListObject = redisService.get(key);
+        if (expressListObject != null) {
+            redisService.expire(key, 60 * 60 * 12);
+            return JSON.parseArray(expressListObject.toString(), ExpressResult.class);
+        }
         List<ExpressResult> expressResultList = new ArrayList<>();
         try {
             JuHeExpressDeliveryUtils.JuHeExpressDeliveryInfoResponse juHeExpressDeliveryInfoResponse = JuHeExpressDeliveryUtils.findExpressDeliveryInfo(expressDeliveryCompanyNumber, expressDeliveryNumber, "", receiverPhone);
+            AtomicBoolean isSuccess = new AtomicBoolean(false);
             if (juHeExpressDeliveryInfoResponse.getSuccess()) {
-
+                Lists.reverse(juHeExpressDeliveryInfoResponse.getList()).forEach(item -> {
+                    ExpressResult expressResult = new ExpressResult();
+                    expressResult.setDateTime(DateUtil.format(item.getDatetime(), "yyyy-MM-dd HH:mm:SS"));
+                    expressResult.setContext(item.getRemark());
+                    if (item.getRemark().contains("签收")) {
+                        isSuccess.set(true);
+                    }
+                    expressResultList.add(expressResult);
+                });
+            }
+            redisService.set(key, JSON.toJSONString(expressResultList), 60 * 60 * 12);
+            if (isSuccess.get()) {
+                express = new Express();
+                express.setExpressNo(no);
+                express.setDatajson(JSON.toJSONString(expressResultList));
+                expressMapper.insert(express);
             }
         } catch (Exception e) {
             e.printStackTrace();

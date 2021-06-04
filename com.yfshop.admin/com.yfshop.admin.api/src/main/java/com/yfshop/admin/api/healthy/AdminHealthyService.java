@@ -31,4 +31,8 @@ public interface AdminHealthyService {
     IPage<JxsMerchantResult> findJxsMerchant(QueryJxsMerchantReq req);
 
     Void updateSubOrderPostWay(SubOrderPostWay req);
+
+    HealthyItemResult getItemDetail(Integer id);
+
+    Void deleteAct(Integer id);
 }

@@ -95,4 +95,5 @@ public interface CacheConstants {
     String HEALTHY_ITEMS_KEY_PREFIX = "healthy_items_";
     String HEALTHY_ITEM_DETAIL_KEY_PREFIX = "healthy_item_detail_";
     String HEALTHY_ACTIVITIES_KEY_PREFIX = "healthy_activities_";
+    String EXPRESS_KEY_PREFIX = "express_";
 }

@@ -67,6 +67,15 @@ public class AdminHealthyController implements BaseController {
     }
 
 
+    @RequestMapping(value = "/deleteAct", method = {RequestMethod.POST})
+    @ResponseBody
+    @SaCheckLogin
+    @SaCheckRole(value = "sys")
+    public CommonResult<Void> deleteAct(Integer id) {
+        return CommonResult.success(adminHealthyService.deleteAct(id));
+    }
+
+
     @RequestMapping(value = "/getActList", method = {RequestMethod.POST})
     @ResponseBody
     @SaCheckLogin
@@ -88,7 +97,7 @@ public class AdminHealthyController implements BaseController {
     @ResponseBody
     @SaCheckLogin
     @SaCheckRole(value = "sys")
-    public CommonResult<Void> addItem(HealthyItemReq req) {
+    public CommonResult<Void> addItem(@RequestBody HealthyItemReq req) {
         return CommonResult.success(adminHealthyService.addItem(req));
     }
 
@@ -101,11 +110,21 @@ public class AdminHealthyController implements BaseController {
         return CommonResult.success(adminHealthyService.getItemList(req));
     }
 
+
+    @RequestMapping(value = "/getItemDetail", method = {RequestMethod.POST})
+    @ResponseBody
+    @SaCheckLogin
+    @SaCheckRole(value = "sys")
+    public CommonResult<HealthyItemResult> getItemDetail(Integer id) {
+        return CommonResult.success(adminHealthyService.getItemDetail(id));
+    }
+
+
     @RequestMapping(value = "/updateItem", method = {RequestMethod.POST})
     @ResponseBody
     @SaCheckLogin
     @SaCheckRole(value = "sys")
-    public CommonResult<Void> updateItem(HealthyItemReq req) {
+    public CommonResult<Void> updateItem(@RequestBody HealthyItemReq req) {
         return CommonResult.success(adminHealthyService.updateItem(req));
     }
 

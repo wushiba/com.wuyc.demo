@@ -20,7 +20,7 @@ import java.util.List;
 @DubboService
 public class TraceServiceImpl implements TraceService {
     @Autowired
-    private TraceManager traceMapper;
+    private TraceManager traceManager;
     @Autowired
     private TraceDetailsManager traceDetailsManager;
 
@@ -35,7 +35,7 @@ public class TraceServiceImpl implements TraceService {
                 trace.setCreateTime(now);
                 destList.add(trace);
             });
-            traceMapper.saveBatch(destList);
+            traceManager.saveBatch(destList, 20000);
         }
     }
 
@@ -50,7 +50,7 @@ public class TraceServiceImpl implements TraceService {
                 details.setCreateTime(now);
                 destList.add(details);
             });
-            traceDetailsManager.saveBatch(destList);
+            traceDetailsManager.saveBatch(destList, 20000);
         }
     }
 }
