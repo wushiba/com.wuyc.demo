@@ -35,10 +35,10 @@ spring:
     password: redis01:N72BcGB2FUs3ZRA29gL
 
   mail:
-    host: smtp.sina.cn
+    host: smtp.exmail.qq.com
     port: 465
-    username: yflook@sina.cn
-    password: 558eac7a98baacf4
+    username: jujibao@51jujibao.com
+    password: Bsd147
     protocol: smtp
     test-connection: true
     default-encoding: UTF-8
