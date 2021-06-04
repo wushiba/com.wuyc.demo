@@ -25,7 +25,6 @@ public class BaiduMapGeocoderUtil {
         // getAddressInfoByLngAndLat("120.2027200000", "30.1834890000");
 
 
-
     }
 
     /**
@@ -51,13 +50,26 @@ public class BaiduMapGeocoderUtil {
                 map.put("province", addressComponent.getString("province"));
                 map.put("city", addressComponent.getString("city"));
                 map.put("district", addressComponent.getString("district"));
-                //System.out.println(map);
+                fixCity(map);
                 return map;
             }
         } catch (Exception e) {
 
         }
         return null;
+    }
+
+
+    public static void fixCity(Map<String, String> map) {
+        String province = map.get("province");
+        switch (province) {
+            case "上海市":
+            case "重庆市":
+            case "北京市":
+            case "天津市":
+                map.put("city", "市辖区");
+                break;
+        }
     }
 
 }
