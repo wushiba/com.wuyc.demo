@@ -5,6 +5,7 @@ import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSON;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.google.common.collect.Lists;
 import com.sf.csim.express.service.CallExpressServiceTools;
 import com.sf.csim.express.service.HttpClientUtil;
@@ -125,7 +126,12 @@ public class ExpressServiceImpl implements ExpressService {
     private List<ExpressResult> queryCommExpress(String expressDeliveryCompanyNumber,
                                                  String expressDeliveryNumber,
                                                  String receiverPhone) {
-        String key = CacheConstants.EXPRESS_KEY_PREFIX + expressDeliveryCompanyNumber + "_" + expressDeliveryNumber;
+        String no = expressDeliveryCompanyNumber + "_" + expressDeliveryNumber;
+        Express express = expressMapper.selectOne(Wrappers.lambdaQuery(Express.class).eq(Express::getExpressNo, no));
+        if (express != null) {
+            return JSON.parseArray(express.getDatajson(), ExpressResult.class);
+        }
+        String key = CacheConstants.EXPRESS_KEY_PREFIX + no;
         Object expressListObject = redisService.get(key);
         if (expressListObject != null) {
             redisService.expire(key, 60 * 60 * 12);
@@ -148,8 +154,9 @@ public class ExpressServiceImpl implements ExpressService {
             }
             redisService.set(key, JSON.toJSONString(expressResultList), 60 * 60 * 12);
             if (isSuccess.get()) {
-                Express express=new Express();
-//                express
+                express = new Express();
+                express.setExpressNo(no);
+                express.setDatajson(JSON.toJSONString(expressResultList));
                 expressMapper.insert(express);
             }
         } catch (Exception e) {

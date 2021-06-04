@@ -135,7 +135,9 @@ public class AdminHealthyServiceImpl implements AdminHealthyService {
     public IPage<HealthyItemResult> getItemList(HealthyItemReq req) {
         IPage<HealthyItem> healthyItemIPage = healthyItemMapper.selectPage(new Page<>(req.getPageIndex(), req.getPageSize()), Wrappers.lambdaQuery(HealthyItem.class)
                 .eq(req.getId() != null, HealthyItem::getId, req.getId())
-                .eq(StringUtils.isNotBlank(req.getItemTitle()), HealthyItem::getItemTitle, req.getItemTitle()));
+                .eq(StringUtils.isNotBlank(req.getItemTitle()), HealthyItem::getItemTitle, req.getItemTitle())
+                .eq(HealthyItem::getIsDelete, "N"));
+
         return BeanUtil.iPageConvert(healthyItemIPage, HealthyItemResult.class);
     }
 
