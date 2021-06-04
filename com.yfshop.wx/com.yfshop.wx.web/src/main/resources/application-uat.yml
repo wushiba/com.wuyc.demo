@@ -29,8 +29,8 @@ wx:
   mp:
     useRedis: false
     configs:
-      - appId: wxfe620617eec2f4b0 # 第一个公众号的appid
-        secret: 64a61d9e95094f1e974861b62ec4dce8 # 公众号的appsecret
+      - appId: wxf4797fe8b12cdf62 # 第一个公众号的appid
+        secret: 44f813375f7cf549757b846e0d1e6042 # 公众号的appsecret
         token: yufanshop # 接口配置里的Token值
         aesKey: U2ztwhpnvy5SNDiICGloZA0Pgi2WdgDmsO4abHCEtvz # 接口配置里的EncodingAESKey
   pay:

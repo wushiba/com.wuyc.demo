@@ -3,9 +3,11 @@ package com.yfshop.open.controller;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.io.IoUtil;
 import com.yfshop.common.api.CommonResult;
+import com.yfshop.common.exception.Asserts;
 import com.yfshop.open.api.trace.request.StorageReq;
 import com.yfshop.open.api.trace.request.TraceReq;
 import com.yfshop.open.api.trace.service.TraceService;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,15 +36,20 @@ public class TraceController {
         List<String> list = IoUtil.readUtf8Lines(file.getInputStream(), new ArrayList<>());
         List<TraceReq> traceReqs = new ArrayList<>();
         list.forEach(item -> {
-            String[] data = item.split(",");
-            if (data.length == 6) {
-                TraceReq traceReq = new TraceReq();
-                traceReq.setTraceNo(data[0]);
-                traceReq.setBoxNo(data[1]);
-                traceReq.setProductNo(data[2]);
-                traceReqs.add(traceReq);
+            if (StringUtils.isNotBlank(item)) {
+                String[] data = item.split(",");
+                if (data.length == 6) {
+                    TraceReq traceReq = new TraceReq();
+                    traceReq.setTraceNo(data[0]);
+                    traceReq.setBoxNo(data[1]);
+                    traceReq.setProductNo(data[2]);
+                    traceReqs.add(traceReq);
+                } else {
+                    Asserts.assertTrue(false, 500, "文件格式有问题！");
+                }
             }
         });
+        Asserts.assertCollectionNotEmpty(traceReqs, 500, "文件数据为空！");
         traceService.syncTrace(traceReqs);
         return CommonResult.success(1, "接收成功");
     }
@@ -57,17 +64,22 @@ public class TraceController {
         List<String> list = IoUtil.readUtf8Lines(file.getInputStream(), new ArrayList<>());
         List<StorageReq> storageReqs = new ArrayList<>();
         list.forEach(item -> {
-            String[] data = item.split(",");
-            if (data.length == 5) {
-                StorageReq storageReq = new StorageReq();
-                storageReq.setBoxNo(data[0]);
-                storageReq.setDealerNo(data[1]);
-                storageReq.setDealerMobile(data[2]);
-                storageReq.setDealerName(data[3]);
-                storageReq.setDealerAddress(data[4]);
-                storageReqs.add(storageReq);
+            if (StringUtils.isNotBlank(item)) {
+                String[] data = item.split(",");
+                if (data.length == 5) {
+                    StorageReq storageReq = new StorageReq();
+                    storageReq.setBoxNo(data[0]);
+                    storageReq.setDealerNo(data[1]);
+                    storageReq.setDealerMobile(data[2]);
+                    storageReq.setDealerName(data[3]);
+                    storageReq.setDealerAddress(data[4]);
+                    storageReqs.add(storageReq);
+                } else {
+                    Asserts.assertTrue(false, 500, "文件格式有问题！");
+                }
             }
         });
+        Asserts.assertCollectionNotEmpty(storageReqs, 500, "文件数据为空！");
         traceService.syncStorage(storageReqs);
         return CommonResult.success(1, "接收成功");
     }
