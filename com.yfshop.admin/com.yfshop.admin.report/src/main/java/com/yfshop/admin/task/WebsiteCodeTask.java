@@ -115,9 +115,14 @@ public class WebsiteCodeTask {
                     String msg = "<p>您好!</p>\n" +
                             "<p>&nbsp;&nbsp;&nbsp;&nbsp;此邮件内含光明网点码，请妥善保管。雨帆</p>";
                     if (StringUtils.isNotBlank(websiteCode.getEmail())) {
-                        sendAttachmentsMail(websiteCode.getEmail(), "光明网点码", msg, fileZip.getPath(),"xuwei@51jujibao.com");
+                        try {
+                            sendAttachmentsMail(websiteCode.getEmail(), "光明网点码", msg, fileZip.getPath(), "xuwei@51jujibao.com");
+                        } catch (Exception e) {
+                            websiteCode.setFileStatus("FAIL-Mail");
+                            e.printStackTrace();
+                        }
                     }
-                }else{
+                } else {
                     logger.info("上传文件失败！");
                 }
             }
@@ -128,7 +133,7 @@ public class WebsiteCodeTask {
     //商户码 3位地区码+6位pid+6位年月日+5位序号
     @Async
     public void buildWebSiteCode(WebsiteCode websiteCode) {
-        int count = websiteCodeDao.sumWebsiteCodeByBeforeId(websiteCode.getId(),websiteCode.getMerchantId());
+        int count = websiteCodeDao.sumWebsiteCodeByBeforeId(websiteCode.getId(), websiteCode.getMerchantId());
         if (count > 9999) {
             logger.info("{},超出限量了", websiteCode.getBatchNo());
             websiteCode.setFileStatus("FAIL");
@@ -137,7 +142,7 @@ public class WebsiteCodeTask {
         }
         Merchant merchant = merchantMapper.selectById(websiteCode.getMerchantId());
         Region region = regionMapper.selectById(merchant.getCityId());
-        String code = String.format("%s-%03d", merchant.getMobile().substring(merchant.getMobile().length()-4),region == null ? 0 : region.getAreaCode());
+        String code = String.format("%s-%03d", merchant.getMobile().substring(merchant.getMobile().length() - 4), region == null ? 0 : region.getAreaCode());
         List<WebsiteCodeDetail> list = new ArrayList<>();
         for (int i = 0; i < websiteCode.getQuantity(); i++) {
             WebsiteCodeDetail websiteCodeDetail = new WebsiteCodeDetail();
