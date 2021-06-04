@@ -119,4 +119,6 @@ public class ItemResult implements Serializable {
      * 商品的规格
      */
     private List<ItemSpecNameResult> specNames;
+
+    private BigDecimal minSalePrice;
 }
