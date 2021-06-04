@@ -103,7 +103,7 @@ public class MallServiceImpl implements MallService {
         list.parallelStream().forEach(itemResult -> {
             BigDecimal minSalePrice = skuMapper.selectList(Wrappers.lambdaQuery(ItemSku.class)
                     .eq(ItemSku::getItemId, itemResult.getId()).eq(ItemSku::getIsEnable, "Y"))
-                    .stream().map(ItemSku::getSkuSalePrice).findFirst().orElse(null);
+                    .stream().map(ItemSku::getSkuSalePrice).min(BigDecimal::compareTo).orElse(null);
             itemResult.setMinSalePrice(minSalePrice);
         });
         return list;
