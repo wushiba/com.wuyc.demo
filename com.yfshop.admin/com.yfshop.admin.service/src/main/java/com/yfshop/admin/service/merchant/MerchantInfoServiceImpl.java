@@ -239,7 +239,7 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
 //            merchant.setRoleAlias(GroupRoleEnum.WD.getCode());
 //            merchant.setRoleName(GroupRoleEnum.WD.getDescription());
             MerchantDetail merchantDetail = merchantDetailMapper.selectOne(Wrappers.<MerchantDetail>lambdaQuery()
-                    .eq(MerchantDetail::getMerchantId, websiteReq.getId()));
+                    .eq(MerchantDetail::getMerchantId, merchantId));
             if (merchantDetail != null) {
                 Integer merchantDetailId = merchantDetail.getId();
                 merchantDetail = BeanUtil.convert(websiteReq, MerchantDetail.class);
@@ -248,6 +248,7 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
                 merchantDetailMapper.updateById(merchantDetail);
             } else {
                 merchantDetail = BeanUtil.convert(websiteReq, MerchantDetail.class);
+                merchantDetail.setGeoHash(GeoUtils.toBase32(websiteReq.getLatitude(), websiteReq.getLongitude(), 12));
                 merchantDetail.setMerchantId(merchantId);
                 merchantDetailMapper.insert(merchantDetail);
             }
