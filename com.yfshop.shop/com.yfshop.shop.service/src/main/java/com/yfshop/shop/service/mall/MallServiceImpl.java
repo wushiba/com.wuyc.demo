@@ -3,8 +3,23 @@ package com.yfshop.shop.service.mall;
 import cn.hutool.core.collection.CollectionUtil;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
-import com.yfshop.code.mapper.*;
-import com.yfshop.code.model.*;
+import com.yfshop.code.mapper.BannerMapper;
+import com.yfshop.code.mapper.ItemCategoryMapper;
+import com.yfshop.code.mapper.ItemContentMapper;
+import com.yfshop.code.mapper.ItemImageMapper;
+import com.yfshop.code.mapper.ItemMapper;
+import com.yfshop.code.mapper.ItemSkuMapper;
+import com.yfshop.code.mapper.ItemSpecNameMapper;
+import com.yfshop.code.mapper.ItemSpecValueMapper;
+import com.yfshop.code.mapper.UserCartMapper;
+import com.yfshop.code.model.Banner;
+import com.yfshop.code.model.Item;
+import com.yfshop.code.model.ItemCategory;
+import com.yfshop.code.model.ItemContent;
+import com.yfshop.code.model.ItemImage;
+import com.yfshop.code.model.ItemSku;
+import com.yfshop.code.model.ItemSpecName;
+import com.yfshop.code.model.ItemSpecValue;
 import com.yfshop.common.constants.CacheConstants;
 import com.yfshop.common.enums.BannerPositionsEnum;
 import com.yfshop.common.exception.ApiException;
@@ -12,18 +27,23 @@ import com.yfshop.common.exception.Asserts;
 import com.yfshop.common.service.RedisService;
 import com.yfshop.common.util.BeanUtil;
 import com.yfshop.shop.dao.ItemDao;
-import com.yfshop.shop.service.coupon.result.YfCouponResult;
 import com.yfshop.shop.service.mall.req.QueryItemDetailReq;
 import com.yfshop.shop.service.mall.req.QueryItemReq;
-import com.yfshop.shop.service.mall.result.*;
-import org.apache.commons.lang3.StringUtils;
+import com.yfshop.shop.service.mall.result.BannerResult;
+import com.yfshop.shop.service.mall.result.ItemCategoryResult;
+import com.yfshop.shop.service.mall.result.ItemContentResult;
+import com.yfshop.shop.service.mall.result.ItemImageResult;
+import com.yfshop.shop.service.mall.result.ItemResult;
+import com.yfshop.shop.service.mall.result.ItemSkuResult;
+import com.yfshop.shop.service.mall.result.ItemSpecNameResult;
+import com.yfshop.shop.service.mall.result.ItemSpecValueResult;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -73,13 +93,20 @@ public class MallServiceImpl implements MallService {
             key = "'" + CacheConstants.MALL_CATEGORY_ITEMS_CACHE_KEY_PREFIX + "' + #root.args[0].categoryId")
     @Override
     public List<ItemResult> queryItems(QueryItemReq req) {
-//        if (req == null || req.getCategoryId() == null) {
-//            return new ArrayList<>(0);
-//        }
+        //        if (req == null || req.getCategoryId() == null) {
+        //            return new ArrayList<>(0);
+        //        }
         List<Item> items = itemMapper.selectList(Wrappers.lambdaQuery(Item.class)
                 .eq(req.getCategoryId() != null, Item::getCategoryId, req.getCategoryId())
                 .eq(Item::getIsEnable, "Y").eq(Item::getIsDelete, "N"));
-        return BeanUtil.convertList(items, ItemResult.class);
+        List<ItemResult> list = BeanUtil.convertList(items, ItemResult.class);
+        list.parallelStream().forEach(itemResult -> {
+            BigDecimal minSalePrice = skuMapper.selectList(Wrappers.lambdaQuery(ItemSku.class)
+                    .eq(ItemSku::getItemId, itemResult.getId()).eq(ItemSku::getIsEnable, "Y"))
+                    .stream().map(ItemSku::getSkuSalePrice).min(BigDecimal::compareTo).orElse(null);
+            itemResult.setMinSalePrice(minSalePrice);
+        });
+        return list;
     }
 
     @Cacheable(cacheManager = CacheConstants.CACHE_MANAGE_NAME,
@@ -146,7 +173,7 @@ public class MallServiceImpl implements MallService {
                 .eq(Banner::getPositions, BannerPositionsEnum.HOME.getCode())
                 .eq(Banner::getIsEnable, "Y").orderByAsc(Banner::getSort));
         return BeanUtil.convertList(banners, BannerResult.class);
-//        return banners.stream().map(Banner::getImageUrl).collect(Collectors.toList());
+        //        return banners.stream().map(Banner::getImageUrl).collect(Collectors.toList());
     }
 
     @Cacheable(cacheManager = CacheConstants.CACHE_MANAGE_NAME,
@@ -158,7 +185,7 @@ public class MallServiceImpl implements MallService {
                 .eq(Banner::getPositions, BannerPositionsEnum.BANNER.getCode())
                 .eq(Banner::getIsEnable, "Y").orderByAsc(Banner::getSort));
         return BeanUtil.convertList(banners, BannerResult.class);
-//        return banners.stream().map(Banner::getImageUrl).collect(Collectors.toList());
+        //        return banners.stream().map(Banner::getImageUrl).collect(Collectors.toList());
     }
 
 
@@ -180,8 +207,9 @@ public class MallServiceImpl implements MallService {
 
     /**
      * 修改商品sku库存
-     * @param   skuId     skuId
-     * @param   num       扣减库存的数量
+     *
+     * @param skuId skuId
+     * @param num   扣减库存的数量
      * @return
      * @throws ApiException
      */
@@ -189,10 +217,10 @@ public class MallServiceImpl implements MallService {
     @Transactional(rollbackFor = Exception.class)
     public Integer updateItemSkuStock(Integer skuId, Integer num) throws ApiException {
         Asserts.assertNonNull(skuId, 500, "商品skuId不可以为空");
-        Asserts.assertFalse(num == null || num <= 0 , 500, "请传入正确的数量");
+        Asserts.assertFalse(num == null || num <= 0, 500, "请传入正确的数量");
 
         int result = itemDao.updateItemSkuStock(skuId, num);
-        Asserts.assertFalse(result <= 0 , 500, "库存不足，请稍后重试");
+        Asserts.assertFalse(result <= 0, 500, "库存不足，请稍后重试");
         return result;
     }
 

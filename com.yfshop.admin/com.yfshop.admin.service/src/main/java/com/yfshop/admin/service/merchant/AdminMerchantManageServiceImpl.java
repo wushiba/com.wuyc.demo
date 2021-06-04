@@ -37,6 +37,7 @@ import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
+import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
@@ -52,6 +53,7 @@ import java.util.stream.Collectors;
  * @author Xulg
  * Created in 2021-03-25 11:18
  */
+@Validated
 @DubboService
 public class AdminMerchantManageServiceImpl implements AdminMerchantManageService {
 
@@ -92,6 +94,7 @@ public class AdminMerchantManageServiceImpl implements AdminMerchantManageServic
         Asserts.assertTrue("Y".equalsIgnoreCase(currentLoginMerchant.getIsEnable()), 500, "当前登录商户已被禁用");
         Asserts.assertTrue("N".equalsIgnoreCase(currentLoginMerchant.getIsDelete()), 500, "当前登录商户已被删除");
         GroupRoleEnum createMerchantRole = GroupRoleEnum.getByCode(req.getRoleAlias());
+        Asserts.assertTrue(!req.getRoleAlias().equals(GroupRoleEnum.ZB.getCode()), 500, "不能创建总部商户");
 
         // 查询上级
         Merchant pm = getParentMerchantThenCheck(currentLoginMerchant, req.getPid(), req.getRoleAlias());
@@ -212,7 +215,7 @@ public class AdminMerchantManageServiceImpl implements AdminMerchantManageServic
         if (req.getPid() != null && !existMerchant.getPid().equals(req.getPid())) {
             // 修改下级商户的pid_path
             List<Merchant> subMerchants = merchantMapper.selectList(Wrappers.lambdaQuery(Merchant.class)
-                    .likeRight(Merchant::getPidPath, req.getMerchantId()).ne(Merchant::getId, req.getMerchantId()));
+                    .like(Merchant::getPidPath, "." + req.getMerchantId() + ".").ne(Merchant::getId, req.getMerchantId()));
             Map<Integer, Merchant> subMerchantEntitiesMap = subMerchants.stream()
                     .map(subMerchant -> {
                         String newPidPath = merchant.getPidPath() + StrUtil.subAfter(subMerchant.getPidPath(),
