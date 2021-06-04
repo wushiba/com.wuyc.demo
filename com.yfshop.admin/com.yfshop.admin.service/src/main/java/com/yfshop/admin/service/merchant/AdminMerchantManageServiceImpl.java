@@ -94,6 +94,7 @@ public class AdminMerchantManageServiceImpl implements AdminMerchantManageServic
         Asserts.assertTrue("Y".equalsIgnoreCase(currentLoginMerchant.getIsEnable()), 500, "当前登录商户已被禁用");
         Asserts.assertTrue("N".equalsIgnoreCase(currentLoginMerchant.getIsDelete()), 500, "当前登录商户已被删除");
         GroupRoleEnum createMerchantRole = GroupRoleEnum.getByCode(req.getRoleAlias());
+        Asserts.assertTrue(!req.getRoleAlias().equals(GroupRoleEnum.ZB.getCode()), 500, "不能创建总部商户");
 
         // 查询上级
         Merchant pm = getParentMerchantThenCheck(currentLoginMerchant, req.getPid(), req.getRoleAlias());
