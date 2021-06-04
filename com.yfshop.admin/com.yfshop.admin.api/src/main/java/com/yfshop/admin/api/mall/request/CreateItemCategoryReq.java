@@ -20,7 +20,7 @@ public class CreateItemCategoryReq implements Serializable {
 
     @ApiModelProperty(value = "分类名称", required = true)
     @NotBlank(message = "分类名称不能为空")
-    @Length(min = 1, max = 4, message = "分类名称不能超过{max}个字")
+    @Length(min = 1, max = 20, message = "分类名称不能超过{max}个字")
     private String categoryName;
 
     @ApiModelProperty(value = "是否上架", allowableValues = "Y|N", required = true)
