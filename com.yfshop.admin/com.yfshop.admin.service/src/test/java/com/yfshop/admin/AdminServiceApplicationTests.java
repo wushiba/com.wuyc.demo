@@ -24,6 +24,7 @@ import com.yfshop.admin.api.mall.result.ItemSkuResult;
 import com.yfshop.admin.api.menu.AdminMenuManageService;
 import com.yfshop.admin.api.menu.result.MenuResult;
 import com.yfshop.admin.api.merchant.AdminMerchantManageService;
+import com.yfshop.admin.api.merchant.request.UpdateMerchantReq;
 import com.yfshop.admin.api.merchant.result.MerchantResult;
 import com.yfshop.code.manager.MenuManager;
 import com.yfshop.code.mapper.ItemContentMapper;
@@ -52,8 +53,6 @@ import org.springframework.dao.DuplicateKeyException;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import javax.annotation.Resource;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -92,7 +91,27 @@ public class AdminServiceApplicationTests {
     @DubboReference(check = false)
     private AdminMerchantManageService adminMerchantManageService;
 
-    @Test
+    // @Test
+    public void fasfasdfasdfas() {
+        UpdateMerchantReq req = new UpdateMerchantReq();
+        req.setOperatorId(1);
+        req.setMerchantId(10424);
+        req.setRoleAlias("jxs");
+        req.setContacts("嘻嘻");
+        req.setMobile("13333333332");
+        req.setPassword("32131");
+        req.setProvinceId(1);
+        req.setCityId(1);
+        req.setDistrictId(1);
+        req.setAddress("dfasfasfas");
+        req.setPid(10431);
+        req.setIsRefrigerator("Y");
+        req.setHeadImage("fdsfasfas");
+        req.setMerchantName("fsdfasf");
+        adminMerchantManageService.updateMerchant(1, req);
+    }
+
+    // @Test
     public void sdasdadada() {
         ItemCreateReq req = new ItemCreateReq();
         req.setItemTitle("ffsdfsd");
@@ -285,7 +304,6 @@ public class AdminServiceApplicationTests {
             e.printStackTrace();
         }
     }
-
 
 
     @Test
@@ -1744,12 +1762,12 @@ public class AdminServiceApplicationTests {
         importMerchantsFromExcel(path1, province);
     }
 
-//    @Test
-//    public void importMerchantsFromExcel13() {
-//        String path1 = "f:\\618大促账号信息收集（湖北）(1).xlsx";
-//        String province = "湖北省";
-//        importMerchantsFromExcel(path1, province);
-//    }
+    //    @Test
+    //    public void importMerchantsFromExcel13() {
+    //        String path1 = "f:\\618大促账号信息收集（湖北）(1).xlsx";
+    //        String province = "湖北省";
+    //        importMerchantsFromExcel(path1, province);
+    //    }
 
     //@Test
     public void importMerchantsFromExcel14() {
