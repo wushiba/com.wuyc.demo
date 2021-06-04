@@ -122,6 +122,10 @@ public class MallServiceImpl implements MallService {
             return null;
         }
         ItemResult itemResult = BeanUtil.convert(item, ItemResult.class);
+        BigDecimal minSalePrice = skuMapper.selectList(Wrappers.lambdaQuery(ItemSku.class)
+                .eq(ItemSku::getItemId, itemResult.getId()).eq(ItemSku::getIsEnable, "Y"))
+                .stream().map(ItemSku::getSkuSalePrice).min(BigDecimal::compareTo).orElse(null);
+        itemResult.setMinSalePrice(minSalePrice);
         // category
         ItemCategory category = itemCategoryMapper.selectById(item.getCategoryId());
         if (category != null) {
