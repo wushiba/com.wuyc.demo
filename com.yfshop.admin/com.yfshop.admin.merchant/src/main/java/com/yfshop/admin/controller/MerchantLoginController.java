@@ -91,7 +91,7 @@ class MerchantLoginController extends AbstractBaseController {
      */
     @RequestMapping(value = "/logout", method = {RequestMethod.POST})
     public CommonResult<MerchantResult> logout() {
-        //StpUtil.logout();
+        StpUtil.logout();
         return CommonResult.success(null);
     }
 
