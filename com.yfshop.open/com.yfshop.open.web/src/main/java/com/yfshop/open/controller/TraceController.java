@@ -1,6 +1,7 @@
 package com.yfshop.open.controller;
 
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.io.IoUtil;
 import com.yfshop.common.api.CommonResult;
@@ -17,6 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -34,6 +36,7 @@ public class TraceController {
      */
     @RequestMapping(value = "/importTrace", method = {RequestMethod.POST})
     public CommonResult importTrace(@RequestParam("file") MultipartFile file) throws IOException {
+        String no= DateUtil.format(new Date(),"yyMMddHH");
         List<String> list = IoUtil.readUtf8Lines(file.getInputStream(), new ArrayList<>());
         List<TraceReq> traceReqs = new ArrayList<>();
         list.forEach(item -> {
@@ -46,15 +49,13 @@ public class TraceController {
                     traceReq.setProductNo(data[2]);
                     traceReqs.add(traceReq);
                     if (traceReqs.size() == 20000) {
-                        traceService.syncTrace(traceReqs);
+                        traceService.syncTrace(no,traceReqs, false);
                         traceReqs.clear();
                     }
                 }
             }
         });
-        if (CollectionUtil.isNotEmpty(traceReqs)) {
-            traceService.syncTrace(traceReqs);
-        }
+        traceService.syncTrace(no,traceReqs, true);
         return CommonResult.success(1, "接收成功");
     }
 
@@ -65,6 +66,7 @@ public class TraceController {
      */
     @RequestMapping(value = "/importStorage", method = {RequestMethod.POST})
     public CommonResult importStorage(@RequestParam("file") MultipartFile file) throws IOException {
+        String no= DateUtil.format(new Date(),"yyMMddHH");
         List<String> list = IoUtil.readUtf8Lines(file.getInputStream(), new ArrayList<>());
         List<StorageReq> storageReqs = new ArrayList<>();
         list.forEach(item -> {
@@ -79,15 +81,13 @@ public class TraceController {
                     storageReq.setDealerAddress(data[4]);
                     storageReqs.add(storageReq);
                     if (storageReqs.size() == 20000) {
-                        traceService.syncStorage(storageReqs);
+                        traceService.syncStorage(no,storageReqs, false);
                         storageReqs.clear();
                     }
                 }
             }
         });
-        if (CollectionUtil.isNotEmpty(storageReqs)) {
-            traceService.syncStorage(storageReqs);
-        }
+        traceService.syncStorage(no,storageReqs, true);
         return CommonResult.success(1, "接收成功");
     }
 }
