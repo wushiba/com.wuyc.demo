@@ -45,15 +45,16 @@ public class TraceController {
                     traceReq.setBoxNo(data[1]);
                     traceReq.setProductNo(data[2]);
                     traceReqs.add(traceReq);
-                } else {
-                    Asserts.assertTrue(false, 500, "文件格式有问题！");
+                    if (traceReqs.size() == 20000) {
+                        traceService.syncTrace(traceReqs);
+                        traceReqs.clear();
+                    }
                 }
             }
         });
-        Asserts.assertCollectionNotEmpty(traceReqs, 500, "文件数据为空！");
-        CollectionUtil.split(traceReqs, 20000).forEach(item -> {
-            traceService.syncTrace(item);
-        });
+        if (CollectionUtil.isNotEmpty(traceReqs)) {
+            traceService.syncTrace(traceReqs);
+        }
         return CommonResult.success(1, "接收成功");
     }
 
@@ -77,15 +78,16 @@ public class TraceController {
                     storageReq.setDealerName(data[3]);
                     storageReq.setDealerAddress(data[4]);
                     storageReqs.add(storageReq);
-                } else {
-                    Asserts.assertTrue(false, 500, "文件格式有问题！");
+                    if (storageReqs.size() == 20000) {
+                        traceService.syncStorage(storageReqs);
+                        storageReqs.clear();
+                    }
                 }
             }
         });
-        Asserts.assertCollectionNotEmpty(storageReqs, 500, "文件数据为空！");
-        CollectionUtil.split(storageReqs, 20000).forEach(item -> {
-            traceService.syncStorage(item);
-        });
+        if (CollectionUtil.isNotEmpty(storageReqs)) {
+            traceService.syncStorage(storageReqs);
+        }
         return CommonResult.success(1, "接收成功");
     }
 }
