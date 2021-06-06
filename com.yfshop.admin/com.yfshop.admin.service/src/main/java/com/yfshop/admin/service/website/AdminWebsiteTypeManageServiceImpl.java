@@ -1,5 +1,6 @@
 package com.yfshop.admin.service.website;
 
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.yfshop.admin.api.website.AdminWebsiteTypeManageService;
 import com.yfshop.admin.api.website.result.WebsiteTypeResult;
 import com.yfshop.code.mapper.WebsiteTypeMapper;
@@ -50,7 +51,7 @@ public class AdminWebsiteTypeManageServiceImpl implements AdminWebsiteTypeManage
 
     @Override
     public List<WebsiteTypeResult> queryWebsiteTypes() {
-        List<WebsiteTypeResult> websiteTypes = websiteTypeMapper.selectList(null)
+        List<WebsiteTypeResult> websiteTypes = websiteTypeMapper.selectList(Wrappers.lambdaQuery())
                 .stream().map((w) -> BeanUtil.convert(w, WebsiteTypeResult.class))
                 .collect(Collectors.toList());
         // 统计各个类型网点数量
