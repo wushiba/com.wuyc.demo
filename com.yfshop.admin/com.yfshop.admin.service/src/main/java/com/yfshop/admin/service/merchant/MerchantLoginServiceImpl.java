@@ -66,4 +66,11 @@ public class MerchantLoginServiceImpl implements MerchantLoginService {
         Asserts.assertNonNull(merchant, 500, "没有商户信息");
         return BeanUtil.convert(merchant, MerchantResult.class);
     }
+
+    @Override
+    public void clearOpenId(Integer merchantId) {
+        Merchant merchant=new Merchant();
+        merchant.setOpenId("");
+        merchantMapper.updateById(merchant);
+    }
 }
