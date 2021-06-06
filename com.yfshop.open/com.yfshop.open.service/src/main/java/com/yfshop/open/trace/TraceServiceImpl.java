@@ -37,7 +37,7 @@ public class TraceServiceImpl implements TraceService {
     @Override
     //@Async
     public void syncStorage(String no,List<String> storageReqList, boolean finish) {
-        String key = "Task:Storage"+no;
+        String key = "Task:Storage:"+no;
         if (!CollectionUtils.isEmpty(storageReqList)) {
             stringRedisTemplate.opsForList().leftPush(key, JSONUtil.toJsonStr(storageReqList));
         }
