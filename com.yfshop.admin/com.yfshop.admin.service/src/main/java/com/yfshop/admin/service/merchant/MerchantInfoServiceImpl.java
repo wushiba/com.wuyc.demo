@@ -737,6 +737,7 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
                 .eq(Merchant::getPid, merchantId)
                 .eq(Merchant::getIsEnable, "Y")
                 .eq(Merchant::getIsDelete, "N")
+                .ne(Merchant::getRoleAlias, GroupRoleEnum.WD.getCode())
                 .orderByDesc(Merchant::getId);
         List<Merchant> list = merchantMapper.selectList(lambdaQueryWrapper);
         return BeanUtil.convertList(list, MerchantResult.class);
