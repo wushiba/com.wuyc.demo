@@ -1,10 +1,4 @@
 ---
-logging:
-  level:
-    com.yfshop.code.mapper: debug
-    com.yfshop: debug
-    me.chanjar.weixin: DEBUG
-    com.github.binarywang.wxpay: DEBUG
 server:
   port: 10000
 spring:
