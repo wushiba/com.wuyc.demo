@@ -236,6 +236,8 @@ class MerchantInfoController extends AbstractBaseController {
      */
     @RequestMapping(value = "/websiteCodeBind", method = {RequestMethod.POST})
     public CommonResult<Void> websiteCodeBind(WebsiteCodeBindReq websiteReq) {
+        Asserts.assertStringNotBlank(websiteReq.getWebsiteTypeName(),500,"请选择网点类型！");
+        Asserts.assertStringNotBlank(websiteReq.getIsRefrigerator(),500,"请选择是否有冰箱！");
         if (StpUtil.isLogin()) {
             websiteReq.setId(StpUtil.getLoginIdAsInt());
         }
