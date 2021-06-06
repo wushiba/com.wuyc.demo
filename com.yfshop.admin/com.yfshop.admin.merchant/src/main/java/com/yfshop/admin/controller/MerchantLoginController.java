@@ -93,7 +93,7 @@ class MerchantLoginController extends AbstractBaseController {
     @RequestMapping(value = "/logout", method = {RequestMethod.POST})
     public CommonResult<MerchantResult> logout() {
         String openId = getCurrentOpenId();
-        if (StringUtils.isNotBlank(openId) {
+        if (StringUtils.isNotBlank(openId)) {
             merchantLoginService.clearOpenId(openId);
         }
         StpUtil.logout();
