@@ -24,7 +24,7 @@ public class TraceManagerImpl extends ServiceImpl<TraceMapper, Trace> implements
             rollbackFor = {Exception.class}
     )
     @Override
-    public boolean saveBatch(Collection<Trace> entityList) {
+    public boolean saveBatch(Collection<Trace> entityList,int size) {
         getBaseMapper().insertBatchSomeColumn(entityList);
         return true;
     }

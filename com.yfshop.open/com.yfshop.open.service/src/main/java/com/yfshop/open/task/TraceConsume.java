@@ -65,7 +65,7 @@ public class TraceConsume {
                 trace.setCreateTime(now);
                 destList.add(trace);
             });
-            traceManager.saveBatch(destList);
+            traceManager.saveBatch(destList,50000);
         }
     }
 
@@ -78,7 +78,7 @@ public class TraceConsume {
                 details.setCreateTime(now);
                 destList.add(details);
             });
-            traceDetailsManager.saveBatch(destList);
+            traceDetailsManager.saveBatch(destList,50000);
         }
     }
 
