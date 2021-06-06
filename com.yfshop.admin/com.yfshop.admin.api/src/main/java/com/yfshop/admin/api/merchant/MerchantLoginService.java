@@ -31,5 +31,5 @@ public interface MerchantLoginService {
      */
     MerchantResult loginByWx(String openId) throws ApiException;
 
-    void clearOpenId(Integer merchantId);
+    void clearOpenId(String openId);
 }

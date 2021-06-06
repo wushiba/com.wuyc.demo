@@ -68,12 +68,12 @@ public class MerchantLoginServiceImpl implements MerchantLoginService {
     }
 
     @Override
-    public void clearOpenId(Integer merchantId) {
-        if (merchantId != null) {
+    public void clearOpenId(String openId) {
+        if (StringUtils.isNotBlank(openId)) {
             Merchant merchant = new Merchant();
-            merchant.setId(merchantId);
             merchant.setOpenId("");
-            merchantMapper.updateById(merchant);
+            merchantMapper.update(merchant, Wrappers.lambdaQuery(Merchant.class)
+                    .eq(Merchant::getOpenId, openId));
         }
     }
 }
