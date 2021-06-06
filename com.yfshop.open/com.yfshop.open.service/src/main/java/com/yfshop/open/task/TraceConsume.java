@@ -78,14 +78,13 @@ public class TraceConsume {
             List<TraceDetails> destList = new ArrayList<>();
             LocalDateTime now = LocalDateTime.now();
             storageReqList.forEach(item -> {
-                TraceDetails details = new TraceDetails();
                 String[] data = item.split(",");
-                StorageReq storageReq = new StorageReq();
-                storageReq.setBoxNo(data[0]);
-                storageReq.setDealerNo(data[1]);
-                storageReq.setDealerMobile(data[2]);
-                storageReq.setDealerName(data[3]);
-                storageReq.setDealerAddress(data[4]);
+                TraceDetails details = new TraceDetails();
+                details.setBoxNo(data[0]);
+                details.setDealerNo(data[1]);
+                details.setDealerMobile(data[2]);
+                details.setDealerName(data[3]);
+                details.setDealerAddress(data[4]);
                 details.setCreateTime(now);
                 destList.add(details);
             });
