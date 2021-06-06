@@ -39,14 +39,14 @@ public class TraceConsume {
             }
             if (key.startsWith("Task:Trace")) {
                 try {
-                    List<TraceReq> codes = JSONUtil.toList(value, TraceReq.class);
+                    List<String> codes = JSONUtil.toList(value, String.class);
                     syncTrace(codes);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
             } else if (key.startsWith("Task:Storage")) {
                 try {
-                    List<StorageReq> codes = JSONUtil.toList(value, StorageReq.class);
+                    List<String> codes = JSONUtil.toList(value, String.class);
                     syncStorage(codes);
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -56,29 +56,40 @@ public class TraceConsume {
     }
 
 
-    private void syncTrace(List<TraceReq> traceReqList) {
+    private void syncTrace(List<String> traceReqList) {
         if (traceReqList != null) {
             List<Trace> destList = new ArrayList<>();
             LocalDateTime now = LocalDateTime.now();
             traceReqList.forEach(item -> {
-                Trace trace = BeanUtil.convert(item, Trace.class);
+                String[] data = item.split(",");
+                Trace trace = new Trace();
+                trace.setTraceNo(data[0]);
+                trace.setBoxNo(data[1]);
+                trace.setProductNo(data[2]);
                 trace.setCreateTime(now);
                 destList.add(trace);
             });
-            traceManager.saveBatch(destList,50000);
+            traceManager.saveBatch(destList, 30000);
         }
     }
 
-    private void syncStorage(List<StorageReq> storageReqList) {
+    private void syncStorage(List<String> storageReqList) {
         if (storageReqList != null) {
             List<TraceDetails> destList = new ArrayList<>();
             LocalDateTime now = LocalDateTime.now();
             storageReqList.forEach(item -> {
-                TraceDetails details = BeanUtil.convert(item, TraceDetails.class);
+                TraceDetails details = new TraceDetails();
+                String[] data = item.split(",");
+                StorageReq storageReq = new StorageReq();
+                storageReq.setBoxNo(data[0]);
+                storageReq.setDealerNo(data[1]);
+                storageReq.setDealerMobile(data[2]);
+                storageReq.setDealerName(data[3]);
+                storageReq.setDealerAddress(data[4]);
                 details.setCreateTime(now);
                 destList.add(details);
             });
-            traceDetailsManager.saveBatch(destList,50000);
+            traceDetailsManager.saveBatch(destList, 30000);
         }
     }
 

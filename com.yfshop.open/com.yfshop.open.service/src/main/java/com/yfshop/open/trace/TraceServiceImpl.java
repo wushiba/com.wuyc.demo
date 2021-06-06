@@ -23,7 +23,7 @@ public class TraceServiceImpl implements TraceService {
 
     @Override
     //@Async
-    public void syncTrace(String no,List<TraceReq> traceReqList, boolean finish) {
+    public void syncTrace(String no,List<String> traceReqList, boolean finish) {
         String key = "Task:Trace:"+no;
         if (!CollectionUtils.isEmpty(traceReqList)) {
             stringRedisTemplate.opsForList().leftPush(key, JSONUtil.toJsonStr(traceReqList));
@@ -36,7 +36,7 @@ public class TraceServiceImpl implements TraceService {
 
     @Override
     //@Async
-    public void syncStorage(String no,List<StorageReq> storageReqList, boolean finish) {
+    public void syncStorage(String no,List<String> storageReqList, boolean finish) {
         String key = "Task:Storage"+no;
         if (!CollectionUtils.isEmpty(storageReqList)) {
             stringRedisTemplate.opsForList().leftPush(key, JSONUtil.toJsonStr(storageReqList));

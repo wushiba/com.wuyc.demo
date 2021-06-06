@@ -38,17 +38,13 @@ public class TraceController {
     public CommonResult importTrace(@RequestParam("file") MultipartFile file) throws IOException {
         String no= DateUtil.format(new Date(),"yyMMddHH");
         List<String> list = IoUtil.readUtf8Lines(file.getInputStream(), new ArrayList<>());
-        List<TraceReq> traceReqs = new ArrayList<>();
+        List<String> traceReqs = new ArrayList<>();
         list.forEach(item -> {
             if (StringUtils.isNotBlank(item)) {
                 String[] data = item.split(",");
                 if (data.length == 6) {
-                    TraceReq traceReq = new TraceReq();
-                    traceReq.setTraceNo(data[0]);
-                    traceReq.setBoxNo(data[1]);
-                    traceReq.setProductNo(data[2]);
-                    traceReqs.add(traceReq);
-                    if (traceReqs.size() == 50000) {
+                    traceReqs.add(item);
+                    if (traceReqs.size() == 30000) {
                         traceService.syncTrace(no,traceReqs, false);
                         traceReqs.clear();
                     }
@@ -68,19 +64,13 @@ public class TraceController {
     public CommonResult importStorage(@RequestParam("file") MultipartFile file) throws IOException {
         String no= DateUtil.format(new Date(),"yyMMddHH");
         List<String> list = IoUtil.readUtf8Lines(file.getInputStream(), new ArrayList<>());
-        List<StorageReq> storageReqs = new ArrayList<>();
+        List<String> storageReqs = new ArrayList<>();
         list.forEach(item -> {
             if (StringUtils.isNotBlank(item)) {
                 String[] data = item.split(",");
                 if (data.length == 5) {
-                    StorageReq storageReq = new StorageReq();
-                    storageReq.setBoxNo(data[0]);
-                    storageReq.setDealerNo(data[1]);
-                    storageReq.setDealerMobile(data[2]);
-                    storageReq.setDealerName(data[3]);
-                    storageReq.setDealerAddress(data[4]);
-                    storageReqs.add(storageReq);
-                    if (storageReqs.size() == 50000) {
+                    storageReqs.add(item);
+                    if (storageReqs.size() == 30000) {
                         traceService.syncStorage(no,storageReqs, false);
                         storageReqs.clear();
                     }

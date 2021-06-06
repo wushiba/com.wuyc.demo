@@ -7,8 +7,8 @@ import java.util.List;
 
 public interface TraceService {
 
-    void syncTrace(String no,List<TraceReq> traceReqList,boolean finish);
+    void syncTrace(String no,List<String> traceReqList,boolean finish);
 
-    void syncStorage(String no,List<StorageReq> traceReqList,boolean finish);
+    void syncStorage(String no,List<String> traceReqList,boolean finish);
 
 }
