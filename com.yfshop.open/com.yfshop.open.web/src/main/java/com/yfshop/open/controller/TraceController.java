@@ -48,7 +48,7 @@ public class TraceController {
                     traceReq.setBoxNo(data[1]);
                     traceReq.setProductNo(data[2]);
                     traceReqs.add(traceReq);
-                    if (traceReqs.size() == 20000) {
+                    if (traceReqs.size() == 50000) {
                         traceService.syncTrace(no,traceReqs, false);
                         traceReqs.clear();
                     }
@@ -80,7 +80,7 @@ public class TraceController {
                     storageReq.setDealerName(data[3]);
                     storageReq.setDealerAddress(data[4]);
                     storageReqs.add(storageReq);
-                    if (storageReqs.size() == 20000) {
+                    if (storageReqs.size() == 50000) {
                         traceService.syncStorage(no,storageReqs, false);
                         storageReqs.clear();
                     }
