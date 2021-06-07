@@ -13,11 +13,11 @@ import com.yfshop.shop.service.healthy.result.HealthyItemResult;
 import com.yfshop.shop.service.healthy.result.HealthyOrderResult;
 import com.yfshop.shop.service.healthy.result.HealthySubOrderResult;
 import org.apache.dubbo.config.annotation.DubboReference;
+import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -29,7 +29,7 @@ import java.util.List;
  * Created in 2021-05-26 15:34
  */
 @Validated
-@RestController
+@Controller
 @RequestMapping("front/healthy")
 public class HealthyController implements BaseController {
 
@@ -57,6 +57,7 @@ public class HealthyController implements BaseController {
 
     @RequestMapping(value = "/pageQueryUserHealthyOrders", method = {RequestMethod.GET, RequestMethod.POST})
     @ResponseBody
+    @SaCheckLogin
     public CommonResult<IPage<HealthyOrderResult>> pageQueryUserHealthyOrders(QueryHealthyOrdersReq req) {
         req.setUserId(getCurrentUserId());
         return CommonResult.success(healthyService.pageQueryUserHealthyOrders(req));
@@ -64,6 +65,7 @@ public class HealthyController implements BaseController {
 
     @RequestMapping(value = "/pageQueryHealthyOrderDetail", method = {RequestMethod.GET, RequestMethod.POST})
     @ResponseBody
+    @SaCheckLogin
     public CommonResult<List<HealthySubOrderResult>> pageQueryHealthyOrderDetail(@NotNull(message = "订单ID不能为空") Long orderId) {
         return CommonResult.success(healthyService.pageQueryHealthyOrderDetail(getCurrentUserId(), orderId));
     }
