@@ -1,11 +1,13 @@
 package com.yfshop.shop.controller.healthy;
 
 import cn.dev33.satoken.annotation.SaCheckLogin;
+import cn.hutool.core.date.DateTime;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.github.binarywang.wxpay.bean.order.WxPayMpOrderResult;
 import com.yfshop.common.api.CommonResult;
 import com.yfshop.common.base.BaseController;
 import com.yfshop.shop.service.healthy.HealthyService;
+import com.yfshop.shop.service.healthy.req.PreviewShowShipPlansReq;
 import com.yfshop.shop.service.healthy.req.QueryHealthyOrdersReq;
 import com.yfshop.shop.service.healthy.req.SubmitHealthyOrderReq;
 import com.yfshop.shop.service.healthy.result.HealthyActResult;
@@ -22,6 +24,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author Xulg
@@ -55,7 +58,6 @@ public class HealthyController implements BaseController {
         return CommonResult.success(healthyService.queryHealthyActivities());
     }
 
-
     @RequestMapping(value = "/queryHealthyActivityDetail", method = {RequestMethod.GET, RequestMethod.POST})
     @ResponseBody
     public CommonResult<HealthyActResult> queryHealthyActivityDetail(Integer id) {
@@ -75,5 +77,17 @@ public class HealthyController implements BaseController {
     @SaCheckLogin
     public CommonResult<List<HealthySubOrderResult>> pageQueryHealthyOrderDetail(@NotNull(message = "订单ID不能为空") Long orderId) {
         return CommonResult.success(healthyService.pageQueryHealthyOrderDetail(getCurrentUserId(), orderId));
+    }
+
+    @RequestMapping(value = "/findHealthyItemDetail", method = {RequestMethod.GET, RequestMethod.POST})
+    @ResponseBody
+    public CommonResult<HealthyItemResult> findHealthyItemDetail(@NotNull(message = "商品ID不能为空") Integer itemId) {
+        return CommonResult.success(healthyService.findHealthyItemDetail(itemId));
+    }
+
+    @RequestMapping(value = "/previewShowShipPlans", method = {RequestMethod.GET, RequestMethod.POST})
+    @ResponseBody
+    public CommonResult<List<String>> previewShowShipPlans(@Valid @NotNull(message = "商品不能为空") PreviewShowShipPlansReq req) {
+        return CommonResult.success(healthyService.previewShowShipPlans(req).stream().map(d -> DateTime.of(d).toDateStr()).collect(Collectors.toList()));
     }
 }
