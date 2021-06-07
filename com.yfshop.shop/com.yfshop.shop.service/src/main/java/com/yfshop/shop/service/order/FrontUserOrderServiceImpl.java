@@ -287,6 +287,7 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
     @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> submitOrderBySkuId(Integer userId, Integer skuId, Integer num, Long userCouponId, Long addressId) throws ApiException {
         ItemSkuResult itemSku = mallService.getItemSkuBySkuId(skuId);
+        Asserts.assertEquals("TC", itemSku.getSkuType(), 500, "单品商品不能单独购买，请添加套餐一起购买");
         Asserts.assertFalse(itemSku.getSkuStock() < num, 500, "商品库存不足");
 
         UserAddressResult addressInfo = userAddressService.queryUserAddresses(userId).stream()
@@ -374,9 +375,17 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
 
         // 扣库存，这里要做手写SQL，搞乐观锁
         Map<Integer, ItemSkuResult> itemSkuMap = new HashMap<>();
+        // 保存套餐的商品类型
+        Set<Integer> tcCategory = new HashSet<>();
+        Set<Integer> dpCategory = new HashSet<>();
         for (UserCart userCart : userCartList) {
             ItemSkuResult itemSku = mallService.getItemSkuBySkuId(userCart.getSkuId());
             Asserts.assertFalse(itemSku.getSkuStock() < userCart.getNum(), 500, "商品库存不足");
+            if ("TC".equals(itemSku.getSkuType())) {
+                tcCategory.add(itemSku.getCategoryId());
+            } else {
+                dpCategory.add(itemSku.getCategoryId());
+            }
             checkPrizeAddress(userCart.getSkuId(), addressInfo.getProvince());
             mallService.updateItemSkuStock(itemSku.getId(), userCart.getNum());
             itemSkuMap.put(itemSku.getId(), itemSku);
@@ -385,6 +394,10 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
             orderPrice = orderPrice.add((itemSku.getSkuSalePrice().multiply(new BigDecimal(userCart.getNum()))));
             payPrice = orderFreight.add(orderPrice);
         }
+        //检测是否只包含单品
+        dpCategory.forEach(item -> {
+            Asserts.assertTrue(tcCategory.contains(item), 500, "单品商品不能单独购买，请添加套餐一起购买");
+        });
 
         // 修改优惠券状态
         if (userCoupon.getId() != null) {

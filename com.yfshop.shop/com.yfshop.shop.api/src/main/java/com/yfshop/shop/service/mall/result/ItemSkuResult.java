@@ -101,4 +101,6 @@ public class ItemSkuResult implements Serializable {
      * 排序字段
      */
     private Integer sort;
+
+    private String skuType;
 }
