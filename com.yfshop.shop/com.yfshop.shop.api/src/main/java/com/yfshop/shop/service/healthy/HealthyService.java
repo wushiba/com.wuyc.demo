@@ -3,6 +3,7 @@ package com.yfshop.shop.service.healthy;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.github.binarywang.wxpay.bean.order.WxPayMpOrderResult;
 import com.yfshop.common.exception.ApiException;
+import com.yfshop.shop.service.healthy.req.PreviewShowShipPlansReq;
 import com.yfshop.shop.service.healthy.req.QueryHealthyOrdersReq;
 import com.yfshop.shop.service.healthy.req.SubmitHealthyOrderReq;
 import com.yfshop.shop.service.healthy.result.HealthyActResult;
@@ -12,6 +13,7 @@ import com.yfshop.shop.service.healthy.result.HealthySubOrderResult;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -35,4 +37,6 @@ public interface HealthyService {
     List<HealthySubOrderResult> pageQueryHealthyOrderDetail(Integer userId, Long orderId);
 
     HealthyActResult queryHealthyActivityDetail(Integer id);
+
+    List<Date> previewShowShipPlans(@Valid @NotNull PreviewShowShipPlansReq req) throws ApiException;
 }

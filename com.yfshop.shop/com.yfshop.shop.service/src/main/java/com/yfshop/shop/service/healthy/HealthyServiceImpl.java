@@ -1,6 +1,7 @@
 package com.yfshop.shop.service.healthy;
 
 import cn.hutool.core.date.DateTime;
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import com.alibaba.fastjson.JSON;
@@ -12,8 +13,23 @@ import com.github.binarywang.wxpay.bean.order.WxPayMpOrderResult;
 import com.github.binarywang.wxpay.bean.request.BaseWxPayRequest;
 import com.github.binarywang.wxpay.bean.request.WxPayUnifiedOrderRequest;
 import com.github.binarywang.wxpay.exception.WxPayException;
-import com.yfshop.code.mapper.*;
-import com.yfshop.code.model.*;
+import com.yfshop.code.mapper.HealthyActContentMapper;
+import com.yfshop.code.mapper.HealthyActMapper;
+import com.yfshop.code.mapper.HealthyItemContentMapper;
+import com.yfshop.code.mapper.HealthyItemImageMapper;
+import com.yfshop.code.mapper.HealthyItemMapper;
+import com.yfshop.code.mapper.HealthyOrderMapper;
+import com.yfshop.code.mapper.HealthySubOrderMapper;
+import com.yfshop.code.mapper.MerchantMapper;
+import com.yfshop.code.mapper.UserMapper;
+import com.yfshop.code.model.HealthyAct;
+import com.yfshop.code.model.HealthyActContent;
+import com.yfshop.code.model.HealthyItem;
+import com.yfshop.code.model.HealthyItemContent;
+import com.yfshop.code.model.HealthyItemImage;
+import com.yfshop.code.model.HealthyOrder;
+import com.yfshop.code.model.HealthySubOrder;
+import com.yfshop.code.model.User;
 import com.yfshop.common.constants.CacheConstants;
 import com.yfshop.common.enums.PayPrefixEnum;
 import com.yfshop.common.exception.ApiException;
@@ -22,6 +38,7 @@ import com.yfshop.common.healthy.enums.HealthyOrderStatusEnum;
 import com.yfshop.common.util.BeanUtil;
 import com.yfshop.shop.service.address.UserAddressService;
 import com.yfshop.shop.service.address.result.UserAddressResult;
+import com.yfshop.shop.service.healthy.req.PreviewShowShipPlansReq;
 import com.yfshop.shop.service.healthy.req.QueryHealthyOrdersReq;
 import com.yfshop.shop.service.healthy.req.SubmitHealthyOrderReq;
 import com.yfshop.shop.service.healthy.result.HealthyActResult;
@@ -33,6 +50,7 @@ import com.yfshop.wx.api.service.MpPayNotifyService;
 import com.yfshop.wx.api.service.MpPayService;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.DateUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.slf4j.Logger;
@@ -46,6 +64,7 @@ import javax.annotation.Resource;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -288,6 +307,53 @@ public class HealthyServiceImpl implements HealthyService {
                     return subOrderResult;
                 })
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<Date> previewShowShipPlans(@Valid @NotNull PreviewShowShipPlansReq req) throws ApiException {
+        Integer itemId = req.getItemId(); String postRule = req.getPostRule();
+        HealthyItem healthyItem = healthyItemMapper.selectById(itemId);
+        Asserts.assertNonNull(healthyItem, 500, "商品不存在");
+        Asserts.assertTrue("Y".equalsIgnoreCase(healthyItem.getIsEnable()), 500, "商品已下架");
+        Asserts.assertTrue("N".equalsIgnoreCase(healthyItem.getIsDelete()), 500, "商品已删除");
+        Asserts.assertTrue(healthyItem.getPostRule().contains(postRule), 500, "未知的配送规格");
+
+        String[] postRuleInfo = StringUtils.split(postRule, "-");
+
+        // 每次配送数量
+        int count = Integer.parseInt(postRuleInfo[1]);
+        // 配送次数
+        int subOrderCount = healthyItem.getSpec() / count;
+
+        // 今日11点时刻
+        LocalDateTime today11Clock = LocalDateTime.of(LocalDate.now().getYear(), LocalDate.now().getMonth(),
+                LocalDate.now().getDayOfMonth(), 11, 0, 0, 0);
+
+        // 第一次配送时间
+        Date firstPostTime;
+        if (LocalDateTime.now().isAfter(today11Clock)) {
+            // 第3天开始
+            firstPostTime = DateUtil.parse(DateTime.of(DateUtils.addDays(new Date(), 2)).toDateStr());
+        } else {
+            // 第2天开始
+            firstPostTime = DateUtil.parse(DateTime.of(DateUtils.addDays(new Date(), 1)).toDateStr());
+        }
+
+        // 配送时间列表
+        List<Date> postDateTimes = new ArrayList<>();
+        postDateTimes.add(firstPostTime);
+        Date temp = firstPostTime;
+        for (int time = 1; time < subOrderCount; time++) {
+            if ("W".equals(postRuleInfo[0])) {
+                temp = DateUtils.addWeeks(temp, 1);
+                postDateTimes.add(temp);
+            } else if ("M".equals(postRuleInfo[0])) {
+                temp = DateUtils.addMonths(temp, 1);
+                postDateTimes.add(temp);
+            }
+        }
+
+        return postDateTimes;
     }
 
     private String generateOrderNo(Integer userId) {
