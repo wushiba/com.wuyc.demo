@@ -99,6 +99,7 @@ public class ItemSku extends Model<ItemSku> {
      */
     private Integer sort;
 
+    private String skuType;
 
     @Override
     protected Serializable pkVal() {
