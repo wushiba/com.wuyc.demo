@@ -41,6 +41,8 @@ import com.yfshop.shop.service.healthy.result.HealthyActResult;
 import com.yfshop.shop.service.healthy.result.HealthyItemResult;
 import com.yfshop.shop.service.healthy.result.HealthyOrderResult;
 import com.yfshop.shop.service.healthy.result.HealthySubOrderResult;
+import com.yfshop.wx.api.request.WxPayOrderNotifyReq;
+import com.yfshop.wx.api.service.MpPayNotifyService;
 import com.yfshop.wx.api.service.MpPayService;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -62,6 +64,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 /**
@@ -93,6 +96,8 @@ public class HealthyServiceImpl implements HealthyService {
     private MerchantMapper merchantMapper;
     @Resource
     private UserMapper userMapper;
+    @DubboReference(check = false)
+    private MpPayNotifyService mpPayNotifyService;
     @DubboReference(check = false)
     private MpPayService mpPayService;
     @DubboReference(check = false)
@@ -176,11 +181,24 @@ public class HealthyServiceImpl implements HealthyService {
         orderRequest.setSpbillCreateIp(req.getClientIp());
         orderRequest.setTimeStart(DateFormatUtils.format(new Date(), "yyyyMMddHHmmss"));
         orderRequest.setTimeExpire(DateFormatUtils.format(new Date(System.currentTimeMillis() + (1000 * 60 * 15)), "yyyyMMddHHmmss"));
-        try {
-            return mpPayService.createPayOrder(orderRequest);
-        } catch (WxPayException e) {
-            logger.error("拉起微信支付失败", e);
-            throw new ApiException("拉起微信支付失败");
+
+        // wechat pay info
+        if ("pro".equalsIgnoreCase(SpringUtil.getActiveProfile())) {
+            try {
+                return mpPayService.createPayOrder(orderRequest);
+            } catch (WxPayException e) {
+                logger.error("拉起微信支付失败", e);
+                throw new ApiException("拉起微信支付失败");
+            }
+        } else {
+            // 测试环境模拟支付成功回调
+            CompletableFuture.runAsync(() -> {
+                WxPayOrderNotifyReq notifyReq = new WxPayOrderNotifyReq();
+                notifyReq.setOutTradeNo(healthyOrder.getOrderNo());
+                notifyReq.setTransactionId("test-" + RandomUtil.randomNumbers(20));
+                mpPayNotifyService.payOrderNotify(PayPrefixEnum.HEALTHY_ORDER.getBizType(), notifyReq);
+            });
+            return new WxPayMpOrderResult();
         }
     }
 
