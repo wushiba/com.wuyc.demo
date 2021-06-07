@@ -10,15 +10,15 @@ import lombok.EqualsAndHashCode;
 
 /**
  * <p>
- * 商品图片表
+ * 商品详情表
  * </p>
  *
  * @author yoush
- * @since 2021-05-27
+ * @since 2021-06-07
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class HealthyAct extends Model<HealthyAct> {
+public class HealthyActContent extends Model<HealthyActContent> {
 
     private static final long serialVersionUID = 1L;
 
@@ -32,25 +32,12 @@ public class HealthyAct extends Model<HealthyAct> {
     /**
      * 商品编号
      */
-    private String actName;
+    private Integer actId;
 
     /**
-     * 商品编号
+     * 商品详情,富文本内容
      */
-    private Integer itemId;
-
-    /**
-     * 图片地址
-     */
-    private String imageUrl;
-
-    /**
-     * 排序字段
-     */
-    private Integer sort;
-
-    private String isEnable;
-
+    private String content;
 
 
     @Override

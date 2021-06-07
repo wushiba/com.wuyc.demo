@@ -41,4 +41,6 @@ public class HealthyActResult implements Serializable {
 
     private String isEnable;
 
+    private String content;
+
 }

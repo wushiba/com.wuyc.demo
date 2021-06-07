@@ -84,6 +84,15 @@ public class AdminHealthyController implements BaseController {
         return CommonResult.success(adminHealthyService.getActList(req));
     }
 
+    @RequestMapping(value = "/getActDetail", method = {RequestMethod.POST})
+    @ResponseBody
+    @SaCheckLogin
+    @SaCheckRole(value = "sys")
+    public CommonResult<HealthyActResult> getActDetail(Integer id) {
+        return CommonResult.success(adminHealthyService.getActDetail(id));
+    }
+
+
 
     @RequestMapping(value = "/updateAct", method = {RequestMethod.POST})
     @ResponseBody

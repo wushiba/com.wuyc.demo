@@ -12,21 +12,8 @@ import com.github.binarywang.wxpay.bean.order.WxPayMpOrderResult;
 import com.github.binarywang.wxpay.bean.request.BaseWxPayRequest;
 import com.github.binarywang.wxpay.bean.request.WxPayUnifiedOrderRequest;
 import com.github.binarywang.wxpay.exception.WxPayException;
-import com.yfshop.code.mapper.HealthyActMapper;
-import com.yfshop.code.mapper.HealthyItemContentMapper;
-import com.yfshop.code.mapper.HealthyItemImageMapper;
-import com.yfshop.code.mapper.HealthyItemMapper;
-import com.yfshop.code.mapper.HealthyOrderMapper;
-import com.yfshop.code.mapper.HealthySubOrderMapper;
-import com.yfshop.code.mapper.MerchantMapper;
-import com.yfshop.code.mapper.UserMapper;
-import com.yfshop.code.model.HealthyAct;
-import com.yfshop.code.model.HealthyItem;
-import com.yfshop.code.model.HealthyItemContent;
-import com.yfshop.code.model.HealthyItemImage;
-import com.yfshop.code.model.HealthyOrder;
-import com.yfshop.code.model.HealthySubOrder;
-import com.yfshop.code.model.User;
+import com.yfshop.code.mapper.*;
+import com.yfshop.code.model.*;
 import com.yfshop.common.constants.CacheConstants;
 import com.yfshop.common.enums.PayPrefixEnum;
 import com.yfshop.common.exception.ApiException;
@@ -89,6 +76,8 @@ public class HealthyServiceImpl implements HealthyService {
     private HealthyItemContentMapper healthyItemContentMapper;
     @Resource
     private HealthyItemImageMapper healthyItemImageMapper;
+    @Resource
+    private HealthyActContentMapper healthyActContentMapper;
     @Resource
     private MerchantMapper merchantMapper;
     @Resource
@@ -231,6 +220,19 @@ public class HealthyServiceImpl implements HealthyService {
                 .eq(HealthyAct::getIsEnable, "Y").orderByAsc(HealthyAct::getSort));
         return acts.stream().map(act -> BeanUtil.convert(act, HealthyActResult.class))
                 .collect(Collectors.toList());
+    }
+
+
+    @Override
+    public HealthyActResult queryHealthyActivityDetail(Integer id) {
+        HealthyAct healthyAct = healthyActMapper.selectById(id);
+        HealthyActResult healthyActResult = BeanUtil.convert(healthyAct, HealthyActResult.class);
+        HealthyActContent healthyActContent = healthyActContentMapper.selectOne(Wrappers.lambdaQuery(HealthyActContent.class)
+                .eq(HealthyActContent::getActId, id));
+        if (healthyActContent != null) {
+            healthyActResult.setContent(healthyActContent.getContent());
+        }
+        return healthyActResult;
     }
 
     @Override

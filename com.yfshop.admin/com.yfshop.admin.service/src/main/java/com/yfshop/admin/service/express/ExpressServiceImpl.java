@@ -176,7 +176,7 @@ public class ExpressServiceImpl implements ExpressService {
         map.put("圆通", "yt");
         map.put("申通", "sto");
         map.put("顺丰", "sf");
-        List<String> list = FileUtil.readUtf8Lines(new File("H://3.txt"));
+        List<String> list = FileUtil.readUtf8Lines(new File("H://1.txt"));
         List<String> tag = new ArrayList<>();
         list.forEach(item -> {
             String[] s = item.split(",");

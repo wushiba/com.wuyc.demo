@@ -55,6 +55,13 @@ public class HealthyController implements BaseController {
         return CommonResult.success(healthyService.queryHealthyActivities());
     }
 
+
+    @RequestMapping(value = "/queryHealthyActivityDetail", method = {RequestMethod.GET, RequestMethod.POST})
+    @ResponseBody
+    public CommonResult<HealthyActResult> queryHealthyActivityDetail(Integer id) {
+        return CommonResult.success(healthyService.queryHealthyActivityDetail(id));
+    }
+
     @RequestMapping(value = "/pageQueryUserHealthyOrders", method = {RequestMethod.GET, RequestMethod.POST})
     @ResponseBody
     public CommonResult<IPage<HealthyOrderResult>> pageQueryUserHealthyOrders(QueryHealthyOrdersReq req) {

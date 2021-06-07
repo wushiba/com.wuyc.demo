@@ -18,6 +18,8 @@ public interface AdminHealthyService {
 
     IPage<HealthyActResult> getActList(HealthyActReq req);
 
+    HealthyActResult getActDetail(Integer id);
+
     Void notifyByWechatPay(String orderNo, String wechatBillNo) throws ApiException;
 
     Void updateAct(HealthyActReq req);

@@ -50,6 +50,9 @@ public class AdminHealthyServiceImpl implements AdminHealthyService {
     @Resource
     private MerchantMapper merchantMapper;
 
+    @Resource
+    private HealthyActContentMapper healthyActContentMapper;
+
     @Override
     public IPage<HealthyOrderResult> findOrderList(QueryHealthyOrderReq req) {
         LambdaQueryWrapper queryWrapper = Wrappers.lambdaQuery(HealthyOrder.class)
@@ -96,7 +99,23 @@ public class AdminHealthyServiceImpl implements AdminHealthyService {
     public Void addAct(HealthyActReq req) {
         HealthyAct healthyAct = BeanUtil.convert(req, HealthyAct.class);
         healthyActMapper.insert(healthyAct);
+        HealthyActContent healthyActContent = new HealthyActContent();
+        healthyActContent.setActId(healthyAct.getId());
+        healthyActContent.setContent(req.getContent());
+        healthyActContentMapper.insert(healthyActContent);
         return null;
+    }
+
+    @Override
+    public HealthyActResult getActDetail(Integer id) {
+        HealthyAct healthyAct = healthyActMapper.selectById(id);
+        HealthyActResult healthyActResult = BeanUtil.convert(healthyAct, HealthyActResult.class);
+        HealthyActContent healthyActContent = healthyActContentMapper.selectOne(Wrappers.lambdaQuery(HealthyActContent.class)
+                .eq(HealthyActContent::getActId, id));
+        if (healthyActContent != null) {
+            healthyActResult.setContent(healthyActContent.getContent());
+        }
+        return healthyActResult;
     }
 
     @Override
@@ -109,6 +128,10 @@ public class AdminHealthyServiceImpl implements AdminHealthyService {
     public Void updateAct(HealthyActReq req) {
         HealthyAct healthyAct = BeanUtil.convert(req, HealthyAct.class);
         healthyActMapper.updateById(healthyAct);
+        HealthyActContent healthyActContent = new HealthyActContent();
+        healthyActContent.setContent(req.getContent());
+        healthyActContentMapper.update(healthyActContent, Wrappers.lambdaQuery(HealthyActContent.class)
+                .eq(HealthyActContent::getActId, req.getId()));
         return null;
     }
 

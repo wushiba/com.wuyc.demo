@@ -33,4 +33,6 @@ public interface HealthyService {
     IPage<HealthyOrderResult> pageQueryUserHealthyOrders(@Valid @NotNull QueryHealthyOrdersReq req);
 
     List<HealthySubOrderResult> pageQueryHealthyOrderDetail(Integer userId, Long orderId);
+
+    HealthyActResult queryHealthyActivityDetail(Integer id);
 }

@@ -44,6 +44,8 @@ public class HealthyActReq implements Serializable {
      */
     private Integer sort;
 
+    private String content;
+
     private String isEnable;
 
     private Integer pageIndex = 1;

@@ -39,4 +39,6 @@ public class HealthyActResult implements Serializable {
     private Integer sort;
 
     private String isEnable;
+
+    private String content;
 }
