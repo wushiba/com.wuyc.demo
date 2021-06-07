@@ -11,6 +11,8 @@ public class JxsMerchantResult implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    private Integer id;
+
     private String merchantName;
 
     private String contracts;
