@@ -1,5 +1,6 @@
 package com.yfshop.shop.service.healthy.result;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -20,9 +21,8 @@ public class HealthyOrderResult implements Serializable {
 
     private Long id;
 
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", locale = "zh", timezone = "GMT+8")
     private LocalDateTime createTime;
-
-    private LocalDateTime updateTime;
 
     private String orderNo;
 
@@ -93,11 +93,13 @@ public class HealthyOrderResult implements Serializable {
     /**
      * 支付时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", locale = "zh", timezone = "GMT+8")
     private LocalDateTime payTime;
 
     /**
      * 订单取消时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", locale = "zh", timezone = "GMT+8")
     private LocalDateTime cancelTime;
 
     /**
