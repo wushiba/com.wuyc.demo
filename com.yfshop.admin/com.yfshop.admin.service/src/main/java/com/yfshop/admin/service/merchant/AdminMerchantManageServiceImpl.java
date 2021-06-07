@@ -232,7 +232,7 @@ public class AdminMerchantManageServiceImpl implements AdminMerchantManageServic
             List<Integer> mIds = subMerchants.stream().map(Merchant::getId).collect(Collectors.toList());
             mIds.add(req.getMerchantId());
             List<WebsiteCodeDetail> websiteCodeDetails = websiteCodeDetailMapper.selectList(Wrappers
-                    .lambdaQuery(WebsiteCodeDetail.class).in(WebsiteCodeDetail::getMerchantId, mIds));
+                    .lambdaQuery(WebsiteCodeDetail.class).in(WebsiteCodeDetail::getPid, mIds));
             if (CollectionUtil.isNotEmpty(websiteCodeDetails)) {
                 List<Integer> parentIds = websiteCodeDetails.stream().map(WebsiteCodeDetail::getPid).distinct().collect(Collectors.toList());
                 Map<Integer, Merchant> parentMerchantMap = merchantMapper.selectBatchIds(parentIds).stream().collect(Collectors.toMap(Merchant::getId, m -> m));
