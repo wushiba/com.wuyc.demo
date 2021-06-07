@@ -71,7 +71,18 @@ public class AdminHealthyServiceImpl implements AdminHealthyService {
         HealthyOrder healthyOrder = healthyOrderMapper.selectById(id);
         HealthyOrderDetailResult healthyOrderDetailResult = BeanUtil.convert(healthyOrder, HealthyOrderDetailResult.class);
         List<HealthySubOrder> list = healthySubOrderMapper.selectList(Wrappers.lambdaQuery(HealthySubOrder.class).eq(HealthySubOrder::getPOrderId, id));
-        healthyOrderDetailResult.setList(BeanUtil.convertList(list, HealthySubOrderResult.class));
+        List<HealthySubOrderResult> subList = BeanUtil.convertList(list, HealthySubOrderResult.class);
+        subList.forEach(item -> {
+            if (item.getMerchantId() != null) {
+                Merchant merchant = merchantMapper.selectById(item.getMerchantId());
+                if (merchant != null) {
+                    item.setMerchantName(merchant.getMerchantName());
+                    item.setMerchantContacts(merchant.getContacts());
+                    item.setMerchantMobile(merchant.getMobile());
+                }
+            }
+        });
+        healthyOrderDetailResult.setList(subList);
         return healthyOrderDetailResult;
     }
 
