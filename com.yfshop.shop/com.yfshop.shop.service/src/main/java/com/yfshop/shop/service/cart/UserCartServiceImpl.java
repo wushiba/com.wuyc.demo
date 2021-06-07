@@ -19,7 +19,6 @@ import com.yfshop.shop.service.cart.result.UserCartSummary;
 import com.yfshop.shop.service.coupon.request.QueryUserCouponReq;
 import com.yfshop.shop.service.coupon.result.YfUserCouponResult;
 import com.yfshop.shop.service.coupon.service.FrontUserCouponService;
-import com.yfshop.shop.service.mall.result.ItemResult;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.cache.annotation.CacheEvict;
@@ -36,6 +35,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -64,22 +64,29 @@ public class UserCartServiceImpl implements UserCartService {
     @Override
     public List<UserCartResult> queryUserCarts(Integer userId) {
         if (userId == null || userId <= 0) {
-            return null;
+            return new ArrayList<>(0);
         }
         // 查询用户所有的购物车列表
         List<UserCart> userCarts = cartMapper.selectList(Wrappers.lambdaQuery(UserCart.class)
                 .eq(UserCart::getUserId, userId));
         // 查询sku信息
         List<Integer> skuIdList = userCarts.stream().map(UserCart::getSkuId).collect(Collectors.toList());
-        if (CollectionUtil.isEmpty(skuIdList)) return new ArrayList<>();
-        Map<Integer, ItemSku> skuIndexMap = skuMapper.selectBatchIds(skuIdList).stream().collect(Collectors.toMap(ItemSku::getId, s -> s));
+        Map<Integer, ItemSku> skuIndexMap = CollectionUtil.isEmpty(skuIdList) ? new HashMap<>(0) :
+                skuMapper.selectBatchIds(skuIdList).stream().collect(Collectors.toMap(ItemSku::getId, s -> s));
         List<UserCartResult> userCartResults = BeanUtil.convertList(userCarts, UserCartResult.class);
         for (UserCartResult userCartResult : userCartResults) {
             ItemSku itemSku = skuIndexMap.get(userCartResult.getSkuId());
-            userCartResult.setSkuSalePrice(itemSku.getSkuSalePrice());
-            // 是否有效
-            userCartResult.setIsAvailable(itemSku != null && "Y".equals(itemSku.getIsEnable()) ? "Y" : "N");
+            if (itemSku == null || "N".equalsIgnoreCase(itemSku.getIsEnable())) {
+                userCartResult.setIsAvailable("N");
+            } else {
+                userCartResult.setSkuSalePrice(itemSku.getSkuSalePrice());
+                // 是否有效
+                userCartResult.setIsAvailable("Y");
+            }
         }
+        userCartResults.sort((c1, c2) -> c1.getIsAvailable().equalsIgnoreCase(c2.getIsAvailable()) ? 0 :
+                ("Y".equalsIgnoreCase(c1.getIsAvailable()) ? 1 : ("Y".equalsIgnoreCase(c2.getIsAvailable()) ? 1 : -1))
+        );
         return userCartResults;
     }
 
@@ -216,7 +223,7 @@ public class UserCartServiceImpl implements UserCartService {
         QueryUserCouponReq userCouponReq = new QueryUserCouponReq();
         userCouponReq.setUserId(userId);
         userCouponReq.setIsCanUse("Y");
-       // List<YfUserCouponResult> availableCoupons = frontUserCouponService.findUserCouponList(userCouponReq);
+        // List<YfUserCouponResult> availableCoupons = frontUserCouponService.findUserCouponList(userCouponReq);
 
         // 封装数据
         UserCartSummary cartSummary = new UserCartSummary();
