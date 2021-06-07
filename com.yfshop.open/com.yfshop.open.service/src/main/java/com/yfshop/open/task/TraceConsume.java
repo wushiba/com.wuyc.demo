@@ -63,9 +63,9 @@ public class TraceConsume {
             traceReqList.forEach(item -> {
                 String[] data = item.split(",");
                 Trace trace = new Trace();
-                trace.setTraceNo(data[0]);
-                trace.setBoxNo(data[1]);
-                trace.setProductNo(data[2]);
+                trace.setTraceNo(data[0].trim());
+                trace.setBoxNo(data[1].trim());
+                trace.setProductNo(data[2].trim());
                 trace.setCreateTime(now);
                 destList.add(trace);
             });
@@ -80,17 +80,15 @@ public class TraceConsume {
             storageReqList.forEach(item -> {
                 String[] data = item.split(",");
                 TraceDetails details = new TraceDetails();
-                details.setBoxNo(data[0]);
-                details.setDealerNo(data[1]);
-                details.setDealerMobile(data[2]);
-                details.setDealerName(data[3]);
-                details.setDealerAddress(data[4]);
+                details.setBoxNo(data[0].trim());
+                details.setDealerNo(data[1].trim());
+                details.setDealerMobile(data[2].trim());
+                details.setDealerName(data[3].trim());
+                details.setDealerAddress(data[4].trim());
                 details.setCreateTime(now);
                 destList.add(details);
             });
             traceDetailsManager.saveBatch(destList, 10000);
         }
     }
-
-
 }
