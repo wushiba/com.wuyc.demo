@@ -44,7 +44,7 @@ public class TraceController {
                 String[] data = item.split(",");
                 if (data.length == 6) {
                     traceReqs.add(item);
-                    if (traceReqs.size() == 30000) {
+                    if (traceReqs.size() == 10000) {
                         traceService.syncTrace(no,traceReqs, false);
                         traceReqs.clear();
                     }
@@ -70,7 +70,7 @@ public class TraceController {
                 String[] data = item.split(",");
                 if (data.length == 5) {
                     storageReqs.add(item);
-                    if (storageReqs.size() == 30000) {
+                    if (storageReqs.size() == 10000) {
                         traceService.syncStorage(no,storageReqs, false);
                         storageReqs.clear();
                     }
