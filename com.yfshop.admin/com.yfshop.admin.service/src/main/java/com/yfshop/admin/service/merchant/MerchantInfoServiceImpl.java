@@ -161,7 +161,10 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
                 .eq(MerchantDetail::getMerchantId, merchantId));
         MerchantResult merchantResult = BeanUtil.convert(merchant, MerchantResult.class);
         if (merchantDetail != null) {
-            BeanUtil.copyProperties(merchantDetail, merchantResult);
+            merchantResult.setWebsiteTypeName(merchantDetail.getWebsiteTypeName());
+            merchantResult.setIsRefrigerator(merchantDetail.getIsRefrigerator());
+            merchantResult.setLatitude(merchantDetail.getLatitude());
+            merchantResult.setLongitude(merchantDetail.getLongitude());
             merchantResult.setId(merchant.getId());
         }
         return merchantResult;
