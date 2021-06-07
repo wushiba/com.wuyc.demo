@@ -1,6 +1,7 @@
 package com.yfshop.open.controller;
 
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.io.IoUtil;
 import com.yfshop.common.api.CommonResult;
@@ -17,6 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -34,26 +36,22 @@ public class TraceController {
      */
     @RequestMapping(value = "/importTrace", method = {RequestMethod.POST})
     public CommonResult importTrace(@RequestParam("file") MultipartFile file) throws IOException {
+        String no= DateUtil.format(new Date(),"yyMMddHH");
         List<String> list = IoUtil.readUtf8Lines(file.getInputStream(), new ArrayList<>());
-        List<TraceReq> traceReqs = new ArrayList<>();
+        List<String> traceReqs = new ArrayList<>();
         list.forEach(item -> {
             if (StringUtils.isNotBlank(item)) {
                 String[] data = item.split(",");
                 if (data.length == 6) {
-                    TraceReq traceReq = new TraceReq();
-                    traceReq.setTraceNo(data[0]);
-                    traceReq.setBoxNo(data[1]);
-                    traceReq.setProductNo(data[2]);
-                    traceReqs.add(traceReq);
-                } else {
-                    Asserts.assertTrue(false, 500, "文件格式有问题！");
+                    traceReqs.add(item);
+                    if (traceReqs.size() == 30000) {
+                        traceService.syncTrace(no,traceReqs, false);
+                        traceReqs.clear();
+                    }
                 }
             }
         });
-        Asserts.assertCollectionNotEmpty(traceReqs, 500, "文件数据为空！");
-        CollectionUtil.split(traceReqs, 20000).forEach(item -> {
-            traceService.syncTrace(item);
-        });
+        traceService.syncTrace(no,traceReqs, true);
         return CommonResult.success(1, "接收成功");
     }
 
@@ -64,28 +62,22 @@ public class TraceController {
      */
     @RequestMapping(value = "/importStorage", method = {RequestMethod.POST})
     public CommonResult importStorage(@RequestParam("file") MultipartFile file) throws IOException {
+        String no= DateUtil.format(new Date(),"yyMMddHH");
         List<String> list = IoUtil.readUtf8Lines(file.getInputStream(), new ArrayList<>());
-        List<StorageReq> storageReqs = new ArrayList<>();
+        List<String> storageReqs = new ArrayList<>();
         list.forEach(item -> {
             if (StringUtils.isNotBlank(item)) {
                 String[] data = item.split(",");
                 if (data.length == 5) {
-                    StorageReq storageReq = new StorageReq();
-                    storageReq.setBoxNo(data[0]);
-                    storageReq.setDealerNo(data[1]);
-                    storageReq.setDealerMobile(data[2]);
-                    storageReq.setDealerName(data[3]);
-                    storageReq.setDealerAddress(data[4]);
-                    storageReqs.add(storageReq);
-                } else {
-                    Asserts.assertTrue(false, 500, "文件格式有问题！");
+                    storageReqs.add(item);
+                    if (storageReqs.size() == 30000) {
+                        traceService.syncStorage(no,storageReqs, false);
+                        storageReqs.clear();
+                    }
                 }
             }
         });
-        Asserts.assertCollectionNotEmpty(storageReqs, 500, "文件数据为空！");
-        CollectionUtil.split(storageReqs, 20000).forEach(item -> {
-            traceService.syncStorage(item);
-        });
+        traceService.syncStorage(no,storageReqs, true);
         return CommonResult.success(1, "接收成功");
     }
 }

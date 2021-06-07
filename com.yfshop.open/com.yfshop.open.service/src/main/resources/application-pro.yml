@@ -26,7 +26,11 @@ spring:
     testOnReturn: false
     driverClassName: com.mysql.cj.jdbc.Driver
     maxActive: 20
-  
+
+  redis:
+    host: yf-sz-redis01.redis.rds.aliyuncs.com
+    port: 6379
+    password: redis01:N72BcGB2FUs3ZRA29gL
   
 dubbo:
   registry:

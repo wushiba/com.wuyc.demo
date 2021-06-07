@@ -45,13 +45,13 @@ public class JuHeExpressDeliveryUtils {
     private static final String APP_KEY = "34f005fe8c8c612f2d6c5c6507d1ab0c";
 
     public static void main(String[] args) {
-//        JuHeExpressDeliveryCompanyResponse response1 = queryAllExpressDeliveryCompanyNumber();
-//        System.out.println(JSON.toJSONString(response1, true));
+        JuHeExpressDeliveryCompanyResponse response1 = queryAllExpressDeliveryCompanyNumber();
+        System.out.println(JSON.toJSONString(response1, true));
 
-        JuHeExpressDeliveryInfoResponse response2 = findExpressDeliveryInfo("sf",
-                "SF1313722597010",
-                "", "8377");
-        System.out.println(JSON.toJSONString(response2, true));
+//        JuHeExpressDeliveryInfoResponse response2 = findExpressDeliveryInfo("sf",
+//                "SF1313722597010",
+//                "", "8377");
+//        System.out.println(JSON.toJSONString(response2, true));
     }
 
     /**

@@ -13,6 +13,7 @@ import com.yfshop.common.enums.CaptchaSourceEnum;
 import com.yfshop.common.enums.GroupRoleEnum;
 import com.yfshop.common.exception.Asserts;
 import com.yfshop.common.validate.annotation.Mobile;
+import org.apache.commons.lang.StringUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -91,7 +92,11 @@ class MerchantLoginController extends AbstractBaseController {
      */
     @RequestMapping(value = "/logout", method = {RequestMethod.POST})
     public CommonResult<MerchantResult> logout() {
-        //StpUtil.logout();
+        String openId = getCurrentOpenId();
+        if (StringUtils.isNotBlank(openId)) {
+            merchantLoginService.clearOpenId(openId);
+        }
+        StpUtil.logout();
         return CommonResult.success(null);
     }
 

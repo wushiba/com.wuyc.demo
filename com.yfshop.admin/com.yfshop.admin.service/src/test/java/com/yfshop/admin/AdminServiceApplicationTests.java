@@ -26,6 +26,7 @@ import com.yfshop.admin.api.menu.result.MenuResult;
 import com.yfshop.admin.api.merchant.AdminMerchantManageService;
 import com.yfshop.admin.api.merchant.request.UpdateMerchantReq;
 import com.yfshop.admin.api.merchant.result.MerchantResult;
+import com.yfshop.admin.utils.BaiduMapGeocoderUtil;
 import com.yfshop.code.manager.MenuManager;
 import com.yfshop.code.mapper.ItemContentMapper;
 import com.yfshop.code.mapper.ItemImageMapper;
@@ -53,6 +54,7 @@ import org.springframework.dao.DuplicateKeyException;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import javax.annotation.Resource;
+import java.io.File;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -1903,5 +1905,40 @@ public class AdminServiceApplicationTests {
                         .like(StringUtils.isNotBlank("北京分公司"), Merchant::getMerchantName, "北京分公司")
         );
         System.out.println(JSON.toJSONString(page, true));
+    }
+
+    @Test
+    public void asa() {
+        List<String> list = FileUtil.readUtf8Lines(new File("H://5.txt"));
+        List<String> tag = new ArrayList<>();
+        list.forEach(item -> {
+            String[] s = item.split(",");
+            Map<String, String> temp = BaiduMapGeocoderUtil.getAddressInfoByLngAndLat(s[1], s[2]);
+
+            if (temp != null) {
+                Region province = regionMapper.selectOne(Wrappers.<Region>lambdaQuery()
+                        .eq(Region::getName, temp.get("province")));
+                if (province != null) {
+                    temp.put("provinceId", province.getId() + "");
+                    Region city = regionMapper.selectOne(Wrappers.<Region>lambdaQuery()
+                            .eq(Region::getName, temp.get("city"))
+                            .eq(Region::getPid, province.getId()));
+                    if (city != null) {
+                        temp.put("cityId", city.getId() + "");
+                        Region county = regionMapper.selectOne(Wrappers.<Region>lambdaQuery()
+                                .eq(Region::getName, temp.get("district"))
+                                .eq(Region::getPid, city.getId()));
+                        if (county != null) {
+                            temp.put("districtId", county.getId() + "");
+                        }
+                    }
+                }
+                tag.add(String.format("update yf_merchant m set m.province='%s',m.city='%s',m.district='%s',m.province_id=%s,m.city_id=%s,m.district_id=%s where m.id=%s;",
+                        temp.get("province"),temp.get("city"),temp.get("district"), temp.get("provinceId"),temp.get("cityId"),temp.get("districtId"),s[0]
+                        ));
+            }
+
+        });
+        FileUtil.writeLines(tag, new File("H://6.txt"), "UTF-8");
     }
 }

@@ -1,10 +1,8 @@
 ---
 logging:
   level:
-    com.yfshop.code.mapper: debug
-    com.yfshop: debug
-    me.chanjar.weixin: DEBUG
-    com.github.binarywang.wxpay: DEBUG
+    com.yfshop.code.mapper: INFO
+    com.yfshop: INFO
 server:
   port: 10000
 spring:
@@ -28,7 +26,11 @@ spring:
     testOnReturn: false
     driverClassName: com.mysql.cj.jdbc.Driver
     maxActive: 20
-  
+
+  redis:
+    host: yf-sz-redis-staging.redis.rds.aliyuncs.com
+    port: 6379
+    password: redis_staging:SZ9v4UrVJKfCCDKUxia
   
 dubbo:
   registry:
@@ -48,3 +50,4 @@ dubbo:
     retries: 0
   consumer:
     check: false
+

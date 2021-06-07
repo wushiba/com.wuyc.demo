@@ -38,10 +38,10 @@ import java.util.TimeZone;
 public class WebMvcConfig extends BaseWebMvcConfig {
     private static final String DEFAULT_DATE_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
-    @Bean
-    public WebSystemOperateLogAspect webSystemOperateLogAspect() {
-        return new WebSystemOperateLogAspect();
-    }
+//    @Bean
+//    public WebSystemOperateLogAspect webSystemOperateLogAspect() {
+//        return new WebSystemOperateLogAspect();
+//    }
 
 
     @Bean
