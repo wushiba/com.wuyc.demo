@@ -37,6 +37,8 @@ public class QueryHealthySubOrderReq implements Serializable {
 
     private Date endTime;
 
+    private String postKey;
+
     private Integer pageIndex = 1;
 
     private Integer pageSize = 10;

@@ -71,18 +71,7 @@ public class AdminHealthyServiceImpl implements AdminHealthyService {
         HealthyOrder healthyOrder = healthyOrderMapper.selectById(id);
         HealthyOrderDetailResult healthyOrderDetailResult = BeanUtil.convert(healthyOrder, HealthyOrderDetailResult.class);
         List<HealthySubOrder> list = healthySubOrderMapper.selectList(Wrappers.lambdaQuery(HealthySubOrder.class).eq(HealthySubOrder::getPOrderId, id));
-        List<HealthySubOrderResult> subList = BeanUtil.convertList(list, HealthySubOrderResult.class);
-        subList.forEach(item -> {
-            if (item.getMerchantId() != null) {
-                Merchant merchant = merchantMapper.selectById(item.getMerchantId());
-                if (merchant != null) {
-                    item.setMerchantName(merchant.getMerchantName());
-                    item.setMerchantContacts(merchant.getContacts());
-                    item.setMerchantMobile(merchant.getMobile());
-                }
-            }
-        });
-        healthyOrderDetailResult.setList(subList);
+        healthyOrderDetailResult.setList(BeanUtil.convertList(list, HealthySubOrderResult.class));
         return healthyOrderDetailResult;
     }
 
@@ -100,8 +89,19 @@ public class AdminHealthyServiceImpl implements AdminHealthyService {
                 .eq(req.getCityId() != null, HealthySubOrder::getCityId, req.getCityId())
                 .eq(req.getDistrictId() != null, HealthySubOrder::getDistrictId, req.getDistrictId())
                 .ge(req.getStartTime() != null, HealthySubOrder::getExpectShipTime, req.getStartTime())
+                .and(StringUtils.isNotBlank(req.getPostKey()), wrapper -> {
+                    wrapper.like(HealthySubOrder::getMerchantContacts, req.getPostKey())
+                            .or()
+                            .like(HealthySubOrder::getMerchantName, req.getPostKey())
+                            .or()
+                            .like(HealthySubOrder::getMerchantContacts, req.getPostKey())
+                            .or()
+                            .like(HealthySubOrder::getExpressNo, req.getPostKey())
+                            .or()
+                            .like(HealthySubOrder::getExpressNo, req.getPostKey());
+                })
                 .lt(req.getEndTime() != null, HealthySubOrder::getExpectShipTime, req.getEndTime());
-        IPage<HealthySubOrder> iPage = healthyOrderMapper.selectPage(new Page<>(req.getPageIndex(), req.getPageSize()), queryWrapper);
+        IPage<HealthySubOrder> iPage = healthySubOrderMapper.selectPage(new Page<>(req.getPageIndex(), req.getPageSize()), queryWrapper);
         return BeanUtil.iPageConvert(iPage, HealthySubOrderResult.class);
     }
 

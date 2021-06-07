@@ -55,6 +55,19 @@ public class HealthySubOrder extends Model<HealthySubOrder> {
      */
     private Integer merchantId;
 
+
+    private String merchantName;
+
+    /**
+     * 商户手机号
+     */
+    private String merchantMobile;
+
+    /**
+     * 联系人
+     */
+    private String merchantContacts;
+
     /**
      * 订单分配路径
      */

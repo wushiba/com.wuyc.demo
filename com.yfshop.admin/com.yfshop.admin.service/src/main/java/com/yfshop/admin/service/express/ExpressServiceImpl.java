@@ -29,6 +29,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.dubbo.config.annotation.DubboService;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.io.File;
 import java.util.*;
@@ -43,12 +44,23 @@ public class ExpressServiceImpl implements ExpressService {
     private RedisService redisService;
     @Resource
     private ExpressMapper expressMapper;
+    Map<String, String> map = new HashMap<>();
+
+    @PostConstruct
+    public void init() {
+        map.put("中通", "zto");
+        map.put("韵达", "yd");
+        map.put("圆通", "yt");
+        map.put("申通", "sto");
+        map.put("顺丰", "sf");
+    }
+
 
     @Override
     public ExpressOrderResult queryExpress(Long id) throws ApiException {
         ExpressOrderResult expressOrderResult = new ExpressOrderResult();
         OrderDetail orderDetail = orderDetailMapper.selectById(id);
-        List<ExpressResult> list = queryExpressByWayBillNo(orderDetail.getExpressNo());
+        List<ExpressResult> list = queryStExpress(orderDetail.getExpressNo());
         expressOrderResult.setExpressNo(orderDetail.getExpressNo());
         expressOrderResult.setExpressName(orderDetail.getExpressCompany());
         expressOrderResult.setList(list);
@@ -56,13 +68,12 @@ public class ExpressServiceImpl implements ExpressService {
     }
 
     @Override
-    public List<ExpressResult> queryExpressByWayBillNo(String wayBillNo) throws ApiException {
-        if (StringUtils.isBlank(wayBillNo)) return new ArrayList<>();
-        if (wayBillNo.startsWith("SF")) {
-            return querySfExpress(wayBillNo);
-        } else {
-            return queryStExpress(wayBillNo);
-        }
+    public List<ExpressResult> queryByExpressNo(String expressNo, String expressName, String receiverMobile) throws ApiException {
+        String value = map.get(expressName);
+        if (value == null) return new ArrayList<>();
+        if ("st".equals(value)) return queryStExpress(expressNo);
+        receiverMobile = receiverMobile.substring(receiverMobile.length() - 4);
+        return queryCommExpress(value, expressName, receiverMobile);
     }
 
 
