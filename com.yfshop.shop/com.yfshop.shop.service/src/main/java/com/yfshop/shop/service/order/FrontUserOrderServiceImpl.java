@@ -287,7 +287,7 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
     @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> submitOrderBySkuId(Integer userId, Integer skuId, Integer num, Long userCouponId, Long addressId) throws ApiException {
         ItemSkuResult itemSku = mallService.getItemSkuBySkuId(skuId);
-        Asserts.assertEquals("TC", itemSku.getSkuType(), 500, "单品商品不能单独购买，请添加套餐一起购买");
+        Asserts.assertEquals("TC", itemSku.getSkuType(), 500, "该商品不能单独购买，请添加套餐一起购买");
         Asserts.assertFalse(itemSku.getSkuStock() < num, 500, "商品库存不足");
 
         UserAddressResult addressInfo = userAddressService.queryUserAddresses(userId).stream()
@@ -396,7 +396,7 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
         }
         //检测是否只包含单品
         dpCategory.forEach(item -> {
-            Asserts.assertTrue(tcCategory.contains(item), 500, "单品商品不能单独购买，请添加套餐一起购买");
+            Asserts.assertTrue(tcCategory.contains(item), 500, "该商品不能单独购买，请添加套餐一起购买");
         });
 
         // 修改优惠券状态
