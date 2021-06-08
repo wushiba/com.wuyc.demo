@@ -10,7 +10,7 @@ import java.util.List;
 
 public interface ActCodeDao {
 
-    List<ActCodeResult> queryActCodeList(IPage iPage, @Param("req") ActCodeQueryReq req);
+    IPage<ActCodeResult> queryActCodeList(IPage iPage, @Param("req") ActCodeQueryReq req);
 
     int sumActCodeByBeforeId(@Param("id")Integer id,@Param("startDate") Date startDate);
 }

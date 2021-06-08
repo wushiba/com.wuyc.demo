@@ -78,13 +78,7 @@ public class AdminActCodeManageServiceImpl implements AdminActCodeManageService 
 
     @Override
     public IPage<ActCodeResult> queryActCodeList(ActCodeQueryReq req) {
-        IPage<ActCodeResult> iPage = new Page(req.getPageIndex(), req.getPageSize());
-        List<ActCodeResult> list = actCodeDao.queryActCodeList(iPage, req);
-        iPage.setTotal(actCodeBatchMapper.selectCount(Wrappers.<ActCodeBatch>lambdaQuery()
-                .eq(req.getActId() != null, ActCodeBatch::getActId, req.getActId())
-                .eq(StringUtils.isNotBlank(req.getBatchNo()), ActCodeBatch::getBatchNo, req.getBatchNo())));
-        iPage.setRecords(list);
-        return iPage;
+        return actCodeDao.queryActCodeList(new Page(req.getPageIndex(), req.getPageSize()), req);
     }
 
     @Override
