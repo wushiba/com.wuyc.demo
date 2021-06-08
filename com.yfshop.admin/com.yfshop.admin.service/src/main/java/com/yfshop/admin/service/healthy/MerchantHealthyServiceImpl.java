@@ -187,7 +187,8 @@ public class MerchantHealthyServiceImpl implements MerchantHealthyService {
         LambdaQueryWrapper<HealthySubOrder> queryWrapper = Wrappers.lambdaQuery(HealthySubOrder.class)
                 .eq(HealthySubOrder::getMerchantId, req.getMerchantId())
                 .eq(HealthySubOrder::getOrderStatus, req.getOrderStatus())
-                .eq(HealthySubOrder::getPostWay, "PS");
+                .eq(HealthySubOrder::getPostWay, "PS")
+                .orderByAsc(HealthySubOrder::getExpectShipTime);
         Page<HealthySubOrder> page = healthySubOrderMapper.selectPage(new Page<>(req.getPageIndex(), req.getPageSize()), queryWrapper);
         return BeanUtil.iPageConvert(page, HealthySubOrderResult.class);
     }
