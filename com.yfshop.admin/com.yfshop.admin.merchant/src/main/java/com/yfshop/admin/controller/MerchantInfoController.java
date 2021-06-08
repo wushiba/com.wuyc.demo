@@ -149,19 +149,19 @@ class MerchantInfoController extends AbstractBaseController {
         Integer result = merchantInfoService.checkWebsiteCode(websiteCode);
         MerchantResult merchantResult;
         if (result == 0) {
-            if (StpUtil.isLogin()) {
-                merchantResult = merchantInfoService.getWebsiteInfo(getCurrentAdminUserId());
-            } else {
-                merchantResult = merchantInfoService.getMerchantByOpenId(getCurrentOpenId());
-            }
-            if (merchantResult != null) {
-                if (!merchantResult.getRoleAlias().equals(GroupRoleEnum.WD.getCode())) {
-                    Asserts.assertTrue("jxs,fxs,cxy,ywy,cxy".contains(merchantResult.getRoleAlias()), 500, "网点码未激活！");
-                    Integer count = merchantInfoService.getWebsiteCodeBindCount(merchantResult.getId());
-                    Asserts.assertEquals(count == null ? 0 : count, 0, 500, "您已经绑定过网点码了！");
-                }
-
-            }
+//            if (StpUtil.isLogin()) {
+//                merchantResult = merchantInfoService.getWebsiteInfo(getCurrentAdminUserId());
+//            } else {
+//                merchantResult = merchantInfoService.getMerchantByOpenId(getCurrentOpenId());
+//            }
+//            if (merchantResult != null) {
+//                if (!merchantResult.getRoleAlias().equals(GroupRoleEnum.WD.getCode())) {
+//                    Asserts.assertTrue("jxs,fxs,cxy,ywy,cxy".contains(merchantResult.getRoleAlias()), 500, "网点码未激活！");
+//                    Integer count = merchantInfoService.getWebsiteCodeBindCount(merchantResult.getId());
+//                    Asserts.assertEquals(count == null ? 0 : count, 0, 500, "您已经绑定过网点码了！");
+//                }
+//
+//            }
         } else if (result > 0) {
             merchantResult = merchantInfoService.getMerchantByWebsiteCode(websiteCode);
             result = 2;

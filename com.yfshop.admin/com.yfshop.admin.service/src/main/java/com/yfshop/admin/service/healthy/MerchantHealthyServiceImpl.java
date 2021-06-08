@@ -186,7 +186,9 @@ public class MerchantHealthyServiceImpl implements MerchantHealthyService {
     public IPage<HealthySubOrderResult> pageJxsSubOrderList(QueryJxsHealthySubOrderReq req) throws ApiException {
         LambdaQueryWrapper<HealthySubOrder> queryWrapper = Wrappers.lambdaQuery(HealthySubOrder.class)
                 .eq(HealthySubOrder::getMerchantId, req.getMerchantId())
-                .eq(HealthySubOrder::getOrderStatus, req.getOrderStatus());
+                .eq(HealthySubOrder::getOrderStatus, req.getOrderStatus())
+                .eq(HealthySubOrder::getPostWay, "PS")
+                .orderByAsc(HealthySubOrder::getExpectShipTime);
         Page<HealthySubOrder> page = healthySubOrderMapper.selectPage(new Page<>(req.getPageIndex(), req.getPageSize()), queryWrapper);
         return BeanUtil.iPageConvert(page, HealthySubOrderResult.class);
     }
@@ -210,7 +212,8 @@ public class MerchantHealthyServiceImpl implements MerchantHealthyService {
                 .eq(req.getProvinceId() != null, Merchant::getProvinceId, req.getProvinceId())
                 .eq(req.getCityId() != null, Merchant::getCityId, req.getCityId())
                 .eq(req.getDistrictId() != null, Merchant::getDistrictId, req.getDistrictId())
-                .likeLeft(Merchant::getPidPath, merchant.getPidPath())
+                .ne(Merchant::getId,merchant.getId())
+                .likeRight(Merchant::getPidPath, merchant.getPidPath())
                 .and(StringUtils.isNotBlank(req.getContacts()), wrapper -> {
                     wrapper.like(Merchant::getContacts, req.getContacts()).or().like(Merchant::getMerchantName, req.getMerchantName());
                 })
@@ -218,7 +221,7 @@ public class MerchantHealthyServiceImpl implements MerchantHealthyService {
                 .eq(Merchant::getIsEnable, "Y")
                 .eq(Merchant::getIsDelete, "N");
 
-        IPage<Merchant> merchantIPage = healthySubOrderMapper.selectPage(new Page<>(req.getPageIndex(), req.getPageSize()), lambdaQueryWrapper);
+        IPage<Merchant> merchantIPage = merchantMapper.selectPage(new Page<>(req.getPageIndex(), req.getPageSize()), lambdaQueryWrapper);
         return BeanUtil.iPageConvert(merchantIPage, MerchantResult.class);
     }
 

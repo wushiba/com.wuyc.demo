@@ -223,7 +223,11 @@ public class AdminHealthyServiceImpl implements AdminHealthyService {
         subOrder.setExpressCompany(req.getExpressCompany());
         subOrder.setExpressNo(req.getExpressNo());
         if (req.getMerchantId() != null) {
+            Merchant merchant = merchantMapper.selectById(req.getMerchantId());
             subOrder.setMerchantId(req.getMerchantId());
+            subOrder.setMerchantContacts(merchant.getContacts());
+            subOrder.setMerchantMobile(merchant.getMobile());
+            subOrder.setMerchantName(merchant.getMerchantName());
             subOrder.setCurrentMerchantId(req.getMerchantId());
             subOrder.setAllocateMerchantPath(req.getMerchantId() + "");
             subOrder.setOrderStatus(HealthySubOrderStatusEnum.IN_CIRCULATION.getCode());
@@ -362,6 +366,9 @@ public class AdminHealthyServiceImpl implements AdminHealthyService {
             subOrder.setItemId(order.getItemId());
             subOrder.setItemTitle(order.getItemTitle());
             subOrder.setExpectArrivedTime(expectArrivedTime);
+            subOrder.setItemSubTitle(order.getItemSubTitle());
+            subOrder.setItemCover(order.getItemCover());
+            subOrder.setPostRule(order.getPostRule());
             healthySubOrderMapper.insert(subOrder);
         }
         return null;

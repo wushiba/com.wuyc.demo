@@ -9,7 +9,6 @@ public interface AdminHealthyService {
 
     IPage<HealthyOrderResult> findOrderList(QueryHealthyOrderReq req);
 
-
     HealthyOrderDetailResult getOrderDetail(Integer id);
 
     IPage<HealthySubOrderResult> findSubOrderList(QueryHealthySubOrderReq req);

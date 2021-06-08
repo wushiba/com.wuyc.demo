@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 /**
@@ -166,16 +167,22 @@ public class HealthySubOrder extends Model<HealthySubOrder> {
      */
     private Integer itemId;
 
-    /**
-     * 商品名称
-     */
     private String itemTitle;
+
+    private String itemSubTitle;
+
+    /**
+     * 商品封面图
+     */
+    private String itemCover;
 
     /**
      * 配送员信息
      * json串
      */
     private String deliveryMan;
+
+    private String postRule;
 
     @Override
     protected Serializable pkVal() {
