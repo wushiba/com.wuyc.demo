@@ -151,4 +151,8 @@ public class HealthySubOrderResult implements Serializable {
      */
     private String itemTitle;
 
+    /**
+     * 预计送达时间
+     */
+    private LocalDateTime expectArrivedTime;
 }
