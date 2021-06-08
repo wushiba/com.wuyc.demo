@@ -220,7 +220,7 @@ public class MerchantHealthyServiceImpl implements MerchantHealthyService {
                 .eq(Merchant::getIsEnable, "Y")
                 .eq(Merchant::getIsDelete, "N");
 
-        IPage<Merchant> merchantIPage = healthySubOrderMapper.selectPage(new Page<>(req.getPageIndex(), req.getPageSize()), lambdaQueryWrapper);
+        IPage<Merchant> merchantIPage = merchantMapper.selectPage(new Page<>(req.getPageIndex(), req.getPageSize()), lambdaQueryWrapper);
         return BeanUtil.iPageConvert(merchantIPage, MerchantResult.class);
     }
 

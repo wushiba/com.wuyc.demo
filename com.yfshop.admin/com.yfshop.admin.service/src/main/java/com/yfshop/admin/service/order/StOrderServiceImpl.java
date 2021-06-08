@@ -47,8 +47,8 @@ public class StOrderServiceImpl implements StOrderService {
             stOrderReq.setBillType("01");
             StOrderReq.SenderDTO senderDTO = new StOrderReq.SenderDTO();
             senderDTO.setName("四川申通龙泉公司");
-            senderDTO.setTel("400-668-0091");
-            senderDTO.setMobile("400-668-0091");
+            senderDTO.setTel("13799988851");
+            senderDTO.setMobile("13799988851");
             senderDTO.setProvince("四川省");
             senderDTO.setCity("成都市");
             senderDTO.setArea("龙泉驿区");
@@ -57,8 +57,23 @@ public class StOrderServiceImpl implements StOrderService {
             StOrderReq.ReceiverDTO receiverDTO = new StOrderReq.ReceiverDTO();
             receiverDTO.setProvince(orderAddress.getProvince());
             receiverDTO.setCity(orderAddress.getCity());
-
+            receiverDTO.setArea(orderAddress.getDistrict());
+            receiverDTO.setAddress(orderAddress.getAddress());
+            receiverDTO.setTel(orderAddress.getMobile());
+            receiverDTO.setMobile(orderAddress.getMobile());
+            receiverDTO.setName(orderAddress.getRealname());
             stOrderReq.setReceiver(receiverDTO);
+            StOrderReq.CargoDTO cargoDTO = new StOrderReq.CargoDTO();
+            cargoDTO.setBattery("30");
+            cargoDTO.setGoodsType("小件");
+            cargoDTO.setGoodsName("椰岛陆龟酒");
+            stOrderReq.setCargo(cargoDTO);
+
+            StOrderReq.CustomerDTO customerDTO=new StOrderReq.CustomerDTO();
+            customerDTO.setSiteCode("");
+            customerDTO.setCustomerName("");
+            customerDTO.setSitePwd("");
+            stOrderReq.setCustomer(customerDTO);
         }
 
     }
