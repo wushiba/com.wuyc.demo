@@ -177,6 +177,8 @@ public class HealthySubOrder extends Model<HealthySubOrder> {
      */
     private String deliveryMan;
 
+    private String postRule;
+
     @Override
     protected Serializable pkVal() {
         return this.id;

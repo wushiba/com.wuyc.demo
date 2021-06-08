@@ -158,4 +158,6 @@ public class HealthySubOrderResult implements Serializable {
      */
     private String deliveryMan;
 
+    private String postRule;
+
 }

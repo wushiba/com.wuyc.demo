@@ -343,6 +343,7 @@ public class AdminHealthyServiceImpl implements AdminHealthyService {
             subOrder.setItemTitle(order.getItemTitle());
             subOrder.setItemSubTitle(order.getItemSubTitle());
             subOrder.setItemCover(order.getItemCover());
+            subOrder.setPostRule(order.getPostRule());
             healthySubOrderMapper.insert(subOrder);
         }
         return null;

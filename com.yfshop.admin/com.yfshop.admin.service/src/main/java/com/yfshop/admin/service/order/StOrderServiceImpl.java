@@ -40,19 +40,23 @@ public class StOrderServiceImpl implements StOrderService {
                 .eq(OrderDetail::getIsPay, "Y")
                 .eq(OrderDetail::getOrderStatus, UserOrderStatusEnum.WAIT_DELIVERY.getCode()));
         if (!CollectionUtils.isEmpty(orderDetailList)) {
-            orderAddressMapper.selectOne(Wrappers.lambdaQuery(OrderAddress.class).eq(OrderAddress::getOrderId,orderId));
+            OrderAddress orderAddress = orderAddressMapper.selectOne(Wrappers.lambdaQuery(OrderAddress.class).eq(OrderAddress::getOrderId, orderId));
             StOrderReq stOrderReq = new StOrderReq();
             stOrderReq.setOrderNo(order.getId() + "");
             stOrderReq.setOrderSource("雨帆健康家");
             stOrderReq.setBillType("01");
             StOrderReq.SenderDTO senderDTO = new StOrderReq.SenderDTO();
-            senderDTO.setName("湖南雨帆噜渴乳业股份有限公司");
+            senderDTO.setName("四川申通龙泉公司");
             senderDTO.setTel("400-668-0091");
             senderDTO.setMobile("400-668-0091");
+            senderDTO.setProvince("四川省");
+            senderDTO.setCity("成都市");
+            senderDTO.setArea("龙泉驿区");
+            senderDTO.setAddress("大连路4号四川申通龙泉公司");
             stOrderReq.setSender(senderDTO);
-
             StOrderReq.ReceiverDTO receiverDTO = new StOrderReq.ReceiverDTO();
-
+            receiverDTO.setProvince(orderAddress.getProvince());
+            receiverDTO.setCity(orderAddress.getCity());
 
             stOrderReq.setReceiver(receiverDTO);
         }
