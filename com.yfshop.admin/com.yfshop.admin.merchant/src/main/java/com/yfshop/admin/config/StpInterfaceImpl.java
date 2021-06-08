@@ -1,6 +1,12 @@
 package com.yfshop.admin.config;
 
 import cn.dev33.satoken.stp.StpInterface;
+import com.google.common.collect.Lists;
+import com.yfshop.admin.api.rolepermission.RolePermissionManageService;
+import org.apache.dubbo.config.annotation.DubboReference;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -10,22 +16,18 @@ import java.util.List;
  * 权限配置
  */
 @Component
-public class StpInterfaceImpl implements StpInterface {
+public class StpInterfaceImpl implements StpInterface, InitializingBean {
+    private static final Logger logger = LoggerFactory.getLogger(StpInterfaceImpl.class);
+
+    @DubboReference(check = false)
+    private RolePermissionManageService rolePermissionManageService;
 
     /**
      * 返回一个账号所拥有的权限码集合
      */
     @Override
     public List<String> getPermissionList(Object loginId, String loginKey) {
-        // 本list仅做模拟，实际项目中要根据具体业务逻辑来查询权限
-        List<String> list = new ArrayList<String>();
-        list.add("101");
-        list.add("user-add");
-        list.add("user-delete");
-        list.add("user-update");
-        list.add("user-get");
-        list.add("article-get");
-        return list;
+        return rolePermissionManageService.queryMerchantPermissions(Integer.valueOf(loginId.toString()));
     }
 
     /**
@@ -33,10 +35,12 @@ public class StpInterfaceImpl implements StpInterface {
      */
     @Override
     public List<String> getRoleList(Object loginId, String loginKey) {
-        // 本list仅做模拟，实际项目中要根据具体业务逻辑来查询角色
-        List<String> list = new ArrayList<String>();
-        list.add("admin");
-        list.add("super-admin");
-        return list;
+        String role = rolePermissionManageService.findMerchantRole(Integer.valueOf(loginId.toString()));
+        return Lists.newArrayList(role);
+    }
+
+    @Override
+    public void afterPropertiesSet() {
+        logger.info("*****************创建完毕：sa-token StpInterfaceImpl*********************************");
     }
 }
