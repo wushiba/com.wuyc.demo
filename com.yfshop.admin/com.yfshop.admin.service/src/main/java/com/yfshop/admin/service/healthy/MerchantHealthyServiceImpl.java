@@ -212,7 +212,8 @@ public class MerchantHealthyServiceImpl implements MerchantHealthyService {
                 .eq(req.getProvinceId() != null, Merchant::getProvinceId, req.getProvinceId())
                 .eq(req.getCityId() != null, Merchant::getCityId, req.getCityId())
                 .eq(req.getDistrictId() != null, Merchant::getDistrictId, req.getDistrictId())
-                .likeLeft(Merchant::getPidPath, merchant.getPidPath())
+                .ne(Merchant::getId,merchant.getId())
+                .likeRight(Merchant::getPidPath, merchant.getPidPath())
                 .and(StringUtils.isNotBlank(req.getContacts()), wrapper -> {
                     wrapper.like(Merchant::getContacts, req.getContacts()).or().like(Merchant::getMerchantName, req.getMerchantName());
                 })
