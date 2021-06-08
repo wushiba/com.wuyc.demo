@@ -22,6 +22,7 @@ import com.yfshop.admin.api.website.WebsiteBillService;
 import com.yfshop.admin.dao.OrderDao;
 import com.yfshop.code.mapper.*;
 import com.yfshop.code.model.*;
+import com.yfshop.common.enums.ReceiveWayEnum;
 import com.yfshop.common.enums.UserCouponStatusEnum;
 import com.yfshop.common.enums.UserOrderStatusEnum;
 import com.yfshop.common.exception.ApiException;
@@ -115,6 +116,7 @@ public class AdminUserOrderServiceImpl implements AdminUserOrderService {
                         .eq(DrawRecord::getUserCouponId, item.getUserCouponId()));
             }
         });
+
 
         return null;
     }
@@ -259,4 +261,6 @@ public class AdminUserOrderServiceImpl implements AdminUserOrderService {
         orderDetailResult.getList().add(orderDetails);
         return orderDetailResult;
     }
+
+
 }

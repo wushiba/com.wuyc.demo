@@ -40,6 +40,8 @@ public class HealthyOrder extends Model<HealthyOrder> {
 
     private String itemTitle;
 
+    private String itemSubTitle;
+
     /**
      * 商品sku售价
      */
