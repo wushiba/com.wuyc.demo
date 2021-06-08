@@ -158,13 +158,10 @@ public class HealthySubOrderResult implements Serializable {
      */
     private String deliveryMan;
 
-<<<<<<< HEAD
     /**
      * 预计送达时间
      */
     private LocalDateTime expectArrivedTime;
-=======
-    private String postRule;
 
->>>>>>> ef8bd829bd34bf7e781e631963d77db743796a86
+    private String postRule;
 }

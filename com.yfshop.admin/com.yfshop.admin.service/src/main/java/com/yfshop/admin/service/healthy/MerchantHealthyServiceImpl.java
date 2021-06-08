@@ -212,7 +212,7 @@ public class MerchantHealthyServiceImpl implements MerchantHealthyService {
                 .eq(req.getProvinceId() != null, Merchant::getProvinceId, req.getProvinceId())
                 .eq(req.getCityId() != null, Merchant::getCityId, req.getCityId())
                 .eq(req.getDistrictId() != null, Merchant::getDistrictId, req.getDistrictId())
-                .ne(Merchant::getId,merchant.getId())
+                .ne(Merchant::getId, merchant.getId())
                 .likeRight(Merchant::getPidPath, merchant.getPidPath())
                 .and(StringUtils.isNotBlank(req.getContacts()), wrapper -> {
                     wrapper.like(Merchant::getContacts, req.getContacts()).or().like(Merchant::getMerchantName, req.getMerchantName());
@@ -234,5 +234,11 @@ public class MerchantHealthyServiceImpl implements MerchantHealthyService {
         healthySubOrder.setOrderStatus(HealthySubOrderStatusEnum.WAIT_DELIVERY.getCode());
         healthySubOrderMapper.updateById(healthySubOrder);
         return null;
+    }
+
+    @Override
+    public HealthySubOrderResult getSubOrderDetail(Integer id) {
+        HealthySubOrder healthySubOrder = healthySubOrderMapper.selectById(id);
+        return BeanUtil.convert(healthySubOrder, HealthySubOrderResult.class);
     }
 }

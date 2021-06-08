@@ -93,7 +93,6 @@ public class AdminHealthyController implements BaseController {
     }
 
 
-
     @RequestMapping(value = "/updateAct", method = {RequestMethod.POST})
     @ResponseBody
     @SaCheckLogin

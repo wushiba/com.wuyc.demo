@@ -33,4 +33,6 @@ public interface MerchantHealthyService {
     IPage<MerchantResult> pageMerchantHealthyList(String requestIpStr, QueryMerchantReq req);
 
     Void updatePostWaySubOrder(PostWayHealthySubOrderReq req);
+
+    HealthySubOrderResult getSubOrderDetail(Integer id);
 }

@@ -63,13 +63,22 @@ public class MerchantHealthyController extends AbstractBaseController {
     }
 
 
+    @RequestMapping(value = "/getSubOrderDetail", method = {RequestMethod.GET, RequestMethod.POST})
+    @ResponseBody
+    @SaCheckLogin
+    @SaCheckRole(value = {"jxs", "fxs", "ywy", "cxy"}, mode = SaMode.OR)
+    public CommonResult<HealthySubOrderResult> getSubOrderDetail(Integer id) {
+        return CommonResult.success(merchantHealthyService.getSubOrderDetail(id));
+    }
+
+
     @RequestMapping(value = "/getMerchantHealthyList", method = {RequestMethod.GET, RequestMethod.POST})
     @ResponseBody
     @SaCheckLogin
     @SaCheckRole(value = {"jxs"}, mode = SaMode.OR)
     public CommonResult<IPage<MerchantResult>> pageMerchantHealthyList(QueryMerchantReq req) {
         req.setMerchantId(getCurrentAdminUserId());
-        return CommonResult.success(merchantHealthyService.pageMerchantHealthyList(getRequestIpStr(),req));
+        return CommonResult.success(merchantHealthyService.pageMerchantHealthyList(getRequestIpStr(), req));
     }
 
 
