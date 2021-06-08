@@ -325,13 +325,13 @@ public class HealthyServiceImpl implements HealthyService {
         // 配送次数
         int subOrderCount = healthyItem.getSpec() / count;
 
-        // 今日11点时刻
-        LocalDateTime today11Clock = LocalDateTime.of(LocalDate.now().getYear(), LocalDate.now().getMonth(),
-                LocalDate.now().getDayOfMonth(), 11, 0, 0, 0);
+        // 今日16点时刻
+        LocalDateTime today16Clock = LocalDateTime.of(LocalDate.now().getYear(), LocalDate.now().getMonth(),
+                LocalDate.now().getDayOfMonth(), 16, 0, 0, 0);
 
         // 第一次配送时间
         Date firstPostTime;
-        if (LocalDateTime.now().isAfter(today11Clock)) {
+        if (LocalDateTime.now().isAfter(today16Clock)) {
             // 第3天开始
             firstPostTime = DateUtil.parse(DateTime.of(DateUtils.addDays(new Date(), 2)).toDateStr());
         } else {
@@ -352,8 +352,10 @@ public class HealthyServiceImpl implements HealthyService {
                 postDateTimes.add(temp);
             }
         }
-
-        return postDateTimes;
+        // 预计送达时间
+        return postDateTimes.stream()
+                .map(postDateTime -> DateUtils.addDays(postDateTime, 3))
+                .collect(Collectors.toList());
     }
 
     private String generateOrderNo(Integer userId) {

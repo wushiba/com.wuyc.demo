@@ -7,10 +7,32 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.yfshop.admin.api.healthy.AdminHealthyService;
-import com.yfshop.admin.api.healthy.request.*;
-import com.yfshop.admin.api.healthy.result.*;
-import com.yfshop.code.mapper.*;
-import com.yfshop.code.model.*;
+import com.yfshop.admin.api.healthy.request.HealthyActReq;
+import com.yfshop.admin.api.healthy.request.HealthyItemReq;
+import com.yfshop.admin.api.healthy.request.QueryHealthyOrderReq;
+import com.yfshop.admin.api.healthy.request.QueryHealthySubOrderReq;
+import com.yfshop.admin.api.healthy.request.QueryJxsMerchantReq;
+import com.yfshop.admin.api.healthy.request.SubOrderPostWay;
+import com.yfshop.admin.api.healthy.result.HealthyActResult;
+import com.yfshop.admin.api.healthy.result.HealthyItemResult;
+import com.yfshop.admin.api.healthy.result.HealthyOrderDetailResult;
+import com.yfshop.admin.api.healthy.result.HealthyOrderResult;
+import com.yfshop.admin.api.healthy.result.HealthySubOrderResult;
+import com.yfshop.admin.api.healthy.result.JxsMerchantResult;
+import com.yfshop.code.mapper.HealthyActContentMapper;
+import com.yfshop.code.mapper.HealthyActMapper;
+import com.yfshop.code.mapper.HealthyItemImageMapper;
+import com.yfshop.code.mapper.HealthyItemMapper;
+import com.yfshop.code.mapper.HealthyOrderMapper;
+import com.yfshop.code.mapper.HealthySubOrderMapper;
+import com.yfshop.code.mapper.MerchantMapper;
+import com.yfshop.code.model.HealthyAct;
+import com.yfshop.code.model.HealthyActContent;
+import com.yfshop.code.model.HealthyItem;
+import com.yfshop.code.model.HealthyItemImage;
+import com.yfshop.code.model.HealthyOrder;
+import com.yfshop.code.model.HealthySubOrder;
+import com.yfshop.code.model.Merchant;
 import com.yfshop.common.exception.ApiException;
 import com.yfshop.common.exception.Asserts;
 import com.yfshop.common.healthy.enums.HealthyOrderStatusEnum;
@@ -273,18 +295,18 @@ public class AdminHealthyServiceImpl implements AdminHealthyService {
         // 每次配送数量
         int count = Integer.parseInt(postRule[1]);
 
-        // 今日11点时刻
-        LocalDateTime today11Clock = LocalDateTime.of(LocalDate.now().getYear(), LocalDate.now().getMonth(),
-                LocalDate.now().getDayOfMonth(), 11, 0, 0, 0);
+        // 今日16点时刻
+        LocalDateTime today16Clock = LocalDateTime.of(LocalDate.now().getYear(), LocalDate.now().getMonth(),
+                LocalDate.now().getDayOfMonth(), 16, 0, 0, 0);
 
         // 第一次配送时间
         Date firstPostTime;
-        if (bean.getPayTime().isAfter(today11Clock)) {
-            // 第3天开始
-            firstPostTime = DateUtil.parse(DateTime.of(DateUtils.addDays(new Date(), 2)).toDateStr());
-        } else {
-            // 第2天开始
+        if (bean.getPayTime().isAfter(today16Clock)) {
+            // 第二天发货
             firstPostTime = DateUtil.parse(DateTime.of(DateUtils.addDays(new Date(), 1)).toDateStr());
+        } else {
+            // 当天发货
+            firstPostTime = DateUtil.parse(DateTime.now().toDateStr());
         }
 
         // 配送时间列表
@@ -305,6 +327,8 @@ public class AdminHealthyServiceImpl implements AdminHealthyService {
         int remain = order.getItemSpec() % count;
         for (int i = 0; i < postDateTimes.size(); i++) {
             LocalDateTime expectShipTime = LocalDateTime.ofInstant(postDateTimes.get(i).toInstant(), ZoneId.systemDefault());
+            LocalDateTime expectArrivedTime = LocalDateTime.ofInstant(DateUtils.addDays(postDateTimes.get(i), 3).toInstant(),
+                    ZoneId.systemDefault());
             // 最后一次配送加上余量
             int postItemCount = (i == postDateTimes.size() - 1) ? count + remain : count;
             HealthySubOrder subOrder = new HealthySubOrder();
@@ -337,6 +361,7 @@ public class AdminHealthyServiceImpl implements AdminHealthyService {
             subOrder.setPostItemCount(postItemCount);
             subOrder.setItemId(order.getItemId());
             subOrder.setItemTitle(order.getItemTitle());
+            subOrder.setExpectArrivedTime(expectArrivedTime);
             healthySubOrderMapper.insert(subOrder);
         }
         return null;
