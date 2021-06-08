@@ -255,6 +255,11 @@ public class AdminMallManageServiceImpl implements AdminMallManageService {
     @Transactional(rollbackFor = Exception.class)
     @Override
     public Void updateSkuIsEnable(@NotNull(message = "规格id不能为空") Integer skuId, boolean isEnable) throws ApiException {
+        if (isEnable) {
+            ItemSku itemSku = skuMapper.selectById(skuId);
+            Asserts.assertTrue(itemSku.getSkuSalePrice().compareTo(BigDecimal.ZERO) > 0,
+                    500, "SKU售价低于0，不允许上架");
+        }
         ItemSku sku = new ItemSku();
         sku.setId(skuId);
         sku.setIsEnable(isEnable ? "Y" : "N");
