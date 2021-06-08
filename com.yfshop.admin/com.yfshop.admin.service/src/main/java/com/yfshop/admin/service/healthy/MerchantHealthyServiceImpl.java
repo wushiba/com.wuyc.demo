@@ -186,7 +186,8 @@ public class MerchantHealthyServiceImpl implements MerchantHealthyService {
     public IPage<HealthySubOrderResult> pageJxsSubOrderList(QueryJxsHealthySubOrderReq req) throws ApiException {
         LambdaQueryWrapper<HealthySubOrder> queryWrapper = Wrappers.lambdaQuery(HealthySubOrder.class)
                 .eq(HealthySubOrder::getMerchantId, req.getMerchantId())
-                .eq(HealthySubOrder::getOrderStatus, req.getOrderStatus());
+                .eq(HealthySubOrder::getOrderStatus, req.getOrderStatus())
+                .eq(HealthySubOrder::getPostWay, "PS");
         Page<HealthySubOrder> page = healthySubOrderMapper.selectPage(new Page<>(req.getPageIndex(), req.getPageSize()), queryWrapper);
         return BeanUtil.iPageConvert(page, HealthySubOrderResult.class);
     }
