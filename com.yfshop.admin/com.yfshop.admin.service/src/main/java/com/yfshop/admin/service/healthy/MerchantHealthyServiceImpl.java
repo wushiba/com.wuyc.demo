@@ -109,7 +109,7 @@ public class MerchantHealthyServiceImpl implements MerchantHealthyService {
         entity.setOrderStatus(HealthySubOrderStatusEnum.IN_DELIVERY.getCode());
         entity.setShipTime(LocalDateTime.now());
         // 配送员信息
-        entity.setDeliveryMan(JSON.toJSONString(DeliveryMan.builder().merchantId(merchantId).mobile(merchant.getMobile()).name(merchant.getMerchantName()).build()));
+        //entity.setDeliveryMan(JSON.toJSONString(DeliveryMan.builder().merchantId(merchantId).mobile(merchant.getMobile()).name(merchant.getMerchantName()).build()));
         int rows = healthySubOrderMapper.update(entity, Wrappers.lambdaQuery(HealthySubOrder.class)
                 .eq(HealthySubOrder::getId, subOrder).eq(HealthySubOrder::getOrderStatus, HealthySubOrderStatusEnum.WAIT_DELIVERY.getCode()));
         if (rows > 0) {
@@ -227,11 +227,13 @@ public class MerchantHealthyServiceImpl implements MerchantHealthyService {
 
     @Override
     public Void updatePostWaySubOrder(PostWayHealthySubOrderReq req) {
+        Merchant merchant = merchantMapper.selectById(req.getCurrentMerchantId());
         HealthySubOrder healthySubOrder = new HealthySubOrder();
         healthySubOrder.setId(req.getId());
         healthySubOrder.setAllocateMerchantPath(req.getMerchantId() + "," + req.getCurrentMerchantId());
         healthySubOrder.setCurrentMerchantId(req.getCurrentMerchantId());
         healthySubOrder.setOrderStatus(HealthySubOrderStatusEnum.WAIT_DELIVERY.getCode());
+        healthySubOrder.setDeliveryMan(JSON.toJSONString(DeliveryMan.builder().merchantId(merchant.getId()).mobile(merchant.getMobile()).name(merchant.getMerchantName()).build()));
         healthySubOrderMapper.updateById(healthySubOrder);
         return null;
     }
