@@ -243,7 +243,7 @@ public class AdminWebsiteCodeManageServiceImpl implements AdminWebsiteCodeManage
                 //扣除0.6%的手续费
                 BigDecimal subtractFee = totalFee.multiply(new BigDecimal("0.006")).setScale(0, RoundingMode.CEILING);
                 int refundFee = totalFee.subtract(subtractFee).intValue();
-                wxPayRefund.setTotalFee(totalFee.subtract(subtractFee).intValue());
+                wxPayRefund.setTotalFee(refundFee);
                 wxPayRefund.setTransactionId(wxPayNotify.getTransactionId());
                 wxPayRefund.setOuttradeNo(wxPayNotify.getOuttradeNo());
                 wxPayRefund.setRefundNo("refundNo-websiteCode-" + id);
