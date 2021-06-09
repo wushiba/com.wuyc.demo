@@ -191,12 +191,12 @@ public class AdminUserOrderServiceImpl implements AdminUserOrderService {
                         WxPayRefund wxPayRefund = new WxPayRefund();
                         wxPayRefund.setCreateTime(LocalDateTime.now());
                         wxPayRefund.setOpenId(wxPayNotify.getOpenId());
-                        BigDecimal payPrice= orderDetail.getPayPrice();
+                        BigDecimal payPrice= orderDetail.getPayPrice().multiply(new BigDecimal("100"));
                         //扣除0.6%的手续费
 //                        BigDecimal subtractFee = payPrice.multiply(new BigDecimal("0.006")).setScale(0, RoundingMode.CEILING);
 //                        int refundFee = payPrice.subtract(subtractFee).intValue();
 //                        wxPayRefund.setTotalFee(refundFee);
-                        wxPayRefund.setTotalFee(payPrice.multiply(new BigDecimal("100")).intValue());
+                        wxPayRefund.setTotalFee(payPrice.intValue());
                         wxPayRefund.setTransactionId(wxPayNotify.getTransactionId());
                         wxPayRefund.setOuttradeNo(wxPayNotify.getOuttradeNo());
                         wxPayRefund.setRefundNo("refundNo-shopOrder-" + id);
