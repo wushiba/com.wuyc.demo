@@ -189,7 +189,7 @@ public class MerchantHealthyServiceImpl implements MerchantHealthyService {
                 .eq(HealthySubOrder::getOrderStatus, req.getOrderStatus())
                 .eq(HealthySubOrder::getPostWay, "PS")
                 .orderByAsc(HealthySubOrder::getExpectShipTime);
-        Page<HealthySubOrder> page = healthySubOrderMapper.selectPage(new Page<>(req.getPageIndex(), req.getPageSize()), queryWrapper);
+        IPage<HealthySubOrder> page = healthySubOrderMapper.selectPage(new Page<>(req.getPageIndex(), req.getPageSize()), queryWrapper);
         return BeanUtil.iPageConvert(page, HealthySubOrderResult.class);
     }
 
