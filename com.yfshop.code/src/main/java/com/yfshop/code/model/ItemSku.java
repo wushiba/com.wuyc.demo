@@ -1,5 +1,6 @@
 package com.yfshop.code.model;
 
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.activerecord.Model;
 import lombok.Data;
@@ -24,6 +25,7 @@ public class ItemSku extends Model<ItemSku> {
 
     private static final long serialVersionUID = 1L;
 
+    @TableId(value = "id")
     private Integer id;
 
     private LocalDateTime createTime;
