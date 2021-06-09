@@ -26,7 +26,7 @@ public class AdminExcelManageController implements BaseController {
 
     @SaCheckLogin
     @RequestMapping(value = "/sendWebsiteData", method = {RequestMethod.GET, RequestMethod.POST})
-//    @SaCheckRole(value = "sys")
+    @SaCheckRole(value = "sys")
     @ResponseBody
     public CommonResult<Void> sendWebsiteData() {
         return CommonResult.success(excelService.sendWebsiteData());
