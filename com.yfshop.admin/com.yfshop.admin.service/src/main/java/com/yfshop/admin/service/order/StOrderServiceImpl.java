@@ -93,8 +93,9 @@ public class StOrderServiceImpl implements StOrderService {
     public static void main(String[] args) {
         StOrderReq stOrderReq = new StOrderReq();
         stOrderReq.setOrderNo(1 + "");
-        stOrderReq.setOrderSource("雨帆健康家");
-        stOrderReq.setBillType("01");
+        stOrderReq.setOrderSource("CAKFvLQuMfpsbGZ");
+        stOrderReq.setBillType("00");
+        stOrderReq.setOrderType("01");
         StOrderReq.SenderDTO senderDTO = new StOrderReq.SenderDTO();
         senderDTO.setName("四川申通龙泉公司");
         senderDTO.setTel("13799988851");
@@ -107,8 +108,8 @@ public class StOrderServiceImpl implements StOrderService {
         StOrderReq.ReceiverDTO receiverDTO = new StOrderReq.ReceiverDTO();
         receiverDTO.setProvince("浙江省");
         receiverDTO.setCity("杭州市");
-        receiverDTO.setArea("西湖区");
-        receiverDTO.setAddress("测试地址");
+        receiverDTO.setArea("滨江区");
+        receiverDTO.setAddress("人工智能产业园B座");
         receiverDTO.setTel("18758187433");
         receiverDTO.setMobile("18758187433");
         receiverDTO.setName("18758187433");
@@ -119,19 +120,22 @@ public class StOrderServiceImpl implements StOrderService {
         cargoDTO.setGoodsName("椰岛陆龟酒");
         stOrderReq.setCargo(cargoDTO);
         StOrderReq.CustomerDTO customerDTO = new StOrderReq.CustomerDTO();
-        customerDTO.setSiteCode("666666");
-        customerDTO.setCustomerName("666666000001");
+        customerDTO.setSiteCode("646640");
+        customerDTO.setCustomerName("646640000002");
         customerDTO.setSitePwd("abc123");
         stOrderReq.setCustomer(customerDTO);
         LinkRequest data = new LinkRequest();
-        data.setFromAppkey("CAKoUWcvhIUBCVz");
-        data.setFromCode("CAKoUWcvhIUBCVz");
-        data.setToAppkey("sto_trace_query");
-        data.setToCode("sto_trace_query");
-        data.setApiName("STO_TRACE_QUERY_COMMON");
-        String url = "http://cloudinter-linkgatewaytest.sto.cn/gateway/link.do";
-        String secretKey = "CNHOUUv7PBH0IqRH2DQcdsKEGPqmLLZ6";
+        data.setFromAppkey("CAKFvLQuMfpsbGZ");
+        data.setFromCode("CAKFvLQuMfpsbGZ");
+        data.setToAppkey("sto_oms");
+        data.setToCode("sto_oms");
+        data.setApiName("OMS_EXPRESS_ORDER_CREATE");
+        data.setContent(JSONUtil.toJsonStr(stOrderReq));
+        String url = "https://cloudinter-linkgatewayonline.sto.cn/gateway/link.do";
+        String secretKey = "Omj0YY5P29cAvWhddNukhdxwxL4S1b4x";
         String json = LinkUtils.request(data, url, secretKey);
-        StOrderResult stOrderResult = JSONUtil.toBean(json, StOrderResult.class);
+        System.out.println(json);
+        StOrderResult stOrderResult =  JSONUtil.toBean(json.startsWith("<response>") ? JSONUtil.xmlToJson(json).toString():json, StOrderResult.class);
+        System.out.println(stOrderResult);
     }
 }

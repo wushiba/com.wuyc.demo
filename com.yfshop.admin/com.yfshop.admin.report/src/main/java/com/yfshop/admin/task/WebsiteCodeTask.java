@@ -65,12 +65,10 @@ public class WebsiteCodeTask {
     @Resource
     private WebsiteCodeDao websiteCodeDao;
     @Autowired
-    private OssUploader ossUploader;
+    EmailTask emailTask;
     @Autowired
-    private JavaMailSender mailSender;
+    private OssUploader ossUploader;
 
-    @Value("${spring.mail.username}")
-    private String from;
 
     private static final Logger logger = LoggerFactory.getLogger(WebsiteCodeTask.class);
 
@@ -116,7 +114,7 @@ public class WebsiteCodeTask {
                             "<p>&nbsp;&nbsp;&nbsp;&nbsp;此邮件内含光明网点码，请妥善保管。雨帆</p>";
                     if (StringUtils.isNotBlank(websiteCode.getEmail())) {
                         try {
-                            sendAttachmentsMail(websiteCode.getEmail(), "光明网点码", msg, fileZip.getPath(), "xuwei@51jujibao.com");
+                            emailTask.sendAttachmentsMail(websiteCode.getEmail(), "光明网点码", msg, fileZip.getPath(), "xuwei@51jujibao.com");
                         } catch (Exception e) {
                             websiteCode.setFileStatus("FAIL-Mail");
                             e.printStackTrace();
@@ -202,22 +200,5 @@ public class WebsiteCodeTask {
         }
         return null;
     }
-
-    private void sendAttachmentsMail(String to, String subject, String content, String filePath, String... cc) throws MessagingException {
-        MimeMessage message = mailSender.createMimeMessage();
-        MimeMessageHelper helper = new MimeMessageHelper(message, true);
-        helper.setFrom(from);
-        helper.setTo(to);
-        helper.setSubject(subject);
-        helper.setText(content, true);
-        if (ArrayUtil.isNotEmpty(cc)) {
-            helper.setCc(cc);
-        }
-        File file = new File(filePath);
-        FileSystemResource fileResource = new FileSystemResource(file);
-        helper.addAttachment(file.getName(), fileResource);
-        mailSender.send(message);
-    }
-
 
 }
