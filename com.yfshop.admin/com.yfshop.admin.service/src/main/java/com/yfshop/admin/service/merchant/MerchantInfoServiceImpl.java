@@ -878,7 +878,8 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
                 .collect(Collectors.toList());
         list.forEach(item -> {
             MerchantResult result = BeanUtil.convert(item, MerchantResult.class);
-            result.setDistance(mapDistance.get(item.getId()).toString());
+            Distance distance = mapDistance.get(item.getId());
+            result.setDistance(String.format("%.2f%s", distance.getValue(), distance.getMetric()));
             resultList.add(result);
         });
         resultList.sort(Comparator.comparing(MerchantResult::getDistance));
