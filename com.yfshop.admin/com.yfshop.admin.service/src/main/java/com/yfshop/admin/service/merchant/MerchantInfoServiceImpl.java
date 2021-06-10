@@ -881,7 +881,7 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
             MerchantResult result = BeanUtil.convert(item, MerchantResult.class);
             Distance distance = mapDistance.get(item.getId());
             result.setDistanceValue(distance.getValue());
-            if (distance.getValue() > 0) {
+            if ("km".equals(distance.getUnit()) && distance.getValue() < 0) {
                 result.setDistance(String.format("%.1f千米", distance.getValue()));
             } else {
                 result.setDistance(String.format("%d米", distance.getValue() * 1000));

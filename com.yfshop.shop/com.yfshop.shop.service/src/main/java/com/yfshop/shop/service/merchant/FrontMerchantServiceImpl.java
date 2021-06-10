@@ -110,7 +110,7 @@ public class FrontMerchantServiceImpl implements FrontMerchantService {
             Distance distance = mapDistance.get(item.getId());
             System.out.println(distance.getValue() + "," + distance.getNormalizedValue() + "," + distance.getUnit());
             result.setDistanceValue(distance.getValue());
-            if (distance.getValue() > 0) {
+            if ("km".equals(distance.getUnit()) && distance.getValue() < 0) {
                 result.setDistance(String.format("%.1f千米", distance.getValue()));
             } else {
                 result.setDistance(String.format("%d米", distance.getValue() * 1000));
