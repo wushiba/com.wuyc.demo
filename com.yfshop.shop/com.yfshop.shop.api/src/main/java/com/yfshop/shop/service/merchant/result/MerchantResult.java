@@ -4,7 +4,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.springframework.data.geo.Distance;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.beans.Transient;
 import java.io.Serializable;
 
 @Data
@@ -104,7 +106,6 @@ public class MerchantResult implements Serializable {
 
     private String distance;
 
-    @JsonIgnore
-    private double distanceValue;
+    private transient double distanceValue;
 
 }
