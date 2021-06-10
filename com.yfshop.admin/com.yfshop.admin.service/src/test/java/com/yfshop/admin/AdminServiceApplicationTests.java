@@ -31,6 +31,7 @@ import com.yfshop.code.manager.MenuManager;
 import com.yfshop.code.mapper.ItemContentMapper;
 import com.yfshop.code.mapper.ItemImageMapper;
 import com.yfshop.code.mapper.ItemMapper;
+import com.yfshop.code.mapper.MerchantDetailMapper;
 import com.yfshop.code.mapper.MerchantMapper;
 import com.yfshop.code.mapper.RegionMapper;
 import com.yfshop.code.model.Item;
@@ -38,7 +39,9 @@ import com.yfshop.code.model.ItemContent;
 import com.yfshop.code.model.ItemImage;
 import com.yfshop.code.model.Menu;
 import com.yfshop.code.model.Merchant;
+import com.yfshop.code.model.MerchantDetail;
 import com.yfshop.code.model.Region;
+import com.yfshop.common.constants.CacheConstants;
 import com.yfshop.common.enums.GroupRoleEnum;
 import com.yfshop.common.enums.ReceiveWayEnum;
 import com.yfshop.common.util.AddressUtil;
@@ -51,6 +54,16 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationContext;
 import org.springframework.dao.DuplicateKeyException;
+import org.springframework.data.geo.Circle;
+import org.springframework.data.geo.Distance;
+import org.springframework.data.geo.GeoResult;
+import org.springframework.data.geo.GeoResults;
+import org.springframework.data.geo.Point;
+import org.springframework.data.redis.connection.RedisGeoCommands.DistanceUnit;
+import org.springframework.data.redis.connection.RedisGeoCommands.GeoLocation;
+import org.springframework.data.redis.connection.RedisGeoCommands.GeoRadiusCommandArgs;
+import org.springframework.data.redis.core.GeoOperations;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import javax.annotation.Resource;
@@ -68,6 +81,8 @@ import java.util.stream.Collectors;
 public class AdminServiceApplicationTests {
     private static final Logger logger = LoggerFactory.getLogger(AdminServiceApplicationTests.class);
 
+    @Resource
+    private MerchantDetailMapper merchantDetailMapper;
     @DubboReference(check = false)
     private AdminMallManageService adminMallManageService;
     @Resource
@@ -308,7 +323,7 @@ public class AdminServiceApplicationTests {
     }
 
 
-    @Test
+    // @Test
     public void contextLoads1() {
 
         try {
@@ -1934,11 +1949,54 @@ public class AdminServiceApplicationTests {
                     }
                 }
                 tag.add(String.format("update yf_merchant m set m.province='%s',m.city='%s',m.district='%s',m.province_id=%s,m.city_id=%s,m.district_id=%s where m.id=%s;",
-                        temp.get("province"),temp.get("city"),temp.get("district"), temp.get("provinceId"),temp.get("cityId"),temp.get("districtId"),s[0]
-                        ));
+                        temp.get("province"), temp.get("city"), temp.get("district"), temp.get("provinceId"), temp.get("cityId"), temp.get("districtId"), s[0]
+                ));
             }
 
         });
         FileUtil.writeLines(tag, new File("H://6.txt"), "UTF-8");
     }
+
+    @Resource
+    private RedisTemplate<String, Object> redisTemplate;
+
+    // @Test
+    public void testRedisGeo() {
+        List<MerchantDetail> merchantDetails = merchantDetailMapper.selectList(null);
+
+        GeoOperations<String, Object> opsForGeo = redisTemplate.opsForGeo();
+        // 添加门店坐标信息到redis
+        for (MerchantDetail merchantDetail : merchantDetails) {
+            Point point = new Point(merchantDetail.getLongitude(), merchantDetail.getLatitude());
+            Long count = opsForGeo.add(CacheConstants.MERCHANT_GRO_DATA, point, merchantDetail.getMerchantId());
+            System.out.println(merchantDetail.getMerchantId() + "-" + count);
+        }
+
+        // 移除坐标
+        Long count = redisTemplate.opsForZSet().remove(CacheConstants.MERCHANT_GRO_DATA, merchantDetails.get(0).getMerchantId());
+        System.out.println(count);
+
+        // 中心位置
+        double myLongitude = 120.22403408501432D;
+        double myLatitude = 30.2090974734466D;
+        int radius = 100;
+        int limit = 100;
+        // 中心位置半径100km内的前100个门店
+        Circle circle = new Circle(new Point(myLongitude, myLatitude), new Distance(radius, DistanceUnit.KILOMETERS));
+        GeoRadiusCommandArgs args = GeoRadiusCommandArgs.newGeoRadiusArgs().includeCoordinates().includeDistance().sortAscending().limit(limit);
+        GeoResults<GeoLocation<Object>> geoLocationGeoResults = opsForGeo.radius(CacheConstants.MERCHANT_GRO_DATA, circle, args);
+        if (geoLocationGeoResults != null) {
+            for (GeoResult<GeoLocation<Object>> locationGeoResult : geoLocationGeoResults) {
+                GeoLocation<Object> content = locationGeoResult.getContent();
+                // 店的坐标
+                Point point = content.getPoint();
+                // 距离
+                Distance dist = locationGeoResult.getDistance();
+                // 店id
+                Object merchantId = content.getName();
+                System.out.println("member=" + merchantId.toString() + "&distance=" + dist.toString() + "&coordinate=" + point.toString());
+            }
+        }
+    }
+
 }
