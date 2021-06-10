@@ -173,4 +173,5 @@ public class AdminWebsiteManageController implements BaseController {
     public CommonResult<Void> sendEmailWebsiteCode(Integer websiteCodeId,String email) {
         return CommonResult.success(adminWebsiteCodeManageService.sendEmailWebsiteCode(websiteCodeId,email));
     }
+
 }
