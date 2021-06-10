@@ -882,9 +882,9 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
             Distance distance = mapDistance.get(item.getId());
             result.setDistanceValue(distance.getValue());
             if ("km".equals(distance.getUnit()) && distance.getValue() < 0) {
-                result.setDistance(String.format("%.1f千米", distance.getValue()));
+                result.setDistance(String.format("%s千米", distance.getValue() + ""));
             } else {
-                result.setDistance(String.format("%d米", distance.getValue() * 1000));
+                result.setDistance(String.format("%s米", (distance.getValue() * 1000) + ""));
             }
             MerchantDetail merchantDetail = merchantDetailMap.get(distance.getValue());
             if (merchantDetail != null) {
