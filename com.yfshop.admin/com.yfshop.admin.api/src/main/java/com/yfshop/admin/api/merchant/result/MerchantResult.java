@@ -122,7 +122,7 @@ public class MerchantResult implements Serializable {
 
     private String distance;
 
-    private transient double distanceValue;
+    private double distanceValue;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", locale = "zh", timezone = "GMT+8")
     private LocalDateTime createTime;

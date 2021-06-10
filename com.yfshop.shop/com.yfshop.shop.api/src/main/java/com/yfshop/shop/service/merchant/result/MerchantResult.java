@@ -106,6 +106,6 @@ public class MerchantResult implements Serializable {
 
     private String distance;
 
-    private transient double distanceValue;
+    private double distanceValue;
 
 }

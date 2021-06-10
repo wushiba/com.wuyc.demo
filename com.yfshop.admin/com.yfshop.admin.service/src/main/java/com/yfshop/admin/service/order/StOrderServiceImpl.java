@@ -93,18 +93,18 @@ public class StOrderServiceImpl implements StOrderService {
 
     public static void main(String[] args) {
         StOrderReq stOrderReq = new StOrderReq();
-        stOrderReq.setOrderNo(1 + "");
+        stOrderReq.setOrderNo(2 + "");
         stOrderReq.setOrderSource("CAKFvLQuMfpsbGZ");
         stOrderReq.setBillType("00");
         stOrderReq.setOrderType("01");
         StOrderReq.SenderDTO senderDTO = new StOrderReq.SenderDTO();
-        senderDTO.setName("五洲国际申通快递");
-        senderDTO.setTel("13890312117");
-        senderDTO.setMobile("13890312117");
+        senderDTO.setName("四川申通龙泉公司");
+        senderDTO.setTel("13799988851");
+        senderDTO.setMobile("13799988851");
         senderDTO.setProvince("四川省");
-        senderDTO.setCity("眉山市");
-        senderDTO.setArea("东坡区");
-        senderDTO.setAddress("诗书路南段五洲国际申通快递");
+        senderDTO.setCity("成都市");
+        senderDTO.setArea("龙泉驿区");
+        senderDTO.setAddress("大连路4号四川申通龙泉公司");
         stOrderReq.setSender(senderDTO);
         StOrderReq.ReceiverDTO receiverDTO = new StOrderReq.ReceiverDTO();
         receiverDTO.setProvince("浙江省");
