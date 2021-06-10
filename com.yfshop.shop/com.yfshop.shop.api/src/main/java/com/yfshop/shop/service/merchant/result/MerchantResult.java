@@ -101,6 +101,6 @@ public class MerchantResult implements Serializable {
      */
     private String headImage;
 
-    private Distance distance;
+    private String distance;
 
 }

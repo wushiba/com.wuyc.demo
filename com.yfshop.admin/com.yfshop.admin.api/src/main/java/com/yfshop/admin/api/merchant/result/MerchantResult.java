@@ -119,7 +119,7 @@ public class MerchantResult implements Serializable {
      */
     private String headImage;
 
-    private Distance distance;
+    private String distance;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", locale = "zh", timezone = "GMT+8")
     private LocalDateTime createTime;
