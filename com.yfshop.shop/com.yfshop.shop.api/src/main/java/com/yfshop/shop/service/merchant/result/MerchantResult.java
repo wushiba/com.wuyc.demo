@@ -103,4 +103,6 @@ public class MerchantResult implements Serializable {
 
     private String distance;
 
+    private double distanceValue;
+
 }

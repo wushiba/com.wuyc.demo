@@ -880,6 +880,7 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
         list.forEach(item -> {
             MerchantResult result = BeanUtil.convert(item, MerchantResult.class);
             Distance distance = mapDistance.get(item.getId());
+            result.setDistanceValue(distance.getValue());
             if (distance.getValue() > 0) {
                 result.setDistance(String.format("%.1f千米", distance.getValue()));
             } else {
@@ -892,7 +893,7 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
             }
             resultList.add(result);
         });
-        resultList.sort(Comparator.comparing(MerchantResult::getDistance));
+        resultList.sort(Comparator.comparing(MerchantResult::getDistanceValue));
         return resultList;
 
     }
