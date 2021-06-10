@@ -1,6 +1,7 @@
 package com.yfshop.admin.api.merchant.result;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.springframework.data.geo.Distance;
@@ -121,6 +122,7 @@ public class MerchantResult implements Serializable {
 
     private String distance;
 
+    @JsonIgnore
     private double distanceValue;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", locale = "zh", timezone = "GMT+8")

@@ -1,5 +1,6 @@
 package com.yfshop.shop.service.merchant.result;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.springframework.data.geo.Distance;
@@ -103,6 +104,7 @@ public class MerchantResult implements Serializable {
 
     private String distance;
 
+    @JsonIgnore
     private double distanceValue;
 
 }
