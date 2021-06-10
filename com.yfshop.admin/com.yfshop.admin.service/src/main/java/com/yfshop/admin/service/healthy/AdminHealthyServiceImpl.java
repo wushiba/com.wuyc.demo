@@ -111,14 +111,14 @@ public class AdminHealthyServiceImpl implements AdminHealthyService {
                 .eq(req.getCityId() != null, HealthySubOrder::getCityId, req.getCityId())
                 .eq(req.getDistrictId() != null, HealthySubOrder::getDistrictId, req.getDistrictId())
                 .ge(req.getStartTime() != null, HealthySubOrder::getExpectShipTime, req.getStartTime())
+                .like(req.getExpressCompany() != null, HealthySubOrder::getExpressCompany, req.getExpressCompany())
+                .like(req.getExpressNo() != null, HealthySubOrder::getExpressNo, req.getExpressNo())
                 .and(StringUtils.isNotBlank(req.getPostKey()), wrapper -> {
                     wrapper.like(HealthySubOrder::getMerchantContacts, req.getPostKey())
                             .or()
                             .like(HealthySubOrder::getMerchantName, req.getPostKey())
                             .or()
                             .like(HealthySubOrder::getMerchantContacts, req.getPostKey())
-                            .or()
-                            .like(HealthySubOrder::getExpressNo, req.getPostKey())
                             .or()
                             .like(HealthySubOrder::getExpressNo, req.getPostKey());
                 })

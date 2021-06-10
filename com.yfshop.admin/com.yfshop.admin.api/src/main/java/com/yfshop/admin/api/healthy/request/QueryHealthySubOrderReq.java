@@ -37,6 +37,10 @@ public class QueryHealthySubOrderReq implements Serializable {
 
     private Date endTime;
 
+    private String expressCompany;
+
+    private String expressNo;
+
     private String postKey;
 
     private Integer pageIndex = 1;
