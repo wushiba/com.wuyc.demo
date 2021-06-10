@@ -193,10 +193,10 @@ public class OrderServiceImpl implements OrderService {
         });
         List<DownloadProductResult.Goods> goodsList = new ArrayList<>();
         if (!CollectionUtils.isEmpty(skuIds)) {
-            IPage<ItemSku> ipage = itemSkuMapper.selectPage(new Page<>(downloadProductReq.getPageIndex(), downloadProductReq.getPageSize()), Wrappers.<ItemSku>lambdaQuery().in(ItemSku::getId, skuIds));
+            IPage<ItemSku> iPage = itemSkuMapper.selectPage(new Page<>(downloadProductReq.getPageIndex(), downloadProductReq.getPageSize()), Wrappers.<ItemSku>lambdaQuery().in(ItemSku::getId, skuIds));
             downloadProductResult.setCode("10000");
             downloadProductResult.setMessage("SUCCESS");
-            Map<Integer, List<ItemSku>> skuMap = ipage.getRecords().stream().collect(Collectors.groupingBy(ItemSku::getItemId));
+            Map<Integer, List<ItemSku>> skuMap = iPage.getRecords().stream().collect(Collectors.groupingBy(ItemSku::getItemId));
             List<Integer> items = new ArrayList<>();
             skuMap.forEach((key, value) -> {
                 items.add(key);

@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 import com.github.binarywang.wxpay.bean.request.WxPayRefundRequest;
 import com.google.common.collect.Lists;
 
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -190,12 +191,18 @@ public class AdminUserOrderServiceImpl implements AdminUserOrderService {
                         WxPayRefund wxPayRefund = new WxPayRefund();
                         wxPayRefund.setCreateTime(LocalDateTime.now());
                         wxPayRefund.setOpenId(wxPayNotify.getOpenId());
-                        wxPayRefund.setTotalFee(orderDetail.getPayPrice().multiply(new BigDecimal("100")).intValue());
+                        BigDecimal payPrice= orderDetail.getPayPrice().multiply(new BigDecimal("100"));
+                        //扣除0.6%的手续费
+//                        BigDecimal subtractFee = payPrice.multiply(new BigDecimal("0.006")).setScale(0, RoundingMode.CEILING);
+//                        int refundFee = payPrice.subtract(subtractFee).intValue();
+//                        wxPayRefund.setTotalFee(refundFee);
+                        wxPayRefund.setTotalFee(payPrice.intValue());
                         wxPayRefund.setTransactionId(wxPayNotify.getTransactionId());
                         wxPayRefund.setOuttradeNo(wxPayNotify.getOuttradeNo());
                         wxPayRefund.setRefundNo("refundNo-shopOrder-" + id);
                         wxPayRefundMapper.insert(wxPayRefund);
                         WxPayRefundReq wxPayRefundReq = BeanUtil.convert(wxPayRefund, WxPayRefundReq.class);
+                        wxPayRefundReq.setTotalFee(wxPayNotify.getTotalFee());
                         wxPayRefundReq.setRefundFee(wxPayRefund.getTotalFee());
                         this.mpService.refund(wxPayRefundReq);
                     }

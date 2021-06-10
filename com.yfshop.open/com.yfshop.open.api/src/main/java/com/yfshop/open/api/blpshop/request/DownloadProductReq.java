@@ -26,6 +26,6 @@ public class DownloadProductReq implements Serializable {
     /**
      * 每页条数 20
      */
-    private Integer pageSize = 20;
+    private Integer pageSize = 50;
 
 }

@@ -15,9 +15,9 @@ public class HealthySubOrderResult implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private Long id;
-
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", locale = "zh", timezone = "GMT+8")
     private LocalDateTime createTime;
-
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", locale = "zh", timezone = "GMT+8")
     private LocalDateTime updateTime;
 
     /**
@@ -161,6 +161,7 @@ public class HealthySubOrderResult implements Serializable {
     /**
      * 预计送达时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", locale = "zh", timezone = "GMT+8")
     private LocalDateTime expectArrivedTime;
 
     private String postRule;

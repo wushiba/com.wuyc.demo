@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yfshop.admin.dao.ExcelDao">
+
+    <select id="getWebsiteCode" resultType="com.yfshop.admin.api.excel.result.WebsiteCodeExcel">
+        SELECT province,
+               city,
+               district,
+               CONCAT(province, city, district, address) AS address,
+               p_merchant_name,
+               merchant_name,
+               mobile,
+               contacts,
+               (
+                   SELECT count(1)
+                   FROM yf_merchant c
+                   WHERE c.id != m.id AND c.pid_path LIKE CONCAT(m.pid_path, '%')
+            AND c.is_enable = 'Y'
+            AND c.is_delete = 'N'
+            AND c.role_alias != 'wd'
+            ) AS child_count,
+            (
+        SELECT
+            sum(c.quantity)
+        FROM
+            yf_merchant t
+            INNER JOIN yf_website_code c
+        ON t.id = c.merchant_id
+        WHERE
+            c.file_status = 'SUCCESS'
+          AND c.billno IS NOT NULL
+          AND c.order_status in ('WAIT','SUCCESS','DELIVERY')
+          AND c.pid_path LIKE CONCAT(m.pid_path, '%')
+          AND t.is_enable = 'Y'
+          AND t.is_delete = 'N'
+            ) AS factory_count
+            , (
+        SELECT
+            sum(c.quantity)
+        FROM
+            yf_merchant t
+            INNER JOIN yf_website_code c
+        ON t.id = c.merchant_id
+        WHERE
+            c.file_status = 'SUCCESS'
+          AND c.billno IS NULL
+          AND c.pid_path LIKE CONCAT( m.pid_path, '%')
+          AND t.is_enable = 'Y'
+          AND t.is_delete = 'N'
+            ) AS email_count
+            , (
+        SELECT
+            count(1)
+        FROM
+            yf_merchant t
+            INNER JOIN yf_website_code_detail d
+        ON t.id = d.merchant_id
+        WHERE
+            d.pid_path LIKE CONCAT(m.pid_path, '%')
+          AND d.is_activate = 'Y'
+          AND t.is_enable = 'Y'
+          AND t.is_delete = 'N'
+            ) AS active_count
+        FROM
+            yf_merchant m
+        WHERE
+            m.role_alias = 'jxs'
+          AND m.is_enable = 'Y'
+          AND m.is_delete = 'N'
+    </select>
+
+
+</mapper>
