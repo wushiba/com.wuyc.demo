@@ -100,6 +100,7 @@ public class FrontMerchantServiceImpl implements FrontMerchantService {
         if (CollectionUtils.isEmpty(merchantIds)) {
             return resultList;
         }
+        Map<Integer, MerchantDetail> merchantDetailMap = merchantDetailMapper.selectList(Wrappers.lambdaQuery(MerchantDetail.class).in(MerchantDetail::getMerchantId, merchantIds)).stream().collect(Collectors.toMap((item) -> item.getMerchantId(), item -> item));
         List<Merchant> list = merchantMapper.selectList(Wrappers.lambdaQuery(Merchant.class)
                 .in(Merchant::getId, merchantIds)
                 .eq(Merchant::getIsDelete, 'N')
@@ -107,7 +108,16 @@ public class FrontMerchantServiceImpl implements FrontMerchantService {
         list.forEach(item -> {
             MerchantResult result = BeanUtil.convert(item, MerchantResult.class);
             Distance distance = mapDistance.get(item.getId());
-            result.setDistance(String.format("%.2f%s", distance.getValue(), distance.getMetric()));
+            if (distance.getValue() > 0) {
+                result.setDistance(String.format("%.1f千米", distance.getValue()));
+            } else {
+                result.setDistance(String.format("%d米", distance.getValue() * 1000));
+            }
+            MerchantDetail merchantDetail = merchantDetailMap.get(distance.getValue());
+            if (merchantDetail != null) {
+                result.setLatitude(merchantDetail.getLatitude());
+                result.setLongitude(merchantDetail.getLongitude());
+            }
             resultList.add(result);
         });
         resultList.sort(Comparator.comparing(MerchantResult::getDistance));
