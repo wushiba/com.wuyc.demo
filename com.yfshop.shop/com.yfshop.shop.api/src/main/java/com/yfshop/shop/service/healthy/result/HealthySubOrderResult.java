@@ -154,5 +154,6 @@ public class HealthySubOrderResult implements Serializable {
     /**
      * 预计送达时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", locale = "zh", timezone = "GMT+8")
     private LocalDateTime expectArrivedTime;
 }
