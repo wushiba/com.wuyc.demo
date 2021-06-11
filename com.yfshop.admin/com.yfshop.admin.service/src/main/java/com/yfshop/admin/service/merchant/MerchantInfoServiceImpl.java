@@ -340,7 +340,11 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
                     }
                 }
             }
-            websiteCodeBindReq.setAddress(maps.get("town"));
+            String address = maps.get("town");
+            if (address != null) {
+                address = address.replaceFirst(websiteCodeBindReq.getDistrict(),"");
+            }
+            websiteCodeBindReq.setAddress(address);
         }
     }
 
