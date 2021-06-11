@@ -27,6 +27,7 @@ import com.yfshop.code.model.MerchantDetail;
 import com.yfshop.code.model.MerchantLog;
 import com.yfshop.code.model.Region;
 import com.yfshop.code.model.WebsiteCodeDetail;
+import com.yfshop.common.constants.CacheConstants;
 import com.yfshop.common.enums.GroupRoleEnum;
 import com.yfshop.common.exception.ApiException;
 import com.yfshop.common.exception.Asserts;
@@ -34,7 +35,10 @@ import com.yfshop.common.util.AddressUtil;
 import com.yfshop.common.util.BeanUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
+import org.springframework.data.geo.Point;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.validation.annotation.Validated;
@@ -79,6 +83,9 @@ public class AdminMerchantManageServiceImpl implements AdminMerchantManageServic
     private WebsiteCodeDetailMapper websiteCodeDetailMapper;
     @Resource
     private WebsiteCodeDetailManager websiteCodeDetailManager;
+
+    @Autowired
+    private RedisTemplate<String, Object> redisTemplate;
 
     @Transactional(rollbackFor = Exception.class)
     @Override
@@ -318,6 +325,17 @@ public class AdminMerchantManageServiceImpl implements AdminMerchantManageServic
         merchantLog.setBeforeData(JSONUtil.toJsonStr(oldM));
         merchantLog.setAfterData(JSONUtil.toJsonStr(newM));
         merchantLogMapper.insert(merchantLog);
+        MerchantDetail merchantDetail = merchantDetailMapper.selectOne(Wrappers.lambdaQuery(MerchantDetail.class).eq(MerchantDetail::getMerchantId, merchant));
+        if (merchantDetail != null) {
+            if (isEnable) {
+                if (merchantDetail.getLongitude() != null && merchantDetail.getLatitude() != null) {
+                    Point point = new Point(merchantDetail.getLongitude(), merchantDetail.getLatitude());
+                    redisTemplate.opsForGeo().add(CacheConstants.MERCHANT_GRO_DATA, point, merchantDetail.getMerchantId());
+                }
+            } else {
+                redisTemplate.opsForZSet().remove(CacheConstants.MERCHANT_GRO_DATA, merchantId);
+            }
+        }
         return null;
     }
 
@@ -367,6 +385,18 @@ public class AdminMerchantManageServiceImpl implements AdminMerchantManageServic
                     .eq(Merchant::getMobile, item.getMobile()));
         });
 
+        return null;
+    }
+
+    @Override
+    public Void loadGeoWebsite() {
+        List<MerchantDetail> merchantDetails = merchantDetailMapper.selectList(Wrappers.lambdaQuery(MerchantDetail.class));
+        merchantDetails.forEach(item -> {
+            if (item.getLongitude() != null && item.getLatitude() != null) {
+                Point point = new Point(item.getLongitude(), item.getLatitude());
+                redisTemplate.opsForGeo().add(CacheConstants.MERCHANT_GRO_DATA, point, item.getMerchantId());
+            }
+        });
         return null;
     }
 

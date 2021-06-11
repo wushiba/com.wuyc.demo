@@ -1,15 +1,18 @@
 package com.yfshop.admin.api.healthy;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.github.binarywang.wxpay.exception.WxPayException;
 import com.yfshop.admin.api.healthy.request.*;
 import com.yfshop.admin.api.healthy.result.*;
 import com.yfshop.common.exception.ApiException;
+
+import java.util.List;
 
 public interface AdminHealthyService {
 
     IPage<HealthyOrderResult> findOrderList(QueryHealthyOrderReq req);
 
-    HealthyOrderDetailResult getOrderDetail(Integer id);
+    HealthyOrderDetailResult getOrderDetail(Long id);
 
     IPage<HealthySubOrderResult> findSubOrderList(QueryHealthySubOrderReq req);
 
@@ -36,4 +39,6 @@ public interface AdminHealthyService {
     HealthyItemResult getItemDetail(Integer id);
 
     Void deleteAct(Integer id);
+
+    Void closedOrder(Long id) throws WxPayException;
 }

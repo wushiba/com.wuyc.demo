@@ -109,7 +109,7 @@ public class OrderTask {
             websiteCode.setPayMethod("WxPay");
             websiteCode.setPayTime(LocalDateTime.parse(wxPayOrderQueryResult.getTimeEnd(), DateTimeFormatter.ofPattern("yyyyMMddHHmmss")));
             websiteCode.setOrderStatus("WAIT");
-            websiteCode.setBillno(wxPayOrderQueryResult.getTradeType());
+            websiteCode.setBillno(wxPayOrderQueryResult.getTransactionId());
             int count = websiteCodeMapper.update(websiteCode, Wrappers.<WebsiteCode>lambdaQuery()
                     .eq(WebsiteCode::getOrderNo, wxPayOrderQueryResult.getOutTradeNo())
                     .eq(WebsiteCode::getOrderStatus, "PAYING"));

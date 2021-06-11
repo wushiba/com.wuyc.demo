@@ -1,7 +1,12 @@
 package com.yfshop.shop.service.merchant.result;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.springframework.data.geo.Distance;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.beans.Transient;
 import java.io.Serializable;
 
 @Data
@@ -100,5 +105,7 @@ public class MerchantResult implements Serializable {
     private String headImage;
 
     private String distance;
+
+    private double distanceValue;
 
 }

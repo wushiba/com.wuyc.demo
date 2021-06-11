@@ -141,4 +141,13 @@ public class AdminMerchantManageController implements BaseController {
     }
 
 
+    @RequestMapping(value = "/loadGeoWebsite", method = {RequestMethod.GET, RequestMethod.POST})
+    @ResponseBody
+    @SaCheckLogin
+    @SaCheckRole(value = {"sys"}, mode = SaMode.OR)
+    public CommonResult<Void> loadGeoWebsite() {
+
+        return CommonResult.success(adminMerchantManageService.loadGeoWebsite());
+    }
+
 }

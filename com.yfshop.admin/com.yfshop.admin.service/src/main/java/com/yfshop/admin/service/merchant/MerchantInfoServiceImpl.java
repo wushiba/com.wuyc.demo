@@ -58,12 +58,11 @@ import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.geo.Distance;
-import org.springframework.data.geo.GeoResult;
-import org.springframework.data.geo.GeoResults;
-import org.springframework.data.geo.Point;
+import org.springframework.data.geo.*;
 import org.springframework.data.redis.connection.RedisGeoCommands;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
@@ -71,10 +70,7 @@ import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
@@ -151,7 +147,8 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
     private MerchantLogMapper merchantLogMapper;
     @Resource
     private WebsiteCodeGroupMapper websiteCodeGroupMapper;
-
+    @Autowired
+    private RedisTemplate<String, Object> redisTemplate;
 
     @Override
     public MerchantResult getWebsiteInfo(Integer merchantId) throws ApiException {
@@ -222,6 +219,10 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
             merchantDetail.setGeoHash(GeoUtils.toBase32(websiteReq.getLatitude(), websiteReq.getLongitude(), 12));
             merchantDetailMapper.insert(merchantDetail);
             roleAlias = GroupRoleEnum.WD.getCode();
+            if (merchantDetail.getLongitude() != null && merchantDetail.getLatitude() != null) {
+                Point point = new Point(merchantDetail.getLongitude(), merchantDetail.getLatitude());
+                redisTemplate.opsForGeo().add(CacheConstants.MERCHANT_GRO_DATA, point, merchantDetail.getMerchantId());
+            }
         } else {
             String pidPath = merchant.getPidPath();
             merchantId = merchant.getId();
@@ -254,6 +255,10 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
                 merchantDetail.setGeoHash(GeoUtils.toBase32(websiteReq.getLatitude(), websiteReq.getLongitude(), 12));
                 merchantDetail.setMerchantId(merchantId);
                 merchantDetailMapper.insert(merchantDetail);
+            }
+            if (merchantDetail.getLongitude() != null && merchantDetail.getLatitude() != null) {
+                Point point = new Point(merchantDetail.getLongitude(), merchantDetail.getLatitude());
+                redisTemplate.opsForGeo().add(CacheConstants.MERCHANT_GRO_DATA, point, merchantDetail.getMerchantId());
             }
         }
         if (GroupRoleEnum.WD.getCode().equals(roleAlias)) {
@@ -844,40 +849,53 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
     @Override
     public List<MerchantResult> findNearMerchantList(Integer merchantId, Integer districtId, Double
             longitude, Double latitude) {
-        List<MerchantResult> merchantResultList = initWdMerchantList();
-        if (CollectionUtils.isEmpty(merchantResultList)) {
-            return null;
-        }
-
         List<MerchantResult> resultList = new ArrayList<>();
-        if (districtId != null) {
-            resultList = merchantResultList.stream().filter(data -> data.getDistrictId().intValue() == districtId)
-                    .collect(Collectors.toList());
-        } else {
-            GeoResults<RedisGeoCommands.GeoLocation<Object>> geoResults = redisService.findNearDataList(CacheConstants.MERCHANT_GRO_DATA,
-                    longitude, latitude, CacheConstants.USER_MERCHANT_DISTANCE, CacheConstants.USER_MERCHANT_DISTANCE_UNIT);
-            if (geoResults == null) {
-                return resultList;
-            }
-            Map<Integer, List<MerchantResult>> merchantMap = merchantResultList.stream().collect(Collectors.groupingBy(MerchantResult::getId));
-            for (GeoResult<RedisGeoCommands.GeoLocation<Object>> locationGeoResult : geoResults) {
-                Distance dist = locationGeoResult.getDistance();
+        int limit = 100;
+        // 中心位置半径100km内的前100个门店
+        Circle circle = new Circle(new Point(longitude, latitude), new Distance(CacheConstants.USER_MERCHANT_DISTANCE, RedisGeoCommands.DistanceUnit.KILOMETERS));
+        RedisGeoCommands.GeoRadiusCommandArgs args = RedisGeoCommands.GeoRadiusCommandArgs.newGeoRadiusArgs().includeCoordinates().includeDistance().sortAscending().limit(limit);
+        GeoResults<RedisGeoCommands.GeoLocation<Object>> geoLocationGeoResults = redisTemplate.opsForGeo().radius(CacheConstants.MERCHANT_GRO_DATA, circle, args);
+        List<Integer> merchantIds = new ArrayList<>();
+        Map<Integer, Distance> mapDistance = new HashMap<>();
+        if (geoLocationGeoResults != null) {
+            for (GeoResult<RedisGeoCommands.GeoLocation<Object>> locationGeoResult : geoLocationGeoResults) {
                 RedisGeoCommands.GeoLocation<Object> content = locationGeoResult.getContent();
-                Point point = content.getPoint();
+                Distance dist = locationGeoResult.getDistance();
                 Object id = content.getName();
-                System.out.println("merchantId=" + id.toString() + "&distance=" + dist.toString() + "&coordinate=" + point.toString());
-                List<MerchantResult> merchantLists = merchantMap.get(Integer.valueOf(id.toString()));
-                if (!CollectionUtils.isEmpty(merchantLists)) {
-                    MerchantResult merchantData = merchantLists.get(0);
-                    merchantData.setDistance(dist.toString());
-                    resultList.add(merchantData);
-                }
+                merchantIds.add(Integer.valueOf(id.toString()));
+                mapDistance.put(Integer.valueOf(id.toString()), dist);
             }
         }
+        if (CollectionUtils.isEmpty(merchantIds)) {
+            return resultList;
+        }
+        Map<Integer, MerchantDetail> merchantDetailMap = merchantDetailMapper.selectList(Wrappers.lambdaQuery(MerchantDetail.class).in(MerchantDetail::getMerchantId, merchantIds)).stream().collect(Collectors.toMap((item) -> item.getMerchantId(), item -> item));
+        List<Merchant> list = merchantMapper.selectList(Wrappers.lambdaQuery(Merchant.class)
+                .in(Merchant::getId, merchantIds)
+                .eq(Merchant::getIsDelete, 'N')
+                .eq(Merchant::getIsEnable, 'Y'));
         Merchant merchant = merchantMapper.selectById(merchantId);
-        resultList = resultList.stream().filter(data -> data.getPidPath().startsWith(merchant.getPidPath()))
+        list = list.stream().filter(data -> data.getPidPath().startsWith(merchant.getPidPath()))
                 .collect(Collectors.toList());
+        list.forEach(item -> {
+            MerchantResult result = BeanUtil.convert(item, MerchantResult.class);
+            Distance distance = mapDistance.get(item.getId());
+            result.setDistanceValue(distance.getValue());
+            if ("km".equals(distance.getUnit()) && distance.getValue() < 0) {
+                result.setDistance(String.format("%.1f千米", distance.getValue() + ""));
+            } else {
+                result.setDistance(String.format("%.1f米", (distance.getValue() * 1000) + ""));
+            }
+            MerchantDetail merchantDetail = merchantDetailMap.get(item.getId());
+            if (merchantDetail != null) {
+                result.setLatitude(merchantDetail.getLatitude());
+                result.setLongitude(merchantDetail.getLongitude());
+            }
+            resultList.add(result);
+        });
+        resultList.sort(Comparator.comparing(MerchantResult::getDistanceValue));
         return resultList;
+
     }
 
     @Override
@@ -1066,55 +1084,4 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
         return totalPostage;
     }
 
-
-    //-------------------------------------------------------- privete-method-----------------------------------------------------------------//
-
-    /**
-     * 初始化网点
-     */
-    private List<MerchantResult> initWdMerchantList() {
-        Object merchantListObject = redisService.get(CacheConstants.MERCHANT_LIST_INFO_DATA);
-        if (merchantListObject != null) {
-            return JSON.parseArray(merchantListObject.toString(), MerchantResult.class);
-        }
-        List<Integer> ids = websiteCodeDetailMapper.selectList(Wrappers.lambdaQuery(WebsiteCodeDetail.class).eq(WebsiteCodeDetail::getIsActivate, "Y"))
-                .stream().map(WebsiteCodeDetail::getMerchantId).distinct().collect(Collectors.toList());
-        if (CollectionUtils.isEmpty(ids)) {
-            return null;
-        }
-        List<Merchant> merchantList = merchantMapper.selectList(Wrappers.lambdaQuery(Merchant.class)
-                .in(Merchant::getId, ids)
-                .eq(Merchant::getIsEnable, "Y")
-                .eq(Merchant::getIsDelete, "N"));
-        if (CollectionUtils.isEmpty(merchantList)) {
-            return null;
-        }
-        List<Integer> idList = merchantList.stream().map(Merchant::getId).collect(Collectors.toList());
-        List<MerchantDetail> detailList = merchantDetailMapper.selectList(Wrappers.lambdaQuery(MerchantDetail.class)
-                .in(MerchantDetail::getMerchantId, idList)
-                .orderByDesc(MerchantDetail::getMerchantId));
-
-        Map<Integer, List<MerchantDetail>> detailMap = detailList.stream().collect(
-                Collectors.groupingBy(MerchantDetail::getMerchantId));
-        List<MerchantResult> merchantResultList = BeanUtil.convertList(merchantList, MerchantResult.class);
-        merchantResultList.forEach(merchant -> {
-            List<MerchantDetail> merchantDetailList = detailMap.get(merchant.getId());
-            if (CollectionUtils.isNotEmpty(merchantDetailList)) {
-                merchant.setLongitude(merchantDetailList.get(0).getLongitude());
-                merchant.setLatitude(merchantDetailList.get(0).getLatitude());
-                merchant.setGeoHash(merchantDetailList.get(0).getGeoHash());
-            }
-        });
-
-        // 将商户信息存入redis
-        redisService.set(CacheConstants.MERCHANT_LIST_INFO_DATA, JSON.toJSONString(merchantResultList), 60 * 10);
-
-        // 更新缓存中的商户经纬度，先删除后更新
-        detailList.forEach(merchantDetail -> {
-            redisService.zRemove(CacheConstants.MERCHANT_GRO_DATA, merchantDetail.getMerchantId() + "");
-            redisService.geoAdd(CacheConstants.MERCHANT_GRO_DATA, merchantDetail.getLongitude(), merchantDetail.getLatitude(), merchantDetail.getMerchantId());
-        });
-
-        return merchantResultList;
-    }
 }

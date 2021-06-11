@@ -71,4 +71,6 @@ public interface AdminMerchantManageService {
                                                               Integer pageIndex, Integer pageSize);
 
     Void importExcel(List<MerchantExcelReq> merchantExcels);
+
+    Void loadGeoWebsite();
 }

@@ -174,7 +174,6 @@ public interface MerchantInfoService {
     /**
      * 网点码支付回调
      *
-     * @param notifyResult
      */
     void websitePayOrderNotify(String transactionId,String outTradeNo) throws ApiException;
 

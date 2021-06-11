@@ -47,8 +47,9 @@ public class StOrderServiceImpl implements StOrderService {
             OrderAddress orderAddress = orderAddressMapper.selectOne(Wrappers.lambdaQuery(OrderAddress.class).eq(OrderAddress::getOrderId, orderId));
             StOrderReq stOrderReq = new StOrderReq();
             stOrderReq.setOrderNo(order.getId() + "");
-            stOrderReq.setOrderSource("雨帆健康家");
-            stOrderReq.setBillType("01");
+            stOrderReq.setOrderSource("CAKFvLQuMfpsbGZ");
+            stOrderReq.setBillType("00");
+            stOrderReq.setOrderType("01");
             StOrderReq.SenderDTO senderDTO = new StOrderReq.SenderDTO();
             senderDTO.setName("四川申通龙泉公司");
             senderDTO.setTel("13799988851");
@@ -73,9 +74,9 @@ public class StOrderServiceImpl implements StOrderService {
             cargoDTO.setGoodsName("椰岛陆龟酒");
             stOrderReq.setCargo(cargoDTO);
             StOrderReq.CustomerDTO customerDTO = new StOrderReq.CustomerDTO();
-            customerDTO.setSiteCode("666666");
-            customerDTO.setCustomerName("666666000001");
-            customerDTO.setSitePwd("abc123");
+            customerDTO.setSiteCode("646640");
+            customerDTO.setCustomerName("646640000002");
+            customerDTO.setSitePwd("JJB123");
             stOrderReq.setCustomer(customerDTO);
             LinkRequest data = new LinkRequest();
             data.setFromAppkey("CAKoUWcvhIUBCVz");
@@ -92,7 +93,7 @@ public class StOrderServiceImpl implements StOrderService {
 
     public static void main(String[] args) {
         StOrderReq stOrderReq = new StOrderReq();
-        stOrderReq.setOrderNo(1 + "");
+        stOrderReq.setOrderNo(2 + "");
         stOrderReq.setOrderSource("CAKFvLQuMfpsbGZ");
         stOrderReq.setBillType("00");
         stOrderReq.setOrderType("01");
@@ -110,19 +111,19 @@ public class StOrderServiceImpl implements StOrderService {
         receiverDTO.setCity("杭州市");
         receiverDTO.setArea("滨江区");
         receiverDTO.setAddress("人工智能产业园B座");
-        receiverDTO.setTel("18758187433");
-        receiverDTO.setMobile("18758187433");
-        receiverDTO.setName("18758187433");
+        receiverDTO.setTel("15669068377");
+        receiverDTO.setMobile("15669068377");
+        receiverDTO.setName("尤圣回");
         stOrderReq.setReceiver(receiverDTO);
         StOrderReq.CargoDTO cargoDTO = new StOrderReq.CargoDTO();
         cargoDTO.setBattery("30");
         cargoDTO.setGoodsType("小件");
-        cargoDTO.setGoodsName("椰岛陆龟酒");
+        cargoDTO.setGoodsName("135ml鹿龟酒");
         stOrderReq.setCargo(cargoDTO);
         StOrderReq.CustomerDTO customerDTO = new StOrderReq.CustomerDTO();
-        customerDTO.setSiteCode("646640");
-        customerDTO.setCustomerName("646640000002");
-        customerDTO.setSitePwd("abc123");
+        customerDTO.setSiteCode("646643");
+        customerDTO.setCustomerName("646643000296");
+        customerDTO.setSitePwd("1259...");
         stOrderReq.setCustomer(customerDTO);
         LinkRequest data = new LinkRequest();
         data.setFromAppkey("CAKFvLQuMfpsbGZ");

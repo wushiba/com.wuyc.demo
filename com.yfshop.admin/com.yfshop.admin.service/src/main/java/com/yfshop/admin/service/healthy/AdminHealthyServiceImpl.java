@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.github.binarywang.wxpay.exception.WxPayException;
 import com.yfshop.admin.api.healthy.AdminHealthyService;
 import com.yfshop.admin.api.healthy.request.HealthyActReq;
 import com.yfshop.admin.api.healthy.request.HealthyItemReq;
@@ -13,38 +14,27 @@ import com.yfshop.admin.api.healthy.request.QueryHealthyOrderReq;
 import com.yfshop.admin.api.healthy.request.QueryHealthySubOrderReq;
 import com.yfshop.admin.api.healthy.request.QueryJxsMerchantReq;
 import com.yfshop.admin.api.healthy.request.SubOrderPostWay;
-import com.yfshop.admin.api.healthy.result.HealthyActResult;
-import com.yfshop.admin.api.healthy.result.HealthyItemResult;
-import com.yfshop.admin.api.healthy.result.HealthyOrderDetailResult;
-import com.yfshop.admin.api.healthy.result.HealthyOrderResult;
-import com.yfshop.admin.api.healthy.result.HealthySubOrderResult;
-import com.yfshop.admin.api.healthy.result.JxsMerchantResult;
-import com.yfshop.code.mapper.HealthyActContentMapper;
-import com.yfshop.code.mapper.HealthyActMapper;
-import com.yfshop.code.mapper.HealthyItemImageMapper;
-import com.yfshop.code.mapper.HealthyItemMapper;
-import com.yfshop.code.mapper.HealthyOrderMapper;
-import com.yfshop.code.mapper.HealthySubOrderMapper;
-import com.yfshop.code.mapper.MerchantMapper;
-import com.yfshop.code.model.HealthyAct;
-import com.yfshop.code.model.HealthyActContent;
-import com.yfshop.code.model.HealthyItem;
-import com.yfshop.code.model.HealthyItemImage;
-import com.yfshop.code.model.HealthyOrder;
-import com.yfshop.code.model.HealthySubOrder;
-import com.yfshop.code.model.Merchant;
+import com.yfshop.admin.api.healthy.result.*;
+import com.yfshop.code.manager.WxPayNotifyManager;
+import com.yfshop.code.mapper.*;
+import com.yfshop.code.model.*;
 import com.yfshop.common.exception.ApiException;
 import com.yfshop.common.exception.Asserts;
 import com.yfshop.common.healthy.enums.HealthyOrderStatusEnum;
 import com.yfshop.common.healthy.enums.HealthySubOrderStatusEnum;
 import com.yfshop.common.util.BeanUtil;
+import com.yfshop.wx.api.request.WxPayRefundReq;
+import com.yfshop.wx.api.service.MpService;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
+import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -75,6 +65,15 @@ public class AdminHealthyServiceImpl implements AdminHealthyService {
     @Resource
     private HealthyActContentMapper healthyActContentMapper;
 
+    @Resource
+    private WxPayNotifyMapper wxPayNotifyMapper;
+
+    @DubboReference
+    private MpService mpService;
+
+    @Resource
+    private WxPayRefundMapper wxPayRefundMapper;
+
     @Override
     public IPage<HealthyOrderResult> findOrderList(QueryHealthyOrderReq req) {
         LambdaQueryWrapper queryWrapper = Wrappers.lambdaQuery(HealthyOrder.class)
@@ -89,7 +88,7 @@ public class AdminHealthyServiceImpl implements AdminHealthyService {
     }
 
     @Override
-    public HealthyOrderDetailResult getOrderDetail(Integer id) {
+    public HealthyOrderDetailResult getOrderDetail(Long id) {
         HealthyOrder healthyOrder = healthyOrderMapper.selectById(id);
         HealthyOrderDetailResult healthyOrderDetailResult = BeanUtil.convert(healthyOrder, HealthyOrderDetailResult.class);
         List<HealthySubOrder> list = healthySubOrderMapper.selectList(Wrappers.lambdaQuery(HealthySubOrder.class).eq(HealthySubOrder::getPOrderId, id));
@@ -111,14 +110,14 @@ public class AdminHealthyServiceImpl implements AdminHealthyService {
                 .eq(req.getCityId() != null, HealthySubOrder::getCityId, req.getCityId())
                 .eq(req.getDistrictId() != null, HealthySubOrder::getDistrictId, req.getDistrictId())
                 .ge(req.getStartTime() != null, HealthySubOrder::getExpectShipTime, req.getStartTime())
+                .like(req.getExpressCompany() != null, HealthySubOrder::getExpressCompany, req.getExpressCompany())
+                .like(req.getExpressNo() != null, HealthySubOrder::getExpressNo, req.getExpressNo())
                 .and(StringUtils.isNotBlank(req.getPostKey()), wrapper -> {
                     wrapper.like(HealthySubOrder::getMerchantContacts, req.getPostKey())
                             .or()
                             .like(HealthySubOrder::getMerchantName, req.getPostKey())
                             .or()
                             .like(HealthySubOrder::getMerchantContacts, req.getPostKey())
-                            .or()
-                            .like(HealthySubOrder::getExpressNo, req.getPostKey())
                             .or()
                             .like(HealthySubOrder::getExpressNo, req.getPostKey());
                 })
@@ -163,8 +162,12 @@ public class AdminHealthyServiceImpl implements AdminHealthyService {
         healthyActMapper.updateById(healthyAct);
         HealthyActContent healthyActContent = new HealthyActContent();
         healthyActContent.setContent(req.getContent());
-        healthyActContentMapper.update(healthyActContent, Wrappers.lambdaQuery(HealthyActContent.class)
+        int count = healthyActContentMapper.update(healthyActContent, Wrappers.lambdaQuery(HealthyActContent.class)
                 .eq(HealthyActContent::getActId, req.getId()));
+        if (count == 0) {
+            healthyActContent.setActId(req.getId());
+            healthyActContentMapper.insert(healthyActContent);
+        }
         return null;
     }
 
@@ -371,6 +374,45 @@ public class AdminHealthyServiceImpl implements AdminHealthyService {
             subOrder.setPostRule(order.getPostRule());
             healthySubOrderMapper.insert(subOrder);
         }
+        return null;
+    }
+
+
+    @Override
+    public Void closedOrder(Long id) throws WxPayException {
+        HealthyOrder healthyOrder = healthyOrderMapper.selectById(id);
+        Asserts.assertNonNull(healthyOrder, 500, "订单不存在");
+        Asserts.assertNotEquals(HealthyOrderStatusEnum.SERVICING.getCode(), healthyOrder.getOrderStatus(), 500, "订单状态不能关闭");
+        Asserts.assertNonNull(healthyOrder.getBillNo(), 500, "订单未支付");
+        int count = healthySubOrderMapper.selectCount(Wrappers.lambdaQuery(HealthySubOrder.class)
+                .eq(HealthySubOrder::getPOrderId, id).
+                        in(HealthySubOrder::getOrderStatus, HealthySubOrderStatusEnum.WAIT_ALLOCATE.getCode(), HealthySubOrderStatusEnum.IN_CIRCULATION.getCode(), HealthySubOrderStatusEnum.WAIT_ALLOCATE.getCode()));
+        Asserts.assertTrue(count > 0, 500, "订单状态不能关闭");
+        int sumCount = healthySubOrderMapper.selectCount(Wrappers.lambdaQuery(HealthySubOrder.class)
+                .eq(HealthySubOrder::getPOrderId, id));
+        WxPayNotify wxPayNotify = wxPayNotifyMapper.selectOne(Wrappers.lambdaQuery(WxPayNotify.class).eq(WxPayNotify::getTransactionId, healthyOrder.getBillNo()));
+        Asserts.assertNonNull(wxPayNotify, 500, "订单未支付");
+        BigDecimal refundFee = new BigDecimal(wxPayNotify.getTotalFee()).divide(new BigDecimal(sumCount)).multiply(new BigDecimal(count)).setScale(0, RoundingMode.HALF_UP);
+        WxPayRefund wxPayRefund = new WxPayRefund();
+        wxPayRefund.setCreateTime(LocalDateTime.now());
+        wxPayRefund.setOpenId(wxPayNotify.getOpenId());
+        wxPayRefund.setTotalFee(refundFee.intValue());
+        wxPayRefund.setTransactionId(wxPayNotify.getTransactionId());
+        wxPayRefund.setOuttradeNo(wxPayNotify.getOuttradeNo());
+        wxPayRefund.setRefundNo("refundNo-healthy-" + id);
+        wxPayRefundMapper.insert(wxPayRefund);
+        HealthyOrder order = new HealthyOrder();
+        order.setId(id);
+        order.setOrderStatus(HealthyOrderStatusEnum.CLOSED.getCode());
+        healthyOrderMapper.updateById(order);
+        HealthySubOrder subOrder = new HealthySubOrder();
+        subOrder.setOrderStatus(HealthyOrderStatusEnum.CLOSED.getCode());
+        healthySubOrderMapper.update(subOrder, Wrappers.lambdaQuery(HealthySubOrder.class).eq(HealthySubOrder::getPOrderId, id).
+                in(HealthySubOrder::getOrderStatus, HealthySubOrderStatusEnum.WAIT_ALLOCATE.getCode(), HealthySubOrderStatusEnum.IN_CIRCULATION.getCode(), HealthySubOrderStatusEnum.WAIT_ALLOCATE.getCode()));
+        WxPayRefundReq wxPayRefundReq = BeanUtil.convert(wxPayRefund, WxPayRefundReq.class);
+        wxPayRefundReq.setTotalFee(wxPayNotify.getTotalFee());
+        wxPayRefundReq.setRefundFee(refundFee.intValue());
+        this.mpService.refund(wxPayRefundReq);
         return null;
     }
 

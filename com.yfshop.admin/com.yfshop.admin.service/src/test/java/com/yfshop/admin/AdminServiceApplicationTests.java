@@ -1999,4 +1999,24 @@ public class AdminServiceApplicationTests {
         }
     }
 
+
+
+    @Test
+    public void asasa(){
+        File file=new File("H://2105091508277588182");
+        for (File s : file.listFiles()) {
+            System.out.println(s.getName());
+        }
+
+    }
+
+    public static void main(String[] args) {
+        File file=new File("H://2105091508277588182");
+        List<String>no=new ArrayList<>();
+        for (File s : file.listFiles()) {
+            no.add(String.format("INSERT INTO `yf_website_code_detail` (`batch_id`,`alias`,`is_activate`,`activity_time`,`merchant_id`,`merchant_name`,`merchant_pid_path`,`mobile`,`pid`,`pid_path`) VALUES (326,'%s','N',null,null,null,null,null,13011,'10389.13007.13011.');",s.getName().replace(".png","")));
+        }
+        FileUtil.writeUtf8Lines(no,"H://8.txt");
+
+    }
 }

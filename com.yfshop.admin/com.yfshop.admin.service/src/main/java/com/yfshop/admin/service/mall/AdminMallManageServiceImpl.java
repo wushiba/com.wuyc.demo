@@ -835,6 +835,7 @@ public class AdminMallManageServiceImpl implements AdminMallManageService {
                 targetSku.setSkuCover(candidateSku.getSkuCover());
             }
         }
+        //System.out.println(targetSkuList);
         skuManager.saveBatch(targetSkuList);
         return null;
     }
