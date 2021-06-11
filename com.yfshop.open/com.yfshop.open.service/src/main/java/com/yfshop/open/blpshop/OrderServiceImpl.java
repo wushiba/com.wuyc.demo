@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -137,6 +138,7 @@ public class OrderServiceImpl implements OrderService {
         orderDetail.setOrderId(Long.parseLong(sendReq.getPlatOrderNo()));
         orderDetail.setExpressCompany(sendReq.getLogisticName());
         orderDetail.setExpressNo(sendReq.getLogisticNo());
+        orderDetail.setShipTime(LocalDateTime.now());
         orderDetailMapper.update(orderDetail, Wrappers.<OrderDetail>lambdaQuery()
                 .eq(OrderDetail::getOrderId, Long.parseLong(sendReq.getPlatOrderNo()))
                 .in(!CollectionUtils.isEmpty(subPlatOrderNo), OrderDetail::getId, subPlatOrderNo));
