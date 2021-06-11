@@ -285,7 +285,7 @@ public class HealthyServiceImpl implements HealthyService {
                     .eq(HealthyOrder::getOrderStatus, req.getOrderStatus());
         }
         wrapper.orderByDesc(HealthyOrder::getCreateTime);
-        Page<HealthyOrder> page = healthyOrderMapper.selectPage(new Page<>(req.getPageIndex(), req.getPageIndex()), wrapper);
+        Page<HealthyOrder> page = healthyOrderMapper.selectPage(new Page<>(req.getPageIndex(), req.getPageSize()), wrapper);
         return BeanUtil.iPageConvert(page, HealthyOrderResult.class);
     }
 
