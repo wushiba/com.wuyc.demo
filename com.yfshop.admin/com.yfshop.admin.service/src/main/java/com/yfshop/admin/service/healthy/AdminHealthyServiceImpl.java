@@ -162,8 +162,11 @@ public class AdminHealthyServiceImpl implements AdminHealthyService {
         healthyActMapper.updateById(healthyAct);
         HealthyActContent healthyActContent = new HealthyActContent();
         healthyActContent.setContent(req.getContent());
-        healthyActContentMapper.update(healthyActContent, Wrappers.lambdaQuery(HealthyActContent.class)
+        int count = healthyActContentMapper.update(healthyActContent, Wrappers.lambdaQuery(HealthyActContent.class)
                 .eq(HealthyActContent::getActId, req.getId()));
+        if (count == 0) {
+            healthyActContentMapper.insert(healthyActContent);
+        }
         return null;
     }
 
