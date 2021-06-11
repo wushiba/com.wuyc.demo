@@ -145,7 +145,7 @@ public class AdminMerchantManageController implements BaseController {
     @ResponseBody
     @SaCheckLogin
     @SaCheckRole(value = {"sys"}, mode = SaMode.OR)
-    public CommonResult<Void> loadGeoWebsite(@NotNull(message = "商户ID不能为空") Integer merchantId) {
+    public CommonResult<Void> loadGeoWebsite() {
 
         return CommonResult.success(adminMerchantManageService.loadGeoWebsite());
     }
