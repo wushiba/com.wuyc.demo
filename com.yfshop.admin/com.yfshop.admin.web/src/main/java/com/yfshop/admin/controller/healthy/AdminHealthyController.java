@@ -2,17 +2,29 @@ package com.yfshop.admin.controller.healthy;
 
 import cn.dev33.satoken.annotation.SaCheckLogin;
 import cn.dev33.satoken.annotation.SaCheckRole;
+import cn.dev33.satoken.annotation.SaMode;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.github.binarywang.wxpay.exception.WxPayException;
+import com.yfshop.admin.api.draw.result.DrawRecordExportResult;
+import com.yfshop.admin.api.healthy.AdminHealthyExportService;
 import com.yfshop.admin.api.healthy.AdminHealthyService;
 import com.yfshop.admin.api.healthy.request.*;
 import com.yfshop.admin.api.healthy.result.*;
 import com.yfshop.common.api.CommonResult;
 import com.yfshop.common.base.BaseController;
+import com.yfshop.common.util.ExcelUtils;
+import lombok.SneakyThrows;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 @Controller
 @RequestMapping("admin/healthy")
@@ -21,6 +33,9 @@ public class AdminHealthyController implements BaseController {
 
     @DubboReference
     private AdminHealthyService adminHealthyService;
+
+    @DubboReference
+    private AdminHealthyExportService adminHealthyExportService;
 
     @RequestMapping(value = "/findOrderList", method = {RequestMethod.POST})
     @ResponseBody
@@ -35,7 +50,7 @@ public class AdminHealthyController implements BaseController {
     @ResponseBody
     @SaCheckLogin
     @SaCheckRole(value = "sys")
-    public CommonResult<HealthyOrderDetailResult> getOrderDetail(Integer id) {
+    public CommonResult<HealthyOrderDetailResult> getOrderDetail(Long id) {
         return CommonResult.success(adminHealthyService.getOrderDetail(id));
     }
 
@@ -46,6 +61,25 @@ public class AdminHealthyController implements BaseController {
     @SaCheckRole(value = "sys")
     public CommonResult<IPage<HealthySubOrderResult>> findSubOrderList(QueryHealthySubOrderReq req) {
         return CommonResult.success(adminHealthyService.findSubOrderList(req));
+    }
+
+    @SneakyThrows
+    @RequestMapping(value = "/exportSubOrderList", method = {RequestMethod.POST})
+    @ResponseBody
+    @SaCheckLogin
+    @SaCheckRole(value = "sys")
+    public void exportSubOrderList(QueryHealthySubOrderReq req) {
+        ExcelUtils.exportExcel(adminHealthyExportService.exportSubOrderList(req), "孝心订订单详情", "孝心订订单详情",
+                DrawRecordExportResult.class, "孝心订订单详情.xls", getCurrentResponse());
+    }
+
+    @RequestMapping(value = "/importSubOrderList", method = {RequestMethod.GET, RequestMethod.POST})
+    @ResponseBody
+    @SaCheckLogin
+    @SaCheckRole(value = {"sys"}, mode = SaMode.OR)
+    public CommonResult<Void> importSubOrderList(MultipartFile file) {
+        List<HealthySubOrderImportReq> healthySubOrderImport = ExcelUtils.importExcel(file, 0, 1, HealthySubOrderImportReq.class);
+        return CommonResult.success(adminHealthyExportService.importSubOrderList(healthySubOrderImport));
     }
 
 
@@ -143,5 +177,14 @@ public class AdminHealthyController implements BaseController {
     @SaCheckRole(value = "sys")
     public CommonResult<IPage<JxsMerchantResult>> findJxsMerchant(QueryJxsMerchantReq req) {
         return CommonResult.success(adminHealthyService.findJxsMerchant(req));
+    }
+
+
+    @RequestMapping(value = "/closedOrder", method = {RequestMethod.POST})
+    @ResponseBody
+    @SaCheckLogin
+    @SaCheckRole(value = "sys")
+    public CommonResult<Void> closedOrder(Long id) throws WxPayException {
+        return CommonResult.success(adminHealthyService.closedOrder(id));
     }
 }
