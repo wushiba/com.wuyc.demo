@@ -128,7 +128,10 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public SendResult send(SendReq sendReq) throws ApiException {
-        List<Long> subPlatOrderNo = Arrays.stream(sendReq.getSubPlatOrderNo().split("|")).map(a -> Long.parseLong(a)).collect(Collectors.toList());
+        List<Long> subPlatOrderNo = new ArrayList<>();
+        if (StringUtils.isNotBlank(sendReq.getSubPlatOrderNo())) {
+            subPlatOrderNo = Arrays.stream(sendReq.getSubPlatOrderNo().split("|")).map(a -> Long.parseLong(a)).collect(Collectors.toList());
+        }
         OrderDetail orderDetail = new OrderDetail();
         orderDetail.setOrderStatus(UserOrderStatusEnum.WAIT_RECEIVE.getCode());
         orderDetail.setOrderId(Long.parseLong(sendReq.getPlatOrderNo()));
@@ -136,7 +139,7 @@ public class OrderServiceImpl implements OrderService {
         orderDetail.setExpressNo(sendReq.getLogisticNo());
         orderDetailMapper.update(orderDetail, Wrappers.<OrderDetail>lambdaQuery()
                 .eq(OrderDetail::getOrderId, Long.parseLong(sendReq.getPlatOrderNo()))
-                .in(OrderDetail::getId, subPlatOrderNo));
+                .in(!CollectionUtils.isEmpty(subPlatOrderNo), OrderDetail::getId, subPlatOrderNo));
         SendResult sendResult = new SendResult();
         sendResult.setCode("10000");
         sendResult.setMessage("Success");
@@ -277,7 +280,7 @@ public class OrderServiceImpl implements OrderService {
                 List<OrderAddress> orderAddresses = orderAddressMapper.selectList(Wrappers.<OrderAddress>lambdaQuery().in(OrderAddress::getOrderId, orderIds));
                 Map<Long, Order> orderMap = orders.stream().collect(Collectors.toMap(Order::getId, Function.identity()));
                 Map<Long, OrderAddress> orderAddressMap = orderAddresses.stream().collect(Collectors.toMap(OrderAddress::getOrderId, Function.identity()));
-                numTotalOrder=OrderDetailList.size();
+                numTotalOrder = OrderDetailList.size();
                 OrderDetailList.forEach((key, value) -> {
                     List<RefundResult.RefundGoods> goodInfos = new ArrayList<>();
                     OrderAddress orderAddress = orderAddressMap.get(key);
