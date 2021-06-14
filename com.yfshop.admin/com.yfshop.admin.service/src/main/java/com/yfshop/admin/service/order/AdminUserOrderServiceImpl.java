@@ -119,7 +119,7 @@ public class AdminUserOrderServiceImpl implements AdminUserOrderService {
                 drawRecordMapper.update(drawRecord, Wrappers.<DrawRecord>lambdaQuery()
                         .eq(DrawRecord::getUserCouponId, item.getUserCouponId()));
                 //二等奖优惠券申通无忧下单
-                if (item.getSkuId().equals("2032001")&&item.getReceiveWay().equals(ReceiveWayEnum.PS.getCode())){
+                if (item.getSkuId().equals("2032001") && item.getReceiveWay().equals(ReceiveWayEnum.PS.getCode())) {
                     //stOrderService.pushStOrder(item.getOrderId(),item.getId());
                 }
             }
@@ -196,7 +196,7 @@ public class AdminUserOrderServiceImpl implements AdminUserOrderService {
                         WxPayRefund wxPayRefund = new WxPayRefund();
                         wxPayRefund.setCreateTime(LocalDateTime.now());
                         wxPayRefund.setOpenId(wxPayNotify.getOpenId());
-                        BigDecimal payPrice= orderDetail.getPayPrice().multiply(new BigDecimal("100"));
+                        BigDecimal payPrice = orderDetail.getPayPrice().multiply(new BigDecimal("100"));
                         //扣除0.6%的手续费
 //                        BigDecimal subtractFee = payPrice.multiply(new BigDecimal("0.006")).setScale(0, RoundingMode.CEILING);
 //                        int refundFee = payPrice.subtract(subtractFee).intValue();
@@ -276,4 +276,15 @@ public class AdminUserOrderServiceImpl implements AdminUserOrderService {
     }
 
 
+    @Override
+    public Void trySendStoOrder(Long id) {
+        OrderDetail orderDetail = orderDetailMapper.selectById(id);
+        if (orderDetail == null) return null;
+        //二等奖优惠券申通无忧下单
+        if (UserOrderStatusEnum.WAIT_DELIVERY.getCode().equals(orderDetail.getOrderStatus()) && "2032001".equals(orderDetail.getSkuId()) && ReceiveWayEnum.PS.getCode().equals(orderDetail.getReceiveWay())) {
+            stOrderService.pushStOrder(orderDetail.getOrderId(), orderDetail.getId());
+        }
+
+        return null;
+    }
 }

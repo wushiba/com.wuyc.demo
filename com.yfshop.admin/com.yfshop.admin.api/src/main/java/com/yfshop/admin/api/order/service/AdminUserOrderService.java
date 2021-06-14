@@ -71,4 +71,6 @@ public interface AdminUserOrderService {
      * @return
      */
     OrderDetailResult getOrderDetail(Long id) throws ApiException;
+
+    Void trySendStoOrder(Long id);
 }

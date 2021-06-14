@@ -67,4 +67,13 @@ public class AdminOrderManageController implements BaseController {
         return CommonResult.success(adminUserOrderService.getOrderDetail(id));
     }
 
+    @SaCheckLogin
+    @ApiOperation(value = "重新发送申通快递", httpMethod = "POST")
+    @RequestMapping(value = "/trySendStoOrder", method = {RequestMethod.POST})
+    @SaCheckRole(value = "sys")
+    @ResponseBody
+    public CommonResult<Void> trySendStoOrder(Long id) {
+        return CommonResult.success(adminUserOrderService.trySendStoOrder(id));
+    }
+
 }
