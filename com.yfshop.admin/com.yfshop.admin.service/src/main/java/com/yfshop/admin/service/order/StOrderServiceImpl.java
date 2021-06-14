@@ -50,16 +50,12 @@ public class StOrderServiceImpl implements StOrderService {
          */
         OrderDetail orderDetail = orderDetailMapper.selectById(childOrderId);
         if (orderDetail == null) {
-            logger.info("订单未查询到->{}",childOrderId);
-            return;
-        }
-        if (UserOrderStatusEnum.WAIT_DELIVERY.getCode().equals(orderDetail.getOrderStatus())) {
-            logger.info("订单状态不对->{}",childOrderId);
+            logger.info("订单未查询到->{}", childOrderId);
             return;
         }
         OrderAddress orderAddress = orderAddressMapper.selectOne(Wrappers.lambdaQuery(OrderAddress.class).eq(OrderAddress::getOrderId, orderId));
         if (orderAddress == null) {
-            logger.info("订单地址不存在->{}",childOrderId);
+            logger.info("订单地址不存在->{}", childOrderId);
             return;
         }
         String url = "https://cloudinter-linkgatewayonline.sto.cn/gateway/link.do";
@@ -97,7 +93,7 @@ public class StOrderServiceImpl implements StOrderService {
         detail.setExpressStatus("FAIL");
         try {
             String json = LinkUtils.request(wuyou, url, secretKey);
-            logger.info("请求申通数据响应结果->{}",json);
+            logger.info("请求申通数据响应结果->{}", json);
             StOrderResult o = JSONUtil.toBean(json, StOrderResult.class);
             if (o.getSuccess() && StringUtils.isNotBlank(o.getData().getWaybillCode())) {
                 detail.setOrderStatus(UserOrderStatusEnum.WAIT_RECEIVE.getCode());
