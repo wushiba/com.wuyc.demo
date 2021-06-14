@@ -78,6 +78,8 @@ public class Order extends Model<Order> {
      */
     private String billNo;
 
+    private String outOrderNo;
+
     /**
      * 支付时间
      */

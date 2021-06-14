@@ -152,7 +152,8 @@ public class OrderTask {
                 //1,5,10,15 频率调用
                 if (offset == 1 || offset == 5 || offset == 10 || offset == 15) {
                     try {
-                        String outOrderId = PayPrefixEnum.USER_ORDER.getPrefix() + order.getId() + "-" + order.getPayEntryCount();
+                        String outOrderId = order.getOutOrderNo();
+                        if (StringUtils.isBlank(outOrderId)) return;
                         WxPayOrderQueryResult wxPayOrderQueryResult = payService.queryOrder(outOrderId);
                         switch (wxPayOrderQueryResult.getTradeState()) {
                             case "SUCCESS":
@@ -168,7 +169,7 @@ public class OrderTask {
                                 break;
                         }
                     } catch (Exception e) {
-                        failIds.add(order.getId());
+                        //failIds.add(order.getId());
                         e.printStackTrace();
                     }
                 }

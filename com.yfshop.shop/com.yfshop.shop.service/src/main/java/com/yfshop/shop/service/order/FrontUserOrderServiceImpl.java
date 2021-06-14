@@ -612,9 +612,12 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
         orderRequest.setOutTradeNo(PayPrefixEnum.USER_ORDER.getPrefix() + order.getId() + "-" + order.getPayEntryCount());
         orderRequest.setTimeExpire(DateFormatUtils.format(new Date(System.currentTimeMillis() + (1000 * 60 * 15)), "yyyyMMddHHmmss"));
         WxPayMpOrderResult payOrderResult = mpPayService.createPayOrder(orderRequest);
-
         // 修改订单支付重试次数, 防止唤起支付后不立马支付
         orderDao.updateOrderPayEntryCount(orderId);
+        Order o = new Order();
+        o.setId(orderId);
+        o.setOutOrderNo(orderRequest.getOutTradeNo());
+        orderMapper.updateById(o);
         return payOrderResult;
     }
 
