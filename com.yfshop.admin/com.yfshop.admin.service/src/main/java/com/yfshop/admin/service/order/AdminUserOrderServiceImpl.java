@@ -119,8 +119,8 @@ public class AdminUserOrderServiceImpl implements AdminUserOrderService {
                 drawRecordMapper.update(drawRecord, Wrappers.<DrawRecord>lambdaQuery()
                         .eq(DrawRecord::getUserCouponId, item.getUserCouponId()));
                 //二等奖优惠券申通无忧下单
-                if (item.getSkuId().equals("2032001") && item.getReceiveWay().equals(ReceiveWayEnum.PS.getCode())) {
-                    //stOrderService.pushStOrder(item.getOrderId(),item.getId());
+                if ("2032001".equals(orderDetail.getSkuId()) && ReceiveWayEnum.PS.getCode().equals(orderDetail.getReceiveWay())) {
+                    stOrderService.pushStOrder(item.getOrderId(),item.getId());
                 }
             }
         });
