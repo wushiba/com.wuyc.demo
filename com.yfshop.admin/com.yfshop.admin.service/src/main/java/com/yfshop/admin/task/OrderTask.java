@@ -168,6 +168,7 @@ public class OrderTask {
                                 break;
                         }
                     } catch (Exception e) {
+                        failIds.add(order.getId());
                         e.printStackTrace();
                     }
                 }
