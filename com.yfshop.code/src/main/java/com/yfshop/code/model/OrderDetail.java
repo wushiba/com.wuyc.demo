@@ -149,6 +149,8 @@ public class OrderDetail extends Model<OrderDetail> {
      */
     private String expressNo;
 
+    private String expressStatus;
+
 
     @Override
     protected Serializable pkVal() {

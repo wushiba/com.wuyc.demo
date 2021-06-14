@@ -234,6 +234,7 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
             orderDetailMapper.updateById(orderDetail);
         });
         order.setIsCancel("Y");
+        order.setIsPay("N");
         order.setCancelTime(LocalDateTime.now());
         orderMapper.updateById(order);
         return null;
@@ -287,7 +288,7 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
     @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> submitOrderBySkuId(Integer userId, Integer skuId, Integer num, Long userCouponId, Long addressId) throws ApiException {
         ItemSkuResult itemSku = mallService.getItemSkuBySkuId(skuId);
-        Asserts.assertEquals("TC", itemSku.getSkuType(), 500, "该商品不能单独购买，请添加套餐一起购买");
+        Asserts.assertEquals("TC", itemSku.getSkuType(), 500, "该商品不能单独购买，请添加同类套餐一起购买");
         Asserts.assertFalse(itemSku.getSkuStock() < num, 500, "商品库存不足");
 
         UserAddressResult addressInfo = userAddressService.queryUserAddresses(userId).stream()
@@ -319,6 +320,22 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
         User user = userMapper.selectById(userId);
         if (user != null) {
             userName = user.getNickname();
+        }
+        //二等奖数量大于1时，使用优惠券必须拆单为一瓶装
+        if (itemSku.getId().equals(2032001) && userCoupon.getId() != null && num > 1) {
+            couponPrice = userCoupon.getCouponPrice() == null ? new BigDecimal("0.00") : new BigDecimal(userCoupon.getCouponPrice());
+            payPrice = itemSku.getSkuSalePrice().add(itemSku.getFreight()).subtract(couponPrice);
+            insertUserOrderDetail(userId, userName, orderId, null, null, null, ReceiveWayEnum.PS.getCode(), "N", 1,
+                    itemSku.getItemId(), itemSku.getId(), itemSku.getSkuTitle(), itemSku.getSkuSalePrice(), itemSku.getSkuCover(), itemSku.getFreight(), couponPrice,
+                    itemSku.getSkuSalePrice(), payPrice, userCouponId, UserOrderStatusEnum.WAIT_PAY.getCode(), itemSku.getSpecValueIdPath(), itemSku.getSpecNameValueJson());
+            num = num - 1;
+            userCoupon.setCouponId(null);
+            userCoupon.setId(null);
+            userCoupon.setCouponPrice(null);
+            orderFreight = new BigDecimal(num).multiply(itemSku.getFreight());
+            orderPrice = new BigDecimal(num).multiply(itemSku.getSkuSalePrice());
+            couponPrice = userCoupon.getCouponPrice() == null ? new BigDecimal("0.00") : new BigDecimal(userCoupon.getCouponPrice());
+            payPrice = orderPrice.add(orderFreight).subtract(couponPrice);
         }
         insertUserOrderDetail(userId, userName, orderId, null, null, null, ReceiveWayEnum.PS.getCode(), "N", num, itemSku.getItemId(),
                 itemSku.getId(), itemSku.getSkuTitle(), itemSku.getSkuSalePrice(), itemSku.getSkuCover(), orderFreight, couponPrice, orderPrice,
@@ -396,7 +413,7 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
         }
         //检测是否只包含单品
         dpCategory.forEach(item -> {
-            Asserts.assertTrue(tcCategory.contains(item), 500, "该商品不能单独购买，请添加套餐一起购买");
+            Asserts.assertTrue(tcCategory.contains(item), 500, "该商品不能单独购买，请添加同类套餐一起购买");
         });
 
         // 修改优惠券状态
@@ -416,21 +433,32 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
         for (UserCart userCart : userCartList) {
             ItemSkuResult itemSku = itemSkuMap.get(userCart.getSkuId());
             BigDecimal childCouponPrice = new BigDecimal("0.0");
-            if (userCoupon.getId() != null) {
-                childCouponPrice = new BigDecimal(userCoupon.getCouponPrice());
-            }
-
-            BigDecimal childOrderFreight = new BigDecimal(userCart.getNum()).multiply(itemSku.getFreight());
-            BigDecimal childOrderPrice = itemSku.getSkuSalePrice().multiply(new BigDecimal(userCart.getNum()));
-            BigDecimal childPayPrice = childOrderPrice.add(childOrderFreight).subtract(childCouponPrice);
             String userName = null;
             User user = userMapper.selectById(userId);
             if (user != null) {
                 userName = user.getNickname();
             }
+            //二等奖数量大于1时，使用优惠券必须拆单为一瓶装
+            if (itemSku.getId().equals(2032001) && userCoupon.getId() != null && userCart.getNum() > 1) {
+                BigDecimal childPayPrice = itemSku.getSkuSalePrice().add(itemSku.getFreight()).subtract(childCouponPrice);
+                insertUserOrderDetail(userId, userName, orderId, null, null, null, ReceiveWayEnum.PS.getCode(), "N", 1,
+                        itemSku.getItemId(), itemSku.getId(), itemSku.getSkuTitle(), itemSku.getSkuSalePrice(), itemSku.getSkuCover(), itemSku.getFreight(), childCouponPrice,
+                        itemSku.getSkuSalePrice(), childPayPrice, userCouponId, UserOrderStatusEnum.WAIT_PAY.getCode(), itemSku.getSpecValueIdPath(), itemSku.getSpecNameValueJson());
+                userCoupon.setCouponId(null);
+                userCoupon.setId(null);
+                userCoupon.setCouponPrice(null);
+                userCart.setNum(userCart.getNum() - 1);
+            }
+            if (userCoupon.getId() != null) {
+                childCouponPrice = new BigDecimal(userCoupon.getCouponPrice());
+            }
+            BigDecimal childOrderFreight = new BigDecimal(userCart.getNum()).multiply(itemSku.getFreight());
+            BigDecimal childOrderPrice = itemSku.getSkuSalePrice().multiply(new BigDecimal(userCart.getNum()));
+            BigDecimal childPayPrice = childOrderPrice.add(childOrderFreight).subtract(childCouponPrice);
             insertUserOrderDetail(userId, userName, orderId, null, null, null, ReceiveWayEnum.PS.getCode(), "N", userCart.getNum(),
                     itemSku.getItemId(), itemSku.getId(), itemSku.getSkuTitle(), itemSku.getSkuSalePrice(), itemSku.getSkuCover(), childOrderFreight, childCouponPrice,
                     childOrderPrice, childPayPrice, userCouponId, UserOrderStatusEnum.WAIT_PAY.getCode(), itemSku.getSpecValueIdPath(), itemSku.getSpecNameValueJson());
+
         }
 
         insertUserOrderAddress(orderId, addressInfo.getMobile(), addressInfo.getRealname(), addressInfo.getProvince(), addressInfo.getProvinceId(), addressInfo.getCity(),
@@ -792,7 +820,7 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
     }
 
     private void checkPrizeAddress(Integer skuId, String provinceName) throws ApiException {
-        if (skuId == 20068 || skuId == 200770) {
+        if (skuId.equals(2030001) || skuId.equals(2032001)) {
             if (!drawCanUseRegion.contains(provinceName.substring(0, 2))) {
                 throw new ApiException(500, provinceName + "暂不支持配送一等奖或二等奖");
             }

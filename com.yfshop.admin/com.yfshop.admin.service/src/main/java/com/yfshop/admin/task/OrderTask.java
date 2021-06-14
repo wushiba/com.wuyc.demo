@@ -6,13 +6,12 @@ import com.github.binarywang.wxpay.bean.result.WxPayOrderQueryResult;
 import com.yfshop.admin.api.order.service.AdminUserOrderService;
 import com.yfshop.admin.api.website.WebsiteCodeTaskService;
 import com.yfshop.admin.utils.ProxyUtil;
-import com.yfshop.code.mapper.OrderMapper;
-import com.yfshop.code.mapper.WebsiteCodeGroupMapper;
-import com.yfshop.code.mapper.WebsiteCodeMapper;
-import com.yfshop.code.model.Order;
-import com.yfshop.code.model.WebsiteCode;
-import com.yfshop.code.model.WebsiteCodeGroup;
+import com.yfshop.code.mapper.*;
+import com.yfshop.code.model.*;
 import com.yfshop.common.enums.PayPrefixEnum;
+import com.yfshop.common.enums.UserCouponStatusEnum;
+import com.yfshop.common.enums.UserOrderStatusEnum;
+import com.yfshop.common.util.DateUtil;
 import com.yfshop.wx.api.service.MpPayService;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
@@ -24,6 +23,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 @Component
@@ -34,8 +34,12 @@ public class OrderTask {
     WebsiteCodeMapper websiteCodeMapper;
     @Resource
     OrderMapper orderMapper;
+    @Resource
+    OrderDetailMapper orderDetailMapper;
     @DubboReference
     MpPayService payService;
+    @Resource
+    private UserCouponMapper userCouponMapper;
 
     @DubboReference
     private WebsiteCodeTaskService websiteCodeTask;
@@ -45,6 +49,9 @@ public class OrderTask {
 
     @Resource
     private WebsiteCodeGroupMapper websiteCodeGroupMapper;
+
+    @Resource
+    private DrawRecordMapper drawRecordMapper;
 
     /**
      * 同步网点码未支付的订单
@@ -86,10 +93,10 @@ public class OrderTask {
         if (CollectionUtils.isNotEmpty(failIds)) {
             WebsiteCode websiteCode = new WebsiteCode();
             websiteCode.setOrderStatus("PENDING");
-            int count =websiteCodeMapper.update(websiteCode, Wrappers.<WebsiteCode>lambdaQuery()
+            int count = websiteCodeMapper.update(websiteCode, Wrappers.<WebsiteCode>lambdaQuery()
                     .in(WebsiteCode::getId, failIds)
                     .eq(WebsiteCode::getOrderStatus, "PAYING"));
-            if (count>0) {
+            if (count > 0) {
                 WebsiteCode w = websiteCodeMapper.selectById(failIds.get(0));
                 if (w != null && StringUtils.isNotBlank(w.getOrderNo())) {
                     WebsiteCodeGroup websiteCodeGroup = new WebsiteCodeGroup();
@@ -129,7 +136,7 @@ public class OrderTask {
     }
 
     /**
-     * 同步网点码未支付的订单
+     * 同步商城未支付的订单
      */
     public void syncShopOrder() {
         long currentTime = LocalDateTime.now().toEpochSecond(ZoneOffset.of("+8")) / 60;
@@ -173,6 +180,40 @@ public class OrderTask {
                     .in(Order::getId, failIds)
                     .eq(Order::getIsPay, "I"));
         }
+    }
+
+
+    /**
+     * 同步商城超时的订单
+     */
+    public void syncShopTimeOutOrder() {
+        Calendar calendar = Calendar.getInstance();
+        //获取30分钟过期的订单
+        calendar.add(Calendar.MINUTE, -30);
+        List<Order> orders = orderMapper.selectList(Wrappers.<Order>lambdaQuery().in(Order::getIsPay, "I", "N").eq(Order::getIsCancel, "N").lt(Order::getCreateTime, calendar.getTime()));
+        orders.forEach(order -> {
+            // 退还优惠券.优惠券改成未使用
+            List<OrderDetail> detailList = orderDetailMapper.selectList(Wrappers.lambdaQuery(OrderDetail.class).eq(OrderDetail::getOrderId, order.getId()));
+            detailList.forEach(orderDetail -> {
+                if (orderDetail.getUserCouponId() != null) {
+                    UserCoupon userCoupon = new UserCoupon();
+                    userCoupon.setUseStatus(UserCouponStatusEnum.NO_USE.getCode());
+                    userCoupon.setId(orderDetail.getUserCouponId());
+                    userCouponMapper.updateById(userCoupon);
+                    DrawRecord drawRecord = new DrawRecord();
+                    drawRecord.setUseStatus(UserCouponStatusEnum.NO_USE.getCode());
+                    drawRecordMapper.update(drawRecord, Wrappers.<DrawRecord>lambdaQuery()
+                            .eq(DrawRecord::getUserCouponId, orderDetail.getUserCouponId()));
+                }
+                orderDetail.setOrderStatus(UserOrderStatusEnum.CANCEL.getCode());
+                orderDetailMapper.updateById(orderDetail);
+            });
+            order.setIsCancel("Y");
+            order.setIsPay("N");
+            order.setCancelTime(LocalDateTime.now());
+            orderMapper.updateById(order);
+        });
+
     }
 
 

@@ -19,6 +19,7 @@ import com.yfshop.admin.api.order.request.QueryOrderReq;
 import com.yfshop.admin.api.order.result.OrderDetailResult;
 import com.yfshop.admin.api.order.result.OrderResult;
 import com.yfshop.admin.api.order.service.AdminUserOrderService;
+import com.yfshop.admin.api.order.service.StOrderService;
 import com.yfshop.admin.api.website.WebsiteBillService;
 import com.yfshop.admin.dao.OrderDao;
 import com.yfshop.code.mapper.*;
@@ -71,6 +72,8 @@ public class AdminUserOrderServiceImpl implements AdminUserOrderService {
     private WxPayRefundMapper wxPayRefundMapper;
     @DubboReference
     private MpService mpService;
+    @DubboReference
+    StOrderService stOrderService;
 
     /**
      * 用户付款后修改订单状态
@@ -115,10 +118,12 @@ public class AdminUserOrderServiceImpl implements AdminUserOrderService {
                 drawRecord.setUseStatus(UserCouponStatusEnum.HAS_USE.getCode());
                 drawRecordMapper.update(drawRecord, Wrappers.<DrawRecord>lambdaQuery()
                         .eq(DrawRecord::getUserCouponId, item.getUserCouponId()));
+                //二等奖优惠券申通无忧下单
+                if (item.getSkuId().equals("2032001")&&item.getReceiveWay().equals(ReceiveWayEnum.PS.getCode())){
+                    //stOrderService.pushStOrder(item.getOrderId(),item.getId());
+                }
             }
         });
-
-
         return null;
     }
 

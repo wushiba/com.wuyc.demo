@@ -1,10 +1,13 @@
 package com.yfshop.admin.service.order;
 
+import cn.hutool.crypto.SecureUtil;
+import cn.hutool.crypto.digest.MD5;
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.sto.link.request.LinkRequest;
 import com.sto.link.util.LinkUtils;
 import com.yfshop.admin.api.order.request.StOrderReq;
+import com.yfshop.admin.api.order.request.WuYouOrderReq;
 import com.yfshop.admin.api.order.result.StOrderResult;
 import com.yfshop.admin.api.order.service.StOrderService;
 import com.yfshop.code.mapper.OrderAddressMapper;
@@ -14,12 +17,15 @@ import com.yfshop.code.model.Order;
 import com.yfshop.code.model.OrderAddress;
 import com.yfshop.code.model.OrderDetail;
 import com.yfshop.common.enums.UserOrderStatusEnum;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Locale;
 
 @DubboService
 public class StOrderServiceImpl implements StOrderService {
@@ -32,111 +38,99 @@ public class StOrderServiceImpl implements StOrderService {
 
     @Override
     @Async
-    public void pushStOrder(Integer orderId) {
-        Order order = orderMapper.selectById(orderId);
+    public void pushStOrder(Long orderId, Long childOrderId) {
         /**
          * 目前只发这些
          */
-        List<OrderDetail> orderDetailList = orderDetailMapper.selectList(Wrappers.lambdaQuery(OrderDetail.class)
-                .eq(OrderDetail::getOrderId, orderId)
-                .in(OrderDetail::getSkuId, "20068", "20117", "20113")
-                .eq(OrderDetail::getReceiveWay, "PS")
-                .eq(OrderDetail::getIsPay, "Y")
-                .eq(OrderDetail::getOrderStatus, UserOrderStatusEnum.WAIT_DELIVERY.getCode()));
-        if (!CollectionUtils.isEmpty(orderDetailList)) {
-            OrderAddress orderAddress = orderAddressMapper.selectOne(Wrappers.lambdaQuery(OrderAddress.class).eq(OrderAddress::getOrderId, orderId));
-            StOrderReq stOrderReq = new StOrderReq();
-            stOrderReq.setOrderNo(order.getId() + "");
-            stOrderReq.setOrderSource("CAKFvLQuMfpsbGZ");
-            stOrderReq.setBillType("00");
-            stOrderReq.setOrderType("01");
-            StOrderReq.SenderDTO senderDTO = new StOrderReq.SenderDTO();
-            senderDTO.setName("四川申通龙泉公司");
-            senderDTO.setTel("13799988851");
-            senderDTO.setMobile("13799988851");
-            senderDTO.setProvince("四川省");
-            senderDTO.setCity("成都市");
-            senderDTO.setArea("龙泉驿区");
-            senderDTO.setAddress("大连路4号四川申通龙泉公司");
-            stOrderReq.setSender(senderDTO);
-            StOrderReq.ReceiverDTO receiverDTO = new StOrderReq.ReceiverDTO();
-            receiverDTO.setProvince(orderAddress.getProvince());
-            receiverDTO.setCity(orderAddress.getCity());
-            receiverDTO.setArea(orderAddress.getDistrict());
-            receiverDTO.setAddress(orderAddress.getAddress());
-            receiverDTO.setTel(orderAddress.getMobile());
-            receiverDTO.setMobile(orderAddress.getMobile());
-            receiverDTO.setName(orderAddress.getRealname());
-            stOrderReq.setReceiver(receiverDTO);
-            StOrderReq.CargoDTO cargoDTO = new StOrderReq.CargoDTO();
-            cargoDTO.setBattery("30");
-            cargoDTO.setGoodsType("小件");
-            cargoDTO.setGoodsName("椰岛陆龟酒");
-            stOrderReq.setCargo(cargoDTO);
-            StOrderReq.CustomerDTO customerDTO = new StOrderReq.CustomerDTO();
-            customerDTO.setSiteCode("646640");
-            customerDTO.setCustomerName("646640000002");
-            customerDTO.setSitePwd("JJB123");
-            stOrderReq.setCustomer(customerDTO);
-            LinkRequest data = new LinkRequest();
-            data.setFromAppkey("CAKoUWcvhIUBCVz");
-            data.setFromCode("CAKoUWcvhIUBCVz");
-            data.setToAppkey("sto_trace_query");
-            data.setToCode("sto_trace_query");
-            data.setApiName("STO_TRACE_QUERY_COMMON");
-            String url = "http://cloudinter-linkgatewaytest.sto.cn/gateway/link.do";
-            String secretKey = "CNHOUUv7PBH0IqRH2DQcdsKEGPqmLLZ6";
-            String json = LinkUtils.request(data, url, secretKey);
-            StOrderResult stOrderResult = JSONUtil.toBean(json, StOrderResult.class);
+        OrderDetail orderDetail = orderDetailMapper.selectById(childOrderId);
+        if (orderDetail == null) return;
+        if (!UserOrderStatusEnum.WAIT_DELIVERY.getCode().equals(orderDetail.getOrderStatus())) return;
+        OrderAddress orderAddress = orderAddressMapper.selectOne(Wrappers.lambdaQuery(OrderAddress.class).eq(OrderAddress::getOrderId, orderId));
+        if (orderAddress == null) return;
+        String url = "https://cloudinter-linkgatewayonline.sto.cn/gateway/link.do";
+        String secretKey = "Omj0YY5P29cAvWhddNukhdxwxL4S1b4x";
+        LinkRequest wuyou = new LinkRequest();
+        wuyou.setFromAppkey("CAKFvLQuMfpsbGZ");
+        wuyou.setFromCode("CAKFvLQuMfpsbGZ");
+        wuyou.setToAppkey("sto_merchant");
+        wuyou.setToCode("sto_merchant_code");
+        wuyou.setApiName("ADD_WUYOU_ORDER");
+        WuYouOrderReq wuYouOrderReq = new WuYouOrderReq();
+        wuYouOrderReq.setPlatformOrderId(orderId + "");
+        wuYouOrderReq.setPayType("标准快递");
+        wuYouOrderReq.setGoodsType("135ml鹿龟酒");
+        wuYouOrderReq.setGoodsNum("1");
+        wuYouOrderReq.setUserName("18780003433");
+        wuYouOrderReq.setPassword(SecureUtil.md5("Sto1259...***"));
+        wuYouOrderReq.setCustomerName("646643000296");
+        wuYouOrderReq.setSenderName("眉山申通");
+        wuYouOrderReq.setSenderMobile("13890312117");
+        wuYouOrderReq.setSenderProvince("四川省");
+        wuYouOrderReq.setSenderCity("眉山市");
+        wuYouOrderReq.setSenderDistrict("东坡区");
+        wuYouOrderReq.setSenderDetail("诗书路南段998号申通快递");
+        wuYouOrderReq.setRecipientName(orderAddress.getRealname());
+        wuYouOrderReq.setRecipientMobile(orderAddress.getMobile());
+        wuYouOrderReq.setRecipientProvince(orderAddress.getProvince());
+        wuYouOrderReq.setRecipientCity(orderAddress.getCity());
+        wuYouOrderReq.setRecipientDistrict(orderAddress.getDistrict());
+        wuYouOrderReq.setRecipientDetail(orderAddress.getAddress());
+        wuYouOrderReq.setOrderAndGetBillCode(1);
+        wuyou.setContent(JSONUtil.toJsonStr(wuYouOrderReq));
+        OrderDetail detail = new OrderDetail();
+        detail.setId(childOrderId);
+        detail.setExpressStatus("FAIL");
+        try {
+            String json = LinkUtils.request(wuyou, url, secretKey);
+            StOrderResult o = JSONUtil.toBean(json, StOrderResult.class);
+            if (o.getSuccess() && StringUtils.isNotBlank(o.getData().getWaybillCode())) {
+                detail.setOrderStatus(UserOrderStatusEnum.WAIT_RECEIVE.getCode());
+                detail.setExpressCompany("申通");
+                detail.setExpressNo(o.getData().getWaybillCode());
+                detail.setShipTime(LocalDateTime.now());
+                detail.setExpressStatus("SUCCESS");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+        orderDetailMapper.updateById(detail);
     }
 
     public static void main(String[] args) {
-        StOrderReq stOrderReq = new StOrderReq();
-        stOrderReq.setOrderNo(2 + "");
-        stOrderReq.setOrderSource("CAKFvLQuMfpsbGZ");
-        stOrderReq.setBillType("00");
-        stOrderReq.setOrderType("01");
-        StOrderReq.SenderDTO senderDTO = new StOrderReq.SenderDTO();
-        senderDTO.setName("四川申通龙泉公司");
-        senderDTO.setTel("13799988851");
-        senderDTO.setMobile("13799988851");
-        senderDTO.setProvince("四川省");
-        senderDTO.setCity("成都市");
-        senderDTO.setArea("龙泉驿区");
-        senderDTO.setAddress("大连路4号四川申通龙泉公司");
-        stOrderReq.setSender(senderDTO);
-        StOrderReq.ReceiverDTO receiverDTO = new StOrderReq.ReceiverDTO();
-        receiverDTO.setProvince("浙江省");
-        receiverDTO.setCity("杭州市");
-        receiverDTO.setArea("滨江区");
-        receiverDTO.setAddress("人工智能产业园B座");
-        receiverDTO.setTel("15669068377");
-        receiverDTO.setMobile("15669068377");
-        receiverDTO.setName("尤圣回");
-        stOrderReq.setReceiver(receiverDTO);
-        StOrderReq.CargoDTO cargoDTO = new StOrderReq.CargoDTO();
-        cargoDTO.setBattery("30");
-        cargoDTO.setGoodsType("小件");
-        cargoDTO.setGoodsName("135ml鹿龟酒");
-        stOrderReq.setCargo(cargoDTO);
-        StOrderReq.CustomerDTO customerDTO = new StOrderReq.CustomerDTO();
-        customerDTO.setSiteCode("646643");
-        customerDTO.setCustomerName("646643000296");
-        customerDTO.setSitePwd("1259...");
-        stOrderReq.setCustomer(customerDTO);
-        LinkRequest data = new LinkRequest();
-        data.setFromAppkey("CAKFvLQuMfpsbGZ");
-        data.setFromCode("CAKFvLQuMfpsbGZ");
-        data.setToAppkey("sto_oms");
-        data.setToCode("sto_oms");
-        data.setApiName("OMS_EXPRESS_ORDER_CREATE");
-        data.setContent(JSONUtil.toJsonStr(stOrderReq));
         String url = "https://cloudinter-linkgatewayonline.sto.cn/gateway/link.do";
         String secretKey = "Omj0YY5P29cAvWhddNukhdxwxL4S1b4x";
-        String json = LinkUtils.request(data, url, secretKey);
-        System.out.println(json);
-        StOrderResult stOrderResult =  JSONUtil.toBean(json.startsWith("<response>") ? JSONUtil.xmlToJson(json).toString():json, StOrderResult.class);
-        System.out.println(stOrderResult);
+        LinkRequest wuyou = new LinkRequest();
+        wuyou.setFromAppkey("CAKFvLQuMfpsbGZ");
+        wuyou.setFromCode("CAKFvLQuMfpsbGZ");
+        wuyou.setToAppkey("sto_merchant");
+        wuyou.setToCode("sto_merchant_code");
+        wuyou.setApiName("ADD_WUYOU_ORDER");
+        WuYouOrderReq wuYouOrderReq = new WuYouOrderReq();
+        wuYouOrderReq.setPlatformOrderId(3 + "");
+        wuYouOrderReq.setPayType("标准快递");
+        wuYouOrderReq.setGoodsType("135ml鹿龟酒");
+        wuYouOrderReq.setGoodsNum("1");
+        wuYouOrderReq.setUserName("18780003433");
+        wuYouOrderReq.setPassword(SecureUtil.md5("Sto1259...***"));
+        wuYouOrderReq.setCustomerName("646643000296");
+        wuYouOrderReq.setSenderName("眉山申通");
+        wuYouOrderReq.setSenderMobile("13890312117");
+        wuYouOrderReq.setSenderProvince("四川省");
+        wuYouOrderReq.setSenderCity("眉山市");
+        wuYouOrderReq.setSenderDistrict("东坡区");
+        wuYouOrderReq.setSenderDetail("诗书路南段998号申通快递");
+        wuYouOrderReq.setRecipientName("尤圣回");
+        wuYouOrderReq.setRecipientMobile("15669068377");
+        wuYouOrderReq.setRecipientProvince("浙江省");
+        wuYouOrderReq.setRecipientCity("杭州市");
+        wuYouOrderReq.setRecipientDistrict("滨江区");
+        wuYouOrderReq.setRecipientDetail("人工智能产业园");
+        wuYouOrderReq.setOrderAndGetBillCode(1);
+        wuyou.setContent(JSONUtil.toJsonStr(wuYouOrderReq));
+        //String json = LinkUtils.request(wuyou, url, secretKey);
+        //System.out.println(json);
+        String json = "{\"data\":{\"expressCode\":\"STO\",\"waybillCode\":\"772013715937274\",\"platformOrderId\":\"2\"},\"success\":\"true\",\"errorCode\":\"200\",\"errorMsg\":\"成功\"}";
+        StOrderResult stOrderResult = JSONUtil.toBean(json, StOrderResult.class);
+        System.out.println(stOrderResult.toString());
     }
 }

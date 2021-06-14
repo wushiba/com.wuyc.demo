@@ -35,4 +35,9 @@ public class TaskJob {
     public void syncShopOrder() throws Exception {
         orderTask.syncShopOrder();
     }
+
+    @XxlJob("syncShopTimeOutOrder")
+    public void syncShopTimeOutOrder() throws Exception {
+        orderTask.syncShopTimeOutOrder();
+    }
 }
