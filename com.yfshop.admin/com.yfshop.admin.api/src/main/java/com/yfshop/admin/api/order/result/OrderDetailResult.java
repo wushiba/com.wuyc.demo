@@ -44,6 +44,8 @@ public class OrderDetailResult implements Serializable {
      */
     private String expressNo;
 
+    private String expressStatus;
+
     private List<OrderDetails> list;
 
     @Data

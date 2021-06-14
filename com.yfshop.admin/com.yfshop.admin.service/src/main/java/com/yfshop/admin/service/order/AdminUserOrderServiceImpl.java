@@ -245,6 +245,7 @@ public class AdminUserOrderServiceImpl implements AdminUserOrderService {
         orderDetailResult.setShipTime(orderDetail.getShipTime());
         orderDetailResult.setExpressCompany(orderDetail.getExpressCompany());
         orderDetailResult.setExpressNo(orderDetail.getExpressNo());
+        orderDetailResult.setExpressStatus(orderDetail.getExpressStatus());
         orderDetailResult.setList(Lists.newArrayList());
         orderDetailResult.setId(id);
         OrderDetailResult.OrderDetails orderDetails = new OrderDetailResult.OrderDetails();

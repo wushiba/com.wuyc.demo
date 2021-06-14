@@ -139,6 +139,7 @@ public class OrderServiceImpl implements OrderService {
         orderDetail.setExpressCompany(sendReq.getLogisticName());
         orderDetail.setExpressNo(sendReq.getLogisticNo());
         orderDetail.setShipTime(LocalDateTime.now());
+        orderDetail.setExpressStatus("SUCCESS");
         orderDetailMapper.update(orderDetail, Wrappers.<OrderDetail>lambdaQuery()
                 .eq(OrderDetail::getOrderId, Long.parseLong(sendReq.getPlatOrderNo()))
                 .in(!CollectionUtils.isEmpty(subPlatOrderNo), OrderDetail::getId, subPlatOrderNo));
