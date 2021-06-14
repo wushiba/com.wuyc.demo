@@ -19,6 +19,8 @@ import com.yfshop.code.model.OrderDetail;
 import com.yfshop.common.enums.UserOrderStatusEnum;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.util.CollectionUtils;
 
@@ -36,17 +38,30 @@ public class StOrderServiceImpl implements StOrderService {
     @Resource
     private OrderAddressMapper orderAddressMapper;
 
+    private static final Logger logger = LoggerFactory.getLogger(StOrderServiceImpl.class);
+
+
     @Override
     @Async
     public void pushStOrder(Long orderId, Long childOrderId) {
+
         /**
          * 目前只发这些
          */
         OrderDetail orderDetail = orderDetailMapper.selectById(childOrderId);
-        if (orderDetail == null) return;
-        if (!UserOrderStatusEnum.WAIT_DELIVERY.getCode().equals(orderDetail.getOrderStatus())) return;
+        if (orderDetail == null) {
+            logger.info("订单未查询到->{}",childOrderId);
+            return;
+        }
+        if (!UserOrderStatusEnum.WAIT_DELIVERY.getCode().equals(orderDetail.getOrderStatus())) {
+            logger.info("订单状态不对->{}",childOrderId);
+            return;
+        }
         OrderAddress orderAddress = orderAddressMapper.selectOne(Wrappers.lambdaQuery(OrderAddress.class).eq(OrderAddress::getOrderId, orderId));
-        if (orderAddress == null) return;
+        if (orderAddress == null) {
+            logger.info("订单地址不存在->{}",childOrderId);
+            return;
+        }
         String url = "https://cloudinter-linkgatewayonline.sto.cn/gateway/link.do";
         String secretKey = "Omj0YY5P29cAvWhddNukhdxwxL4S1b4x";
         LinkRequest wuyou = new LinkRequest();
@@ -82,6 +97,7 @@ public class StOrderServiceImpl implements StOrderService {
         detail.setExpressStatus("FAIL");
         try {
             String json = LinkUtils.request(wuyou, url, secretKey);
+            logger.info("请求申通数据响应结果->{}",json);
             StOrderResult o = JSONUtil.toBean(json, StOrderResult.class);
             if (o.getSuccess() && StringUtils.isNotBlank(o.getData().getWaybillCode())) {
                 detail.setOrderStatus(UserOrderStatusEnum.WAIT_RECEIVE.getCode());

@@ -119,7 +119,9 @@ public class AdminUserOrderServiceImpl implements AdminUserOrderService {
                 drawRecordMapper.update(drawRecord, Wrappers.<DrawRecord>lambdaQuery()
                         .eq(DrawRecord::getUserCouponId, item.getUserCouponId()));
                 //二等奖优惠券申通无忧下单
+                logger.info("商品sku{},发货方式{}",orderDetail.getSkuId(),orderDetail.getReceiveWay());
                 if ("2032001".equals(orderDetail.getSkuId()) && ReceiveWayEnum.PS.getCode().equals(orderDetail.getReceiveWay())) {
+                    logger.info("====通知申通下单发货====="+item.getId());
                     stOrderService.pushStOrder(item.getOrderId(),item.getId());
                 }
             }
