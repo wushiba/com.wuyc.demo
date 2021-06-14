@@ -53,7 +53,7 @@ public class StOrderServiceImpl implements StOrderService {
             logger.info("订单未查询到->{}",childOrderId);
             return;
         }
-        if (!UserOrderStatusEnum.WAIT_DELIVERY.getCode().equals(orderDetail.getOrderStatus())) {
+        if (UserOrderStatusEnum.WAIT_DELIVERY.getCode().equals(orderDetail.getOrderStatus())) {
             logger.info("订单状态不对->{}",childOrderId);
             return;
         }
