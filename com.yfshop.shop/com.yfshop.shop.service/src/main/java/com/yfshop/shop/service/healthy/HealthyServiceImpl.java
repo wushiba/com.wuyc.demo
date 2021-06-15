@@ -49,6 +49,9 @@ import com.yfshop.shop.service.healthy.result.HealthySubOrderResult;
 import com.yfshop.wx.api.request.WxPayOrderNotifyReq;
 import com.yfshop.wx.api.service.MpPayNotifyService;
 import com.yfshop.wx.api.service.MpPayService;
+import com.yfshop.wx.api.service.MpService;
+import me.chanjar.weixin.mp.bean.template.WxMpTemplateData;
+import me.chanjar.weixin.mp.bean.template.WxMpTemplateMessage;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
@@ -113,6 +116,10 @@ public class HealthyServiceImpl implements HealthyService {
     private UserAddressService userAddressService;
     @Value("${wxPay.notifyUrl}")
     private String wxPayNotifyUrl;
+    @Value("${shop.url}")
+    private String shopUrl;
+    @DubboReference(check = false)
+    private MpService mpService;
 
     @Transactional(rollbackFor = Exception.class)
     @Override
@@ -378,6 +385,22 @@ public class HealthyServiceImpl implements HealthyService {
                 healthyOrder.setId(healthySubOrder.getPOrderId());
                 healthyOrder.setOrderStatus(HealthyOrderStatusEnum.COMPLETED.getCode());
                 healthyOrderMapper.updateById(healthyOrder);
+                try {
+                    List<WxMpTemplateData> data = new ArrayList<>();
+                    data.add(new WxMpTemplateData("first", "您的订单已完成"));
+                    data.add(new WxMpTemplateData("keyword1", healthySubOrder.getPOrderNo()));
+                    data.add(new WxMpTemplateData("keyword2", healthySubOrder.getItemTitle()));
+                    data.add(new WxMpTemplateData("keyword3", DateUtil.formatLocalDateTime(LocalDateTime.now())));
+                    data.add(new WxMpTemplateData("remark", "订单已完成，点击【详情】开启新的配送"));
+                    WxMpTemplateMessage wxMpTemplateMessage = WxMpTemplateMessage.builder()
+                            .templateId("E3xoz2b936H0M8YZasqN_mxe3s_OWqKRHzA8OXvEYA8")
+                            .toUser(healthySubOrder.getOpenId())
+                            .data(data)
+                            .url(shopUrl + "#/actPage").build();
+                    mpService.sendWxMpTemplateMsg(wxMpTemplateMessage);
+                } catch (Exception e) {
+                    logger.error("发送微信推送通知用户已开始配送失败", e);
+                }
             }
         }
         return null;

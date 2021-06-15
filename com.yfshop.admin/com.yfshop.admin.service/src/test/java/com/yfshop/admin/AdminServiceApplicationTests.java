@@ -10,6 +10,8 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.google.common.collect.Lists;
+import com.yfshop.admin.api.express.ExpressService;
+import com.yfshop.admin.api.express.result.ExpressOrderResult;
 import com.yfshop.admin.api.mall.AdminMallManageService;
 import com.yfshop.admin.api.mall.request.CreateBannerReq;
 import com.yfshop.admin.api.mall.request.GenerateItemSkuReq;
@@ -107,6 +109,9 @@ public class AdminServiceApplicationTests {
     private TransactionTemplate transactionTemplate;
     @DubboReference(check = false)
     private AdminMerchantManageService adminMerchantManageService;
+
+    @Resource
+    private ExpressService expressService;
 
     // @Test
     public void fasfasdfasdfas() {
@@ -2000,23 +2005,30 @@ public class AdminServiceApplicationTests {
     }
 
 
-
     @Test
-    public void asasa(){
-        File file=new File("H://2105091508277588182");
+    public void asasa() {
+        File file = new File("H://2105091508277588182");
         for (File s : file.listFiles()) {
             System.out.println(s.getName());
         }
 
     }
 
+
+    @Test
+    public void asasaa() {
+        ExpressOrderResult expressOrderResult = expressService.queryByExpressNo("SF1333000794899", "顺丰", "15868859921");
+        System.out.println(expressOrderResult.toString());
+    }
+
+
     public static void main(String[] args) {
-        File file=new File("H://2105091508277588182");
-        List<String>no=new ArrayList<>();
+        File file = new File("H://2105091508277588182");
+        List<String> no = new ArrayList<>();
         for (File s : file.listFiles()) {
-            no.add(String.format("INSERT INTO `yf_website_code_detail` (`batch_id`,`alias`,`is_activate`,`activity_time`,`merchant_id`,`merchant_name`,`merchant_pid_path`,`mobile`,`pid`,`pid_path`) VALUES (326,'%s','N',null,null,null,null,null,13011,'10389.13007.13011.');",s.getName().replace(".png","")));
+            no.add(String.format("INSERT INTO `yf_website_code_detail` (`batch_id`,`alias`,`is_activate`,`activity_time`,`merchant_id`,`merchant_name`,`merchant_pid_path`,`mobile`,`pid`,`pid_path`) VALUES (326,'%s','N',null,null,null,null,null,13011,'10389.13007.13011.');", s.getName().replace(".png", "")));
         }
-        FileUtil.writeUtf8Lines(no,"H://8.txt");
+        FileUtil.writeUtf8Lines(no, "H://8.txt");
 
     }
 }
