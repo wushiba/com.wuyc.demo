@@ -96,7 +96,7 @@
 
         <dependency>
             <groupId>com.yfshop.parent</groupId>
-            <artifactId>com.yfshop.log</artifactId>
+            <artifactId>com.yfshop.logs</artifactId>
             <version>1.0-SNAPSHOT</version>
             <exclusions>
                 <exclusion>

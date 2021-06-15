@@ -9,8 +9,8 @@
         <version>1.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>com.yfshop.log</artifactId>
-    <name>com.yfshop.log</name>
+    <artifactId>com.yfshop.logs</artifactId>
+    <name>com.yfshop.logs</name>
 
     <dependencies>
         <dependency>
