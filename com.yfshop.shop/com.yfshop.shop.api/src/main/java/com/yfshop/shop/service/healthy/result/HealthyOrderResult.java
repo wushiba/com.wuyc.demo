@@ -33,6 +33,8 @@ public class HealthyOrderResult implements Serializable {
 
     private String itemTitle;
 
+    private String itemSubTitle;
+
     /**
      * 商品sku售价
      */

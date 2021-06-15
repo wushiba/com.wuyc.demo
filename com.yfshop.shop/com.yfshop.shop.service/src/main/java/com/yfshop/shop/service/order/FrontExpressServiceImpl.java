@@ -77,7 +77,7 @@ public class FrontExpressServiceImpl implements FrontExpressService {
             expressOrderResult.setList(queryStExpress(expressNo));
         } else {
             receiverMobile = receiverMobile.substring(receiverMobile.length() - 4);
-            expressOrderResult.setList(queryCommExpress(value, expressName, receiverMobile));
+            expressOrderResult.setList(queryCommExpress(value, expressNo, receiverMobile));
         }
         return expressOrderResult;
     }
@@ -124,7 +124,7 @@ public class FrontExpressServiceImpl implements FrontExpressService {
         String key = CacheConstants.EXPRESS_KEY_PREFIX + no;
         Object expressListObject = redisService.get(key);
         if (expressListObject != null) {
-            redisService.expire(key, 60 * 60 * 12);
+            redisService.expire(key, 60 * 60 * 6);
             return JSON.parseArray(expressListObject.toString(), ExpressResult.class);
         }
         List<ExpressResult> expressResultList = new ArrayList<>();
@@ -142,7 +142,7 @@ public class FrontExpressServiceImpl implements FrontExpressService {
                     expressResultList.add(expressResult);
                 });
             }
-            redisService.set(key, JSON.toJSONString(expressResultList), 60 * 60 * 12);
+            redisService.set(key, JSON.toJSONString(expressResultList), 60 * 60 * 6);
             if (isSuccess.get()) {
                 express = new Express();
                 express.setExpressNo(no);
@@ -154,4 +154,5 @@ public class FrontExpressServiceImpl implements FrontExpressService {
         }
         return expressResultList;
     }
+
 }
