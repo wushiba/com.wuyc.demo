@@ -94,6 +94,17 @@
             <version>2.9.1</version>
         </dependency>
 
+        <dependency>
+            <groupId>com.yfshop.parent</groupId>
+            <artifactId>com.yfshop.log</artifactId>
+            <version>1.0-SNAPSHOT</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.yfshop.parent</groupId>
+                    <artifactId>com.yfshop.code</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
     </dependencies>
 
 </project>

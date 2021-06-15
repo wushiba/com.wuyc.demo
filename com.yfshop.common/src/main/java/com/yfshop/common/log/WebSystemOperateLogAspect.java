@@ -8,6 +8,8 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.google.common.collect.Maps;
 import com.yfshop.common.exception.ApiException;
+import com.yfshop.log.CreateVisitLogReq;
+import com.yfshop.log.LogService;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 import org.aspectj.lang.JoinPoint;
@@ -34,6 +36,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.annotation.Resource;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -47,6 +50,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
@@ -76,6 +80,8 @@ public class WebSystemOperateLogAspect {
 
     @Value("${spring.profiles.active}")
     private String profile;
+    @Resource
+    private LogService logService;
 
     @Pointcut("@within(org.springframework.stereotype.Controller)"
             + "||@within(org.springframework.web.bind.annotation.RestController)"
@@ -140,7 +146,19 @@ public class WebSystemOperateLogAspect {
             if (!"/".equals(request.getServletPath())) {
                 logger.info("*******************************\r\nWebSystemLogAspect接口访问信息: \n"
                         + JSON.toJSONString(visitInfo, true) + "\r\n*********************************");
+
+                CompletableFuture.runAsync(() -> {
+                    CreateVisitLogReq req = new CreateVisitLogReq();
+                    req.setInterfaceClass(visitInfo.methodInfo);
+                    req.setRequestUrl(visitInfo.getRequestUrl());
+                    req.setVisitorClientIp(visitInfo.visitorClientIp);
+                    req.setTimeConsume(visitInfo.timeConsume);
+                    req.setParameterContent(JSON.toJSONString(visitInfo.requestParameter));
+                    req.setReturnResult(JSON.toJSONString(visitInfo.returnResult));
+                    logService.createVisitLog(req);
+                });
             }
+
             return result;
         } catch (Throwable e) {
             // log the error msg
@@ -154,6 +172,18 @@ public class WebSystemOperateLogAspect {
             }
             logger.info("*******************************\r\nWebSystemLogAspect接口访问信息: \n"
                     + JSON.toJSONString(visitInfo, true) + "\r\n*********************************");
+
+            CompletableFuture.runAsync(() -> {
+                CreateVisitLogReq req = new CreateVisitLogReq();
+                req.setInterfaceClass(visitInfo.methodInfo);
+                req.setRequestUrl(visitInfo.getRequestUrl());
+                req.setVisitorClientIp(visitInfo.visitorClientIp);
+                req.setTimeConsume(visitInfo.timeConsume);
+                req.setParameterContent(JSON.toJSONString(visitInfo.requestParameter));
+                req.setReturnResult(JSON.toJSONString(visitInfo.returnResult));
+                logService.createVisitLog(req);
+            });
+
             throw e;
         }
     }
