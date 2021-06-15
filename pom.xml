@@ -18,7 +18,6 @@
         <module>com.yfshop.open</module>
         <module>com.yfshop.code</module>
         <module>com.yfshop.common</module>
-        <module>com.yfshop.logs</module>
     </modules>
 
     <properties>
