@@ -1,13 +1,11 @@
 package com.yfshop.admin.api.healthy.request;
 
-import com.yfshop.common.util.DateUtil;
 import io.swagger.annotations.ApiModel;
 import lombok.Data;
 
 import java.io.Serializable;
 import java.util.Date;
 
-@ApiModel
 @Data
 public class QueryHealthySubOrderReq implements Serializable {
 

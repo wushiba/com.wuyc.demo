@@ -1,7 +1,5 @@
 package com.yfshop.shop.controller.draw;
 
-import cn.hutool.Hutool;
-import cn.hutool.extra.servlet.ServletUtil;
 import com.yfshop.common.api.CommonResult;
 import com.yfshop.common.base.BaseController;
 import com.yfshop.common.enums.CouponResourceEnum;
@@ -18,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 @Controller

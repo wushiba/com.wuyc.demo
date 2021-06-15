@@ -5,7 +5,6 @@ import lombok.Data;
 
 import java.io.Serializable;
 
-@ApiModel
 @Data
 public class QueryJxsMerchantReq implements Serializable {
 
