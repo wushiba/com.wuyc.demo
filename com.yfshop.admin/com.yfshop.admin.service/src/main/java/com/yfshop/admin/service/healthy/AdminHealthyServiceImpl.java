@@ -382,7 +382,7 @@ public class AdminHealthyServiceImpl implements AdminHealthyService {
     public Void closedOrder(Long id) throws WxPayException {
         HealthyOrder healthyOrder = healthyOrderMapper.selectById(id);
         Asserts.assertNonNull(healthyOrder, 500, "订单不存在");
-        Asserts.assertNotEquals(HealthyOrderStatusEnum.SERVICING.getCode(), healthyOrder.getOrderStatus(), 500, "订单状态不能关闭");
+        Asserts.assertEquals(HealthyOrderStatusEnum.SERVICING.getCode(), healthyOrder.getOrderStatus(), 500, "订单状态不能关闭");
         Asserts.assertNonNull(healthyOrder.getBillNo(), 500, "订单未支付");
         int count = healthySubOrderMapper.selectCount(Wrappers.lambdaQuery(HealthySubOrder.class)
                 .eq(HealthySubOrder::getPOrderId, id).

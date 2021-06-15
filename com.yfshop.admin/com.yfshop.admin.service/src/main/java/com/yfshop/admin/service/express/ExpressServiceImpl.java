@@ -53,6 +53,9 @@ public class ExpressServiceImpl implements ExpressService {
         map.put("圆通", "yt");
         map.put("申通", "sto");
         map.put("顺丰", "sf");
+        map.put("天天", "tt");
+        map.put("EMS", "ems");
+        map.put("百世快递", "ht");
     }
 
 
@@ -72,7 +75,7 @@ public class ExpressServiceImpl implements ExpressService {
         ExpressOrderResult expressOrderResult = new ExpressOrderResult();
         expressOrderResult.setExpressName(expressName);
         expressOrderResult.setExpressNo(expressNo);
-        String value = map.get(expressName);
+        String value = map.get(expressName != null ? expressName.replace("快递", "") : expressName);
         if (value == null) {
             expressOrderResult.setList(new ArrayList<>());
         }
