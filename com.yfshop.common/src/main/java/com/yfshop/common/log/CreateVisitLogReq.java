@@ -19,6 +19,11 @@ public class CreateVisitLogReq implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
+     * 日志来源平台
+     */
+    private String platform;
+
+    /**
      * 接口controller
      */
     private String interfaceClass;

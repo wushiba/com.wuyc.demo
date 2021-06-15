@@ -1,18 +1,19 @@
 package com.yfshop.code.model;
 
-import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.extension.activerecord.Model;
-import com.baomidou.mybatisplus.annotation.TableId;
-import java.time.LocalDateTime;
 import com.baomidou.mybatisplus.annotation.TableField;
-import java.io.Serializable;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.extension.activerecord.Model;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.io.Serializable;
+import java.time.LocalDateTime;
+
 /**
  * <p>
- * 
+ *
  * </p>
  *
  * @author yoush
@@ -31,6 +32,11 @@ public class VisitLog extends Model<VisitLog> {
     private LocalDateTime createTime;
 
     private LocalDateTime updateTime;
+
+    /**
+     * 日志来源平台
+     */
+    private String platform;
 
     /**
      * 接口controller

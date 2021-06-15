@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
  * Description: 日志服务
  */
 @DubboService
-public class LogServiceImpl implements LogService {
+public class MerchantLogServiceImpl implements LogService {
 
     @Resource
     private VisitLogMapper visitLogMapper;
@@ -26,6 +26,7 @@ public class LogServiceImpl implements LogService {
             VisitLog visitLog = new VisitLog();
             visitLog.setCreateTime(LocalDateTime.now());
             visitLog.setUpdateTime(LocalDateTime.now());
+            visitLog.setPlatform("merchant");
             visitLog.setInterfaceClass(req.getInterfaceClass());
             visitLog.setRequestUrl(req.getRequestUrl());
             visitLog.setVisitorclientip(req.getVisitorClientIp());
