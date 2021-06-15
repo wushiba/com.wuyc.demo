@@ -8,8 +8,6 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.google.common.collect.Maps;
 import com.yfshop.common.exception.ApiException;
-import com.yfshop.log.CreateVisitLogReq;
-import com.yfshop.log.LogService;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 import org.aspectj.lang.JoinPoint;
