@@ -154,6 +154,7 @@ public class HealthyServiceImpl implements HealthyService {
         healthyOrder.setOrderNo(orderNo);
         healthyOrder.setItemId(healthyItem.getId());
         healthyOrder.setItemTitle(healthyItem.getItemTitle());
+        healthyOrder.setItemSubTitle(healthyItem.getItemSubTitle());
         healthyOrder.setItemPrice(healthyItem.getItemPrice());
         healthyOrder.setItemCover(healthyItem.getItemCover());
         healthyOrder.setItemCount(buyCount);
