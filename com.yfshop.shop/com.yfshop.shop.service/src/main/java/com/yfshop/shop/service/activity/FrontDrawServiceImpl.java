@@ -139,9 +139,9 @@ public class FrontDrawServiceImpl implements FrontDrawService {
         // 获取奖品，每个奖品登记优惠券id， 可以走缓存
         YfDrawActivityResult yfDrawActivityResult = getDrawActivityDetailById(drawActivityId);
         Asserts.assertNonNull(yfDrawActivityResult, 501, "活动不存在,请联系管理员");
-        Asserts.assertEquals(yfDrawActivityResult.getIsEnable(), "Y", 500, "活动暂未开启,请联系管理员");
+        Asserts.assertEquals(yfDrawActivityResult.getIsEnable(), "Y", 501, "活动暂未开启,请联系管理员");
         Asserts.assertFalse(yfDrawActivityResult.getStartTime().isAfter(LocalDateTime.now()), 501, "活动暂未开始,请稍后再试");
-        Asserts.assertFalse(yfDrawActivityResult.getEndTime().isBefore(LocalDateTime.now()), 501, "活动暂已结束,请稍后再试");
+        Asserts.assertFalse(yfDrawActivityResult.getEndTime().isBefore(LocalDateTime.now()), 502, "活动暂已结束,请稍后再试");
         List<YfDrawPrizeResult> prizeList = yfDrawActivityResult.getPrizeList();
         Asserts.assertCollectionNotEmpty(prizeList, 500, "活动暂未配置奖品，请稍微再试");
 
@@ -154,7 +154,7 @@ public class FrontDrawServiceImpl implements FrontDrawService {
         String dataStr = DateUtil.format(LocalDateTime.now(), "yyyyMMdd");
         Long drawCount = redisService.incr(CacheConstants.DRAW_DATE_COUNT + dataStr + userId, 1, 1, TimeUnit.DAYS);
         logger.info("======抽奖用户次数userId=" + userId + "，抽奖" + drawCount);
-        Asserts.assertFalse(drawCount > canDrawCount, 502, "您每天只能抽奖" + canDrawCount + "次，请明天再继续抽奖");
+        Asserts.assertFalse(drawCount > canDrawCount, 504, "您每天只能抽奖" + canDrawCount + "次，请明天再继续抽奖");
         //redisService.expire(CacheConstants.DRAW_DATE_COUNT + dataStr + userId, 60 * 60 * 24);
 
         Map<Integer, List<YfDrawPrizeResult>> prizeMap = prizeList.stream().collect(Collectors
