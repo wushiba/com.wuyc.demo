@@ -55,7 +55,7 @@ public class ExpressServiceImpl implements ExpressService {
         map.put("顺丰", "sf");
         map.put("天天", "tt");
         map.put("EMS", "ems");
-        map.put("百世快递", "ht");
+        map.put("百世", "ht");
     }
 
 
