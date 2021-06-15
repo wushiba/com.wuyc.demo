@@ -74,7 +74,7 @@ public class StOrderServiceImpl implements StOrderService {
         wuYouOrderReq.setUserName("18780003433");
         wuYouOrderReq.setPassword(SecureUtil.md5("Sto1259...***"));
         wuYouOrderReq.setCustomerName("646643000296");
-        wuYouOrderReq.setSenderName("眉山申通");
+        wuYouOrderReq.setSenderName("雨帆健康家");
         wuYouOrderReq.setSenderMobile("13890312117");
         wuYouOrderReq.setSenderProvince("四川省");
         wuYouOrderReq.setSenderCity("眉山市");
