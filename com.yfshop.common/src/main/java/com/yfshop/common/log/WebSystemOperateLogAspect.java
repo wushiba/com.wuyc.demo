@@ -34,21 +34,14 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
-import javax.annotation.Resource;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Objects;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
@@ -78,14 +71,14 @@ public class WebSystemOperateLogAspect {
 
     @Value("${spring.profiles.active}")
     private String profile;
-    @Resource
-    private LogService logService;
+
 
     @Pointcut("@within(org.springframework.stereotype.Controller)"
             + "||@within(org.springframework.web.bind.annotation.RestController)"
     )
     public void targetPoint() {
     }
+
 
     @Around("targetPoint()")
     public Object doAround(ProceedingJoinPoint joinPoint) throws Throwable {
@@ -144,17 +137,7 @@ public class WebSystemOperateLogAspect {
             if (!"/".equals(request.getServletPath())) {
                 logger.info("*******************************\r\nWebSystemLogAspect接口访问信息: \n"
                         + JSON.toJSONString(visitInfo, true) + "\r\n*********************************");
-
-                CompletableFuture.runAsync(() -> {
-                    CreateVisitLogReq req = new CreateVisitLogReq();
-                    req.setInterfaceClass(visitInfo.methodInfo);
-                    req.setRequestUrl(visitInfo.getRequestUrl());
-                    req.setVisitorClientIp(visitInfo.visitorClientIp);
-                    req.setTimeConsume(visitInfo.timeConsume);
-                    req.setParameterContent(JSON.toJSONString(visitInfo.requestParameter));
-                    req.setReturnResult(JSON.toJSONString(visitInfo.returnResult));
-                    logService.createVisitLog(req);
-                });
+                saveLog(visitInfo);
             }
 
             return result;
@@ -170,18 +153,7 @@ public class WebSystemOperateLogAspect {
             }
             logger.info("*******************************\r\nWebSystemLogAspect接口访问信息: \n"
                     + JSON.toJSONString(visitInfo, true) + "\r\n*********************************");
-
-            CompletableFuture.runAsync(() -> {
-                CreateVisitLogReq req = new CreateVisitLogReq();
-                req.setInterfaceClass(visitInfo.methodInfo);
-                req.setRequestUrl(visitInfo.getRequestUrl());
-                req.setVisitorClientIp(visitInfo.visitorClientIp);
-                req.setTimeConsume(visitInfo.timeConsume);
-                req.setParameterContent(JSON.toJSONString(visitInfo.requestParameter));
-                req.setReturnResult(JSON.toJSONString(visitInfo.returnResult));
-                logService.createVisitLog(req);
-            });
-
+            saveLog(visitInfo);
             throw e;
         }
     }
@@ -345,8 +317,12 @@ public class WebSystemOperateLogAspect {
         return "pro".equalsIgnoreCase(profile);
     }
 
+    protected void saveLog(VisitInfo visitInfo) {
+
+    }
+
     @Data
-    private static class VisitInfo implements Serializable {
+    protected static class VisitInfo implements Serializable {
         private static final long serialVersionUID = 1L;
 
         /**
