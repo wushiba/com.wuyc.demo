@@ -90,4 +90,11 @@ public class HealthyController implements BaseController {
     public CommonResult<List<String>> previewShowShipPlans(@Valid @NotNull(message = "商品不能为空") PreviewShowShipPlansReq req) {
         return CommonResult.success(healthyService.previewShowShipPlans(req).stream().map(d -> DateTime.of(d).toDateStr()).collect(Collectors.toList()));
     }
+
+    @RequestMapping(value = "/confirmHealthySubOrder", method = {RequestMethod.GET, RequestMethod.POST})
+    @ResponseBody
+    @SaCheckLogin
+    public CommonResult<Void> confirmHealthySubOrder(@NotNull(message = "订单ID不能为空") Long id) {
+        return CommonResult.success(healthyService.confirmHealthySubOrder(id));
+    }
 }

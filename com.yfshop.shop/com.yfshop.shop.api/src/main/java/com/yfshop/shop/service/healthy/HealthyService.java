@@ -39,4 +39,6 @@ public interface HealthyService {
     HealthyActResult queryHealthyActivityDetail(Integer id);
 
     List<Date> previewShowShipPlans(@Valid @NotNull PreviewShowShipPlansReq req) throws ApiException;
+
+    Void confirmHealthySubOrder(Long id);
 }

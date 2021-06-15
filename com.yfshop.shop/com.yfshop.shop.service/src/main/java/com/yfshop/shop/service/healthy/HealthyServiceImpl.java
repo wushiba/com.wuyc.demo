@@ -35,6 +35,7 @@ import com.yfshop.common.enums.PayPrefixEnum;
 import com.yfshop.common.exception.ApiException;
 import com.yfshop.common.exception.Asserts;
 import com.yfshop.common.healthy.enums.HealthyOrderStatusEnum;
+import com.yfshop.common.healthy.enums.HealthySubOrderStatusEnum;
 import com.yfshop.common.util.BeanUtil;
 import com.yfshop.shop.service.address.UserAddressService;
 import com.yfshop.shop.service.address.result.UserAddressResult;
@@ -311,7 +312,8 @@ public class HealthyServiceImpl implements HealthyService {
 
     @Override
     public List<Date> previewShowShipPlans(@Valid @NotNull PreviewShowShipPlansReq req) throws ApiException {
-        Integer itemId = req.getItemId(); String postRule = req.getPostRule();
+        Integer itemId = req.getItemId();
+        String postRule = req.getPostRule();
         HealthyItem healthyItem = healthyItemMapper.selectById(itemId);
         Asserts.assertNonNull(healthyItem, 500, "商品不存在");
         Asserts.assertTrue("Y".equalsIgnoreCase(healthyItem.getIsEnable()), 500, "商品已下架");
@@ -356,6 +358,29 @@ public class HealthyServiceImpl implements HealthyService {
         return postDateTimes.stream()
                 .map(postDateTime -> DateUtils.addDays(postDateTime, 3))
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public Void confirmHealthySubOrder(Long id) {
+        HealthySubOrder healthySubOrder = new HealthySubOrder();
+        healthySubOrder.setId(id);
+        healthySubOrder.setOrderStatus(HealthySubOrderStatusEnum.COMPLETE_DELIVERY.getCode());
+        int count = healthySubOrderMapper.updateById(healthySubOrder);
+        if (count > 0) {
+            healthySubOrder = healthySubOrderMapper.selectById(id);
+            int allCount = healthySubOrderMapper.selectCount(Wrappers.lambdaQuery(HealthySubOrder.class)
+                    .eq(HealthySubOrder::getPOrderId, healthySubOrder.getPOrderId()));
+            int completeCount = healthySubOrderMapper.selectCount(Wrappers.lambdaQuery(HealthySubOrder.class)
+                    .eq(HealthySubOrder::getPOrderId, healthySubOrder.getPOrderId())
+                    .eq(HealthySubOrder::getOrderStatus, HealthySubOrderStatusEnum.COMPLETE_DELIVERY.getCode()));
+            if (allCount == completeCount) {
+                HealthyOrder healthyOrder = new HealthyOrder();
+                healthyOrder.setId(healthySubOrder.getPOrderId());
+                healthyOrder.setOrderStatus(HealthyOrderStatusEnum.COMPLETED.getCode());
+                healthyOrderMapper.updateById(healthyOrder);
+            }
+        }
+        return null;
     }
 
     private String generateOrderNo(Integer userId) {
