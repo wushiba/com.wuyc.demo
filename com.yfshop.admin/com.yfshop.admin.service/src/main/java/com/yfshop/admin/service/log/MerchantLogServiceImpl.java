@@ -26,6 +26,7 @@ public class MerchantLogServiceImpl implements LogService {
             VisitLog visitLog = new VisitLog();
             visitLog.setCreateTime(LocalDateTime.now());
             visitLog.setUpdateTime(LocalDateTime.now());
+            visitLog.setPlatform(req.getPlatform());
             visitLog.setOperatorId(req.getOperatorId());
             visitLog.setInterfaceClass(req.getInterfaceClass());
             visitLog.setRequestUrl(req.getRequestUrl());
