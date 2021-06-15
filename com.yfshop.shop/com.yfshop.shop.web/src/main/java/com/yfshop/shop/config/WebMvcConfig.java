@@ -1,5 +1,6 @@
 package com.yfshop.shop.config;
 
+import cn.dev33.satoken.stp.StpUtil;
 import com.alibaba.fastjson.JSON;
 import com.yfshop.common.config.BaseWebMvcConfig;
 import com.yfshop.common.log.CreateVisitLogReq;
@@ -19,7 +20,6 @@ import java.util.concurrent.CompletableFuture;
  */
 @Configuration
 public class WebMvcConfig extends BaseWebMvcConfig {
-
     @DubboReference
     LogService logService;
 
@@ -36,6 +36,11 @@ public class WebMvcConfig extends BaseWebMvcConfig {
                     req.setTimeConsume(visitInfo.getTimeConsume());
                     req.setParameterContent(JSON.toJSONString(visitInfo.getRequestParameter()));
                     req.setReturnResult(JSON.toJSONString(visitInfo.getReturnResult()));
+                    try {
+                        req.setOperatorId(StpUtil.isLogin() ? StpUtil.getLoginIdAsInt() : null);
+                    } catch (Exception e) {
+
+                    }
                     logService.createVisitLog(req);
                 });
             }
