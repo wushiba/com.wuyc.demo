@@ -26,7 +26,7 @@ public class ExpressController implements BaseController {
     @RequestMapping(value = "/queryByExpressNo", method = {RequestMethod.GET, RequestMethod.POST})
     @ResponseBody
     @SaCheckLogin
-    public CommonResult<List<ExpressResult>> queryByExpressNo(String expressNo, String expressName, String receiverMobile) {
+    public CommonResult<ExpressOrderResult> queryByExpressNo(String expressNo, String expressName, String receiverMobile) {
 
         return CommonResult.success(expressService.queryByExpressNo(expressNo, expressName, receiverMobile));
     }

@@ -68,12 +68,21 @@ public class ExpressServiceImpl implements ExpressService {
     }
 
     @Override
-    public List<ExpressResult> queryByExpressNo(String expressNo, String expressName, String receiverMobile) throws ApiException {
+    public ExpressOrderResult queryByExpressNo(String expressNo, String expressName, String receiverMobile) throws ApiException {
+        ExpressOrderResult expressOrderResult = new ExpressOrderResult();
+        expressOrderResult.setExpressName(expressName);
+        expressOrderResult.setExpressNo(expressNo);
         String value = map.get(expressName);
-        if (value == null) return new ArrayList<>();
-        if ("st".equals(value)) return queryStExpress(expressNo);
-        receiverMobile = receiverMobile.substring(receiverMobile.length() - 4);
-        return queryCommExpress(value, expressName, receiverMobile);
+        if (value == null) {
+            expressOrderResult.setList(new ArrayList<>());
+        }
+        if ("sto".equals(value)) {
+            expressOrderResult.setList(queryStExpress(expressNo));
+        } else {
+            receiverMobile = receiverMobile.substring(receiverMobile.length() - 4);
+            expressOrderResult.setList(queryCommExpress(value, expressName, receiverMobile));
+        }
+        return expressOrderResult;
     }
 
 
@@ -106,36 +115,6 @@ public class ExpressServiceImpl implements ExpressService {
         }
         return expressResultList;
     }
-
-    private List<ExpressResult> querySfExpress(String wayBillNo) {
-        List<ExpressResult> expressResultList = new ArrayList<>();
-        try {
-            String url = "https://sfapi.sf-express.com/std/service";
-            String msgData = "{\"language\": \"0\",\"trackingType\": \"1\",\"trackingNumber\": [" + wayBillNo + "],\"methodType\": \"1\"}";
-            Map<String, String> params = new HashMap<>();
-            params.put("partnerID", "JJBWLgX");  // 顾客编码 ，对应丰桥上获取的clientCode
-            params.put("requestID", UUID.randomUUID().toString().replace("-", ""));
-            params.put("serviceCode", "EXP_RECE_SEARCH_ROUTES");// 接口服务码
-            params.put("timestamp", System.currentTimeMillis() + "");
-            params.put("msgData", msgData);
-            params.put("msgDigest", CallExpressServiceTools.getMsgDigest(msgData, System.currentTimeMillis() + "", "ntSULhd3ef4ObEwAh686uG21eXuwblYf"));//数据签名
-            String result = HttpClientUtil.post(url, params);
-            SfExpressResult sfExpressResult = JSONUtil.toBean(result, SfExpressResult.class);
-            SfExpressResult.ResultData resultData = sfExpressResult.getApiResultData();
-            if (resultData != null && resultData.getSuccess() && CollectionUtils.isNotEmpty(resultData.getMsgData().getRouteResps())) {
-                resultData.getMsgData().getRouteResps().get(0).getRoutes().forEach(item -> {
-                    ExpressResult expressResult = new ExpressResult();
-                    expressResult.setContext(item.getRemark());
-                    expressResult.setDateTime(item.getAcceptTime());
-                    expressResultList.add(expressResult);
-                });
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return expressResultList;
-    }
-
 
     private List<ExpressResult> queryCommExpress(String expressDeliveryCompanyNumber,
                                                  String expressDeliveryNumber,

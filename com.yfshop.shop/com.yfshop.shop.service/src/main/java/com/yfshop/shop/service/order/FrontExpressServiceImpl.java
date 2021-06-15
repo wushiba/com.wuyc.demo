@@ -28,6 +28,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.dubbo.config.annotation.DubboService;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -37,15 +38,26 @@ public class FrontExpressServiceImpl implements FrontExpressService {
     @Resource
     private OrderDetailMapper orderDetailMapper;
     @Resource
-    private ExpressMapper expressMapper;
-    @Resource
     private RedisService redisService;
+    @Resource
+    private ExpressMapper expressMapper;
+    Map<String, String> map = new HashMap<>();
+
+    @PostConstruct
+    public void init() {
+        map.put("中通", "zto");
+        map.put("韵达", "yd");
+        map.put("圆通", "yt");
+        map.put("申通", "sto");
+        map.put("顺丰", "sf");
+    }
+
 
     @Override
     public ExpressOrderResult queryExpress(Long id) throws ApiException {
         ExpressOrderResult expressOrderResult = new ExpressOrderResult();
         OrderDetail orderDetail = orderDetailMapper.selectById(id);
-        List<ExpressResult> list = queryExpressByWayBillNo(orderDetail.getExpressNo());
+        List<ExpressResult> list = queryStExpress(orderDetail.getExpressNo());
         expressOrderResult.setExpressNo(orderDetail.getExpressNo());
         expressOrderResult.setExpressName(orderDetail.getExpressCompany());
         expressOrderResult.setList(list);
@@ -53,13 +65,21 @@ public class FrontExpressServiceImpl implements FrontExpressService {
     }
 
     @Override
-    public List<ExpressResult> queryExpressByWayBillNo(String wayBillNo) throws ApiException {
-        if (StringUtils.isBlank(wayBillNo)) return new ArrayList<>();
-        if (wayBillNo.startsWith("SF")) {
-            return querySfExpress(wayBillNo);
-        } else {
-            return queryStExpress(wayBillNo);
+    public ExpressOrderResult queryByExpressNo(String expressNo, String expressName, String receiverMobile) throws ApiException {
+        ExpressOrderResult expressOrderResult = new ExpressOrderResult();
+        expressOrderResult.setExpressName(expressName);
+        expressOrderResult.setExpressNo(expressNo);
+        String value = map.get(expressName);
+        if (value == null) {
+            expressOrderResult.setList(new ArrayList<>());
         }
+        if ("sto".equals(value)) {
+            expressOrderResult.setList(queryStExpress(expressNo));
+        } else {
+            receiverMobile = receiverMobile.substring(receiverMobile.length() - 4);
+            expressOrderResult.setList(queryCommExpress(value, expressName, receiverMobile));
+        }
+        return expressOrderResult;
     }
 
 
@@ -92,37 +112,6 @@ public class FrontExpressServiceImpl implements FrontExpressService {
         }
         return expressResultList;
     }
-
-    private List<ExpressResult> querySfExpress(String wayBillNo) {
-        List<ExpressResult> expressResultList = new ArrayList<>();
-        try {
-            String url = "https://sfapi.sf-express.com/std/service";
-            String msgData = "{\"language\": \"0\",\"trackingType\": \"1\",\"trackingNumber\": [" + wayBillNo + "],\"methodType\": \"1\"}";
-            Map<String, String> params = new HashMap<>();
-            params.put("partnerID", "JJBWLgX");  // 顾客编码 ，对应丰桥上获取的clientCode
-            params.put("requestID", UUID.randomUUID().toString().replace("-", ""));
-            params.put("serviceCode", "EXP_RECE_SEARCH_ROUTES");// 接口服务码
-            params.put("timestamp", System.currentTimeMillis() + "");
-            params.put("msgData", msgData);
-            params.put("msgDigest", CallExpressServiceTools.getMsgDigest(msgData, System.currentTimeMillis() + "", "ntSULhd3ef4ObEwAh686uG21eXuwblYf"));//数据签名
-            String result = HttpClientUtil.post(url, params);
-            System.out.println(result);
-            SfExpressResult sfExpressResult = JSONUtil.toBean(result, SfExpressResult.class);
-            SfExpressResult.ResultData resultData = sfExpressResult.getApiResultData();
-            if (resultData != null && resultData.getSuccess() && CollectionUtils.isNotEmpty(resultData.getMsgData().getRouteResps())) {
-                resultData.getMsgData().getRouteResps().get(0).getRoutes().forEach(item -> {
-                    ExpressResult expressResult = new ExpressResult();
-                    expressResult.setContext(item.getRemark());
-                    expressResult.setDateTime(item.getAcceptTime());
-                    expressResultList.add(expressResult);
-                });
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return expressResultList;
-    }
-
 
     private List<ExpressResult> queryCommExpress(String expressDeliveryCompanyNumber,
                                                  String expressDeliveryNumber,

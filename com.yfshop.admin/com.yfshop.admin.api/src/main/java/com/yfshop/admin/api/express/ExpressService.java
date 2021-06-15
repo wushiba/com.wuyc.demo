@@ -10,5 +10,5 @@ public interface ExpressService {
 
     ExpressOrderResult queryExpress(Long id) throws ApiException;
 
-    List<ExpressResult> queryByExpressNo(String expressNo,String expressName,String receiverMobile) throws ApiException;
+    ExpressOrderResult queryByExpressNo(String expressNo,String expressName,String receiverMobile) throws ApiException;
 }

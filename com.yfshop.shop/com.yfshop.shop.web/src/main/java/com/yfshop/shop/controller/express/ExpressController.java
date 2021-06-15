@@ -28,12 +28,12 @@ public class ExpressController implements BaseController {
     private FrontExpressService expressService;
 
 
-    @RequestMapping(value = "/queryByWayBillNo", method = {RequestMethod.GET, RequestMethod.POST})
+    @RequestMapping(value = "/queryByExpressNo", method = {RequestMethod.GET, RequestMethod.POST})
     @ResponseBody
     @SaCheckLogin
-    public CommonResult<List<ExpressResult>> queryByWayBillNo(String wayBillNo) {
+    public CommonResult<ExpressOrderResult> queryByExpressNo(String expressNo, String expressName, String receiverMobile) {
 
-        return CommonResult.success(expressService.queryExpressByWayBillNo(wayBillNo));
+        return CommonResult.success(expressService.queryByExpressNo(expressNo, expressName, receiverMobile));
     }
 
     @RequestMapping(value = "/query", method = {RequestMethod.GET, RequestMethod.POST})
