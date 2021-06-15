@@ -42,6 +42,7 @@ public class WebMvcConfig extends BaseWebMvcConfig {
                     req.setParameterContent(JSON.toJSONString(visitInfo.getRequestParameter()));
                     req.setReturnResult(JSON.toJSONString(visitInfo.getReturnResult()));
                     req.setOperatorId(visitInfo.getUserId());
+                    req.setPlatform("merchant");
                     logService.createVisitLog(req);
                 });
             }
