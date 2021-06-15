@@ -33,6 +33,8 @@ public class VisitLog extends Model<VisitLog> {
 
     private LocalDateTime updateTime;
 
+    private Integer operatorId;
+
     /**
      * 日志来源平台
      */

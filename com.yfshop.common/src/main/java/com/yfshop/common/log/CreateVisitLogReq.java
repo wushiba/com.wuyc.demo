@@ -18,6 +18,8 @@ import java.io.Serializable;
 public class CreateVisitLogReq implements Serializable {
     private static final long serialVersionUID = 1L;
 
+    private Integer operatorId;
+
     /**
      * 日志来源平台
      */
