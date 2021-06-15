@@ -25,9 +25,15 @@ public class WebMvcConfig extends BaseWebMvcConfig {
 
     @Bean
     public WebSystemOperateLogAspect webSystemOperateLogAspect() {
+
         return new WebSystemOperateLogAspect() {
             @Override
             protected void saveLog(VisitInfo visitInfo) {
+                try {
+                    visitInfo.setUserId(StpUtil.isLogin() ? StpUtil.getLoginIdAsInt() : null);
+                } catch (Exception e) {
+
+                }
                 CompletableFuture.runAsync(() -> {
                     CreateVisitLogReq req = new CreateVisitLogReq();
                     req.setInterfaceClass(visitInfo.getMethodInfo());
@@ -36,11 +42,7 @@ public class WebMvcConfig extends BaseWebMvcConfig {
                     req.setTimeConsume(visitInfo.getTimeConsume());
                     req.setParameterContent(JSON.toJSONString(visitInfo.getRequestParameter()));
                     req.setReturnResult(JSON.toJSONString(visitInfo.getReturnResult()));
-                    try {
-                        req.setOperatorId(StpUtil.isLogin() ? StpUtil.getLoginIdAsInt() : null);
-                    } catch (Exception e) {
-
-                    }
+                    req.setOperatorId(visitInfo.getUserId());
                     logService.createVisitLog(req);
                 });
             }
