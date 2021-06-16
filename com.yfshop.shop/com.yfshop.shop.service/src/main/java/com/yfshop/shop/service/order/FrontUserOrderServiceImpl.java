@@ -450,7 +450,7 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
         if (userCoupon.getId() != null) {
             frontUserCouponService.useUserCoupon(userCoupon.getId());
             couponPrice = new BigDecimal(userCoupon.getCouponPrice());
-            orderPrice = payPrice.subtract(couponPrice);
+            payPrice = orderPrice.subtract(couponPrice);
             if (userCoupon.getCanUseItemIds().contains("2032")) {
                 orderFreight = orderFreight.add(new BigDecimal("1.8"));
                 sum = sum - 1;
@@ -465,14 +465,14 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
         userCartService.deleteUserCarts(userId, skuIdList);
         //平均运费价格
         BigDecimal freight = BigDecimal.ZERO;
-        if (orderPrice.longValue() < 88) {
+        if (payPrice.longValue() < 88) {
             freight = new BigDecimal("10");
             if (sum > 0) {
                 orderFreight = orderFreight.add(new BigDecimal("10"));
                 freight = freight.divide(new BigDecimal(sum), 2, BigDecimal.ROUND_HALF_UP);
             }
         }
-        payPrice = orderFreight.add(orderPrice);
+        payPrice = orderFreight.add(payPrice);
         // 创建订单
         Order order = insertUserOrder(userId, null, ReceiveWayEnum.PS.getCode(), itemCount, childOrderCount, orderPrice, couponPrice, orderFreight, payPrice, "N", null);
         Long orderId = order.getId();
