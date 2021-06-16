@@ -335,7 +335,7 @@ public class FrontDrawServiceImpl implements FrontDrawService {
         Integer prizeLevel = 3, random = 1;
         Long userIsWhite = redisService.sRemove(CacheConstants.DRAW_WHITE_USER_DATA, userId);
         if (userIsWhite < 1) {
-            random = new Random().nextInt(10000);
+            random = new Random().nextInt(1000000);
         } else {
             logger.info("====抽奖白名单userId=" + userId);
         }
