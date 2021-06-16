@@ -452,13 +452,12 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
         dpCategory.forEach(item -> {
             Asserts.assertTrue(tcCategory.contains(item), 500, "该商品不能单独购买，请添加同类套餐一起购买");
         });
-
+        logger.info("订单价格={}", orderPrice.longValue());
         // 修改优惠券状态
         if (userCoupon.getId() != null) {
             frontUserCouponService.useUserCoupon(userCoupon.getId());
             couponPrice = new BigDecimal(userCoupon.getCouponPrice());
-
-
+            logger.info("优惠券抵扣={}", couponPrice.longValue());
             payPrice = orderPrice.subtract(couponPrice);
             if (userCoupon.getCanUseItemIds().contains("2032")) {
                 orderFreight = orderFreight.add(new BigDecimal("1.8"));
@@ -468,7 +467,7 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
                 sum = sum - 1;
             }
         }
-
+        logger.info("运费价格={}", orderFreight.longValue());
         // 删除购物车id
         List<Integer> skuIdList = userCartList.stream().map(UserCart::getSkuId).collect(Collectors.toList());
         userCartService.deleteUserCarts(userId, skuIdList);
@@ -483,6 +482,7 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
         }
         payPrice = orderFreight.add(payPrice);
         // 创建订单
+        logger.info("支付订单价格={}", payPrice.longValue());
         Order order = insertUserOrder(userId, null, ReceiveWayEnum.PS.getCode(), itemCount, childOrderCount, orderPrice, couponPrice, orderFreight, payPrice, "N", null);
         Long orderId = order.getId();
         for (UserCart userCart : userCartList) {
