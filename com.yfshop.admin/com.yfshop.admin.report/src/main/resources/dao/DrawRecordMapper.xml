@@ -51,4 +51,20 @@
         group by r.user_location
     </select>
 
+    <select id="satsByJxs" resultType="com.yfshop.admin.api.draw.result.DrawRecordSatsByJxsResult">
+        select r.dealer_name as jxs,count(1) as draw_count,sum(if(use_status='NO_USE',0,1)) as use_count
+        from yf_draw_record r
+        where 1=1
+        <if test="req.startTime!=null">
+            and r.create_time &gt;= #{req.startTime}
+        </if>
+        <if test="req.endTime!=null">
+            and r.create_time &lt; #{req.endTime}
+        </if>
+        <if test="req.province!=null and req.province!=''">
+            and r.user_location = #{req.province}
+        </if>
+        group by r.dealer_name
+    </select>
+
 </mapper>

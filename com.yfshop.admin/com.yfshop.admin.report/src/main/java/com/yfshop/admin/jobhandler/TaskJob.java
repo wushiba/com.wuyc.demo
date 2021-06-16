@@ -1,9 +1,5 @@
 package com.yfshop.admin.jobhandler;
 
-import com.google.common.collect.Lists;
-import me.chanjar.weixin.mp.bean.template.WxMpTemplateData;
-import me.chanjar.weixin.mp.bean.template.WxMpTemplateMessage.MiniProgram;
-
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.xxl.job.core.handler.annotation.XxlJob;
 import com.xxl.job.core.log.XxlJobFileAppender;
@@ -12,11 +8,13 @@ import com.yfshop.admin.task.ActCodeTask;
 import com.yfshop.code.mapper.ActCodeBatchMapper;
 import com.yfshop.code.mapper.CouponExpiredConfigMapper;
 import com.yfshop.code.mapper.UserMapper;
+import com.yfshop.code.mapper.VisitLogMapper;
 import com.yfshop.code.model.ActCodeBatch;
 import com.yfshop.code.model.CouponExpiredConfig;
 import com.yfshop.code.model.User;
 import com.yfshop.code.model.UserCoupon;
 import com.yfshop.wx.api.service.MpService;
+import me.chanjar.weixin.mp.bean.template.WxMpTemplateData;
 import me.chanjar.weixin.mp.bean.template.WxMpTemplateMessage;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.slf4j.Logger;
@@ -59,6 +57,9 @@ public class TaskJob {
 
     @Resource
     private UserMapper userMapper;
+
+    @Resource
+    private VisitLogMapper visitLogMapper;
 
     @Value("${xxl.job.executor.logpath}")
     String logPath;
@@ -160,5 +161,10 @@ public class TaskJob {
         }
     }
 
+
+    @XxlJob("deleteExpiredLogs")
+    public void deleteExpiredLogs() throws Exception {
+        //visitLogMapper.delete()
+    }
 
 }
