@@ -194,8 +194,6 @@ public class FrontUserCouponServiceImpl implements FrontUserCouponService {
         }
     }
 
-}
-
     @Override
     public void updateCouponOrderOrderId(Long userCouponId, Long childOrderId) throws ApiException {
         Asserts.assertNonNull(userCouponId, 500, "用户优惠券id不可以为空");

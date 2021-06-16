@@ -43,7 +43,7 @@ public class YfUserCouponResult implements Serializable {
 
     private String pidPath;
 
-    private Integer couponId;
+    private Long couponId;
 
     private String couponTitle;
 
