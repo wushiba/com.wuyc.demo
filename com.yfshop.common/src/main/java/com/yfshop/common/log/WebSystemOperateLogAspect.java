@@ -163,11 +163,15 @@ public class WebSystemOperateLogAspect {
             visitInfo.setEndTimestamp(System.currentTimeMillis());
             visitInfo.setTimeConsume(visitInfo.getEndTimestamp() - visitInfo.getStartTimestamp());
             visitInfo.setIsSuccess(false);
+            HashMap<String, Object> returnResult = new HashMap<>(3);
             if (e instanceof ApiException) {
                 visitInfo.setErrorMsg(((ApiException) e).getErrorCode() + ":" + e.getMessage());
+                returnResult.put("code", ((ApiException) e).getErrorCode());
             } else {
                 visitInfo.setErrorMsg(e.getMessage());
+                returnResult.put("message", e.getMessage());
             }
+            visitInfo.setReturnResult(returnResult);
             logger.info("*******************************\r\nWebSystemLogAspect接口访问信息: \n"
                     + JSON.toJSONString(visitInfo, true) + "\r\n*********************************");
 
