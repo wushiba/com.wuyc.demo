@@ -27,7 +27,7 @@ public class HealthySubOrderExportResult implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @Excel(name = "预发货时间", width = 18, format = "yyyy-MM-dd HH:mm:ss")
+    @Excel(name = "预发货时间", width = 18, format = "yyyy-MM-dd")
     private Date expectShipTime;
 
     @Excel(name = "主订单号", width = 18)

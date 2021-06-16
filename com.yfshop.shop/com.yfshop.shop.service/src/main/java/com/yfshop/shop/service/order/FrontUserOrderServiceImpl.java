@@ -298,7 +298,7 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
 
         UserCoupon userCoupon = new UserCoupon();
         if (userCouponId != null) {
-            userCoupon = userCouponMapper.selectOne(Wrappers.lambdaQuery(UserCoupon.class).eq(UserCoupon::getId, userCouponId));
+            userCoupon = userCouponMapper.selectById(userCouponId);
             this.checkUserCoupon(userCoupon, itemSku.getItemId());
         }
 
@@ -378,7 +378,7 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
 
         UserCoupon userCoupon = new UserCoupon();
         if (userCouponId != null) {
-            userCoupon = userCouponMapper.selectOne(Wrappers.lambdaQuery(UserCoupon.class).eq(UserCoupon::getId, userCouponId));
+            userCoupon = userCouponMapper.selectById(userCouponId);
             this.checkUserCoupon(userCoupon, userCartList.get(0).getItemId());
         }
 
