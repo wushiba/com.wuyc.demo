@@ -459,6 +459,7 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
             couponPrice = new BigDecimal(userCoupon.getCouponPrice());
             logger.info("优惠券抵扣={}", couponPrice.longValue());
             payPrice = orderPrice.subtract(couponPrice);
+            logger.info("减扣后价格={}", payPrice.longValue());
             if (userCoupon.getCanUseItemIds().contains("2032")) {
                 orderFreight = orderFreight.add(new BigDecimal("1.8"));
                 sum = sum - 1;
