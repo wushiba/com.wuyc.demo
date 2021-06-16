@@ -5,11 +5,22 @@ import cn.dev33.satoken.annotation.SaCheckRole;
 import cn.dev33.satoken.annotation.SaMode;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.github.binarywang.wxpay.exception.WxPayException;
-import com.yfshop.admin.api.draw.result.DrawRecordExportResult;
 import com.yfshop.admin.api.healthy.AdminHealthyExportService;
 import com.yfshop.admin.api.healthy.AdminHealthyService;
-import com.yfshop.admin.api.healthy.request.*;
-import com.yfshop.admin.api.healthy.result.*;
+import com.yfshop.admin.api.healthy.request.HealthyActReq;
+import com.yfshop.admin.api.healthy.request.HealthyItemReq;
+import com.yfshop.admin.api.healthy.request.HealthySubOrderImportReq;
+import com.yfshop.admin.api.healthy.request.QueryHealthyOrderReq;
+import com.yfshop.admin.api.healthy.request.QueryHealthySubOrderReq;
+import com.yfshop.admin.api.healthy.request.QueryJxsMerchantReq;
+import com.yfshop.admin.api.healthy.request.SubOrderPostWay;
+import com.yfshop.admin.api.healthy.result.HealthyActResult;
+import com.yfshop.admin.api.healthy.result.HealthyItemResult;
+import com.yfshop.admin.api.healthy.result.HealthyOrderDetailResult;
+import com.yfshop.admin.api.healthy.result.HealthyOrderResult;
+import com.yfshop.admin.api.healthy.result.HealthySubOrderExportResult;
+import com.yfshop.admin.api.healthy.result.HealthySubOrderResult;
+import com.yfshop.admin.api.healthy.result.JxsMerchantResult;
 import com.yfshop.common.api.CommonResult;
 import com.yfshop.common.base.BaseController;
 import com.yfshop.common.util.ExcelUtils;
@@ -18,7 +29,11 @@ import org.apache.dubbo.config.annotation.DubboReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -34,7 +49,7 @@ public class AdminHealthyController implements BaseController {
     @DubboReference
     private AdminHealthyExportService adminHealthyExportService;
 
-    @RequestMapping(value = "/findOrderList", method = {RequestMethod.POST})
+    @RequestMapping(value = "/findOrderList", method = {RequestMethod.POST, RequestMethod.GET})
     @ResponseBody
     @SaCheckLogin
     @SaCheckRole(value = "sys")
@@ -43,7 +58,7 @@ public class AdminHealthyController implements BaseController {
     }
 
 
-    @RequestMapping(value = "/getOrderDetail", method = {RequestMethod.POST})
+    @RequestMapping(value = "/getOrderDetail", method = {RequestMethod.POST, RequestMethod.GET})
     @ResponseBody
     @SaCheckLogin
     @SaCheckRole(value = "sys")
@@ -52,7 +67,7 @@ public class AdminHealthyController implements BaseController {
     }
 
 
-    @RequestMapping(value = "/findSubOrderList", method = {RequestMethod.POST})
+    @RequestMapping(value = "/findSubOrderList", method = {RequestMethod.POST, RequestMethod.GET})
     @ResponseBody
     @SaCheckLogin
     @SaCheckRole(value = "sys")
@@ -67,7 +82,7 @@ public class AdminHealthyController implements BaseController {
     @SaCheckRole(value = "sys")
     public void exportSubOrderList(QueryHealthySubOrderReq req) {
         ExcelUtils.exportExcel(adminHealthyExportService.exportSubOrderList(req), "孝心订订单详情", "孝心订订单详情",
-                DrawRecordExportResult.class, "孝心订订单详情.xls", getCurrentResponse());
+                HealthySubOrderExportResult.class, "孝心订订单详情.xls", getCurrentResponse());
     }
 
     @CrossOrigin
@@ -108,7 +123,7 @@ public class AdminHealthyController implements BaseController {
     }
 
 
-    @RequestMapping(value = "/getActList", method = {RequestMethod.POST})
+    @RequestMapping(value = "/getActList", method = {RequestMethod.POST, RequestMethod.GET})
     @ResponseBody
     @SaCheckLogin
     @SaCheckRole(value = "sys")
@@ -116,7 +131,7 @@ public class AdminHealthyController implements BaseController {
         return CommonResult.success(adminHealthyService.getActList(req));
     }
 
-    @RequestMapping(value = "/getActDetail", method = {RequestMethod.POST})
+    @RequestMapping(value = "/getActDetail", method = {RequestMethod.POST, RequestMethod.GET})
     @ResponseBody
     @SaCheckLogin
     @SaCheckRole(value = "sys")
@@ -142,7 +157,7 @@ public class AdminHealthyController implements BaseController {
     }
 
 
-    @RequestMapping(value = "/getItemList", method = {RequestMethod.POST})
+    @RequestMapping(value = "/getItemList", method = {RequestMethod.POST, RequestMethod.GET})
     @ResponseBody
     @SaCheckLogin
     @SaCheckRole(value = "sys")
@@ -151,7 +166,7 @@ public class AdminHealthyController implements BaseController {
     }
 
 
-    @RequestMapping(value = "/getItemDetail", method = {RequestMethod.POST})
+    @RequestMapping(value = "/getItemDetail", method = {RequestMethod.POST, RequestMethod.GET})
     @ResponseBody
     @SaCheckLogin
     @SaCheckRole(value = "sys")
@@ -169,7 +184,7 @@ public class AdminHealthyController implements BaseController {
     }
 
 
-    @RequestMapping(value = "/findJxsMerchant", method = {RequestMethod.POST})
+    @RequestMapping(value = "/findJxsMerchant", method = {RequestMethod.POST, RequestMethod.GET})
     @ResponseBody
     @SaCheckLogin
     @SaCheckRole(value = "sys")
