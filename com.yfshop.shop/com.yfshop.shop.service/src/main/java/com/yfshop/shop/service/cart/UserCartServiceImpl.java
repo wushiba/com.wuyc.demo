@@ -320,10 +320,4 @@ public class UserCartServiceImpl implements UserCartService {
         return result;
     }
 
-    public static void main(String[] args) {
-        BigDecimal freight = new BigDecimal("10");
-        int sum = 3;
-        System.out.println(freight.divide(new BigDecimal(sum), 2, BigDecimal.ROUND_HALF_UP));
-    }
-
 }

@@ -328,9 +328,9 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
         //平均运费价格
         BigDecimal freight = BigDecimal.ZERO;
         if (payPrice.longValue() < 88) {
-            orderFreight = orderFreight.add(new BigDecimal("10"));
             freight = new BigDecimal("10");
             if (sum > 0) {
+                orderFreight = orderFreight.add(new BigDecimal("10"));
                 freight = freight.divide(new BigDecimal(sum), 2, BigDecimal.ROUND_HALF_UP);
             }
         }
@@ -468,9 +468,9 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
         //平均运费价格
         BigDecimal freight = BigDecimal.ZERO;
         if (payPrice.longValue() < 88) {
-            orderFreight = orderFreight.add(new BigDecimal("10"));
             freight = new BigDecimal("10");
             if (sum > 0) {
+                orderFreight = orderFreight.add(new BigDecimal("10"));
                 freight = freight.divide(new BigDecimal(sum), 2, BigDecimal.ROUND_HALF_UP);
             }
         }
