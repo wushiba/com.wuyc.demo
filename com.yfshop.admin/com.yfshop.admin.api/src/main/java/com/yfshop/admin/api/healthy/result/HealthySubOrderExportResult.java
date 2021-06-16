@@ -1,6 +1,7 @@
 package com.yfshop.admin.api.healthy.result;
 
 import cn.afterturn.easypoi.excel.annotation.Excel;
+import cn.afterturn.easypoi.excel.annotation.ExcelTarget;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.yfshop.common.healthy.enums.HealthySubOrderStatusEnum;
 import lombok.Data;
@@ -18,13 +19,13 @@ import java.time.format.DateTimeFormatter;
  * @author yoush
  * @since 2021-05-08
  */
+@ExcelTarget("HealthySubOrderExportResult")
 @Data
-@EqualsAndHashCode(callSuper = false)
 public class HealthySubOrderExportResult implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @Excel(name = "下单时间", width = 18)
+    @Excel(name = "下单时间", width = 18, format = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createTime;
 
     @Excel(name = "主订单号", width = 18)

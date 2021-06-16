@@ -81,7 +81,8 @@ public class AdminHealthyController implements BaseController {
     @SaCheckLogin
     @SaCheckRole(value = "sys")
     public void exportSubOrderList(QueryHealthySubOrderReq req) {
-        ExcelUtils.exportExcel(adminHealthyExportService.exportSubOrderList(req), "孝心订订单详情", "孝心订订单详情",
+        List<HealthySubOrderExportResult> healthySubOrderExportResults = adminHealthyExportService.exportSubOrderList(req);
+        ExcelUtils.exportExcel(healthySubOrderExportResults, "孝心订订单详情", "孝心订订单详情",
                 HealthySubOrderExportResult.class, "孝心订订单详情.xls", getCurrentResponse());
     }
 
