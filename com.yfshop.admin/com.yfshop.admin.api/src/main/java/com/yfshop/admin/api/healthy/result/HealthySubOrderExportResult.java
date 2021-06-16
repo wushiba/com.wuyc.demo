@@ -4,12 +4,14 @@ import cn.afterturn.easypoi.excel.annotation.Excel;
 import cn.afterturn.easypoi.excel.annotation.ExcelTarget;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.yfshop.common.healthy.enums.HealthySubOrderStatusEnum;
+import com.yfshop.common.util.DateUtil;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Date;
 
 /**
  * <p>
@@ -25,8 +27,8 @@ public class HealthySubOrderExportResult implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @Excel(name = "下单时间", width = 18, format = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime createTime;
+    @Excel(name = "预发货时间", width = 18, format = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime expectShipTime;
 
     @Excel(name = "主订单号", width = 18)
     private String pOrderNo;
@@ -95,8 +97,9 @@ public class HealthySubOrderExportResult implements Serializable {
         return pOrderNo;
     }
 
-    public String getCreateTime() {
-        return createTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+
+    public Date getExpectShipTime() {
+        return DateUtil.localDateTimeToDate(expectShipTime);
     }
 
 
