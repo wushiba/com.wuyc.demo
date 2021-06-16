@@ -267,37 +267,36 @@ public class UserCartServiceImpl implements UserCartService {
                 otherGoods.add(item);
             }
         });
+        BigDecimal freight = new BigDecimal("10");
         if (sumPrice.longValue() >= 88) {
-            otherGoods.forEach(item -> {
-                item.setFreight(BigDecimal.ZERO);
-            });
+            freight = BigDecimal.ZERO;
         } else if (sumPrice.longValue() > 0) {
             int sum = otherGoods.stream().mapToInt(UserCartResult::getNum).sum();
             if (userCoupon != null) {
                 sum = sum - 1;
             }
-            BigDecimal freight = new BigDecimal("10");
             if (sum > 1) {
                 freight = freight.divide(new BigDecimal(sum), 2, BigDecimal.ROUND_HALF_UP);
             }
-            for (UserCartResult item : otherGoods) {
-                if (userCoupon != null && userCoupon.getCanUseItemIds().contains("2032")) {
-                    item.setFreight(new BigDecimal("1.8"));
-                    if (item.getNum() > 1) {
-                        item.setFreight(item.getFreight().add(new BigDecimal(item.getNum() - 1).multiply(freight)));
-                    }
-                    userCoupon = null;
-                } else if (userCoupon != null && userCoupon.getCanUseItemIds().contains("2030")) {
-                    item.setFreight(new BigDecimal("18"));
-                    if (item.getNum() > 1) {
-                        item.setFreight(item.getFreight().add(new BigDecimal(item.getNum() - 1).multiply(freight)));
-                    }
-                    userCoupon = null;
-                } else {
-                    item.setFreight(new BigDecimal(item.getNum()).multiply(freight));
+        }
+        for (UserCartResult item : otherGoods) {
+            if (userCoupon != null && userCoupon.getCanUseItemIds().contains("2032")) {
+                item.setFreight(new BigDecimal("1.8"));
+                if (item.getNum() > 1) {
+                    item.setFreight(item.getFreight().add(new BigDecimal(item.getNum() - 1).multiply(freight)));
                 }
+                userCoupon = null;
+            } else if (userCoupon != null && userCoupon.getCanUseItemIds().contains("2030")) {
+                item.setFreight(new BigDecimal("18"));
+                if (item.getNum() > 1) {
+                    item.setFreight(item.getFreight().add(new BigDecimal(item.getNum() - 1).multiply(freight)));
+                }
+                userCoupon = null;
+            } else {
+                item.setFreight(new BigDecimal(item.getNum()).multiply(freight));
             }
         }
+
         return resultList;
     }
 
