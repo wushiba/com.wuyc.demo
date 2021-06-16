@@ -89,10 +89,10 @@ public class AdminHealthyController implements BaseController {
     @CrossOrigin
     @RequestMapping(value = "/importSubOrderList", method = {RequestMethod.GET, RequestMethod.POST})
     @ResponseBody
-    @SaCheckLogin
-    @SaCheckRole(value = "sys")
+//    @SaCheckLogin
+//    @SaCheckRole(value = "sys")
     public CommonResult<Void> importSubOrderList(MultipartFile file) {
-        List<HealthySubOrderImportReq> healthySubOrderImport = ExcelUtils.importExcel(file, 0, 1, HealthySubOrderImportReq.class);
+        List<HealthySubOrderImportReq> healthySubOrderImport = ExcelUtils.importExcel(file, 1, 1, HealthySubOrderImportReq.class);
         return CommonResult.success(adminHealthyExportService.importSubOrderList(healthySubOrderImport));
     }
 
