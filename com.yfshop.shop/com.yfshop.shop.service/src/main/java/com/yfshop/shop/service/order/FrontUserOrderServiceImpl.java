@@ -586,7 +586,7 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
         Asserts.assertFalse(actIdSetList.size() > 1, 500, "请选择正确的活动");
         YfDrawActivityResult drawActivityResult = frontDrawService.getDrawActivityDetailById(actIdSetList.iterator().next());
         Asserts.assertNonNull(drawActivityResult, 500, "此活动不存在,请联系管理员处理");
-        Set<Long> couponIdSetList = userCouponList.stream().map(UserCoupon::getCouponId).collect(Collectors.toSet());
+        Set<Integer> couponIdSetList = userCouponList.stream().map(UserCoupon::getCouponId).collect(Collectors.toSet());
         Asserts.assertFalse(couponIdSetList.size() > 1, 500, "请传入正确的用户优惠券,自提奖品只支持二等奖");
         YfDrawPrizeResult yfDrawPrizeResult = drawActivityResult.getPrizeList().stream().filter(prize ->
                 prize.getPrizeLevel() == 2).collect(Collectors.toList()).get(0);
