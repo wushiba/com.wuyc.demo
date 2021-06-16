@@ -7,12 +7,10 @@ import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.yfshop.code.mapper.CouponMapper;
+import com.yfshop.code.mapper.DrawRecordMapper;
 import com.yfshop.code.mapper.UserCouponMapper;
 import com.yfshop.code.mapper.UserMapper;
-import com.yfshop.code.model.Coupon;
-import com.yfshop.code.model.DrawActivity;
-import com.yfshop.code.model.User;
-import com.yfshop.code.model.UserCoupon;
+import com.yfshop.code.model.*;
 import com.yfshop.common.constants.CacheConstants;
 import com.yfshop.common.enums.CouponResourceEnum;
 import com.yfshop.common.enums.UserCouponStatusEnum;
@@ -78,6 +76,8 @@ public class FrontUserCouponServiceImpl implements FrontUserCouponService {
     private FrontDrawRecordService frontDrawRecordService;
     @Resource
     private FrontUserService frontUserService;
+    @Resource
+    private DrawRecordMapper drawRecordMapper;
     @DubboReference
     private MpService mpService;
     @Value("${shop.url}")
@@ -173,8 +173,28 @@ public class FrontUserCouponServiceImpl implements FrontUserCouponService {
         Asserts.assertNonNull(userCouponId, 500, "用户优惠券id不可以为空");
         int result = userCouponDao.updateUserCouponInUse(userCouponId);
         Asserts.assertFalse(result < 1, 500, "优惠券使用失败，不可以重复使用");
-        frontDrawRecordService.updateDrawRecordUseStatus(userCouponId,UserCouponStatusEnum.IN_USE.getCode());
+        frontDrawRecordService.updateDrawRecordUseStatus(userCouponId, UserCouponStatusEnum.IN_USE.getCode());
     }
+
+    @Override
+    public void updateCouponData(Long userCouponId, Long orderId, String mobile) throws ApiException {
+        try {
+            UserCoupon userCoupon = new UserCoupon();
+            userCoupon.setCouponId(userCouponId);
+            userCoupon.setOrderId(orderId);
+            userCoupon.setMobile(mobile);
+            userCoupon.setUseTime(LocalDateTime.now());
+            userCouponMapper.updateById(userCoupon);
+            DrawRecord drawRecord = new DrawRecord();
+            drawRecord.setUserMobile(mobile);
+            drawRecordMapper.update(drawRecord, Wrappers.<DrawRecord>lambdaQuery()
+                    .eq(DrawRecord::getUserCouponId, userCouponId));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+}
 
     @Override
     public void updateCouponOrderOrderId(Long userCouponId, Long childOrderId) throws ApiException {

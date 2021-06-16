@@ -342,6 +342,13 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
         logger.info("支付订单价格={}", payPrice.longValue());
         Order order = insertUserOrder(userId, null, ReceiveWayEnum.PS.getCode(), num, 1, orderPrice, couponPrice, orderFreight, payPrice, "N", null);
         Long orderId = order.getId();
+        if (userCoupon != null) {
+            try {
+                frontUserCouponService.updateCouponData(userCoupon.getId(), orderId, addressInfo.getMobile());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
         String userName = null;
         User user = userMapper.selectById(userId);
         if (user != null) {
@@ -490,6 +497,13 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
         logger.info("支付订单价格={}", payPrice.longValue());
         Order order = insertUserOrder(userId, null, ReceiveWayEnum.PS.getCode(), itemCount, childOrderCount, orderPrice, couponPrice, orderFreight, payPrice, "N", null);
         Long orderId = order.getId();
+        if (userCoupon != null) {
+            try {
+                frontUserCouponService.updateCouponData(userCoupon.getId(), orderId, addressInfo.getMobile());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
         for (UserCart userCart : userCartList) {
             ItemSkuResult itemSku = itemSkuMap.get(userCart.getSkuId());
             BigDecimal childCouponPrice = new BigDecimal("0.0");
@@ -572,7 +586,7 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
         Asserts.assertFalse(actIdSetList.size() > 1, 500, "请选择正确的活动");
         YfDrawActivityResult drawActivityResult = frontDrawService.getDrawActivityDetailById(actIdSetList.iterator().next());
         Asserts.assertNonNull(drawActivityResult, 500, "此活动不存在,请联系管理员处理");
-        Set<Integer> couponIdSetList = userCouponList.stream().map(UserCoupon::getCouponId).collect(Collectors.toSet());
+        Set<Long> couponIdSetList = userCouponList.stream().map(UserCoupon::getCouponId).collect(Collectors.toSet());
         Asserts.assertFalse(couponIdSetList.size() > 1, 500, "请传入正确的用户优惠券,自提奖品只支持二等奖");
         YfDrawPrizeResult yfDrawPrizeResult = drawActivityResult.getPrizeList().stream().filter(prize ->
                 prize.getPrizeLevel() == 2).collect(Collectors.toList()).get(0);
@@ -607,6 +621,11 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
         }
         Long orderId = order.getId();
         for (UserCoupon userCoupon : userCouponList) {
+            try {
+                frontUserCouponService.updateCouponData(userCoupon.getCouponId(), orderId, userMobile);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             BigDecimal couponPrice = new BigDecimal(userCoupon.getCouponPrice());
             BigDecimal payPrice = itemSku.getSkuSalePrice().subtract(couponPrice);
             insertUserOrderDetail(userId, userName, orderId, merchantResult.getId(), merchantResult.getPidPath(), websiteCode, ReceiveWayEnum.ZT.getCode(), "N", 1,

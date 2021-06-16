@@ -41,6 +41,8 @@ public interface FrontUserCouponService {
 	 */
 	public void useUserCoupon(Long userCouponId) throws ApiException;
 
+	public void updateCouponData(Long userCouponId,Long orderId,String mobile) throws ApiException;
+
 	/**
 	 * 修改优惠券对应的订单
 	 * @param userCouponId	用户优惠券id

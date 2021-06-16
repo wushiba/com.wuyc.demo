@@ -5,9 +5,7 @@ import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
-import com.yfshop.code.mapper.DrawRecordMapper;
-import com.yfshop.code.mapper.TraceMapper;
-import com.yfshop.code.mapper.UserCouponMapper;
+import com.yfshop.code.mapper.*;
 import com.yfshop.code.model.*;
 import com.yfshop.common.constants.CacheConstants;
 import com.yfshop.common.enums.BoxSpecValEnum;
@@ -55,6 +53,8 @@ public class FrontDrawRecordServiceImpl implements FrontDrawRecordService {
     private UserCouponMapper userCouponMapper;
     @Resource
     private FrontUserService frontUserService;
+    @Resource
+    private OrderAddressMapper orderAddressMapper;
 
     /**
      * 保存中奖记录
