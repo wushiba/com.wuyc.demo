@@ -283,9 +283,15 @@ public class UserCartServiceImpl implements UserCartService {
             for (UserCartResult item : otherGoods) {
                 if (userCoupon != null && userCoupon.getCanUseItemIds().contains("2032")) {
                     item.setFreight(new BigDecimal("1.8"));
+                    if (item.getNum() > 1) {
+                        item.setFreight(item.getFreight().add(new BigDecimal(item.getNum() - 1).multiply(freight)));
+                    }
                     userCoupon = null;
                 } else if (userCoupon != null && userCoupon.getCanUseItemIds().contains("2030")) {
                     item.setFreight(new BigDecimal("18"));
+                    if (item.getNum() > 1) {
+                        item.setFreight(item.getFreight().add(new BigDecimal(item.getNum() - 1).multiply(freight)));
+                    }
                     userCoupon = null;
                 } else {
                     item.setFreight(new BigDecimal(item.getNum()).multiply(freight));
