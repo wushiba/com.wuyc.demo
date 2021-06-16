@@ -27,7 +27,6 @@ import com.yfshop.shop.service.activity.service.FrontDrawService;
 import com.yfshop.shop.service.address.UserAddressService;
 import com.yfshop.shop.service.address.result.UserAddressResult;
 import com.yfshop.shop.service.cart.UserCartService;
-import com.yfshop.shop.service.cart.result.UserCartResult;
 import com.yfshop.shop.service.coupon.service.FrontUserCouponService;
 import com.yfshop.shop.service.mall.MallService;
 import com.yfshop.shop.service.mall.req.QueryItemDetailReq;
@@ -44,7 +43,6 @@ import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
-import org.apache.dubbo.config.annotation.Service;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.transaction.annotation.Transactional;
 
