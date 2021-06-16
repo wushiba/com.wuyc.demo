@@ -465,7 +465,7 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
         userCartService.deleteUserCarts(userId, skuIdList);
         //平均运费价格
         BigDecimal freight = BigDecimal.ZERO;
-        if (payPrice.longValue() < 88) {
+        if (orderPrice.longValue() < 88) {
             freight = new BigDecimal("10");
             if (sum > 0) {
                 orderFreight = orderFreight.add(new BigDecimal("10"));
