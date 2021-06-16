@@ -91,6 +91,10 @@ public class HealthySubOrderExportResult implements Serializable {
     @Excel(name = "物流单号", width = 18)
     private String expressNo;
 
+    public String getPOrderNo() {
+        return pOrderNo;
+    }
+
 
     public String getCreateTime() {
         return createTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
