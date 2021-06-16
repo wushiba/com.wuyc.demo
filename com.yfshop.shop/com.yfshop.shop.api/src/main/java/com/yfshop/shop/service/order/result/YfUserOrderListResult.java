@@ -79,6 +79,10 @@ public class YfUserOrderListResult implements Serializable {
      */
     private String expressNo;
 
+    private String expressCompany;
+
+    private String mobile;
+
     private List<YfUserOrderItem> itemList;
 
     @Data

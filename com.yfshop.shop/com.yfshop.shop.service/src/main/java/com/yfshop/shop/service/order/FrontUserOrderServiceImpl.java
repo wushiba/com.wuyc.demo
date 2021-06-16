@@ -719,10 +719,13 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
                 resultList.add(orderResult);
             } else {
                 // 待发货，待收货，已完成订单状态组装数据
+                OrderAddress orderAddress = orderAddressMapper.selectOne(Wrappers.lambdaQuery(OrderAddress.class).eq(OrderAddress::getOrderId, order.getId()));
+                String mobile = orderAddress == null ? "" : orderAddress.getMobile();
                 for (OrderDetail orderDetail : detailList) {
                     orderResult = BeanUtil.convert(orderDetail, YfUserOrderListResult.class);
                     orderResult.setOrderDetailId(orderDetail.getId());
                     orderResult.setOrderNo(orderDetail.getOrderNo());
+                    orderResult.setMobile(mobile);
                     orderResult.setItemList(BeanUtil.convertList(Arrays.asList(orderDetail), YfUserOrderListResult.YfUserOrderItem.class));
                     resultList.add(orderResult);
                 }

@@ -75,6 +75,8 @@ public class YfUserOrderDetailResult implements Serializable {
      */
     private String expressNo;
 
+    private String expressCompany;
+
     private List<YfUserOrderItem> itemList;
 
     private YfUserOrderAddress addressInfo;
@@ -102,6 +104,7 @@ public class YfUserOrderDetailResult implements Serializable {
         private String specNameValueJson;
 
         private String specValueStr;
+
     }
 
     @Data
