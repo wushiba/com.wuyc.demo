@@ -450,7 +450,7 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
         if (userCoupon.getId() != null) {
             frontUserCouponService.useUserCoupon(userCoupon.getId());
             couponPrice = new BigDecimal(userCoupon.getCouponPrice());
-            payPrice = payPrice.subtract(couponPrice);
+            orderPrice = payPrice.subtract(couponPrice);
             if (userCoupon.getCanUseItemIds().contains("2032")) {
                 orderFreight = orderFreight.add(new BigDecimal("1.8"));
                 sum = sum - 1;
