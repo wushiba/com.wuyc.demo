@@ -43,6 +43,7 @@ public class HealthyController implements BaseController {
     @ResponseBody
     @SaCheckLogin
     public CommonResult<WxPayMpOrderResult> submitOrder(@Valid @NotNull(message = "提交订单信息不能为空") SubmitHealthyOrderReq req) {
+        req.setClientIp(getRequestIpStr());
         return CommonResult.success(healthyService.submitOrder(getCurrentUserId(), req));
     }
 
