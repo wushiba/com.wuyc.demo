@@ -71,34 +71,18 @@ public interface UserCartService {
      */
     Void clearUserCart(@NotNull(message = "用户ID不能为空") Integer userId);
 
-    /**
-     * 根据cartId计算购物车支付页面详情
-     *
-     * @param userId  the user id
-     * @param cartIds the cart id list
-     * @return the result
-     */
-    @Deprecated
-    UserCartSummary calcUserSelectedCarts(Integer userId, List<Integer> cartIds);
-
-    /**
-     * 根据skuId计算购物车支付页面详情
-     *
-     * @param userId the user id
-     * @param skuId  the sku id
-     * @param num    the item num
-     * @return the result
-     */
-    @Deprecated
-    UserCartSummary calcUserBuySkuDetails(Integer userId, Integer skuId, int num);
 
     /**
      * 查询订单结算页商品信息
-     * @param skuId     skuId
-     * @param num       商品数量
-     * @param cartIds   购物车ids
+     *
+     * @param skuId   skuId
+     * @param num     商品数量
+     * @param cartIds 购物车ids
      * @return
      */
     List<UserCartResult> findItemList(Integer skuId, Integer num, String cartIds);
+
+
+    List<UserCartResult> calcUserCart(Integer skuId, Integer num, String cartIds, Long userCouponId);
 
 }

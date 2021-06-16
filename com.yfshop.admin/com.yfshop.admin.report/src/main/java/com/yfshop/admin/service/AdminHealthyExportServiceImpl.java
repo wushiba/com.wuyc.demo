@@ -15,11 +15,13 @@ import com.yfshop.code.model.DrawRecord;
 import com.yfshop.code.model.HealthySubOrder;
 import com.yfshop.common.healthy.enums.HealthySubOrderStatusEnum;
 import com.yfshop.common.util.BeanUtil;
+import com.yfshop.common.util.DateUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.List;
 
 @DubboService
@@ -30,23 +32,28 @@ public class AdminHealthyExportServiceImpl implements AdminHealthyExportService 
     @Override
     public List<HealthySubOrderExportResult> exportSubOrderList(QueryHealthySubOrderReq req) {
         LambdaQueryWrapper queryWrapper = Wrappers.lambdaQuery(HealthySubOrder.class)
-                .eq(org.apache.commons.lang3.StringUtils.isNotBlank(req.getPOrderNo()), HealthySubOrder::getPOrderNo, req.getPOrderNo())
-                .eq(org.apache.commons.lang3.StringUtils.isNotBlank(req.getOrderNo()), HealthySubOrder::getOrderNo, req.getOrderNo())
-                .eq(org.apache.commons.lang3.StringUtils.isNotBlank(req.getContracts()), HealthySubOrder::getContracts, req.getContracts())
-                .eq(org.apache.commons.lang3.StringUtils.isNotBlank(req.getMobile()), HealthySubOrder::getMobile, req.getMobile())
-                .eq(org.apache.commons.lang3.StringUtils.isNotBlank(req.getAddress()), HealthySubOrder::getAddress, req.getAddress())
-                .eq(org.apache.commons.lang3.StringUtils.isNotBlank(req.getOrderStatus()), HealthySubOrder::getOrderStatus, req.getOrderStatus())
+                .eq(StringUtils.isNotBlank(req.getPOrderNo()), HealthySubOrder::getPOrderNo, req.getPOrderNo())
+                .eq(StringUtils.isNotBlank(req.getOrderNo()), HealthySubOrder::getOrderNo, req.getOrderNo())
+                .eq(StringUtils.isNotBlank(req.getContracts()), HealthySubOrder::getContracts, req.getContracts())
+                .eq(StringUtils.isNotBlank(req.getMobile()), HealthySubOrder::getMobile, req.getMobile())
+                .eq(StringUtils.isNotBlank(req.getAddress()), HealthySubOrder::getAddress, req.getAddress())
+                .eq(StringUtils.isNotBlank(req.getOrderStatus()), HealthySubOrder::getOrderStatus, req.getOrderStatus())
                 .eq(StringUtils.isNotBlank(req.getPostWay()), HealthySubOrder::getPostWay, req.getPostWay())
                 .eq(req.getProvinceId() != null, HealthySubOrder::getProvinceId, req.getProvinceId())
                 .eq(req.getCityId() != null, HealthySubOrder::getCityId, req.getCityId())
                 .eq(req.getDistrictId() != null, HealthySubOrder::getDistrictId, req.getDistrictId())
+                .like(StringUtils.isNotBlank(req.getExpressCompany()), HealthySubOrder::getExpressCompany, req.getExpressCompany())
+                .like(StringUtils.isNotBlank(req.getExpressNo()), HealthySubOrder::getExpressNo, req.getExpressNo())
                 .ge(req.getStartTime() != null, HealthySubOrder::getExpectShipTime, req.getStartTime())
-                .like(req.getExpressCompany() != null, HealthySubOrder::getExpressCompany, req.getExpressCompany())
-                .like(req.getExpressNo() != null, HealthySubOrder::getExpressNo, req.getExpressNo())
                 .lt(req.getEndTime() != null, HealthySubOrder::getExpectShipTime, req.getEndTime());
         List<HealthySubOrder> list = healthySubOrderMapper.selectList(queryWrapper);
-
-        return BeanUtil.convertList(list, HealthySubOrderExportResult.class);
+        List<HealthySubOrderExportResult> result = new ArrayList<>();
+        for (HealthySubOrder subOrder : list) {
+            HealthySubOrderExportResult exportResult = BeanUtil.convert(subOrder, HealthySubOrderExportResult.class);
+            exportResult.setExpectShipTime(DateUtil.localDateTimeToDate(subOrder.getExpectShipTime()));
+            result.add(exportResult);
+        }
+        return result;
     }
 
     @Override

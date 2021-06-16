@@ -93,4 +93,9 @@ public class UserCartResult implements Serializable {
      * 商品是否有效的(Y|N)
      */
     private String isAvailable;
+
+    /**
+     * 一级分类id
+     */
+    private Integer categoryId;
 }

@@ -109,9 +109,8 @@ public class AdminHealthyServiceImpl implements AdminHealthyService {
                 .eq(req.getProvinceId() != null, HealthySubOrder::getProvinceId, req.getProvinceId())
                 .eq(req.getCityId() != null, HealthySubOrder::getCityId, req.getCityId())
                 .eq(req.getDistrictId() != null, HealthySubOrder::getDistrictId, req.getDistrictId())
-                .ge(req.getStartTime() != null, HealthySubOrder::getExpectShipTime, req.getStartTime())
-                .like(req.getExpressCompany() != null, HealthySubOrder::getExpressCompany, req.getExpressCompany())
-                .like(req.getExpressNo() != null, HealthySubOrder::getExpressNo, req.getExpressNo())
+                .like(StringUtils.isNotBlank(req.getExpressCompany()), HealthySubOrder::getExpressCompany, req.getExpressCompany())
+                .like(StringUtils.isNotBlank(req.getExpressNo()), HealthySubOrder::getExpressNo, req.getExpressNo())
                 .and(StringUtils.isNotBlank(req.getPostKey()), wrapper -> {
                     wrapper.like(HealthySubOrder::getMerchantContacts, req.getPostKey())
                             .or()
@@ -121,6 +120,7 @@ public class AdminHealthyServiceImpl implements AdminHealthyService {
                             .or()
                             .like(HealthySubOrder::getExpressNo, req.getPostKey());
                 })
+                .ge(req.getStartTime() != null, HealthySubOrder::getExpectShipTime, req.getStartTime())
                 .lt(req.getEndTime() != null, HealthySubOrder::getExpectShipTime, req.getEndTime());
         IPage<HealthySubOrder> iPage = healthySubOrderMapper.selectPage(new Page<>(req.getPageIndex(), req.getPageSize()), queryWrapper);
         return BeanUtil.iPageConvert(iPage, HealthySubOrderResult.class);

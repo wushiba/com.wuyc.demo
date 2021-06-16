@@ -118,14 +118,14 @@ public class StOrderServiceImpl implements StOrderService {
         wuyou.setToCode("sto_merchant_code");
         wuyou.setApiName("ADD_WUYOU_ORDER");
         WuYouOrderReq wuYouOrderReq = new WuYouOrderReq();
-        wuYouOrderReq.setPlatformOrderId(3 + "");
+        wuYouOrderReq.setPlatformOrderId(10 + "");
         wuYouOrderReq.setPayType("标准快递");
         wuYouOrderReq.setGoodsType("135ml鹿龟酒");
         wuYouOrderReq.setGoodsNum("1");
         wuYouOrderReq.setUserName("18780003433");
         wuYouOrderReq.setPassword(SecureUtil.md5("Sto1259...***"));
         wuYouOrderReq.setCustomerName("646643000296");
-        wuYouOrderReq.setSenderName("眉山申通");
+        wuYouOrderReq.setSenderName("雨帆健康家");
         wuYouOrderReq.setSenderMobile("13890312117");
         wuYouOrderReq.setSenderProvince("四川省");
         wuYouOrderReq.setSenderCity("眉山市");
@@ -139,10 +139,10 @@ public class StOrderServiceImpl implements StOrderService {
         wuYouOrderReq.setRecipientDetail("人工智能产业园");
         wuYouOrderReq.setOrderAndGetBillCode(1);
         wuyou.setContent(JSONUtil.toJsonStr(wuYouOrderReq));
-        //String json = LinkUtils.request(wuyou, url, secretKey);
-        //System.out.println(json);
-        String json = "{\"data\":{\"expressCode\":\"STO\",\"waybillCode\":\"772013715937274\",\"platformOrderId\":\"2\"},\"success\":\"true\",\"errorCode\":\"200\",\"errorMsg\":\"成功\"}";
-        StOrderResult stOrderResult = JSONUtil.toBean(json, StOrderResult.class);
-        System.out.println(stOrderResult.toString());
+        String json = LinkUtils.request(wuyou, url, secretKey);
+        System.out.println(json);
+//        String json = "{\"data\":{\"expressCode\":\"STO\",\"waybillCode\":\"772013715937274\",\"platformOrderId\":\"2\"},\"success\":\"true\",\"errorCode\":\"200\",\"errorMsg\":\"成功\"}";
+//        StOrderResult stOrderResult = JSONUtil.toBean(json, StOrderResult.class);
+//        System.out.println(stOrderResult.toString());
     }
 }

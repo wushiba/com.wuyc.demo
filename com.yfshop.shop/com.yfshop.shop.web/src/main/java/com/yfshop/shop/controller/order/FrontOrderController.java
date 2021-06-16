@@ -170,6 +170,15 @@ public class FrontOrderController implements BaseController {
         return CommonResult.success(frontUserOrderService.findUserOrderList(getCurrentUserId(), orderStatus));
     }
 
+
+    @RequestMapping(value = "/order/calcUserCart", method = {RequestMethod.GET, RequestMethod.POST})
+    @ResponseBody
+    @SaCheckLogin
+    public CommonResult<List<UserCartResult>> calcUserCart(Integer skuId, Integer num, String cartIds, Long userCouponId) {
+        return CommonResult.success(userCartService.calcUserCart(skuId, num, cartIds, userCouponId));
+    }
+
+
     /**
      * 用户订单详情
      *

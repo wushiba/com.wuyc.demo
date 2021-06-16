@@ -57,7 +57,7 @@ public class WxMenuController {
         WxMenuButton introduce = new WxMenuButton();//跳转
         introduce.setType(MenuButtonType.VIEW);
         introduce.setName("进入商城");
-        introduce.setUrl("https://m.yufanlook.com/#/HomePage");
+        introduce.setUrl("https://m.yufanlook.com/#/ActPage");
 
         WxMenuButton bindPhone = new WxMenuButton();
         bindPhone.setType(MenuButtonType.VIEW);

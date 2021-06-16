@@ -6,9 +6,11 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.yfshop.code.mapper.ItemMapper;
 import com.yfshop.code.mapper.ItemSkuMapper;
 import com.yfshop.code.mapper.UserCartMapper;
+import com.yfshop.code.mapper.UserCouponMapper;
 import com.yfshop.code.model.Item;
 import com.yfshop.code.model.ItemSku;
 import com.yfshop.code.model.UserCart;
+import com.yfshop.code.model.UserCoupon;
 import com.yfshop.common.constants.CacheConstants;
 import com.yfshop.common.exception.ApiException;
 import com.yfshop.common.exception.Asserts;
@@ -32,12 +34,14 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 import java.math.BigDecimal;
+import java.math.MathContext;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
 /**
@@ -58,6 +62,8 @@ public class UserCartServiceImpl implements UserCartService {
     private ItemMapper itemMapper;
     @Resource
     private FrontUserCouponService frontUserCouponService;
+    @Resource
+    private UserCouponMapper userCouponMapper;
 
     @Cacheable(cacheNames = CacheConstants.USER_CART_CACHE_NAME,
             key = "'" + CacheConstants.USER_CART_CACHE_KEY_PREFIX + "' + #root.args[0]")
@@ -184,56 +190,6 @@ public class UserCartServiceImpl implements UserCartService {
         return null;
     }
 
-    @Override
-    public UserCartSummary calcUserSelectedCarts(Integer userId, List<Integer> cartIds) {
-        if (userId == null || userId <= 0) {
-            return null;
-        }
-        if (CollectionUtil.isEmpty(cartIds)) {
-            return UserCartSummary.emptySummary();
-        }
-        List<UserCart> userCarts = cartMapper.selectList(Wrappers.lambdaQuery(UserCart.class)
-                .eq(UserCart::getUserId, userId).in(UserCart::getId, cartIds));
-        // 查询用户的购物车列表
-        //List<UserCart> userCarts = getUserCarts(userId).stream()
-        //        .filter(userCartResult -> cartIds.contains(userCartResult.getId()))
-        //        .map((userCartResult) -> BeanUtil.convert(userCartResult, UserCart.class))
-        //        .collect(Collectors.toList());
-        return this.calcUserCart(userCarts);
-    }
-
-    @Override
-    public UserCartSummary calcUserBuySkuDetails(Integer userId, Integer skuId, int num) {
-        if (userId == null || userId <= 0 || skuId == null || skuId <= 0 || num <= 0) {
-            return null;
-        }
-        ItemSku sku = skuMapper.selectById(skuId);
-        if (sku == null) {
-            return UserCartSummary.emptySummary();
-        }
-
-        // 总结算价
-        BigDecimal totalMoney = NumberUtil.mul(sku.getSkuSalePrice(), num);
-        // 购物车总市场价
-        BigDecimal oldTotalMoney = NumberUtil.mul(sku.getSkuMarketPrice(), num);
-        // 计算运费
-        BigDecimal totalFreight = calcTotalFreight();
-
-        // TODO: 2021/3/24 优惠信息
-        QueryUserCouponReq userCouponReq = new QueryUserCouponReq();
-        userCouponReq.setUserId(userId);
-        userCouponReq.setIsCanUse("Y");
-        // List<YfUserCouponResult> availableCoupons = frontUserCouponService.findUserCouponList(userCouponReq);
-
-        // 封装数据
-        UserCartSummary cartSummary = new UserCartSummary();
-        cartSummary.setItemCount(num);
-        cartSummary.setTotalMoney(totalMoney);
-        cartSummary.setOldTotalMoney(oldTotalMoney);
-        cartSummary.setTotalFreight(totalFreight);
-        cartSummary.setCarts(null);
-        return cartSummary;
-    }
 
     @Override
     public List<UserCartResult> findItemList(Integer skuId, Integer num, String cartIds) {
@@ -253,6 +209,7 @@ public class UserCartServiceImpl implements UserCartService {
                 if (itemSku != null) {
                     data.setFreight(itemSku.getFreight());
                     data.setSkuSalePrice(itemSku.getSkuSalePrice());
+                    data.setCategoryId(itemSku.getCategoryId());
                 }
             });
         } else {
@@ -265,45 +222,84 @@ public class UserCartServiceImpl implements UserCartService {
         return resultList;
     }
 
-    private UserCartSummary calcUserCart(List<UserCart> userCarts) {
-        // 查询购物车中sku信息
-        List<Integer> skuIds = userCarts.stream().map(UserCart::getSkuId)
-                .collect(Collectors.toList());
-        Map<Integer, ItemSku> skuIndexMap = skuMapper.selectBatchIds(skuIds).stream()
-                .collect(Collectors.toMap(ItemSku::getId, sku -> sku));
 
-        // user cart details
-        List<UserCartResult> carts = userCarts.stream()
-                .map(userCart -> convertUserCart(userCart, skuIndexMap))
-                .collect(Collectors.toList());
-        // available user cart
-        List<UserCartResult> availableUserCarts = carts.stream().filter(c -> "Y".equals(c.getIsAvailable()))
-                .collect(Collectors.toList());
+    @Override
+    public List<UserCartResult> calcUserCart(Integer skuId, Integer num, String cartIds, Long userCouponId) {
+        UserCoupon userCoupon = null;
+        if (userCouponId != null) {
+            userCoupon = userCouponMapper.selectById(userCouponId);
+        }
+        List<UserCartResult> resultList = new ArrayList<>();
+        if (StringUtils.isNotEmpty(cartIds)) {
+            List<Integer> cartIdList = Arrays.stream(StringUtils.split(cartIds, ","))
+                    .map(Integer::valueOf)
+                    .collect(Collectors.toList());
+            List<UserCart> userCartList = cartMapper.selectList(Wrappers.lambdaQuery(UserCart.class)
+                    .in(UserCart::getId, cartIdList));
+            resultList = BeanUtil.convertList(userCartList, UserCartResult.class);
 
-        // 购物车总数量
-        int itemCount = availableUserCarts.stream().mapToInt(UserCartResult::getNum).sum();
-        // 购物车总结算价
-        BigDecimal totalMoney = availableUserCarts.stream()
-                .map((c) -> NumberUtil.mul(c.getSkuSalePrice(), c.getNum()))
-                .reduce(BigDecimal.ZERO, NumberUtil::add);
-        // 购物车总市场价
-        BigDecimal oldTotalMoney = availableUserCarts.stream()
-                .map((c) -> NumberUtil.mul(c.getSkuMarketPrice(), c.getNum()))
-                .reduce(BigDecimal.ZERO, NumberUtil::add);
-        // 计算运费
-        BigDecimal totalFreight = calcTotalFreight();
+            List<Integer> skuIdList = userCartList.stream().map(UserCart::getSkuId).collect(Collectors.toList());
+            Map<Integer, ItemSku> skuIndexMap = skuMapper.selectBatchIds(skuIdList).stream().collect(Collectors.toMap(ItemSku::getId, s -> s));
+            resultList.forEach(data -> {
+                ItemSku itemSku = skuIndexMap.get(data.getSkuId());
+                if (itemSku != null) {
+                    data.setFreight(itemSku.getFreight());
+                    data.setSkuSalePrice(itemSku.getSkuSalePrice());
+                    data.setCategoryId(itemSku.getCategoryId());
+                }
+            });
+        } else {
+            ItemSku itemSku = skuMapper.selectById(skuId);
+            UserCartResult userCartResult = BeanUtil.convert(itemSku, UserCartResult.class);
+            userCartResult.setNum(num);
+            userCartResult.setSkuId(skuId);
+            resultList.add(userCartResult);
+        }
 
-        // TODO: 2021/3/24 优惠信息  购物车不需要优惠券信息
+        //计算非火锅的商品价格
+        BigDecimal sumPrice = resultList.stream().map(item -> item.getSkuSalePrice().multiply(new BigDecimal(item.getNum()))).reduce(BigDecimal.ZERO, (before, grantMoney) -> NumberUtil.add(before, grantMoney));
+        if (userCoupon != null) {
+            sumPrice = sumPrice.subtract(new BigDecimal(userCoupon.getCouponPrice()));
+        }
+        List<UserCartResult> otherGoods = new ArrayList<>();
+        resultList.forEach(item -> {
+            if (item.getCategoryId() != 3) {
+                otherGoods.add(item);
+            }
+        });
+        BigDecimal freight = new BigDecimal("10");
+        if (sumPrice.longValue() >= 88) {
+            freight = BigDecimal.ZERO;
+        } else if (sumPrice.longValue() > 0) {
+            int sum = otherGoods.stream().mapToInt(UserCartResult::getNum).sum();
+            if (userCoupon != null) {
+                sum = sum - 1;
+            }
+            if (sum > 1) {
+                freight = freight.divide(new BigDecimal(sum), 2, BigDecimal.ROUND_HALF_UP);
+            }
+        }
+        for (UserCartResult item : otherGoods) {
+            if (userCoupon != null && userCoupon.getCanUseItemIds().contains("2032")) {
+                item.setFreight(new BigDecimal("1.8"));
+                if (item.getNum() > 1) {
+                    item.setFreight(item.getFreight().add(new BigDecimal(item.getNum() - 1).multiply(freight)));
+                }
+                userCoupon = null;
+            } else if (userCoupon != null && userCoupon.getCanUseItemIds().contains("2030")) {
+                item.setFreight(new BigDecimal("18"));
+                if (item.getNum() > 1) {
+                    item.setFreight(item.getFreight().add(new BigDecimal(item.getNum() - 1).multiply(freight)));
+                }
+                userCoupon = null;
+            } else {
+                item.setFreight(new BigDecimal(item.getNum()).multiply(freight));
+            }
+        }
 
-        // 封装数据
-        UserCartSummary cartSummary = new UserCartSummary();
-        cartSummary.setItemCount(itemCount);
-        cartSummary.setTotalMoney(totalMoney);
-        cartSummary.setOldTotalMoney(oldTotalMoney);
-        cartSummary.setTotalFreight(totalFreight);
-        cartSummary.setCarts(carts);
-        return cartSummary;
+        return resultList;
     }
+
 
     private UserCartResult convertUserCart(UserCart userCart, Map<Integer, ItemSku> skuIndexMap) {
         UserCartResult result = new UserCartResult();
@@ -322,28 +318,6 @@ public class UserCartServiceImpl implements UserCartService {
             result.setSkuMarketPrice(targetSku.getSkuMarketPrice());
         }
         return result;
-    }
-
-    private BigDecimal calcTotalFreight() {
-        throw new UnsupportedOperationException("运费逻辑呢？");
-    }
-
-    private Object calcDiscountInfo(Integer userId, Integer itemId) {
-        if (true) {
-            throw new UnsupportedOperationException();
-        }
-        // 用户可用优惠券
-        QueryUserCouponReq userCouponReq = new QueryUserCouponReq();
-        userCouponReq.setUserId(userId);
-        userCouponReq.setIsCanUse("Y");
-        YfUserCouponResult availableCoupon = frontUserCouponService.findUserCouponList(userCouponReq).stream()
-                .filter(userCoupon -> "ALL".equalsIgnoreCase(userCoupon.getUseRangeType())
-                        || userCoupon.getCanUseItemIds().equals(itemId.toString()))
-                .findFirst().orElse(null);
-        if (availableCoupon == null) {
-            return null;
-        }
-        return null;
     }
 
 }
