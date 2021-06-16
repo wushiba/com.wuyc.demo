@@ -622,7 +622,7 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
         Long orderId = order.getId();
         for (UserCoupon userCoupon : userCouponList) {
             try {
-                frontUserCouponService.updateCouponData(userCoupon.getCouponId(), orderId, userMobile);
+                frontUserCouponService.updateCouponData(userCoupon.getId(), orderId, userMobile);
             } catch (Exception e) {
                 e.printStackTrace();
             }

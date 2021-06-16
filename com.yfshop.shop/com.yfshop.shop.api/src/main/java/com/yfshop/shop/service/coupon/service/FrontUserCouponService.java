@@ -23,7 +23,7 @@ public interface FrontUserCouponService {
 	 * @return	YfCouponResult
 	 * @throws ApiException
 	 */
-	public YfCouponResult getCouponResultById(Long couponId) throws ApiException;
+	public YfCouponResult getCouponResultById(Integer couponId) throws ApiException;
 
 	/**
 	 * 查询用户优惠券YfUserCoupon

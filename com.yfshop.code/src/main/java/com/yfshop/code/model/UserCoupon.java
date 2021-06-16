@@ -41,7 +41,7 @@ public class UserCoupon extends Model<UserCoupon> {
 
     private String pidPath;
 
-    private Long couponId;
+    private Integer couponId;
 
     private String couponTitle;
 

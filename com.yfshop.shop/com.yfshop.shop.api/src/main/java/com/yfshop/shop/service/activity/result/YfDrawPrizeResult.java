@@ -56,7 +56,7 @@ public class YfDrawPrizeResult implements Serializable {
     /**
      * 优惠券id
      */
-    private Long couponId;
+    private Integer couponId;
 
     /**
      * 奖品数量

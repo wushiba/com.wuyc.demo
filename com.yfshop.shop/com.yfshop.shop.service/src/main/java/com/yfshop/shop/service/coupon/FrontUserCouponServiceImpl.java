@@ -91,7 +91,7 @@ public class FrontUserCouponServiceImpl implements FrontUserCouponService {
      * @throws ApiException
      */
     @Override
-    public YfCouponResult getCouponResultById(Long couponId) throws ApiException {
+    public YfCouponResult getCouponResultById(Integer couponId) throws ApiException {
         Asserts.assertNonNull(couponId, 500, "优惠券id不可以为空");
         Object couponObject = redisService.get(CacheConstants.COUPON_INFO_DATA + couponId);
         if (couponObject != null) {
@@ -180,7 +180,7 @@ public class FrontUserCouponServiceImpl implements FrontUserCouponService {
     public void updateCouponData(Long userCouponId, Long orderId, String mobile) throws ApiException {
         try {
             UserCoupon userCoupon = new UserCoupon();
-            userCoupon.setCouponId(userCouponId);
+            userCoupon.setId(userCouponId);
             userCoupon.setOrderId(orderId);
             userCoupon.setMobile(mobile);
             userCoupon.setUseTime(LocalDateTime.now());
