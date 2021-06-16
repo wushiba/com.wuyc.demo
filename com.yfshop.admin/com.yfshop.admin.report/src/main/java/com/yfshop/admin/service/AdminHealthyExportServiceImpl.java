@@ -30,19 +30,19 @@ public class AdminHealthyExportServiceImpl implements AdminHealthyExportService 
     @Override
     public List<HealthySubOrderExportResult> exportSubOrderList(QueryHealthySubOrderReq req) {
         LambdaQueryWrapper queryWrapper = Wrappers.lambdaQuery(HealthySubOrder.class)
-                .eq(org.apache.commons.lang3.StringUtils.isNotBlank(req.getPOrderNo()), HealthySubOrder::getPOrderNo, req.getPOrderNo())
-                .eq(org.apache.commons.lang3.StringUtils.isNotBlank(req.getOrderNo()), HealthySubOrder::getOrderNo, req.getOrderNo())
-                .eq(org.apache.commons.lang3.StringUtils.isNotBlank(req.getContracts()), HealthySubOrder::getContracts, req.getContracts())
-                .eq(org.apache.commons.lang3.StringUtils.isNotBlank(req.getMobile()), HealthySubOrder::getMobile, req.getMobile())
-                .eq(org.apache.commons.lang3.StringUtils.isNotBlank(req.getAddress()), HealthySubOrder::getAddress, req.getAddress())
-                .eq(org.apache.commons.lang3.StringUtils.isNotBlank(req.getOrderStatus()), HealthySubOrder::getOrderStatus, req.getOrderStatus())
+                .eq(StringUtils.isNotBlank(req.getPOrderNo()), HealthySubOrder::getPOrderNo, req.getPOrderNo())
+                .eq(StringUtils.isNotBlank(req.getOrderNo()), HealthySubOrder::getOrderNo, req.getOrderNo())
+                .eq(StringUtils.isNotBlank(req.getContracts()), HealthySubOrder::getContracts, req.getContracts())
+                .eq(StringUtils.isNotBlank(req.getMobile()), HealthySubOrder::getMobile, req.getMobile())
+                .eq(StringUtils.isNotBlank(req.getAddress()), HealthySubOrder::getAddress, req.getAddress())
+                .eq(StringUtils.isNotBlank(req.getOrderStatus()), HealthySubOrder::getOrderStatus, req.getOrderStatus())
                 .eq(StringUtils.isNotBlank(req.getPostWay()), HealthySubOrder::getPostWay, req.getPostWay())
                 .eq(req.getProvinceId() != null, HealthySubOrder::getProvinceId, req.getProvinceId())
                 .eq(req.getCityId() != null, HealthySubOrder::getCityId, req.getCityId())
                 .eq(req.getDistrictId() != null, HealthySubOrder::getDistrictId, req.getDistrictId())
+                .like(StringUtils.isNotBlank(req.getExpressCompany()), HealthySubOrder::getExpressCompany, req.getExpressCompany())
+                .like(StringUtils.isNotBlank(req.getExpressNo()), HealthySubOrder::getExpressNo, req.getExpressNo())
                 .ge(req.getStartTime() != null, HealthySubOrder::getExpectShipTime, req.getStartTime())
-                .like(req.getExpressCompany() != null, HealthySubOrder::getExpressCompany, req.getExpressCompany())
-                .like(req.getExpressNo() != null, HealthySubOrder::getExpressNo, req.getExpressNo())
                 .lt(req.getEndTime() != null, HealthySubOrder::getExpectShipTime, req.getEndTime());
         List<HealthySubOrder> list = healthySubOrderMapper.selectList(queryWrapper);
 
