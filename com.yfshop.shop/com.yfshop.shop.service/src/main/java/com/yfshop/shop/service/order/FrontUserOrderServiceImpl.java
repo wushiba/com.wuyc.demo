@@ -27,6 +27,7 @@ import com.yfshop.shop.service.activity.service.FrontDrawService;
 import com.yfshop.shop.service.address.UserAddressService;
 import com.yfshop.shop.service.address.result.UserAddressResult;
 import com.yfshop.shop.service.cart.UserCartService;
+import com.yfshop.shop.service.coupon.FrontUserCouponServiceImpl;
 import com.yfshop.shop.service.coupon.service.FrontUserCouponService;
 import com.yfshop.shop.service.mall.MallService;
 import com.yfshop.shop.service.mall.req.QueryItemDetailReq;
@@ -43,6 +44,8 @@ import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -62,7 +65,7 @@ import java.util.stream.Collectors;
  */
 @DubboService
 public class FrontUserOrderServiceImpl implements FrontUserOrderService {
-
+    private static final Logger logger = LoggerFactory.getLogger(FrontUserOrderServiceImpl.class);
     @Value("${wxPay.notifyUrl}")
     private String wxPayNotifyUrl;
     @Resource
@@ -320,9 +323,11 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
         // 下单，创建订单，订单详情，收货地址
         //BigDecimal orderFreight = new BigDecimal(num).multiply(itemSku.getFreight());
         BigDecimal orderPrice = new BigDecimal(num).multiply(itemSku.getSkuSalePrice());
+        logger.info("订单价格={}", orderPrice.longValue());
         BigDecimal couponPrice = userCoupon.getCouponPrice() == null ? new BigDecimal("0.00") : new BigDecimal(userCoupon.getCouponPrice());
-
+        logger.info("优惠券抵扣={}", couponPrice.longValue());
         BigDecimal payPrice = orderPrice.subtract(couponPrice);
+        logger.info("减扣后价格={}", payPrice.longValue());
         //平均运费价格
         BigDecimal freight = BigDecimal.ZERO;
         if (payPrice.longValue() < 88) {
@@ -332,7 +337,9 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
                 freight = freight.divide(new BigDecimal(sum), 2, BigDecimal.ROUND_HALF_UP);
             }
         }
+        logger.info("运费价格={}", orderFreight.longValue());
         payPrice = payPrice.add(orderFreight);
+        logger.info("支付订单价格={}", payPrice.longValue());
         Order order = insertUserOrder(userId, null, ReceiveWayEnum.PS.getCode(), num, 1, orderPrice, couponPrice, orderFreight, payPrice, "N", null);
         Long orderId = order.getId();
         String userName = null;
@@ -450,6 +457,8 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
         if (userCoupon.getId() != null) {
             frontUserCouponService.useUserCoupon(userCoupon.getId());
             couponPrice = new BigDecimal(userCoupon.getCouponPrice());
+
+
             payPrice = orderPrice.subtract(couponPrice);
             if (userCoupon.getCanUseItemIds().contains("2032")) {
                 orderFreight = orderFreight.add(new BigDecimal("1.8"));
@@ -485,7 +494,7 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
                 userName = user.getNickname();
             }
             //二等奖数量大于1时，使用优惠券必须拆单为一瓶装
-            if ((itemSku.getId().equals(2032001) || itemSku.getId().equals(2030001))  && userCoupon.getId() != null && userCart.getNum() > 1) {
+            if ((itemSku.getId().equals(2032001) || itemSku.getId().equals(2030001)) && userCoupon.getId() != null && userCart.getNum() > 1) {
                 BigDecimal childPayPrice = itemSku.getSkuSalePrice().add(itemSku.getFreight()).subtract(childCouponPrice);
                 insertUserOrderDetail(userId, userName, orderId, null, null, null, ReceiveWayEnum.PS.getCode(), "N", 1,
                         itemSku.getItemId(), itemSku.getId(), itemSku.getSkuTitle(), itemSku.getSkuSalePrice(), itemSku.getSkuCover(), itemSku.getFreight(), childCouponPrice,
