@@ -28,7 +28,7 @@ public class HealthySubOrderExportResult implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Excel(name = "预发货时间", width = 18, format = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime expectShipTime;
+    private Date expectShipTime;
 
     @Excel(name = "主订单号", width = 18)
     private String pOrderNo;
@@ -95,11 +95,6 @@ public class HealthySubOrderExportResult implements Serializable {
 
     public String getpOrderNo() {
         return pOrderNo;
-    }
-
-
-    public Date getExpectShipTime() {
-        return DateUtil.localDateTimeToDate(expectShipTime);
     }
 
 

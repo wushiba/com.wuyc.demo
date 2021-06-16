@@ -15,11 +15,13 @@ import com.yfshop.code.model.DrawRecord;
 import com.yfshop.code.model.HealthySubOrder;
 import com.yfshop.common.healthy.enums.HealthySubOrderStatusEnum;
 import com.yfshop.common.util.BeanUtil;
+import com.yfshop.common.util.DateUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.List;
 
 @DubboService
@@ -45,8 +47,13 @@ public class AdminHealthyExportServiceImpl implements AdminHealthyExportService 
                 .ge(req.getStartTime() != null, HealthySubOrder::getExpectShipTime, req.getStartTime())
                 .lt(req.getEndTime() != null, HealthySubOrder::getExpectShipTime, req.getEndTime());
         List<HealthySubOrder> list = healthySubOrderMapper.selectList(queryWrapper);
-
-        return BeanUtil.convertList(list, HealthySubOrderExportResult.class);
+        List<HealthySubOrderExportResult> result = new ArrayList<>();
+        for (HealthySubOrder subOrder : list) {
+            HealthySubOrderExportResult exportResult = BeanUtil.convert(subOrder, HealthySubOrderExportResult.class);
+            exportResult.setExpectShipTime(DateUtil.localDateTimeToDate(subOrder.getExpectShipTime()));
+            result.add(exportResult);
+        }
+        return result;
     }
 
     @Override
