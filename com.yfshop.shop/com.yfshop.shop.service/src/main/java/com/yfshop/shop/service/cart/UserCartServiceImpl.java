@@ -276,9 +276,13 @@ public class UserCartServiceImpl implements UserCartService {
             if (userCoupon != null) {
                 sum = sum - 1;
             }
-            BigDecimal freight = new BigDecimal("10").divide(new BigDecimal(sum)).setScale(2, BigDecimal.ROUND_HALF_UP);
+            BigDecimal freight = new BigDecimal("10");
+            if (sum > 1) {
+                freight = freight.divide(new BigDecimal(sum)).setScale(2, BigDecimal.ROUND_HALF_UP);
+            }
+            BigDecimal finalFreight = freight;
             otherGoods.forEach(item -> {
-                item.setFreight(new BigDecimal(item.getNum()).multiply(freight));
+                item.setFreight(new BigDecimal(item.getNum()).multiply(finalFreight));
             });
         }
         return resultList;

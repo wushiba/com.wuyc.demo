@@ -27,6 +27,7 @@ import com.yfshop.shop.service.activity.service.FrontDrawService;
 import com.yfshop.shop.service.address.UserAddressService;
 import com.yfshop.shop.service.address.result.UserAddressResult;
 import com.yfshop.shop.service.cart.UserCartService;
+import com.yfshop.shop.service.cart.result.UserCartResult;
 import com.yfshop.shop.service.coupon.service.FrontUserCouponService;
 import com.yfshop.shop.service.mall.MallService;
 import com.yfshop.shop.service.mall.req.QueryItemDetailReq;
@@ -301,19 +302,39 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
             userCoupon = userCouponMapper.selectById(userCouponId);
             this.checkUserCoupon(userCoupon, itemSku.getItemId());
         }
-
+        int sum = 0;
+        if (itemSku.getCategoryId() != 3) {
+            sum = num;
+        }
+        BigDecimal orderFreight = new BigDecimal(0);
         // 扣库存, 修改优惠券状态
         mallService.updateItemSkuStock(itemSku.getId(), num);
         if (userCoupon.getId() != null) {
             frontUserCouponService.useUserCoupon(userCoupon.getId());
+            if (userCoupon.getCanUseItemIds().contains("2032")) {
+                orderFreight = orderFreight.add(new BigDecimal("1.8"));
+                sum = sum - 1;
+            } else if (userCoupon.getCanUseItemIds().contains("2030")) {
+                orderFreight = orderFreight.add(new BigDecimal("18"));
+                sum = sum - 1;
+            }
         }
-
         // 下单，创建订单，订单详情，收货地址
-        BigDecimal orderFreight = new BigDecimal(num).multiply(itemSku.getFreight());
+        //BigDecimal orderFreight = new BigDecimal(num).multiply(itemSku.getFreight());
         BigDecimal orderPrice = new BigDecimal(num).multiply(itemSku.getSkuSalePrice());
         BigDecimal couponPrice = userCoupon.getCouponPrice() == null ? new BigDecimal("0.00") : new BigDecimal(userCoupon.getCouponPrice());
-        BigDecimal payPrice = orderPrice.add(orderFreight).subtract(couponPrice);
 
+        BigDecimal payPrice = orderPrice.subtract(couponPrice);
+        //平均运费价格
+        BigDecimal freight = BigDecimal.ZERO;
+        if (payPrice.longValue() < 88) {
+            orderFreight = orderFreight.add(new BigDecimal("10"));
+            freight = new BigDecimal("10");
+            if (sum > 0) {
+                freight = freight.divide(new BigDecimal(sum)).setScale(2, BigDecimal.ROUND_HALF_UP);
+            }
+        }
+        payPrice = payPrice.add(orderFreight);
         Order order = insertUserOrder(userId, null, ReceiveWayEnum.PS.getCode(), num, 1, orderPrice, couponPrice, orderFreight, payPrice, "N", null);
         Long orderId = order.getId();
         String userName = null;
@@ -322,17 +343,23 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
             userName = user.getNickname();
         }
         //二等奖数量大于1时，使用优惠券必须拆单为一瓶装
-        if (itemSku.getId().equals(2032001) && userCoupon.getId() != null && num > 1) {
+        if ((itemSku.getId().equals(2032001) || itemSku.getId().equals(2030001)) && userCoupon.getId() != null && num > 1) {
             couponPrice = userCoupon.getCouponPrice() == null ? new BigDecimal("0.00") : new BigDecimal(userCoupon.getCouponPrice());
             payPrice = itemSku.getSkuSalePrice().add(itemSku.getFreight()).subtract(couponPrice);
             insertUserOrderDetail(userId, userName, orderId, null, null, null, ReceiveWayEnum.PS.getCode(), "N", 1,
                     itemSku.getItemId(), itemSku.getId(), itemSku.getSkuTitle(), itemSku.getSkuSalePrice(), itemSku.getSkuCover(), itemSku.getFreight(), couponPrice,
                     itemSku.getSkuSalePrice(), payPrice, userCouponId, UserOrderStatusEnum.WAIT_PAY.getCode(), itemSku.getSpecValueIdPath(), itemSku.getSpecNameValueJson());
+
             num = num - 1;
             userCoupon.setCouponId(null);
             userCoupon.setId(null);
             userCoupon.setCouponPrice(null);
-            orderFreight = new BigDecimal(num).multiply(itemSku.getFreight());
+            orderFreight = new BigDecimal(num).multiply(freight);
+            orderPrice = new BigDecimal(num).multiply(itemSku.getSkuSalePrice());
+            couponPrice = userCoupon.getCouponPrice() == null ? new BigDecimal("0.00") : new BigDecimal(userCoupon.getCouponPrice());
+            payPrice = orderPrice.add(orderFreight).subtract(couponPrice);
+        } else if ((itemSku.getId().equals(2032001) || itemSku.getId().equals(2030001)) && userCoupon.getId() != null) {
+            orderFreight = itemSku.getFreight();
             orderPrice = new BigDecimal(num).multiply(itemSku.getSkuSalePrice());
             couponPrice = userCoupon.getCouponPrice() == null ? new BigDecimal("0.00") : new BigDecimal(userCoupon.getCouponPrice());
             payPrice = orderPrice.add(orderFreight).subtract(couponPrice);
@@ -395,6 +422,8 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
         // 保存套餐的商品类型
         Set<Integer> tcCategory = new HashSet<>();
         Set<Integer> dpCategory = new HashSet<>();
+        //需要支付运费的商品数量
+        int sum = 0;
         for (UserCart userCart : userCartList) {
             ItemSkuResult itemSku = mallService.getItemSkuBySkuId(userCart.getSkuId());
             Asserts.assertFalse(itemSku.getSkuStock() < userCart.getNum(), 500, "商品库存不足");
@@ -407,9 +436,12 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
             mallService.updateItemSkuStock(itemSku.getId(), userCart.getNum());
             itemSkuMap.put(itemSku.getId(), itemSku);
             itemCount += userCart.getNum();
-            orderFreight = orderFreight.add(itemSku.getFreight().multiply(new BigDecimal(userCart.getNum())));
+            // orderFreight = orderFreight.add(itemSku.getFreight().multiply(new BigDecimal(userCart.getNum())));
             orderPrice = orderPrice.add((itemSku.getSkuSalePrice().multiply(new BigDecimal(userCart.getNum()))));
-            payPrice = orderFreight.add(orderPrice);
+            //payPrice = orderFreight.add(orderPrice);
+            if (itemSku.getCategoryId() != 3) {
+                sum += userCart.getNum();
+            }
         }
         //检测是否只包含单品
         dpCategory.forEach(item -> {
@@ -421,12 +453,28 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
             frontUserCouponService.useUserCoupon(userCoupon.getId());
             couponPrice = new BigDecimal(userCoupon.getCouponPrice());
             payPrice = payPrice.subtract(couponPrice);
+            if (userCoupon.getCanUseItemIds().contains("2032")) {
+                orderFreight = orderFreight.add(new BigDecimal("1.8"));
+                sum = sum - 1;
+            } else if (userCoupon.getCanUseItemIds().contains("2030")) {
+                orderFreight = orderFreight.add(new BigDecimal("18"));
+                sum = sum - 1;
+            }
         }
 
         // 删除购物车id
         List<Integer> skuIdList = userCartList.stream().map(UserCart::getSkuId).collect(Collectors.toList());
         userCartService.deleteUserCarts(userId, skuIdList);
-
+        //平均运费价格
+        BigDecimal freight = BigDecimal.ZERO;
+        if (payPrice.longValue() < 88) {
+            orderFreight = orderFreight.add(new BigDecimal("10"));
+            freight = new BigDecimal("10");
+            if (sum > 0) {
+                freight = freight.divide(new BigDecimal(sum)).setScale(2, BigDecimal.ROUND_HALF_UP);
+            }
+        }
+        payPrice = orderFreight.add(orderPrice);
         // 创建订单
         Order order = insertUserOrder(userId, null, ReceiveWayEnum.PS.getCode(), itemCount, childOrderCount, orderPrice, couponPrice, orderFreight, payPrice, "N", null);
         Long orderId = order.getId();
@@ -439,7 +487,7 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
                 userName = user.getNickname();
             }
             //二等奖数量大于1时，使用优惠券必须拆单为一瓶装
-            if (itemSku.getId().equals(2032001) && userCoupon.getId() != null && userCart.getNum() > 1) {
+            if ((itemSku.getId().equals(2032001) || itemSku.getId().equals(2030001))  && userCoupon.getId() != null && userCart.getNum() > 1) {
                 BigDecimal childPayPrice = itemSku.getSkuSalePrice().add(itemSku.getFreight()).subtract(childCouponPrice);
                 insertUserOrderDetail(userId, userName, orderId, null, null, null, ReceiveWayEnum.PS.getCode(), "N", 1,
                         itemSku.getItemId(), itemSku.getId(), itemSku.getSkuTitle(), itemSku.getSkuSalePrice(), itemSku.getSkuCover(), itemSku.getFreight(), childCouponPrice,
@@ -449,10 +497,15 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
                 userCoupon.setCouponPrice(null);
                 userCart.setNum(userCart.getNum() - 1);
             }
+            BigDecimal childOrderFreight = BigDecimal.ZERO;
             if (userCoupon.getId() != null) {
                 childCouponPrice = new BigDecimal(userCoupon.getCouponPrice());
+                if ((itemSku.getId().equals(2032001) || itemSku.getId().equals(2030001))) {
+                    childOrderFreight = itemSku.getFreight();
+                }
+            } else {
+                childOrderFreight = freight;
             }
-            BigDecimal childOrderFreight = new BigDecimal(userCart.getNum()).multiply(itemSku.getFreight());
             BigDecimal childOrderPrice = itemSku.getSkuSalePrice().multiply(new BigDecimal(userCart.getNum()));
             BigDecimal childPayPrice = childOrderPrice.add(childOrderFreight).subtract(childCouponPrice);
             insertUserOrderDetail(userId, userName, orderId, null, null, null, ReceiveWayEnum.PS.getCode(), "N", userCart.getNum(),
