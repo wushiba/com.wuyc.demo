@@ -51,9 +51,9 @@ public class MpServiceImpl implements MpService {
     @Override
     public void sendWxMpTemplateMsg(WxMpTemplateMessage wxMpTemplateMessage) {
         try {
-            if ("o3vDm6TQEJn4BsPB3xi5p4EXvSHo,o3vDm6de43Cl-sFwyFpg78sZK22w".contains(wxMpTemplateMessage.getToUser())) {
-                return;
-            }
+//            if ("o3vDm6TQEJn4BsPB3xi5p4EXvSHo,o3vDm6de43Cl-sFwyFpg78sZK22w".contains(wxMpTemplateMessage.getToUser())) {
+//                return;
+//            }
             wxMpService.getTemplateMsgService().sendTemplateMsg(wxMpTemplateMessage);
             saveWxTemplateMessage(wxMpTemplateMessage, "SUCCESS");
         } catch (WxErrorException e) {
