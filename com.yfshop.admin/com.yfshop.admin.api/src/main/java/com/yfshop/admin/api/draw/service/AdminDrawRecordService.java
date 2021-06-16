@@ -3,10 +3,7 @@ package com.yfshop.admin.api.draw.service;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.yfshop.admin.api.draw.request.QueryDrawRecordReq;
 import com.yfshop.admin.api.draw.request.QueryDrawRecordSatsReq;
-import com.yfshop.admin.api.draw.result.DrawRecordResult;
-import com.yfshop.admin.api.draw.result.DrawRecordSatsByDayResult;
-import com.yfshop.admin.api.draw.result.DrawRecordSatsByLevelResult;
-import com.yfshop.admin.api.draw.result.DrawRecordSatsByProvinceResult;
+import com.yfshop.admin.api.draw.result.*;
 
 import java.util.List;
 
@@ -25,4 +22,6 @@ public interface AdminDrawRecordService {
     List<DrawRecordSatsByLevelResult> satsByLeve(QueryDrawRecordSatsReq recordReq);
 
     List<DrawRecordSatsByProvinceResult> satsByProvince(QueryDrawRecordSatsReq recordReq);
+
+    List<DrawRecordSatsByJxsResult> satsByJxs(QueryDrawRecordSatsReq recordReq);
 }

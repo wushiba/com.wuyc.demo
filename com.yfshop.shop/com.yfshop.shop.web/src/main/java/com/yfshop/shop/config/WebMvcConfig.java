@@ -20,7 +20,7 @@ import java.util.concurrent.CompletableFuture;
  */
 @Configuration
 public class WebMvcConfig extends BaseWebMvcConfig {
-    @DubboReference
+    @DubboReference(group = "MallLogService")
     LogService logService;
 
     @Bean

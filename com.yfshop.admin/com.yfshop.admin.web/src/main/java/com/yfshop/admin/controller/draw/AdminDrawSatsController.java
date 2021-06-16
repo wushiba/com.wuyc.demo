@@ -5,10 +5,7 @@ import cn.dev33.satoken.annotation.SaCheckRole;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.yfshop.admin.api.draw.request.QueryDrawRecordReq;
 import com.yfshop.admin.api.draw.request.QueryDrawRecordSatsReq;
-import com.yfshop.admin.api.draw.result.DrawRecordResult;
-import com.yfshop.admin.api.draw.result.DrawRecordSatsByDayResult;
-import com.yfshop.admin.api.draw.result.DrawRecordSatsByLevelResult;
-import com.yfshop.admin.api.draw.result.DrawRecordSatsByProvinceResult;
+import com.yfshop.admin.api.draw.result.*;
 import com.yfshop.admin.api.draw.service.AdminDrawRecordService;
 import com.yfshop.common.api.CommonResult;
 import com.yfshop.common.base.BaseController;
@@ -60,4 +57,12 @@ public class AdminDrawSatsController implements BaseController {
         return CommonResult.success(adminDrawRecordService.satsByProvince(recordReq));
     }
 
+    @RequestMapping(value = "/satsByJxs", method = {RequestMethod.POST})
+    @ResponseBody
+    @SaCheckLogin
+    @SaCheckRole(value = "sys")
+    public CommonResult<List<DrawRecordSatsByJxsResult>> satsByJxs(QueryDrawRecordSatsReq recordReq) {
+
+        return CommonResult.success(adminDrawRecordService.satsByJxs(recordReq));
+    }
 }

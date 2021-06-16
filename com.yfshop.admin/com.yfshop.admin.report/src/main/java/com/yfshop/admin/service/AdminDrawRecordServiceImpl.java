@@ -7,10 +7,7 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.yfshop.admin.api.draw.request.QueryDrawRecordReq;
 import com.yfshop.admin.api.draw.request.QueryDrawRecordSatsReq;
-import com.yfshop.admin.api.draw.result.DrawRecordResult;
-import com.yfshop.admin.api.draw.result.DrawRecordSatsByDayResult;
-import com.yfshop.admin.api.draw.result.DrawRecordSatsByLevelResult;
-import com.yfshop.admin.api.draw.result.DrawRecordSatsByProvinceResult;
+import com.yfshop.admin.api.draw.result.*;
 import com.yfshop.admin.api.draw.service.AdminDrawRecordService;
 import com.yfshop.admin.dao.DrawRecordDao;
 import com.yfshop.code.mapper.DrawRecordMapper;
@@ -84,5 +81,10 @@ public class AdminDrawRecordServiceImpl implements AdminDrawRecordService {
     @Override
     public List<DrawRecordSatsByProvinceResult> satsByProvince(QueryDrawRecordSatsReq recordReq) {
         return drawRecordDao.satsByProvince(recordReq);
+    }
+
+    @Override
+    public List<DrawRecordSatsByJxsResult> satsByJxs(QueryDrawRecordSatsReq recordReq) {
+        return drawRecordDao.satsByJxs(recordReq);
     }
 }

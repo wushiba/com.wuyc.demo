@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
  * @since 2021-06-15 17:27
  * Description: 日志服务
  */
-@DubboService
+@DubboService(group = "MallLogService")
 public class MallLogServiceImpl implements LogService {
 
     @Resource
