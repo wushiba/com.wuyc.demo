@@ -75,7 +75,7 @@ public class ExpressServiceImpl implements ExpressService {
         ExpressOrderResult expressOrderResult = new ExpressOrderResult();
         expressOrderResult.setExpressName(expressName);
         expressOrderResult.setExpressNo(expressNo);
-        String value = map.get(expressName != null ? expressName.replace("快递", "") : expressName);
+        String value = map.get(expressName != null ? expressName.replace("快递", "").replace("速运","") : expressName);
         if (value == null) {
             expressOrderResult.setList(new ArrayList<>());
         }

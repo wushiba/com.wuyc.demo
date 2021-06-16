@@ -420,6 +420,7 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
         BigDecimal couponPrice = new BigDecimal("0.0");
         BigDecimal orderFreight = new BigDecimal("0.0");
         BigDecimal orderPrice = new BigDecimal("0.0");
+        BigDecimal otherOrderPrice = new BigDecimal("0.0");
         BigDecimal payPrice = new BigDecimal("0.0");
 
         // 扣库存，这里要做手写SQL，搞乐观锁
@@ -445,6 +446,7 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
             orderPrice = orderPrice.add((itemSku.getSkuSalePrice().multiply(new BigDecimal(userCart.getNum()))));
             //payPrice = orderFreight.add(orderPrice);
             if (itemSku.getCategoryId() != 3) {
+                otherOrderPrice = otherOrderPrice.add((itemSku.getSkuSalePrice().multiply(new BigDecimal(userCart.getNum()))));
                 sum += userCart.getNum();
             }
         }
@@ -460,6 +462,7 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
             couponPrice = new BigDecimal(userCoupon.getCouponPrice());
             logger.info("优惠券抵扣={}", couponPrice.longValue());
             payPrice = payPrice.subtract(couponPrice);
+            otherOrderPrice = otherOrderPrice.subtract(couponPrice);
             logger.info("减扣后价格={}", payPrice.longValue());
             if (userCoupon.getCanUseItemIds().contains("2032")) {
                 orderFreight = orderFreight.add(new BigDecimal("1.8"));
@@ -475,7 +478,7 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
         userCartService.deleteUserCarts(userId, skuIdList);
         //平均运费价格
         BigDecimal freight = BigDecimal.ZERO;
-        if (payPrice.longValue() < 88) {
+        if (otherOrderPrice.longValue() < 88) {
             freight = new BigDecimal("10");
             if (sum > 0) {
                 orderFreight = orderFreight.add(new BigDecimal("10"));

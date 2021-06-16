@@ -257,16 +257,17 @@ public class UserCartServiceImpl implements UserCartService {
         }
 
         //计算非火锅的商品价格
-        BigDecimal sumPrice = resultList.stream().map(item -> item.getSkuSalePrice().multiply(new BigDecimal(item.getNum()))).reduce(BigDecimal.ZERO, (before, grantMoney) -> NumberUtil.add(before, grantMoney));
-        if (userCoupon != null) {
-            sumPrice = sumPrice.subtract(new BigDecimal(userCoupon.getCouponPrice()));
-        }
+
         List<UserCartResult> otherGoods = new ArrayList<>();
         resultList.forEach(item -> {
             if (item.getCategoryId() != 3) {
                 otherGoods.add(item);
             }
         });
+        BigDecimal sumPrice = otherGoods.stream().map(item -> item.getSkuSalePrice().multiply(new BigDecimal(item.getNum()))).reduce(BigDecimal.ZERO, (before, grantMoney) -> NumberUtil.add(before, grantMoney));
+        if (userCoupon != null) {
+            sumPrice = sumPrice.subtract(new BigDecimal(userCoupon.getCouponPrice()));
+        }
         BigDecimal freight = new BigDecimal("10");
         if (sumPrice.longValue() >= 88) {
             freight = BigDecimal.ZERO;
