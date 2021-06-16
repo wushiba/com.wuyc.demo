@@ -61,7 +61,7 @@ public class AdminHealthyController implements BaseController {
     }
 
     @SneakyThrows
-    @RequestMapping(value = "/exportSubOrderList", method = {RequestMethod.POST})
+    @RequestMapping(value = "/exportSubOrderList", method = {RequestMethod.POST, RequestMethod.GET})
     @ResponseBody
     @SaCheckLogin
     @SaCheckRole(value = "sys")
