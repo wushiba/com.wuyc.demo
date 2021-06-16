@@ -278,7 +278,7 @@ public class UserCartServiceImpl implements UserCartService {
             }
             BigDecimal freight = new BigDecimal("10");
             if (sum > 1) {
-                freight = freight.divide(new BigDecimal(sum)).setScale(2, BigDecimal.ROUND_HALF_UP);
+                freight = freight.divide(new BigDecimal(sum+"")).setScale(2, BigDecimal.ROUND_HALF_UP);
             }
             for (UserCartResult item : otherGoods) {
                 if (userCoupon != null && userCoupon.getCanUseItemIds().contains("2032")) {
@@ -313,6 +313,12 @@ public class UserCartServiceImpl implements UserCartService {
             result.setSkuMarketPrice(targetSku.getSkuMarketPrice());
         }
         return result;
+    }
+
+    public static void main(String[] args) {
+        BigDecimal freight = new BigDecimal("10");
+        int sum = 2;
+        System.out.println(freight.divide(new BigDecimal(1)).setScale(2, BigDecimal.ROUND_HALF_UP));
     }
 
 }
