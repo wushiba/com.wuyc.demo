@@ -331,7 +331,7 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
             orderFreight = orderFreight.add(new BigDecimal("10"));
             freight = new BigDecimal("10");
             if (sum > 0) {
-                freight = freight.divide(new BigDecimal(sum+"")).setScale(2, BigDecimal.ROUND_HALF_UP);
+                freight = freight.divide(new BigDecimal(sum), 2, BigDecimal.ROUND_HALF_UP);
             }
         }
         payPrice = payPrice.add(orderFreight);
@@ -471,7 +471,7 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
             orderFreight = orderFreight.add(new BigDecimal("10"));
             freight = new BigDecimal("10");
             if (sum > 0) {
-                freight = freight.divide(new BigDecimal(sum+"")).setScale(2, BigDecimal.ROUND_HALF_UP);
+                freight = freight.divide(new BigDecimal(sum), 2, BigDecimal.ROUND_HALF_UP);
             }
         }
         payPrice = orderFreight.add(orderPrice);
