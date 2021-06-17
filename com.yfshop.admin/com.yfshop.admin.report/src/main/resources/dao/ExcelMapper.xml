@@ -56,7 +56,7 @@
             INNER JOIN yf_website_code_detail d
         ON t.id = d.merchant_id
         WHERE
-            d.pid_path LIKE CONCAT(m.pid_path, '%')
+            d.pid_path LIKE CONCAT('%.', m.pid_path, '.%')
           AND d.is_activate = 'Y'
           AND t.is_enable = 'Y'
           AND t.is_delete = 'N'
