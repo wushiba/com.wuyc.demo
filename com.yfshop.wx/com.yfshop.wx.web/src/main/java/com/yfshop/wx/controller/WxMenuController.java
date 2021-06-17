@@ -52,72 +52,51 @@ public class WxMenuController {
         }
         WxMenu menu = new WxMenu();
 
-        WxMenuButton healthy = new WxMenuButton();
-        healthy.setName("健康馆");
-        WxMenuButton healthyOne = new WxMenuButton();
-        healthyOne.setType(MenuButtonType.VIEW);
-        healthyOne.setName("职场减压");
-        healthyOne.setUrl("https://mp.weixin.qq.com/s/5YNRLv_bGqpVRCcXv8BkpQ");
-        healthy.getSubButtons().add(healthyOne);
+        WxMenuButton shop = new WxMenuButton();
+        shop.setName("商城");
 
-        WxMenuButton healthyTwo = new WxMenuButton();
-        healthyTwo.setType(MenuButtonType.VIEW);
-        healthyTwo.setName("儿童成长");
-        healthyTwo.setUrl("https://mp.weixin.qq.com/s/oCwG6brmj2L7SBm85TRCfA");
-        healthy.getSubButtons().add(healthyTwo);
+        WxMenuButton introduce = new WxMenuButton();//跳转
+        introduce.setType(MenuButtonType.VIEW);
+        introduce.setName("进入商城");
+        introduce.setUrl("https://m.yufanlook.com/#/ActPage");
 
-        WxMenuButton healthyThree = new WxMenuButton();
-        healthyThree.setType(MenuButtonType.VIEW);
-        healthyThree.setName("孝敬爸妈");
-        healthyThree.setUrl("https://mp.weixin.qq.com/s/qifIGtBqE6_L8SuZ8Iu34Q");
-        healthy.getSubButtons().add(healthyThree);
+        WxMenuButton bindPhone = new WxMenuButton();
+        bindPhone.setType(MenuButtonType.VIEW);
+        bindPhone.setName("个人中心");
+        bindPhone.setUrl("https://m.yufanlook.com/#/MyPage");
 
-        WxMenuButton action = new WxMenuButton();
-        healthy.setName("618");
-
-        WxMenuButton actionOne = new WxMenuButton();
-        actionOne.setType(MenuButtonType.VIEW);
-        actionOne.setName("个人中心");
-        actionOne.setUrl("https://m.yufanlook.com/#/MyPage");
-        action.getSubButtons().add(actionOne);
-
-        WxMenuButton actionTwo = new WxMenuButton();
-        actionTwo.setType(MenuButtonType.VIEW);
-        actionTwo.setName("父亲节");
-        actionTwo.setUrl("https://m.yufanlook.com/#/ActPage");
-        action.getSubButtons().add(actionTwo);
-
-        WxMenuButton actionThree = new WxMenuButton();
-        actionThree.setType(MenuButtonType.VIEW);
-        actionThree.setName("雨帆商城");
-        actionThree.setUrl("https://m.yufanlook.com/#/allPage");
-        action.getSubButtons().add(actionThree);
+        shop.getSubButtons().add(introduce);
+        shop.getSubButtons().add(bindPhone);
+        menu.getButtons().add(shop);
 
 
-        WxMenuButton kf = new WxMenuButton();
-        kf.setName("客服中心");
-        WxMenuButton kfOne = new WxMenuButton();
-        kfOne.setType(MenuButtonType.VIEW);
-        kfOne.setName("在线客服");
-        kfOne.setUrl("https://tb.53kf.com/code/wx/10187208/5");
-        kf.getSubButtons().add(kfOne);
+        WxMenuButton button3 = new WxMenuButton();
+        button3.setName("活动");
 
-        WxMenuButton kfTwo = new WxMenuButton();
-        kfTwo.setType(MenuButtonType.CLICK);
-        kfTwo.setName("客服电话");
-        kfTwo.setKey("lxwm");
-        kf.getSubButtons().add(kfTwo);
+        WxMenuButton order = new WxMenuButton();
+        order.setType(MenuButtonType.VIEW);
+        order.setName("噜鹿相遇");
+        order.setUrl("https://m.yufanlook.com/#/LuckDrawPageForWx");
 
-        WxMenuButton kfThree = new WxMenuButton();
-        kfThree.setType(MenuButtonType.VIEW);
-        kfThree.setName("商户登录");
-        kfThree.setUrl("https://merchant.yufanlook.com/#/MerchantLogin");
-        kf.getSubButtons().add(kfThree);
+        button3.getSubButtons().add(order);
+        menu.getButtons().add(button3);
 
+        WxMenuButton zc = new WxMenuButton();
+        zc.setName("联系我们");
 
-        menu.getButtons().add(healthy);
-        menu.getButtons().add(action);
-        menu.getButtons().add(kf);
+        WxMenuButton kfdh = new WxMenuButton();//跳转
+        kfdh.setType(MenuButtonType.CLICK);
+        kfdh.setName("客服电话");
+        kfdh.setKey("lxwm");
+
+        WxMenuButton shdl = new WxMenuButton();
+        shdl.setType(MenuButtonType.VIEW);
+        shdl.setName("商户登录");
+        shdl.setUrl("https://merchant.yufanlook.com/#/MerchantLogin");
+
+        zc.getSubButtons().add(kfdh);
+        zc.getSubButtons().add(shdl);
+        menu.getButtons().add(zc);
 
 
         this.wxService.switchover(appid);
