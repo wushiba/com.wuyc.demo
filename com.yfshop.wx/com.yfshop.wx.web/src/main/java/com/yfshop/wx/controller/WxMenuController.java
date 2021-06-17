@@ -103,6 +103,7 @@ public class WxMenuController {
 
         WxMenuButton healthy = new WxMenuButton();
         healthy.setName("健康馆");
+
         WxMenuButton healthyOne = new WxMenuButton();
         healthyOne.setType(MenuButtonType.VIEW);
         healthyOne.setName("职场减压");
@@ -122,7 +123,7 @@ public class WxMenuController {
         healthy.getSubButtons().add(healthyThree);
 
         WxMenuButton action = new WxMenuButton();
-        healthy.setName("618");
+        action.setName("618");
 
         WxMenuButton actionOne = new WxMenuButton();
         actionOne.setType(MenuButtonType.VIEW);
@@ -145,6 +146,7 @@ public class WxMenuController {
 
         WxMenuButton kf = new WxMenuButton();
         kf.setName("客服中心");
+
         WxMenuButton kfOne = new WxMenuButton();
         kfOne.setType(MenuButtonType.VIEW);
         kfOne.setName("在线客服");
