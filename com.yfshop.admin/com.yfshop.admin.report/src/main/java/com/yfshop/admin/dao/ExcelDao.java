@@ -11,4 +11,7 @@ import java.util.List;
 
 public interface ExcelDao {
     List<WebsiteCodeExcel> getWebsiteCode();
+    int countFactoryCount(@Param("pid") Integer pid);
+    int countEmailCount(@Param("pid") Integer pid);
+    int countActiveCount(@Param("pid") Integer pid);
 }
