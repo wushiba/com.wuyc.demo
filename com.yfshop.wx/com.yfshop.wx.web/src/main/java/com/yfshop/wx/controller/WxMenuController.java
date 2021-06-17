@@ -73,7 +73,7 @@ public class WxMenuController {
         healthy.getSubButtons().add(healthyThree);
 
         WxMenuButton action = new WxMenuButton();
-        healthy.setName("活动");
+        healthy.setName("618");
 
         WxMenuButton actionOne = new WxMenuButton();
         actionOne.setType(MenuButtonType.VIEW);
