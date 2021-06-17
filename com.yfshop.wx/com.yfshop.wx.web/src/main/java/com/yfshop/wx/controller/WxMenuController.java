@@ -53,7 +53,7 @@ public class WxMenuController {
         WxMenu menu = new WxMenu();
 
         WxMenuButton healthy = new WxMenuButton();
-        healthy.setName("\uD83C\uDF39健康馆");
+        healthy.setName("健康馆");
         WxMenuButton healthyOne = new WxMenuButton();
         healthyOne.setType(MenuButtonType.VIEW);
         healthyOne.setName("职场减压");
@@ -73,7 +73,7 @@ public class WxMenuController {
         healthy.getSubButtons().add(healthyThree);
 
         WxMenuButton action = new WxMenuButton();
-        healthy.setName("\uD83D\uDD25618活动");
+        healthy.setName("618活动");
 
         WxMenuButton actionOne = new WxMenuButton();
         actionOne.setType(MenuButtonType.VIEW);
@@ -83,7 +83,7 @@ public class WxMenuController {
 
         WxMenuButton actionTwo = new WxMenuButton();
         actionTwo.setType(MenuButtonType.VIEW);
-        actionTwo.setName("\uD83C\uDF81父亲节99元");
+        actionTwo.setName("父亲节99元");
         actionTwo.setUrl("https://m.yufanlook.com/#/ActPage");
         action.getSubButtons().add(actionTwo);
 
