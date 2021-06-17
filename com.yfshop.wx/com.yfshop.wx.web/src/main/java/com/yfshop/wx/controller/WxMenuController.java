@@ -73,7 +73,7 @@ public class WxMenuController {
         healthy.getSubButtons().add(healthyThree);
 
         WxMenuButton action = new WxMenuButton();
-        healthy.setName("618活动");
+        healthy.setName("活动");
 
         WxMenuButton actionOne = new WxMenuButton();
         actionOne.setType(MenuButtonType.VIEW);
@@ -83,7 +83,7 @@ public class WxMenuController {
 
         WxMenuButton actionTwo = new WxMenuButton();
         actionTwo.setType(MenuButtonType.VIEW);
-        actionTwo.setName("父亲节99元");
+        actionTwo.setName("父亲节");
         actionTwo.setUrl("https://m.yufanlook.com/#/ActPage");
         action.getSubButtons().add(actionTwo);
 
