@@ -149,13 +149,13 @@ public class WxMenuController {
 
         WxMenuButton kfOne = new WxMenuButton();
         kfOne.setType(MenuButtonType.VIEW);
-        kfOne.setName("400客服");
+        kfOne.setName("在线客服");
         kfOne.setUrl("https://tb.53kf.com/code/wx/10187208/5");
         kf.getSubButtons().add(kfOne);
 
         WxMenuButton kfTwo = new WxMenuButton();
         kfTwo.setType(MenuButtonType.CLICK);
-        kfTwo.setName("客服电话");
+        kfTwo.setName("400客服");
         kfTwo.setKey("lxwm");
         kf.getSubButtons().add(kfTwo);
 
