@@ -104,7 +104,7 @@ public class WxMenuController {
 
         WxMenuButton kfTwo = new WxMenuButton();
         kfTwo.setType(MenuButtonType.CLICK);
-        kfTwo.setName("400客服");
+        kfTwo.setName("客服电话");
         kfTwo.setKey("lxwm");
         kf.getSubButtons().add(kfTwo);
 
