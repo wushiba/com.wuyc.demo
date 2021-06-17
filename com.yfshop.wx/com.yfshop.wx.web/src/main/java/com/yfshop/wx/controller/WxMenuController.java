@@ -83,7 +83,7 @@ public class WxMenuController {
 
         WxMenuButton actionTwo = new WxMenuButton();
         actionTwo.setType(MenuButtonType.VIEW);
-        actionTwo.setName("\uD83C\uDF81父亲节99元丨送1月");
+        actionTwo.setName("\uD83C\uDF81父亲节99元");
         actionTwo.setUrl("https://m.yufanlook.com/#/ActPage");
         action.getSubButtons().add(actionTwo);
 
@@ -95,7 +95,7 @@ public class WxMenuController {
 
 
         WxMenuButton kf = new WxMenuButton();
-        kf.setName("☎️客服中心");
+        kf.setName("客服中心");
         WxMenuButton kfOne = new WxMenuButton();
         kfOne.setType(MenuButtonType.VIEW);
         kfOne.setName("在线客服");
