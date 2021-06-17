@@ -123,7 +123,7 @@ public class WxMenuController {
         healthy.getSubButtons().add(healthyThree);
 
         WxMenuButton action = new WxMenuButton();
-        action.setName("618");
+        action.setName("618活动");
 
         WxMenuButton actionOne = new WxMenuButton();
         actionOne.setType(MenuButtonType.VIEW);
@@ -149,7 +149,7 @@ public class WxMenuController {
 
         WxMenuButton kfOne = new WxMenuButton();
         kfOne.setType(MenuButtonType.VIEW);
-        kfOne.setName("在线客服");
+        kfOne.setName("400客服");
         kfOne.setUrl("https://tb.53kf.com/code/wx/10187208/5");
         kf.getSubButtons().add(kfOne);
 
