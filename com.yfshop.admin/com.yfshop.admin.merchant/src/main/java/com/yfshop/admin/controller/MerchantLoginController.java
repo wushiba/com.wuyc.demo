@@ -109,7 +109,13 @@ class MerchantLoginController extends AbstractBaseController {
     @RequestMapping(value = "/sendCaptcha", method = {RequestMethod.POST})
     @ResponseBody
     public CommonResult<Void> sendCaptcha(@Mobile(message = "手机号不正确") String mobile) {
-        return CommonResult.success(captchaService.sendCaptcha(mobile, CaptchaSourceEnum.LOGIN_CAPTCHA));
+        try {
+            merchantService.getWebsiteByMobile(mobile);
+            return CommonResult.success(captchaService.sendCaptcha(mobile, CaptchaSourceEnum.LOGIN_CAPTCHA));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return CommonResult.failed("非商户手机号,不能登录系统");
     }
 
 
