@@ -239,7 +239,7 @@ public class WebsiteBillServiceImpl implements WebsiteBillService {
     private void sendConfirmMsg(String userName, String openId, String billId, String mobile) {
         try {
             List<WxMpTemplateData> data = new ArrayList<>();
-            data.add(new WxMpTemplateData("first", String.format("您有来自%s的门店自取订单，请及时处理~", userName)));
+            data.add(new WxMpTemplateData("first", String.format("您有来自%s的门店自取订单，请及时处理~", userName,"#FF0000")));
             data.add(new WxMpTemplateData("keyword1", billId));
             data.add(new WxMpTemplateData("keyword2", "2元"));
             data.add(new WxMpTemplateData("remark", String.format("兑换人手机号%s,请核对好用户信息。", PhoneUtil.hideBetween(mobile))));
