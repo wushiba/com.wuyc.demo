@@ -105,6 +105,8 @@ public class YfUserOrderListResult implements Serializable {
 
         private BigDecimal itemPrice;
 
+        private BigDecimal marketPrice;
+
         private String itemCover;
 
         private String specNameValueJson;

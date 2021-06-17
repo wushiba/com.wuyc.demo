@@ -48,12 +48,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -94,6 +96,8 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
     private OrderDetailMapper orderDetailMapper;
     @Resource
     private OrderAddressMapper orderAddressMapper;
+    @Resource
+    private ItemSkuMapper itemSkuMapper;
     @Resource
     private FrontMerchantService frontMerchantService;
     @Resource
@@ -149,7 +153,13 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
                 .eq(Order::getUserId, userId).orderByDesc(Order::getId));
         List<OrderDetail> detailList = orderDetailMapper.selectList(Wrappers.lambdaQuery(OrderDetail.class)
                 .eq(OrderDetail::getUserId, userId).orderByDesc(OrderDetail::getId));
-
+        if (!CollectionUtils.isEmpty(detailList)) {
+            List<Integer> skuIds = detailList.stream().map(OrderDetail::getSkuId).distinct().collect(Collectors.toList());
+            Map<Integer, BigDecimal> skuMarketPriceMap = itemSkuMapper.selectBatchIds(skuIds).stream().collect(Collectors.toMap(ItemSku::getId, ItemSku::getSkuMarketPrice));
+            detailList.forEach(item -> {
+                item.setMarketPrice(skuMarketPriceMap.get(item.getSkuId()));
+            });
+        }
         List<YfUserOrderListResult> dataList = setUserOrderListResult(orderList, detailList);
         if (StringUtils.isBlank(useStatus)) {
             return dataList;
@@ -183,7 +193,11 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
         if (order == null || CollectionUtil.isEmpty(detailList)) {
             return new YfUserOrderDetailResult();
         }
-
+        List<Integer> skuIds = detailList.stream().map(OrderDetail::getSkuId).distinct().collect(Collectors.toList());
+        Map<Integer, BigDecimal> skuMarketPriceMap = itemSkuMapper.selectBatchIds(skuIds).stream().collect(Collectors.toMap(ItemSku::getId, ItemSku::getSkuMarketPrice));
+        detailList.forEach(item -> {
+            item.setMarketPrice(skuMarketPriceMap.get(item.getSkuId()));
+        });
         if (orderDetailId == null) {
             List<YfUserOrderDetailResult.YfUserOrderItem> itemList = BeanUtil.convertList(detailList, YfUserOrderDetailResult.YfUserOrderItem.class);
             userOrderDetailResult = BeanUtil.convert(order, YfUserOrderDetailResult.class);

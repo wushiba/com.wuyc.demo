@@ -26,7 +26,6 @@ public interface WebsiteBillService {
      * 获取网点记账列表
      *
      * @param websiteCode
-     * @param dateTime
      * @return
      */
     WebsiteBillDayResult getBillByWebsiteCode(String websiteCode, Date startTime,Date endTime);

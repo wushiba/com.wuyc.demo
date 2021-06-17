@@ -70,6 +70,7 @@ public class AdminSourceFactoryManageController implements BaseController {
     })
     @RequestMapping(value = "/importSourceFactory", method = {RequestMethod.POST, RequestMethod.GET})
     @ResponseBody
+    @SaCheckLogin
     public CommonResult<Void> importSourceFactory(@NotNull(message = "导入文件不能为空") MultipartFile file) {
         List<SourceFactoryExcel> excels = ExcelUtils.importExcel(file, 1, 1, SourceFactoryExcel.class);
         Asserts.assertCollectionNotEmpty(excels, 500, "未能解析出Excel内容");
