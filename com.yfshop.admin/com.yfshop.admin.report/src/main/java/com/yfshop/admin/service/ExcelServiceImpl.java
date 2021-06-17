@@ -27,6 +27,8 @@ public class ExcelServiceImpl implements ExcelService {
     private String dirPath = "/home/www/web-deploy/yufan-admin-report/websiteCode/";
     @Autowired
     EmailTask emailTask;
+    @Resource
+    private QueryJxsDataHelper queryJxsDataHelper;
 
     @Override
     @Async
@@ -37,7 +39,7 @@ public class ExcelServiceImpl implements ExcelService {
         }
 
         File file = new File(dir, DateUtil.format(new Date(), "yyMMddHHmmss") + ".xls");
-        List<WebsiteCodeExcel> data = excelDao.getWebsiteCode();
+        List<WebsiteCodeExcel> data = queryJxsDataHelper.getWebsiteCode();
         ExcelWriter excelWriter = ExcelUtil.getWriter(file);
         excelWriter.write(data);
         excelWriter.flush();
