@@ -244,6 +244,7 @@ public class UserCartServiceImpl implements UserCartService {
                 ItemSku itemSku = skuIndexMap.get(data.getSkuId());
                 if (itemSku != null) {
                     data.setFreight(itemSku.getFreight());
+                    data.setSkuMarketPrice(itemSku.getSkuMarketPrice());
                     data.setSkuSalePrice(itemSku.getSkuSalePrice());
                     data.setCategoryId(itemSku.getCategoryId());
                 }
@@ -253,6 +254,7 @@ public class UserCartServiceImpl implements UserCartService {
             UserCartResult userCartResult = BeanUtil.convert(itemSku, UserCartResult.class);
             userCartResult.setNum(num);
             userCartResult.setSkuId(skuId);
+            userCartResult.setSkuMarketPrice(itemSku.getSkuMarketPrice());
             resultList.add(userCartResult);
         }
 

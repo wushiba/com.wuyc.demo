@@ -48,6 +48,8 @@ public class OrderDetailResult implements Serializable {
 
     private List<OrderDetails> list;
 
+    private String websiteInfo;
+
     @Data
     public static class OrderDetails implements Serializable {
         @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", locale = "zh", timezone = "GMT+8")

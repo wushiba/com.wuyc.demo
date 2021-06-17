@@ -80,7 +80,7 @@ public class YfUserOrderDetailResult implements Serializable {
     private List<YfUserOrderItem> itemList;
 
     private YfUserOrderAddress addressInfo;
-
+    
     @Data
     public static class YfUserOrderItem implements Serializable {
 
@@ -98,6 +98,8 @@ public class YfUserOrderDetailResult implements Serializable {
         private String itemTitle;
 
         private BigDecimal itemPrice;
+
+        private BigDecimal marketPrice;
 
         private String itemCover;
 

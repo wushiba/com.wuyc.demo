@@ -67,7 +67,9 @@ public class SubscribeHandler extends AbstractHandler {
         }
 
         try {
-            return new TextBuilder().build("给家人以温暖，给生活以健康", wxMessage, weixinService);
+            return new TextBuilder().build("hi，我们是光明乳业、椰岛集团官方合作商\n\n" +
+                    "给家人以温暖，给生活以健康\n\n" +
+                    "618，给老爸老妈送一份孝心：https://m.yufanlook.com/#/ActPage", wxMessage, weixinService);
         } catch (Exception e) {
             this.logger.error(e.getMessage(), e);
         }

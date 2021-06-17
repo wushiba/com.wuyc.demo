@@ -85,6 +85,9 @@ public class OrderDetail extends Model<OrderDetail> {
      */
     private BigDecimal itemPrice;
 
+
+    private BigDecimal marketPrice;
+
     /**
      * 购买的商品数量
      */

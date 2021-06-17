@@ -61,6 +61,8 @@ public class AdminUserOrderServiceImpl implements AdminUserOrderService {
     @Resource
     private WebsiteBillService websiteBillService;
     @Resource
+    private MerchantMapper merchantMapper;
+    @Resource
     private OrderDetailMapper orderDetailMapper;
     @Resource
     private DrawRecordMapper drawRecordMapper;
@@ -274,6 +276,14 @@ public class AdminUserOrderServiceImpl implements AdminUserOrderService {
         orderDetails.setSpecValueStr(orderDetail.getSpecValueStr());
         orderDetails.setConfirmTime(orderDetail.getConfirmTime());
         orderDetailResult.getList().add(orderDetails);
+        if (ReceiveWayEnum.ZT.getCode().equals(orderDetail.getReceiveWay())) {
+            if (orderDetail.getMerchantId() != null) {
+                Merchant merchant = merchantMapper.selectById(orderDetail.getMerchantId());
+                if (merchant != null) {
+                    orderDetailResult.setWebsiteInfo(String.format("%s,%s", merchant.getMerchantName(), merchant.getMobile()));
+                }
+            }
+        }
         return orderDetailResult;
     }
 

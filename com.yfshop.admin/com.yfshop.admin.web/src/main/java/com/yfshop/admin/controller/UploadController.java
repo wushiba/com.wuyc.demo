@@ -96,7 +96,7 @@ public class UploadController {
 
     @RequestMapping("/image")
     @ResponseBody
-//    @SaCheckLogin
+    @SaCheckLogin
     @CrossOrigin
     public CommonResult uploadImage(@RequestParam("file") MultipartFile file) throws IOException {
         logger.info("======================================进入上传文件uploadImage");

@@ -1,6 +1,9 @@
 package com.yfshop.admin.service.website;
 
+import cn.hutool.Hutool;
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.util.PhoneUtil;
+import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.yfshop.admin.api.order.service.AdminUserOrderService;
@@ -68,16 +71,16 @@ public class WebsiteBillServiceImpl implements WebsiteBillService {
 
     /**
      * 获取网店记账列表
+     *
      * @param merchantId
-     * @param dateTime
      * @param status
      * @return
      */
     @Override
-    public WebsiteBillDayResult getBillListByMerchantId(Integer merchantId, Date startTime,Date endTime, String status) throws ApiException {
-        Integer count=websiteBillMapper.selectCount(Wrappers.<WebsiteBill>lambdaQuery()
-                        .eq(WebsiteBill::getMerchantId, merchantId)
-                        .eq(WebsiteBill::getIsConfirm, status));
+    public WebsiteBillDayResult getBillListByMerchantId(Integer merchantId, Date startTime, Date endTime, String status) throws ApiException {
+        Integer count = websiteBillMapper.selectCount(Wrappers.<WebsiteBill>lambdaQuery()
+                .eq(WebsiteBill::getMerchantId, merchantId)
+                .eq(WebsiteBill::getIsConfirm, status));
         List<WebsiteBill> websiteBills = websiteBillMapper.selectList(Wrappers.<WebsiteBill>lambdaQuery()
                 .eq(WebsiteBill::getMerchantId, merchantId)
                 .ge(startTime != null, WebsiteBill::getCreateTime, startTime)
@@ -99,8 +102,8 @@ public class WebsiteBillServiceImpl implements WebsiteBillService {
     }
 
     @Override
-    public WebsiteBillDayResult getBillByWebsiteCode(String websiteCode, Date startTime,Date endTime) {
-        Integer count=websiteBillMapper.selectCount(Wrappers.<WebsiteBill>lambdaQuery()
+    public WebsiteBillDayResult getBillByWebsiteCode(String websiteCode, Date startTime, Date endTime) {
+        Integer count = websiteBillMapper.selectCount(Wrappers.<WebsiteBill>lambdaQuery()
                 .eq(WebsiteBill::getWebsiteCode, websiteCode));
 //                .eq(WebsiteBill::getIsConfirm, 'Y'));
         List<WebsiteBill> websiteBills = websiteBillMapper.selectList(Wrappers.<WebsiteBill>lambdaQuery()
@@ -191,8 +194,14 @@ public class WebsiteBillServiceImpl implements WebsiteBillService {
         if (CollectionUtil.isEmpty(detailList)) return null;
 
         User user = userMapper.selectById(detailList.get(0).getUserId());
+        OrderAddress orderAddress = orderAddressMapper.selectOne(Wrappers.lambdaQuery(OrderAddress.class).eq(OrderAddress::getOrderId, orderId));
+        String mobile = "";
+        if (orderAddress != null) {
+            mobile = orderAddress.getMobile();
+        }
         if (CollectionUtil.isNotEmpty(detailList)) {
             Merchant merchant = merchantMapper.selectById(detailList.get(0).getMerchantId());
+            String finalMobile = mobile;
             detailList.forEach(detail -> {
                 WebsiteBill websiteBill = new WebsiteBill();
                 websiteBill.setCreateTime(LocalDateTime.now());
@@ -211,7 +220,7 @@ public class WebsiteBillServiceImpl implements WebsiteBillService {
                 if (user != null) {
                     sendPayMsg(user.getOpenId(), order.getBillNo(), detail.getOrderId().toString(), detail.getId().toString());
                     if (merchant != null) {
-                        sendConfirmMsg(user.getNickname(), merchant.getOpenId(), order.getBillNo());
+                        sendConfirmMsg(user.getNickname(), merchant.getOpenId(), order.getBillNo(), finalMobile);
                     }
                 }
 
@@ -227,18 +236,18 @@ public class WebsiteBillServiceImpl implements WebsiteBillService {
      * @param openId
      * @param billId
      */
-    private void sendConfirmMsg(String userName, String openId, String billId) {
+    private void sendConfirmMsg(String userName, String openId, String billId, String mobile) {
         try {
             List<WxMpTemplateData> data = new ArrayList<>();
             data.add(new WxMpTemplateData("first", String.format("您有来自%s的门店自取订单，请及时处理~", userName)));
             data.add(new WxMpTemplateData("keyword1", billId));
             data.add(new WxMpTemplateData("keyword2", "2元"));
-            data.add(new WxMpTemplateData("remark", "请核对好用户信息，避免错拿商品。"));
+            data.add(new WxMpTemplateData("remark", String.format("兑换人手机号%s,请核对好用户信息。", PhoneUtil.hideBetween(mobile))));
             WxMpTemplateMessage wxMpTemplateMessage = WxMpTemplateMessage.builder()
                     .templateId("kEnXD9LGvWpcWud99dUu_A85vc5w1vT9-rMzqybrQaw")
                     .toUser(openId)
                     .data(data)
-                    .url(String.format("%s#/MerchantBooking",merchantUrl))
+                    .url(String.format("%s#/MerchantBooking", merchantUrl))
                     .build();
             mpService.sendWxMpTemplateMsg(wxMpTemplateMessage);
         } catch (Exception e) {
@@ -266,7 +275,7 @@ public class WebsiteBillServiceImpl implements WebsiteBillService {
                     .templateId("kEnXD9LGvWpcWud99dUu_A85vc5w1vT9-rMzqybrQaw")
                     .toUser(openId)
                     .data(data)
-                    .url(String.format("%s#/MyOrderDetail?orderId=%s&orderDetailId=%s&receiveWay=ZT",shopUrl, orderId, orderDetailId))
+                    .url(String.format("%s#/MyOrderDetail?orderId=%s&orderDetailId=%s&receiveWay=ZT", shopUrl, orderId, orderDetailId))
                     .build();
             mpService.sendWxMpTemplateMsg(wxMpTemplateMessage);
         } catch (Exception e) {
