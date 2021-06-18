@@ -296,15 +296,18 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
             Map<String, String> maps = AddressUtil.addressResolution(websiteCodeBindReq.getAddress());
             websiteCodeBindReq.setProvince(maps.get("province"));
             Region province = regionMapper.selectOne(Wrappers.<Region>lambdaQuery()
+                    .eq(Region::getType,1)
                     .eq(Region::getName, maps.get("province")));
             if (province != null) {
                 websiteCodeBindReq.setProvinceId(province.getId());
                 Region city = regionMapper.selectOne(Wrappers.<Region>lambdaQuery()
+                        .eq(Region::getType,2)
                         .eq(Region::getName, maps.get("city"))
                         .eq(Region::getPid, province.getId()));
                 if (city != null) {
                     websiteCodeBindReq.setCityId(city.getId());
                     Region county = regionMapper.selectOne(Wrappers.<Region>lambdaQuery()
+                            .eq(Region::getType,3)
                             .eq(Region::getName, maps.get("county"))
                             .eq(Region::getPid, city.getId()));
                     if (county != null) {
@@ -319,15 +322,18 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
                     if (temp != null) {
                         websiteCodeBindReq.setProvince(temp.get("province"));
                         province = regionMapper.selectOne(Wrappers.<Region>lambdaQuery()
+                                .eq(Region::getType,1)
                                 .eq(Region::getName, temp.get("province")));
                         if (province != null) {
                             websiteCodeBindReq.setProvinceId(province.getId());
                             Region city = regionMapper.selectOne(Wrappers.<Region>lambdaQuery()
+                                    .eq(Region::getType,2)
                                     .eq(Region::getName, temp.get("city"))
                                     .eq(Region::getPid, province.getId()));
                             if (city != null) {
                                 websiteCodeBindReq.setCityId(city.getId());
                                 Region county = regionMapper.selectOne(Wrappers.<Region>lambdaQuery()
+                                        .eq(Region::getType,3)
                                         .eq(Region::getName, temp.get("district"))
                                         .eq(Region::getPid, city.getId()));
                                 if (county != null) {
