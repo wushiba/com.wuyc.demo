@@ -69,10 +69,9 @@
           AND m.is_delete = 'N'
     </select>
 
-
     <select id="countFactoryCount" resultType="java.lang.Integer">
         SELECT
-        sum( c.quantity )
+        ifnull(sum( c.quantity ), 0)
         FROM
         yf_merchant t
         INNER JOIN yf_website_code c ON t.id = c.merchant_id
@@ -86,27 +85,27 @@
     </select>
     <select id="countEmailCount" resultType="java.lang.Integer">
         SELECT
-            sum( c.quantity )
-            FROM
-            yf_merchant t
-            INNER JOIN yf_website_code c ON t.id = c.merchant_id
-            WHERE
-            c.file_status = 'SUCCESS'
-            AND c.billno IS NULL
-            AND c.pid_path LIKE CONCAT('%.', #{pid}, '.%' )
-            AND t.is_enable = 'Y'
-            AND t.is_delete = 'N'
+        ifnull(sum( c.quantity ), 0)
+        FROM
+        yf_merchant t
+        INNER JOIN yf_website_code c ON t.id = c.merchant_id
+        WHERE
+        c.file_status = 'SUCCESS'
+        AND c.billno IS NULL
+        AND c.pid_path LIKE CONCAT('%.', #{pid}, '.%' )
+        AND t.is_enable = 'Y'
+        AND t.is_delete = 'N'
     </select>
     <select id="countActiveCount" resultType="java.lang.Integer">
-            SELECT
-            count( 1 )
-            FROM
-            yf_merchant t
-            INNER JOIN yf_website_code_detail d ON t.id = d.merchant_id
-            WHERE
-            d.pid_path LIKE CONCAT( '%.', #{pid}, '.%' )
-            AND d.is_activate = 'Y'
-            AND t.is_enable = 'Y'
-            AND t.is_delete = 'N'
+        SELECT
+        count(1)
+        FROM
+        yf_merchant t
+        INNER JOIN yf_website_code_detail d ON t.id = d.merchant_id
+        WHERE
+        d.pid_path LIKE CONCAT( '%.', #{pid}, '.%' )
+        AND d.is_activate = 'Y'
+        AND t.is_enable = 'Y'
+        AND t.is_delete = 'N'
     </select>
 </mapper>
