@@ -110,6 +110,11 @@ public class DrawRecordExportResult implements Serializable {
     @Excel(name = "经销商地址", width = 18)
     private String dealerAddress;
 
+    @Excel(name = "ip地址", width = 18)
+    private String ip;
+
+    @Excel(name = "运营商信息", width = 18)
+    private String ipRegion;
 
     public String getCreateTime() {
         return createTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
