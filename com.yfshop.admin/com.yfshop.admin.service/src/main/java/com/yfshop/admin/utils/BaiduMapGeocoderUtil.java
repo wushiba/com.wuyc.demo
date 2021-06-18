@@ -19,10 +19,11 @@ public class BaiduMapGeocoderUtil {
     /**
      * 百度地图 Api调用相关的百度AK
      */
-    private final static String BAIDU_MAP_AK = "gzwaiTL0UHG0rwYtDUo5CaD7HxnSm1lf";
+    private final static String BAIDU_MAP_AK = "UBMLlTPb2ZWbwqqV1WqqGGzBf5ltbLiu";
 
-    private static void main(String[] args) {
-        // getAddressInfoByLngAndLat("120.2027200000", "30.1834890000");
+
+    public static void main(String[] args) {
+        System.out.println(getAddressInfoByLngAndLat("113.8281790000", "30.6633880000"));
 
 
     }
