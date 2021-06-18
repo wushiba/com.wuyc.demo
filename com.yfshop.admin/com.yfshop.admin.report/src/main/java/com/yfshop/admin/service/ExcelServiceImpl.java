@@ -7,6 +7,7 @@ import com.yfshop.admin.api.excel.ExcelService;
 import com.yfshop.admin.api.excel.result.WebsiteCodeExcel;
 import com.yfshop.admin.dao.ExcelDao;
 import com.yfshop.admin.task.EmailTask;
+import com.yfshop.common.exception.ApiException;
 import com.yfshop.common.util.ExcelUtils;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,6 +49,7 @@ public class ExcelServiceImpl implements ExcelService {
             file.deleteOnExit();
         } catch (MessagingException e) {
             e.printStackTrace();
+            throw new ApiException(e);
         }
         return null;
     }
