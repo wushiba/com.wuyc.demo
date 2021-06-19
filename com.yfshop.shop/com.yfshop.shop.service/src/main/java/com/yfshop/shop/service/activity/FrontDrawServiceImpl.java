@@ -187,8 +187,9 @@ public class FrontDrawServiceImpl implements FrontDrawService {
                 if ("0".equals(location)) {
                     Object o = redisService.get("IP2Region:" + ipStr);
                     if (o == null) {
-                        region = BaiduIp2RegionUtil.getRegionByIp(ipStr);
-                        if (StringUtils.isNotBlank(region)) {
+                        String baiduRegion = BaiduIp2RegionUtil.getRegionByIp(ipStr);
+                        if (StringUtils.isNotBlank(baiduRegion)) {
+                            region = baiduRegion;
                             redisService.set("IP2Region:" + ipStr, region, 60 * 60 * 24);
                         }
                     } else {
