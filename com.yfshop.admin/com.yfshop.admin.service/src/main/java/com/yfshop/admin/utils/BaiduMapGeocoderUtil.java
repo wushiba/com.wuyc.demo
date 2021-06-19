@@ -19,7 +19,7 @@ public class BaiduMapGeocoderUtil {
     /**
      * 百度地图 Api调用相关的百度AK
      */
-    private final static String BAIDU_MAP_AK = "UBMLlTPb2ZWbwqqV1WqqGGzBf5ltbLiu";
+    private final static String BAIDU_MAP_AK = "gzwaiTL0UHG0rwYtDUo5CaD7HxnSm1lf";
 
 
     public static void main(String[] args) {

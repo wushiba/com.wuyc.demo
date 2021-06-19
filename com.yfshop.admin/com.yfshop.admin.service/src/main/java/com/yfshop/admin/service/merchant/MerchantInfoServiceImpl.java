@@ -850,7 +850,7 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
         });
         websiteCodeGroupResult.setList(websiteCodeDataResults);
         websiteCodeGroupResult.setCount(totalExchange.get());
-        websiteCodeGroupResult.setCurrentGoodsRecord(websiteGoodsRecordDao.sumGoodsRecordByMerchantId(websiteCodeDataReq.getMerchantId(), websiteCodeDataReq.getStartTime(), websiteCodeDataReq.getEndTime()));
+        websiteCodeGroupResult.setCurrentGoodsRecord(websiteGoodsRecordDao.sumGoodsRecordByMerchantId(websiteCodeDataReq.getMerchantId() == null ? merchantId : websiteCodeDataReq.getMerchantId(), websiteCodeDataReq.getStartTime(), websiteCodeDataReq.getEndTime()));
         websiteCodeGroupResult.setCurrentExchange(currentCurrentExchange.get());
         websiteCodeGroupResult.setTotalExchange(totalExchange.get());
         return websiteCodeGroupResult;

@@ -22,6 +22,7 @@ import com.yfshop.shop.service.coupon.result.YfUserCouponResult;
 import com.yfshop.shop.service.coupon.service.FrontUserCouponService;
 import com.yfshop.shop.service.user.result.UserResult;
 import com.yfshop.shop.service.user.service.FrontUserService;
+import com.yfshop.shop.utils.BaiduIp2RegionUtil;
 import com.yfshop.shop.utils.Ip2regionUtil;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.slf4j.Logger;
@@ -176,14 +177,27 @@ public class FrontDrawServiceImpl implements FrontDrawService {
         result.setDrawPrizeIcon(thirdPrize.getPrizeIcon());
         String region = Ip2regionUtil.getRegionByIp(ipStr);
         actCodeBatchDetail.setActTitle(yfDrawActivityResult.getActTitle());
-        actCodeBatchDetail.setIp(ipStr);
-        actCodeBatchDetail.setIpRegion(region);
         String location = "";
         Integer provinceId = null;
         if (StringUtils.isNotBlank(region)) {
             String[] dataArr = region.split("\\|");
             try {
                 location = dataArr[2];
+                //如果本地查询不到通过百度查询
+                if ("0".equals(location)) {
+                    Object o = redisService.get("IP2Region:" + ipStr);
+                    if (o == null) {
+                        region = BaiduIp2RegionUtil.getRegionByIp(ipStr);
+                        if (StringUtils.isNotBlank(region)) {
+                            redisService.set("IP2Region:" + ipStr, region, 60 * 60 * 24);
+                        }
+                    } else {
+                        region = o.toString();
+                    }
+                    if (StringUtils.isNotBlank(region)) {
+                        location = region.split("\\|")[2];
+                    }
+                }
                 provinceId = this.getProvinceByIpStr(location);
             } catch (Exception e) {
 
@@ -195,6 +209,8 @@ public class FrontDrawServiceImpl implements FrontDrawService {
                 return result;
             }
         }
+        actCodeBatchDetail.setIp(ipStr);
+        actCodeBatchDetail.setIpRegion(region);
         // 判断省份抽奖规则有没有走定制化, 找不到根据活动奖品概率去发奖品, 根据大盒小盒,去抽奖
         DrawProvinceRate provinceRate = this.getProvinceRateByActIdAndProvince(actCodeBatchDetail.getActId(), provinceId);
         if (provinceRate == null) {
