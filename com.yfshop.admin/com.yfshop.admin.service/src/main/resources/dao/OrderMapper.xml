@@ -5,7 +5,11 @@
     <update id="updateOrderPayStatus">
         update yf_order
         set is_pay = 'Y',bill_no = #{billNo}, pay_time = now()
-        where id = #{orderId} and is_pay in ('N','I')
+        where id = #{orderId} and is_pay = 'I'
     </update>
+
+    <select id="selectByIdForUpdate" resultType="com.yfshop.code.model.Order">
+        select * from yf_order where id = #{orderId} for update
+    </select>
 
 </mapper>

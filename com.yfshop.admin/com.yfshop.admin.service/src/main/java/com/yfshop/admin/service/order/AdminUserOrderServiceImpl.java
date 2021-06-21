@@ -90,7 +90,8 @@ public class AdminUserOrderServiceImpl implements AdminUserOrderService {
     public Void updateOrderPayStatus(Long orderId, String billNo) throws ApiException {
         logger.info("====进入订单支付成功通知orderId=" + orderId + ",billNo=" + billNo);
         Asserts.assertNonNull(orderId, 500, "主订单id不可以为空");
-        Order order = orderMapper.selectById(orderId);
+        //Order order = orderMapper.selectById(orderId);
+        Order order = orderDao.selectByIdForUpdate(orderId);
         Asserts.assertNonNull(order, 500, "订单不存在");
         Asserts.assertEquals(order.getIsPay(), "I", 500, "订单未处于支付中");
         String orderStatus = "ZT".equalsIgnoreCase(order.getReceiveWay()) ? UserOrderStatusEnum.SUCCESS.getCode() : UserOrderStatusEnum.WAIT_DELIVERY.getCode();

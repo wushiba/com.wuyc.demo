@@ -257,7 +257,7 @@ public class AdminDrawActivityServiceImpl implements AdminDrawActivityService {
                 smallBoxRate = smallBoxRate + prizeReq.getSmallBoxRate();
             }
         }
-        Asserts.assertFalse(bigBoxRate >= 10000 || smallBoxRate >= 10000, 500, "一等奖品加二等奖品概率之和不能大于100");
+        Asserts.assertFalse(bigBoxRate >= 1000000 || smallBoxRate >= 1000000, 500, "一等奖品加二等奖品概率之和不能大于100");
 
         // 校验特殊省份的特殊中奖概率
 //        List<CreateDrawActivityReq.ProvinceRateReq> provinceRateList = req.getProvinceRateList();

@@ -1,9 +1,17 @@
-package com.yfshop.shop.utils;
+package com.yfshop.admin.utils;
 
+import cn.hutool.core.io.FileUtil;
 import cn.hutool.http.HttpUtil;
 import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.yfshop.code.model.Region;
 import org.apache.commons.lang.StringUtils;
 import org.lionsoul.ip2region.Util;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 public class BaiduIp2RegionUtil {
     private final static String BAIDU_MAP_AK = "gzwaiTL0UHG0rwYtDUo5CaD7HxnSm1lf";
@@ -30,6 +38,22 @@ public class BaiduIp2RegionUtil {
     }
 
     public static void main(String[] args) {
-        System.out.println(getRegionByIp("223.104.130.56"));
+        List<String> list = FileUtil.readUtf8Lines(new File("H://9.txt"));
+        List<String> tag = new ArrayList<>();
+        list.forEach(item -> {
+            String[] s = item.split(",");
+            String ip = BaiduIp2RegionUtil.getRegionByIp(s[1]);
+            if (ip != null) {
+                tag.add(String.format("update yf_draw_record r set r.user_location = '%s',r.ip_region = '%s' where r.id = %s;",
+                        ip.split("\\|")[2], ip, s[0]
+                ));
+            }
+            try {
+                Thread.sleep(300);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        });
+        FileUtil.writeLines(tag, new File("H://10.txt"), "UTF-8");
     }
 }

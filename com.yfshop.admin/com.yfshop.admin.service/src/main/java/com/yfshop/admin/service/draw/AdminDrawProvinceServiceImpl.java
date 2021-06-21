@@ -98,7 +98,7 @@ public class AdminDrawProvinceServiceImpl implements AdminDrawProvinceService {
 
             int bigWinRate = provinceRate.getFirstWinRate() + provinceRate.getSecondWinRate();
             int smallWinRate = provinceRate.getFirstWinRate() + provinceRate.getSecondSmallBoxWinRate();
-            Asserts.assertFalse(bigWinRate > 10000 || smallWinRate > 10000,
+            Asserts.assertFalse(bigWinRate > 1000000 || smallWinRate > 1000000,
                     500, provinceRate.getProvinceName() + "一等奖品加二等奖品概率之和不能大于100");
         });
         List<DrawProvinceRate> drawProvinceRateList = new ArrayList<>();

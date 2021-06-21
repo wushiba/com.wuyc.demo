@@ -60,7 +60,8 @@ public class AddressUtil {
                     }
                     break;
                 case 2:
-                    if (key.contains("市") || key.contains("区") || key.contains("县") || key.contains("旗")) {
+                    if (((key.contains("市") || key.contains("区") || key.contains("县")) && key.length() < 6) || key.contains("旗")) {
+                        //System.out.println(key);
                         map.put("county", key);
                         key = "";
                         level++;
@@ -73,7 +74,7 @@ public class AddressUtil {
     }
 
     public static void main(String[] args) {
-        System.out.println("地址是：" + addressResolution("江西省抚州市东乡区农博城"));
+        System.out.println("地址是：" + addressResolution("广东省东莞市东莞市环城东路联华花园城四季大道117号铺(喜伴生活超市对面)"));
     }
 
 }

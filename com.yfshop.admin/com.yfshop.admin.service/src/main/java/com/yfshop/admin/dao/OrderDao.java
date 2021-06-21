@@ -1,5 +1,6 @@
 package com.yfshop.admin.dao;
 
+import com.yfshop.code.model.Order;
 import org.apache.ibatis.annotations.Param;
 
 /**
@@ -10,4 +11,5 @@ public interface OrderDao {
 
     int updateOrderPayStatus(@Param("orderId") Long orderId, @Param("billNo") String billNo);
 
+    Order selectByIdForUpdate(@Param("orderId") Long orderId);
 }
