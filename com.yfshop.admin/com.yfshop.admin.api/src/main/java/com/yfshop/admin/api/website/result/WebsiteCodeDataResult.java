@@ -13,6 +13,7 @@ public class WebsiteCodeDataResult implements Serializable {
     private Integer merchantId;
     private String merchantName;
     private String alias;
+    private String mobile;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", locale = "zh", timezone = "GMT+8")
     private LocalDateTime activityTime;
     private Integer currentExchange;

@@ -850,6 +850,7 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
             websiteCodeDataResult.setMerchantName(item.getMerchantName());
             websiteCodeDataResult.setActivityTime(item.getActivityTime());
             websiteCodeDataResult.setMerchantId(item.getMerchantId());
+            websiteCodeDataResult.setMobile(item.getMobile());
             websiteCodeDataResult.setCurrentExchange(getCurrentExchangeByWebsiteCode(item.getAlias(), websiteCodeDataReq.getStartTime(), websiteCodeDataReq.getEndTime()));
             websiteCodeDataResult.setTotalExchange(getCurrentExchangeByWebsiteCode(item.getAlias(), null, null));
             currentCurrentExchange.addAndGet(websiteCodeDataResult.getCurrentExchange());
