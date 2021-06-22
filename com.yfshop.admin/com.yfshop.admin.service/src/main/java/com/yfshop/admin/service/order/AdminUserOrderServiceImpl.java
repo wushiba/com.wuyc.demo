@@ -245,7 +245,7 @@ public class AdminUserOrderServiceImpl implements AdminUserOrderService {
         orderDetailResult.setUserName(orderDetail.getUserName());
         orderDetailResult.setReceiveWay(orderDetail.getReceiveWay());
         if (orderAddress != null) {
-            orderDetailResult.setAddress(String.format("%s,%s,%s%s%s", orderAddress.getRealname(), orderAddress.getMobile(), orderAddress.getProvince(), orderAddress.getCity(), orderAddress.getDistrict(), orderAddress.getAddress()));
+            orderDetailResult.setAddress(String.format("%s,%s,%s%s%s%s", orderAddress.getRealname(), orderAddress.getMobile(), orderAddress.getProvince(), orderAddress.getCity(), orderAddress.getDistrict(), orderAddress.getAddress()));
         }
         orderDetailResult.setShipTime(orderDetail.getShipTime());
         orderDetailResult.setExpressCompany(orderDetail.getExpressCompany());

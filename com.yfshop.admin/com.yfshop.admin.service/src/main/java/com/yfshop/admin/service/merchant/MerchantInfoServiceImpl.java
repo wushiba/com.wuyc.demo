@@ -662,12 +662,13 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
     @Override
     public MerchantGroupResult merchantGroup(MerchantGroupReq merchantGroupReq) throws ApiException {
         MerchantGroupResult merchantGroupResult = new MerchantGroupResult();
-        Integer myselfCount = getCurrentWebsiteCount(merchantGroupReq.getMerchantId());
+        //Integer myselfCount = getCurrentWebsiteCount(merchantGroupReq.getMerchantId());
         Merchant merchant = merchantMapper.selectById(merchantGroupReq.getMerchantId());
         Integer count = getAllWebsiteCodeCount(merchantGroupReq.getMerchantId());
         merchantGroupResult.setMerchantId(merchant.getId());
         merchantGroupResult.setMerchantName(merchant.getMerchantName());
         merchantGroupResult.setContacts(merchant.getContacts());
+        merchantGroupResult.setMobile(merchant.getMobile());
         merchantGroupResult.setCount(count);
         LambdaQueryWrapper lambdaQueryWrapper = Wrappers.<Merchant>lambdaQuery()
                 .eq(Merchant::getPid, merchantGroupReq.getMerchantId())
@@ -683,6 +684,7 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
             myself.setMerchantId(merchant.getId());
             myself.setMerchantName(merchant.getMerchantName());
             myself.setContacts(merchant.getContacts());
+            myself.setMobile(merchant.getMobile());
             myself.setCurrentExchange(myselfResult.getCurrentExchange());
             myself.setTotalExchange(myselfResult.getTotalExchange());
             myself.setCurrentGoodsRecord(myselfResult.getCurrentGoodsRecord());
@@ -694,6 +696,7 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
             child.setMerchantId(item.getId());
             child.setMerchantName(item.getMerchantName());
             child.setContacts(item.getContacts());
+            child.setMobile(item.getMobile());
             child.setCurrentExchange(getCurrentExchange(item.getId(), merchantGroupReq.getStartTime(), merchantGroupReq.getEndTime()));
             child.setTotalExchange(getCurrentExchange(item.getId(), null, null));
             child.setCurrentGoodsRecord(websiteGoodsRecordDao.sumAllGoodsRecord(item.getId(), merchantGroupReq.getStartTime(), merchantGroupReq.getEndTime()));
@@ -816,6 +819,7 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
             MerchantGroupResult child = new MerchantGroupResult();
             child.setMerchantId(item.getId());
             child.setMerchantName(item.getMerchantName());
+            child.setMobile(item.getMobile());
             child.setContacts(item.getContacts());
             child.setCurrentExchange(getCurrentExchangeByPid(item.getId(), merchantGroupReq.getStartTime(), merchantGroupReq.getEndTime()));
             child.setTotalExchange(getCurrentExchangeByPid(item.getId(), null, null));
