@@ -349,7 +349,9 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
             String address = maps.get("town");
             if (address != null && websiteCodeBindReq.getDistrict() != null) {
                 try {
-                    address = address.replaceFirst(websiteCodeBindReq.getDistrict(), "");
+                    if (!websiteCodeBindReq.getDistrict().contains("(")) {
+                        address = address.replaceFirst(websiteCodeBindReq.getDistrict(), "");
+                    }
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
