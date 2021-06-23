@@ -74,7 +74,7 @@ public class AddressUtil {
     }
 
     public static void main(String[] args) {
-        System.out.println("地址是：" + addressResolution("广东省东莞市东莞市环城东路联华花园城四季大道117号铺(喜伴生活超市对面)"));
+        System.out.println("地址是：" + addressResolution("广东省中山市同心街68号首层第一卡(佳景康城对面、佳景市场旁)"));
     }
 
 }

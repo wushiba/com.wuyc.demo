@@ -5,6 +5,7 @@ import cn.afterturn.easypoi.excel.annotation.ExcelTarget;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.crypto.SecureUtil;
+import cn.hutool.poi.excel.ExcelUtil;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -12,6 +13,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.google.common.collect.Lists;
 import com.yfshop.admin.api.express.ExpressService;
 import com.yfshop.admin.api.express.result.ExpressOrderResult;
+import com.yfshop.admin.api.healthy.request.HealthySubOrderImportReq;
 import com.yfshop.admin.api.mall.AdminMallManageService;
 import com.yfshop.admin.api.mall.request.CreateBannerReq;
 import com.yfshop.admin.api.mall.request.GenerateItemSkuReq;
@@ -1937,15 +1939,18 @@ public class AdminServiceApplicationTests {
 
             if (temp != null) {
                 Region province = regionMapper.selectOne(Wrappers.<Region>lambdaQuery()
+                        .eq(Region::getType,1)
                         .eq(Region::getName, temp.get("province")));
                 if (province != null) {
                     temp.put("provinceId", province.getId() + "");
                     Region city = regionMapper.selectOne(Wrappers.<Region>lambdaQuery()
+                            .eq(Region::getType,2)
                             .eq(Region::getName, temp.get("city"))
                             .eq(Region::getPid, province.getId()));
                     if (city != null) {
                         temp.put("cityId", city.getId() + "");
                         Region county = regionMapper.selectOne(Wrappers.<Region>lambdaQuery()
+                                .eq(Region::getType,3)
                                 .eq(Region::getName, temp.get("district"))
                                 .eq(Region::getPid, city.getId()));
                         if (county != null) {
@@ -2022,13 +2027,19 @@ public class AdminServiceApplicationTests {
     }
 
 
-    public static void main(String[] args) {
-        File file = new File("H://2105091508277588182");
-        List<String> no = new ArrayList<>();
-        for (File s : file.listFiles()) {
-            no.add(String.format("INSERT INTO `yf_website_code_detail` (`batch_id`,`alias`,`is_activate`,`activity_time`,`merchant_id`,`merchant_name`,`merchant_pid_path`,`mobile`,`pid`,`pid_path`) VALUES (326,'%s','N',null,null,null,null,null,13011,'10389.13007.13011.');", s.getName().replace(".png", "")));
-        }
-        FileUtil.writeUtf8Lines(no, "H://8.txt");
+//    public static void main(String[] args) {
+//        File file = new File("H://2105091508277588182");
+//        List<String> no = new ArrayList<>();
+//        for (File s : file.listFiles()) {
+//            no.add(String.format("INSERT INTO `yf_website_code_detail` (`batch_id`,`alias`,`is_activate`,`activity_time`,`merchant_id`,`merchant_name`,`merchant_pid_path`,`mobile`,`pid`,`pid_path`) VALUES (326,'%s','N',null,null,null,null,null,13011,'10389.13007.13011.');", s.getName().replace(".png", "")));
+//        }
+//        FileUtil.writeUtf8Lines(no, "H://8.txt");
+//
+//    }
+
+
+        public static void main(String[] args) {
+
 
     }
 }
