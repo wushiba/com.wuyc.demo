@@ -861,7 +861,7 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
                     userCartSummary.setItemCount(userCartSummary.getItemCount() + count);
                     userCartSummary.setOrderPrice(userCartSummary.getOrderPrice().add(item.getSkuSalePrice().multiply(new BigDecimal(count))));
                     userCartSummary.setPayMoney(userCartSummary.getPayMoney().add(item.getSkuSalePrice().multiply(new BigDecimal(count))));
-                    PostageRules postageRules = postageRulesMapper.selectOne(Wrappers.lambdaQuery(PostageRules.class).apply("FIND_IN_SET({0},sku_ids)", item.getSkuId()));
+                    PostageRules postageRules = postageRulesMapper.selectOne(Wrappers.lambdaQuery(PostageRules.class).apply("FIND_IN_SET({0},sku_ids)  and coupon_id is null", item.getSkuId()));
                     if (postageRules != null) {
                         postageRulesMap.put(postageRules.getId(), postageRules);
                         List<UserCartResult> cartResults = childItemList.get(postageRules.getId());
