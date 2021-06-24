@@ -893,7 +893,7 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
                     sum += cartResult.getNum();
                     pay.add(cartResult.getSkuSalePrice().multiply(new BigDecimal(cartResult.getNum())));
                 }
-                if (value.getConditions().compareTo(pay) >= 0) {
+                if (pay.compareTo(value.getConditions()) >= 0) {
                     freight = value.getIsTrue().divide(new BigDecimal(sum), 2, RoundingMode.HALF_UP);
                     userCartSummary.setTotalFreight(value.getIsTrue());
                 } else {
