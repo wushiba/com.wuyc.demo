@@ -52,7 +52,9 @@ public class YfUserCouponResult implements Serializable {
      */
     private String couponResource;
 
-    /** 用户扫码抽奖的码，yf_act_code_batch_detail表的actCode */
+    /**
+     * 用户扫码抽奖的码，yf_act_code_batch_detail表的actCode
+     */
     private String actCode;
 
     /**
@@ -62,7 +64,9 @@ public class YfUserCouponResult implements Serializable {
 
     private Integer drawPrizeLevel;
 
-    /** 抽奖奖品图标 */
+    /**
+     * 抽奖奖品图标
+     */
     private String drawPrizeIcon;
 
     /**
@@ -128,6 +132,9 @@ public class YfUserCouponResult implements Serializable {
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     private LocalDateTime useTime;
+
+
+    private String merchantName;
 
     /**
      * 订单编号

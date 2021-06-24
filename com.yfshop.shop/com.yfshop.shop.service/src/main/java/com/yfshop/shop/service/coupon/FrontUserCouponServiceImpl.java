@@ -6,10 +6,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.yfshop.code.mapper.CouponMapper;
-import com.yfshop.code.mapper.DrawRecordMapper;
-import com.yfshop.code.mapper.UserCouponMapper;
-import com.yfshop.code.mapper.UserMapper;
+import com.yfshop.code.mapper.*;
 import com.yfshop.code.model.*;
 import com.yfshop.common.constants.CacheConstants;
 import com.yfshop.common.enums.CouponResourceEnum;
@@ -78,6 +75,10 @@ public class FrontUserCouponServiceImpl implements FrontUserCouponService {
     private FrontUserService frontUserService;
     @Resource
     private DrawRecordMapper drawRecordMapper;
+    @Resource
+    private OrderDetailMapper orderDetailMapper;
+    @Resource
+    private MerchantMapper merchantMapper;
     @DubboReference
     private MpService mpService;
     @Value("${shop.url}")
@@ -148,6 +149,28 @@ public class FrontUserCouponServiceImpl implements FrontUserCouponService {
         }
         return resultList.stream().filter(data -> "ALL".equalsIgnoreCase(data.getUseRangeType()) ||
                 data.getCanUseItemIds().contains(userCouponReq.getItemId() + "")).collect(Collectors.toList());
+    }
+
+
+    @Override
+    public List getUserCouponAll(QueryUserCouponReq userCouponReq) throws ApiException {
+        LambdaQueryWrapper<UserCoupon> queryWrapper = Wrappers.lambdaQuery(UserCoupon.class)
+                .eq(UserCoupon::getUserId, userCouponReq.getUserId()).orderByDesc(UserCoupon::getCouponDesc);
+        List<UserCoupon> dataList = userCouponMapper.selectList(queryWrapper);
+        List<YfUserCouponResult> resultList = BeanUtil.convertList(dataList, YfUserCouponResult.class);
+        resultList.forEach(item -> {
+            //获取自提门店详细
+            if ((UserCouponStatusEnum.HAS_USE.getCode().equals(item.getUseStatus()) || UserCouponStatusEnum.IN_USE.getCode().equals(item.getUseStatus())) && item.getOrderId() != null) {
+                OrderDetail orderDetail = orderDetailMapper.selectOne(Wrappers.lambdaQuery(OrderDetail.class).eq(OrderDetail::getOrderId, item.getOrderId()));
+                if (orderDetail != null && orderDetail.getMerchantId() != null) {
+                    Merchant merchant = merchantMapper.selectById(orderDetail.getMerchantId());
+                    if (merchant != null) {
+                        item.setMerchantName(merchant.getMerchantName());
+                    }
+                }
+            }
+        });
+        return resultList;
     }
 
     @Override

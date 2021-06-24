@@ -97,6 +97,14 @@ public class FrontOrderController implements BaseController {
         return CommonResult.success(frontUserCouponService.findUserCouponList(userCouponReq));
     }
 
+
+    @RequestMapping(value = "/coupon/getAll", method = {RequestMethod.GET, RequestMethod.POST})
+    @ResponseBody
+    public CommonResult<List<YfUserCouponResult>> getUserCouponAll(QueryUserCouponReq userCouponReq) {
+        userCouponReq.setUserId(getCurrentUserId());
+        return CommonResult.success(frontUserCouponService.getUserCouponAll(userCouponReq));
+    }
+
     /**
      * 订单结算页商品信息列表
      *
