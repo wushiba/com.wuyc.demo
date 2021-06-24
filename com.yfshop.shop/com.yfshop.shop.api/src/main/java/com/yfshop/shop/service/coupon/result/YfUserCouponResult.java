@@ -139,6 +139,6 @@ public class YfUserCouponResult implements Serializable {
     /**
      * 订单编号
      */
-    private Integer orderId;
+    private Long orderId;
 
 }
