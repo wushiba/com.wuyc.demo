@@ -166,8 +166,14 @@ public class FrontUserCouponServiceImpl implements FrontUserCouponService {
                     Merchant merchant = merchantMapper.selectById(orderDetail.getMerchantId());
                     if (merchant != null) {
                         item.setMerchantName(merchant.getMerchantName());
+                    } else {
+                        System.out.println("没有商户"+item.getId());
                     }
+                } else {
+                    System.out.println("没有订单详情"+item.getId());
                 }
+            } else {
+                System.out.println("不是自提"+item.getId());
             }
         });
         return resultList;
