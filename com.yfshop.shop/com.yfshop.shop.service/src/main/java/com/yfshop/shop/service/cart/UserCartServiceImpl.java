@@ -317,8 +317,8 @@ public class UserCartServiceImpl implements UserCartService {
             List<UserCartResult> childItem = childItemList.get(key);
             BigDecimal pay = BigDecimal.ZERO;
             int category = childItem.get(0).getCategoryId();
-            //排查是火锅套餐
-            if (category != 3 && !tcCategory.isEmpty()) {
+            //排除是火锅套餐
+            if (!(category == 3 && !tcCategory.isEmpty())) {
                 for (UserCartResult cartResult : childItem) {
                     pay.add(cartResult.getSkuSalePrice().multiply(new BigDecimal(cartResult.getNum())));
                 }

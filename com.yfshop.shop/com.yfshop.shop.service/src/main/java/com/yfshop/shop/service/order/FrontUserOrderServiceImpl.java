@@ -884,8 +884,8 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
             List<UserCartResult> childItem = childItemList.get(key);
             BigDecimal pay = BigDecimal.ZERO;
             int category = childItem.get(0).getCategoryId();
-            //排查是火锅套餐
-            if (category != 3 && !tcCategory.isEmpty()) {
+            //排除是火锅套餐
+            if (!(category == 3 && !tcCategory.isEmpty())) {
                 //总数
                 int sum = 0;
                 BigDecimal freight = null;
