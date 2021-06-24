@@ -29,7 +29,7 @@ public class PostageRules extends Model<PostageRules> {
 
     private String name;
 
-    private BigDecimal condition;
+    private BigDecimal conditions;
 
     private BigDecimal isTrue;
 
