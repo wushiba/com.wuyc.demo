@@ -193,7 +193,6 @@ public class UserCartServiceImpl implements UserCartService {
             List<UserCart> userCartList = cartMapper.selectList(Wrappers.lambdaQuery(UserCart.class)
                     .in(UserCart::getId, cartIdList));
             resultList = BeanUtil.convertList(userCartList, UserCartResult.class);
-
             List<Integer> skuIdList = userCartList.stream().map(UserCart::getSkuId).collect(Collectors.toList());
             Map<Integer, ItemSku> skuIndexMap = skuMapper.selectBatchIds(skuIdList).stream().collect(Collectors.toMap(ItemSku::getId, s -> s));
             resultList.forEach(data -> {
@@ -236,8 +235,10 @@ public class UserCartServiceImpl implements UserCartService {
                 ItemSku itemSku = skuIndexMap.get(data.getSkuId());
                 Item item = itemIndexMap.get(data.getItemId());
                 if (itemSku != null && item != null) {
+                    BeanUtil.copyProperties(itemSku, data);
                     data.setFreight(itemSku.getFreight());
                     data.setSkuSalePrice(itemSku.getSkuSalePrice());
+                    data.setSkuMarketPrice(itemSku.getSkuSalePrice());
                     data.setCategoryId(itemSku.getCategoryId());
                     data.setSkuType(itemSku.getSkuType());
                     data.setIsAvailable("Y".equals(item.getIsEnable()) && "N".equals(item.getIsDelete()) ? "Y" : "N");
@@ -275,18 +276,21 @@ public class UserCartServiceImpl implements UserCartService {
                 if (userCoupon != null) {
                     userCartSummary.setPayMoney(item.getSkuSalePrice().subtract(new BigDecimal(userCoupon.getCouponPrice())));
                 }
+                int count = item.getNum();
                 //优惠券减扣下的邮费计算
                 if (couponPostageRule != null && couponPostageRule.getSkuIds().contains(item.getSkuId() + "")) {
                     userCartSummary.setExchangeMoney(couponPostageRule.getExchangeFee());
                     userCartSummary.setTotalFreight(couponPostageRule.getIsTrue());
                     userCartSummary.setItemCount(userCartSummary.getItemCount() + 1);
-                    item.setNum(item.getNum() - 1);
+                    userCartSummary.setOrderPrice(userCartSummary.getOrderPrice().add(item.getSkuSalePrice().multiply(new BigDecimal(item.getNum()))));
+                    count = count - 1;
                     couponPostageRule = null;
                 }
                 //正常情况的邮费计算
-                if (item.getNum() > 0) {
-                    userCartSummary.setItemCount(userCartSummary.getItemCount() + item.getNum());
-                    userCartSummary.setPayMoney(userCartSummary.getPayMoney().add(item.getSkuSalePrice().multiply(new BigDecimal(item.getNum()))));
+                if (count > 0) {
+                    userCartSummary.setItemCount(userCartSummary.getItemCount() + count);
+                    userCartSummary.setOrderPrice(userCartSummary.getOrderPrice().add(item.getSkuSalePrice().multiply(new BigDecimal(count))));
+                    userCartSummary.setPayMoney(userCartSummary.getPayMoney().add(item.getSkuSalePrice().multiply(new BigDecimal(count))));
                     PostageRules postageRules = postageRulesMapper.selectOne(Wrappers.lambdaQuery(PostageRules.class).apply("FIND_IN_SET({0},sku_ids)", item.getSkuId()));
                     if (postageRules != null) {
                         postageRulesMap.put(postageRules.getId(), postageRules);
@@ -324,7 +328,6 @@ public class UserCartServiceImpl implements UserCartService {
         });
         userCartSummary.setPayMoney(userCartSummary.getPayMoney().add(userCartSummary.getTotalFreight()));
         userCartSummary.setCarts(userCartResult);
-
         return userCartSummary;
     }
 }

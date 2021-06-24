@@ -82,6 +82,11 @@ public class UserCartResult implements Serializable {
      */
     private BigDecimal skuSalePrice;
 
+
+    private BigDecimal payPrice;
+
+    private BigDecimal couponPrice;
+
     /**
      * 市场价(用于展示)
      */

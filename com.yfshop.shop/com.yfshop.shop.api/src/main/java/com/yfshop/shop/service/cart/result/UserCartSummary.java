@@ -33,6 +33,8 @@ public class UserCartSummary implements Serializable {
 
     private BigDecimal exchangeMoney;
 
+    private BigDecimal orderPrice;
+
     /**
      * 购物车列表
      */
@@ -44,6 +46,7 @@ public class UserCartSummary implements Serializable {
         userCartSummary.setTotalFreight(BigDecimal.ZERO);
         userCartSummary.setPayMoney(BigDecimal.ZERO);
         userCartSummary.setExchangeMoney(BigDecimal.ZERO);
+        userCartSummary.setOrderPrice(BigDecimal.ZERO);
         userCartSummary.setCarts(new ArrayList<>(0));
         return userCartSummary;
     }
