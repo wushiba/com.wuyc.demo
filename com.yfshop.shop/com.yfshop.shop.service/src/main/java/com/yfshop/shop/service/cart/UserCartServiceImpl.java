@@ -215,8 +215,6 @@ public class UserCartServiceImpl implements UserCartService {
     }
 
 
-
-
     @Override
     public UserCartSummary calcUserCart(Integer skuId, Integer num, String cartIds, Long userCouponId) {
         UserCoupon userCoupon = null;
@@ -292,7 +290,11 @@ public class UserCartServiceImpl implements UserCartService {
                     PostageRules postageRules = postageRulesMapper.selectOne(Wrappers.lambdaQuery(PostageRules.class).apply("FIND_IN_SET({0},sku_ids)", item.getSkuId()));
                     if (postageRules != null) {
                         postageRulesMap.put(postageRules.getId(), postageRules);
-                        List<UserCartResult> cartResults = childItemList.getOrDefault(postageRules.getId(), new ArrayList<>());
+                        List<UserCartResult> cartResults = childItemList.get(postageRules.getId());
+                        if (cartResults == null) {
+                            cartResults = new ArrayList<>();
+                            childItemList.put(postageRules.getId(), cartResults);
+                        }
                         cartResults.add(item);
                     }
                 }
