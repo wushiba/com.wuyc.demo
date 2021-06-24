@@ -42,6 +42,8 @@ public class UserCartSummary implements Serializable {
         UserCartSummary userCartSummary = new UserCartSummary();
         userCartSummary.setItemCount(0);
         userCartSummary.setTotalFreight(BigDecimal.ZERO);
+        userCartSummary.setPayMoney(BigDecimal.ZERO);
+        userCartSummary.setExchangeMoney(BigDecimal.ZERO);
         userCartSummary.setCarts(new ArrayList<>(0));
         return userCartSummary;
     }

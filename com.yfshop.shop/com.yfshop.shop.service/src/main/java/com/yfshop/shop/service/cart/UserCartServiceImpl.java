@@ -320,6 +320,7 @@ public class UserCartServiceImpl implements UserCartService {
                 }
             }
         });
+        userCartSummary.setPayMoney(userCartSummary.getPayMoney().add(userCartSummary.getTotalFreight()));
         userCartSummary.setCarts(userCartResult);
 
         return userCartSummary;
