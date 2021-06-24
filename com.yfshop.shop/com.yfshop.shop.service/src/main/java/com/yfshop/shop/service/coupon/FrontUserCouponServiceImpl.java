@@ -153,7 +153,7 @@ public class FrontUserCouponServiceImpl implements FrontUserCouponService {
 
 
     @Override
-    public List getUserCouponAll(QueryUserCouponReq userCouponReq) throws ApiException {
+    public List<YfUserCouponResult> getUserCouponAll(QueryUserCouponReq userCouponReq) throws ApiException {
         LambdaQueryWrapper<UserCoupon> queryWrapper = Wrappers.lambdaQuery(UserCoupon.class)
                 .eq(UserCoupon::getUserId, userCouponReq.getUserId()).orderByDesc(UserCoupon::getCouponDesc);
         List<UserCoupon> dataList = userCouponMapper.selectList(queryWrapper);
@@ -163,6 +163,7 @@ public class FrontUserCouponServiceImpl implements FrontUserCouponService {
             if ((UserCouponStatusEnum.HAS_USE.getCode().equals(item.getUseStatus()) || UserCouponStatusEnum.IN_USE.getCode().equals(item.getUseStatus())) && item.getOrderId() != null) {
                 OrderDetail orderDetail = orderDetailMapper.selectOne(Wrappers.lambdaQuery(OrderDetail.class).eq(OrderDetail::getOrderId, item.getOrderId()));
                 if (orderDetail != null && orderDetail.getMerchantId() != null) {
+                    item.setOrderDetailId(orderDetail.getId());
                     Merchant merchant = merchantMapper.selectById(orderDetail.getMerchantId());
                     if (merchant != null) {
                         item.setMerchantName(merchant.getMerchantName());

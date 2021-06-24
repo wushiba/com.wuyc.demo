@@ -35,7 +35,7 @@ public interface FrontUserCouponService {
      */
     public List<YfUserCouponResult> findUserCouponList(QueryUserCouponReq userCouponReq) throws ApiException;
 
-    public List getUserCouponAll(QueryUserCouponReq userCouponReq) throws ApiException;
+    public List<YfUserCouponResult> getUserCouponAll(QueryUserCouponReq userCouponReq) throws ApiException;
 
     public List<YfUserCouponResult> findAllUserDrawRecordList(QueryUserCouponReq userCouponReq) throws ApiException;
 

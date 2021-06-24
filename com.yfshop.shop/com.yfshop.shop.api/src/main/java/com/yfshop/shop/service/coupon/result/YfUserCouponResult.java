@@ -141,4 +141,10 @@ public class YfUserCouponResult implements Serializable {
      */
     private Long orderId;
 
+    /**
+     * 订单编号
+     */
+    private Long orderDetailId;
+
+
 }

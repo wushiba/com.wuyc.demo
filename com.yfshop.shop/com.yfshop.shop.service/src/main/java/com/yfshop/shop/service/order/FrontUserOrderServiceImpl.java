@@ -226,6 +226,7 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
         OrderAddress orderAddress = orderAddressMapper.selectOne(Wrappers.lambdaQuery(OrderAddress.class).eq(OrderAddress::getOrderId, orderId));
         YfUserOrderDetailResult.YfUserOrderAddress addressInfo = BeanUtil.convert(orderAddress, YfUserOrderDetailResult.YfUserOrderAddress.class);
         userOrderDetailResult.setAddressInfo(addressInfo);
+        userOrderDetailResult.setReceiveWay(order.getReceiveWay());
         return userOrderDetailResult;
     }
 

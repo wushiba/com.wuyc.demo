@@ -37,6 +37,8 @@ public class YfUserOrderDetailResult implements Serializable {
 
     private Long orderDetailId;
 
+    private String receiveWay;
+
     /**
      * 商品数量
      */
@@ -82,7 +84,7 @@ public class YfUserOrderDetailResult implements Serializable {
     private List<YfUserOrderItem> itemList;
 
     private YfUserOrderAddress addressInfo;
-    
+
     @Data
     public static class YfUserOrderItem implements Serializable {
 
