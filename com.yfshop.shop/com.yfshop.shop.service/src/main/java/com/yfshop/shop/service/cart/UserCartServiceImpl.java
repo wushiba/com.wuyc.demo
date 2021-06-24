@@ -289,7 +289,7 @@ public class UserCartServiceImpl implements UserCartService {
                 if (item.getNum() > 0) {
                     userCartSummary.setItemCount(userCartSummary.getItemCount() + item.getNum());
                     userCartSummary.setPayMoney(userCartSummary.getPayMoney().add(item.getSkuSalePrice().multiply(new BigDecimal(item.getNum()))));
-                    PostageRules postageRules = postageRulesMapper.selectOne(Wrappers.lambdaQuery(PostageRules.class).apply("FIND_IN_SET('{0}',sku_ids)", item.getSkuId()));
+                    PostageRules postageRules = postageRulesMapper.selectOne(Wrappers.lambdaQuery(PostageRules.class).apply("FIND_IN_SET({0},sku_ids)", item.getSkuId()));
                     if (postageRules != null) {
                         postageRulesMap.put(postageRules.getId(), postageRules);
                         List<UserCartResult> cartResults = childItemList.getOrDefault(postageRules.getId(), new ArrayList<>());
