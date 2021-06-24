@@ -229,7 +229,8 @@ public class UserCartServiceImpl implements UserCartService {
                     .in(UserCart::getId, cartIdList));
             resultList = BeanUtil.convertList(userCartList, UserCartResult.class);
             List<Integer> skuIdList = userCartList.stream().map(UserCart::getSkuId).collect(Collectors.toList());
-            Map<Integer, Item> itemIndexMap = itemMapper.selectBatchIds(skuIdList).stream().collect(Collectors.toMap(Item::getId, s -> s));
+            List<Integer> itemIdList = userCartList.stream().map(UserCart::getItemId).collect(Collectors.toList());
+            Map<Integer, Item> itemIndexMap = itemMapper.selectBatchIds(itemIdList).stream().collect(Collectors.toMap(Item::getId, s -> s));
             Map<Integer, ItemSku> skuIndexMap = skuMapper.selectBatchIds(skuIdList).stream().collect(Collectors.toMap(ItemSku::getId, s -> s));
             resultList.forEach(data -> {
                 ItemSku itemSku = skuIndexMap.get(data.getSkuId());
