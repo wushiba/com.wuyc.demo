@@ -409,7 +409,9 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
         for (UserCartResult userCart : resultList) {
             ItemSku itemSku = skuIndexMap.get(userCart.getSkuId());
             Item item = itemIndexMap.get(userCart.getItemId());
+            Integer id = userCart.getNum();
             BeanUtil.copyProperties(itemSku, userCart);
+            userCart.setId(id);
             Asserts.assertFalse(itemSku.getSkuStock() < userCart.getNum(), 500, "商品库存不足");
             checkPrizeAddress(userCart.getSkuId(), addressInfo.getProvince());
             // 扣库存, 修改优惠券状态

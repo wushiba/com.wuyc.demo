@@ -235,7 +235,9 @@ public class UserCartServiceImpl implements UserCartService {
                 ItemSku itemSku = skuIndexMap.get(data.getSkuId());
                 Item item = itemIndexMap.get(data.getItemId());
                 if (itemSku != null && item != null) {
+                    Integer id = data.getNum();
                     BeanUtil.copyProperties(itemSku, data);
+                    data.setId(id);
                     data.setFreight(itemSku.getFreight());
                     data.setSkuSalePrice(itemSku.getSkuSalePrice());
                     data.setSkuMarketPrice(itemSku.getSkuSalePrice());
