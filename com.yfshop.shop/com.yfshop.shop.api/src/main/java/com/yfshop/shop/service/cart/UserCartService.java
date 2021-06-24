@@ -83,6 +83,6 @@ public interface UserCartService {
     List<UserCartResult> findItemList(Integer skuId, Integer num, String cartIds);
 
 
-    List<UserCartResult> calcUserCart(Integer skuId, Integer num, String cartIds, Long userCouponId);
+    UserCartSummary calcUserCart(Integer skuId, Integer num, String cartIds, Long userCouponId);
 
 }

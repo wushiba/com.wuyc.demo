@@ -23,17 +23,15 @@ public class UserCartSummary implements Serializable {
     /**
      * 购物车商品总金额
      */
-    private BigDecimal totalMoney;
+    private BigDecimal payMoney;
 
-    /**
-     * 购物车商品原价和
-     */
-    private BigDecimal oldTotalMoney;
 
     /**
      * 各平台商品的总运费
      */
     private BigDecimal totalFreight;
+
+    private BigDecimal exchangeMoney;
 
     /**
      * 购物车列表
@@ -43,8 +41,6 @@ public class UserCartSummary implements Serializable {
     public static UserCartSummary emptySummary() {
         UserCartSummary userCartSummary = new UserCartSummary();
         userCartSummary.setItemCount(0);
-        userCartSummary.setTotalMoney(BigDecimal.ZERO);
-        userCartSummary.setOldTotalMoney(BigDecimal.ZERO);
         userCartSummary.setTotalFreight(BigDecimal.ZERO);
         userCartSummary.setCarts(new ArrayList<>(0));
         return userCartSummary;

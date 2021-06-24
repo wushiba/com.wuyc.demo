@@ -9,6 +9,7 @@ import com.yfshop.common.base.BaseController;
 import com.yfshop.common.exception.ApiException;
 import com.yfshop.shop.service.cart.UserCartService;
 import com.yfshop.shop.service.cart.result.UserCartResult;
+import com.yfshop.shop.service.cart.result.UserCartSummary;
 import com.yfshop.shop.service.coupon.request.QueryUserCouponReq;
 import com.yfshop.shop.service.coupon.result.YfUserCouponResult;
 import com.yfshop.shop.service.coupon.service.FrontUserCouponService;
@@ -174,7 +175,7 @@ public class FrontOrderController implements BaseController {
     @RequestMapping(value = "/order/calcUserCart", method = {RequestMethod.GET, RequestMethod.POST})
     @ResponseBody
     @SaCheckLogin
-    public CommonResult<List<UserCartResult>> calcUserCart(Integer skuId, Integer num, String cartIds, Long userCouponId) {
+    public CommonResult<UserCartSummary> calcUserCart(Integer skuId, Integer num, String cartIds, Long userCouponId) {
         return CommonResult.success(userCartService.calcUserCart(skuId, num, cartIds, userCouponId));
     }
 

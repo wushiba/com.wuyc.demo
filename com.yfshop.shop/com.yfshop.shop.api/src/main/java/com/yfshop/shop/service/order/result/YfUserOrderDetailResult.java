@@ -33,6 +33,8 @@ public class YfUserOrderDetailResult implements Serializable {
 
     private Long orderId;
 
+    private String orderNo;
+
     private Long orderDetailId;
 
     /**

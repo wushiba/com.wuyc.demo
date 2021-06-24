@@ -101,10 +101,11 @@ public class MallServiceImpl implements MallService {
                 .eq(Item::getIsEnable, "Y").eq(Item::getIsDelete, "N"));
         List<ItemResult> list = BeanUtil.convertList(items, ItemResult.class);
         list.parallelStream().forEach(itemResult -> {
-            BigDecimal minSalePrice = skuMapper.selectList(Wrappers.lambdaQuery(ItemSku.class)
-                    .eq(ItemSku::getItemId, itemResult.getId()).eq(ItemSku::getIsEnable, "Y"))
-                    .stream().map(ItemSku::getSkuSalePrice).min(BigDecimal::compareTo).orElse(null);
-            itemResult.setMinSalePrice(minSalePrice);
+            ItemSku itemSku = skuMapper.selectOne(Wrappers.lambdaQuery(ItemSku.class)
+                    .eq(ItemSku::getItemId, itemResult.getId()).eq(ItemSku::getIsEnable, "Y").orderByAsc(ItemSku::getSkuSalePrice));
+            itemResult.setMinSalePrice(itemSku.getSkuSalePrice());
+            itemResult.setItemMarketPrice(itemSku.getSkuMarketPrice());
+            itemResult.setItemPrice(itemSku.getSkuSalePrice());
         });
         return list;
     }

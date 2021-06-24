@@ -3,14 +3,8 @@ package com.yfshop.shop.service.cart;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.NumberUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
-import com.yfshop.code.mapper.ItemMapper;
-import com.yfshop.code.mapper.ItemSkuMapper;
-import com.yfshop.code.mapper.UserCartMapper;
-import com.yfshop.code.mapper.UserCouponMapper;
-import com.yfshop.code.model.Item;
-import com.yfshop.code.model.ItemSku;
-import com.yfshop.code.model.UserCart;
-import com.yfshop.code.model.UserCoupon;
+import com.yfshop.code.mapper.*;
+import com.yfshop.code.model.*;
 import com.yfshop.common.constants.CacheConstants;
 import com.yfshop.common.exception.ApiException;
 import com.yfshop.common.exception.Asserts;
@@ -36,11 +30,7 @@ import javax.validation.constraints.Positive;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
@@ -64,6 +54,8 @@ public class UserCartServiceImpl implements UserCartService {
     private FrontUserCouponService frontUserCouponService;
     @Resource
     private UserCouponMapper userCouponMapper;
+    @Resource
+    private PostageRulesMapper postageRulesMapper;
 
     @Cacheable(cacheNames = CacheConstants.USER_CART_CACHE_NAME,
             key = "'" + CacheConstants.USER_CART_CACHE_KEY_PREFIX + "' + #root.args[0]")
@@ -223,8 +215,10 @@ public class UserCartServiceImpl implements UserCartService {
     }
 
 
+
+
     @Override
-    public List<UserCartResult> calcUserCart(Integer skuId, Integer num, String cartIds, Long userCouponId) {
+    public UserCartSummary calcUserCart(Integer skuId, Integer num, String cartIds, Long userCouponId) {
         UserCoupon userCoupon = null;
         if (userCouponId != null) {
             userCoupon = userCouponMapper.selectById(userCouponId);
@@ -237,90 +231,97 @@ public class UserCartServiceImpl implements UserCartService {
             List<UserCart> userCartList = cartMapper.selectList(Wrappers.lambdaQuery(UserCart.class)
                     .in(UserCart::getId, cartIdList));
             resultList = BeanUtil.convertList(userCartList, UserCartResult.class);
-
             List<Integer> skuIdList = userCartList.stream().map(UserCart::getSkuId).collect(Collectors.toList());
+            Map<Integer, Item> itemIndexMap = itemMapper.selectBatchIds(skuIdList).stream().collect(Collectors.toMap(Item::getId, s -> s));
             Map<Integer, ItemSku> skuIndexMap = skuMapper.selectBatchIds(skuIdList).stream().collect(Collectors.toMap(ItemSku::getId, s -> s));
             resultList.forEach(data -> {
                 ItemSku itemSku = skuIndexMap.get(data.getSkuId());
-                if (itemSku != null) {
+                Item item = itemIndexMap.get(data.getItemId());
+                if (itemSku != null && item != null) {
                     data.setFreight(itemSku.getFreight());
-                    data.setSkuMarketPrice(itemSku.getSkuMarketPrice());
                     data.setSkuSalePrice(itemSku.getSkuSalePrice());
                     data.setCategoryId(itemSku.getCategoryId());
+                    data.setSkuType(itemSku.getSkuType());
+                    data.setIsAvailable("Y".equals(item.getIsEnable()) && "N".equals(item.getIsDelete()) ? "Y" : "N");
                 }
             });
         } else {
             ItemSku itemSku = skuMapper.selectById(skuId);
+            Item item = itemMapper.selectById(itemSku.getItemId());
             UserCartResult userCartResult = BeanUtil.convert(itemSku, UserCartResult.class);
             userCartResult.setNum(num);
+            userCartResult.setCategoryId(itemSku.getCategoryId());
+            userCartResult.setSkuType(itemSku.getSkuType());
             userCartResult.setSkuId(skuId);
-            userCartResult.setSkuMarketPrice(itemSku.getSkuMarketPrice());
+            userCartResult.setIsAvailable("Y".equals(item.getIsEnable()) && "N".equals(item.getIsDelete()) ? "Y" : "N");
             resultList.add(userCartResult);
         }
 
-        //计算非火锅的商品价格
 
-        List<UserCartResult> otherGoods = new ArrayList<>();
-        resultList.forEach(item -> {
-            if (item.getCategoryId() != 3) {
-                otherGoods.add(item);
+        return calculationSummary(resultList, userCoupon);
+    }
+
+
+    private UserCartSummary calculationSummary(List<UserCartResult> userCartResult, UserCoupon userCoupon) {
+        UserCartSummary userCartSummary = UserCartSummary.emptySummary();
+        Map<Integer, PostageRules> postageRulesMap = new HashMap<>();
+        Map<Integer, List<UserCartResult>> childItemList = new HashMap<>();
+        Set<Integer> tcCategory = new HashSet<>();
+        PostageRules couponPostageRule = null;
+        if (userCoupon != null) {
+            couponPostageRule = postageRulesMapper.selectOne(Wrappers.lambdaQuery(PostageRules.class).eq(PostageRules::getCouponId, userCoupon.getCouponId()));
+        }
+        for (UserCartResult item : userCartResult) {
+            if ("Y".equals(item.getIsAvailable())) {
+                //优惠券减扣
+                if (userCoupon != null) {
+                    userCartSummary.setPayMoney(item.getSkuSalePrice().subtract(new BigDecimal(userCoupon.getCouponPrice())));
+                }
+                //优惠券减扣下的邮费计算
+                if (couponPostageRule != null && couponPostageRule.getSkuIds().contains(item.getSkuId() + "")) {
+                    userCartSummary.setExchangeMoney(couponPostageRule.getExchangeFee());
+                    userCartSummary.setTotalFreight(couponPostageRule.getIsTrue());
+                    userCartSummary.setItemCount(userCartSummary.getItemCount() + 1);
+                    item.setNum(item.getNum() - 1);
+                    couponPostageRule = null;
+                }
+                //正常情况的邮费计算
+                if (item.getNum() > 0) {
+                    userCartSummary.setItemCount(userCartSummary.getItemCount() + item.getNum());
+                    userCartSummary.setPayMoney(userCartSummary.getPayMoney().add(item.getSkuSalePrice().multiply(new BigDecimal(item.getNum()))));
+                    PostageRules postageRules = postageRulesMapper.selectOne(Wrappers.lambdaQuery(PostageRules.class).apply("FIND_IN_SET('{0}',sku_ids)", item.getSkuId()));
+                    if (postageRules != null) {
+                        postageRulesMap.put(postageRules.getId(), postageRules);
+                        List<UserCartResult> cartResults = childItemList.getOrDefault(postageRules.getId(), new ArrayList<>());
+                        cartResults.add(item);
+                    }
+                }
+                //火锅套餐包邮
+                if (item.getCategoryId() == 3 && "TC".equals(item.getSkuType())) {
+                    tcCategory.add(item.getId());
+                }
+            }
+        }
+
+        //计算邮费按照条件计算情况
+        postageRulesMap.forEach((key, value) -> {
+            List<UserCartResult> childItem = childItemList.get(key);
+            BigDecimal pay = BigDecimal.ZERO;
+            int category = childItem.get(0).getCategoryId();
+            //排查是火锅套餐
+            if (category != 3 && !tcCategory.isEmpty()) {
+                for (UserCartResult cartResult : childItem) {
+                    pay.add(cartResult.getSkuSalePrice().multiply(new BigDecimal(cartResult.getNum())));
+                }
+                if (value.getCondition().compareTo(pay) >= 0) {
+                    userCartSummary.setTotalFreight(value.getIsTrue());
+                } else {
+                    userCartSummary.setTotalFreight(value.getIsFalse());
+                }
             }
         });
-        BigDecimal sumPrice = otherGoods.stream().map(item -> item.getSkuSalePrice().multiply(new BigDecimal(item.getNum()))).reduce(BigDecimal.ZERO, (before, grantMoney) -> NumberUtil.add(before, grantMoney));
-        if (userCoupon != null) {
-            sumPrice = sumPrice.subtract(new BigDecimal(userCoupon.getCouponPrice()));
-        }
-        BigDecimal freight = new BigDecimal("10");
-        if (sumPrice.longValue() >= 88) {
-            freight = BigDecimal.ZERO;
-        } else if (sumPrice.longValue() > 0) {
-            int sum = otherGoods.stream().mapToInt(UserCartResult::getNum).sum();
-            if (userCoupon != null) {
-                sum = sum - 1;
-            }
-            if (sum > 1) {
-                freight = freight.divide(new BigDecimal(sum), 2, BigDecimal.ROUND_HALF_UP);
-            }
-        }
-        for (UserCartResult item : otherGoods) {
-            if (userCoupon != null && userCoupon.getCanUseItemIds().contains("2032")) {
-                item.setFreight(new BigDecimal("1.8"));
-                if (item.getNum() > 1) {
-                    item.setFreight(item.getFreight().add(new BigDecimal(item.getNum() - 1).multiply(freight)));
-                }
-                userCoupon = null;
-            } else if (userCoupon != null && userCoupon.getCanUseItemIds().contains("2030")) {
-                item.setFreight(new BigDecimal("18"));
-                if (item.getNum() > 1) {
-                    item.setFreight(item.getFreight().add(new BigDecimal(item.getNum() - 1).multiply(freight)));
-                }
-                userCoupon = null;
-            } else {
-                item.setFreight(new BigDecimal(item.getNum()).multiply(freight));
-            }
-        }
+        userCartSummary.setCarts(userCartResult);
 
-        return resultList;
+        return userCartSummary;
     }
-
-
-    private UserCartResult convertUserCart(UserCart userCart, Map<Integer, ItemSku> skuIndexMap) {
-        UserCartResult result = new UserCartResult();
-        BeanUtil.copyProperties(userCart, result);
-        ItemSku targetSku = skuIndexMap.get(userCart.getSkuId());
-        if (targetSku == null) {
-            result.setIsAvailable("N");
-        } else {
-            result.setIsAvailable("Y");
-            result.setSkuTitle(targetSku.getSkuTitle());
-            result.setSkuSubTitle(targetSku.getSkuSubTitle());
-            result.setSkuCover(targetSku.getSkuCover());
-            result.setSpecValueIdPath(targetSku.getSpecValueIdPath());
-            result.setSpecNameValueJson(targetSku.getSpecNameValueJson());
-            result.setSkuSalePrice(targetSku.getSkuSalePrice());
-            result.setSkuMarketPrice(targetSku.getSkuMarketPrice());
-        }
-        return result;
-    }
-
 }

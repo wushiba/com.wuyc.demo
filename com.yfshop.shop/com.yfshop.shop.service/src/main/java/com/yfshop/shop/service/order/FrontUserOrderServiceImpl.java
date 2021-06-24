@@ -210,6 +210,7 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
             userOrderDetailResult = BeanUtil.convert(itemList.get(0), YfUserOrderDetailResult.class);
             userOrderDetailResult.setOrderId(order.getId());
             userOrderDetailResult.setOrderDetailId(itemList.get(0).getId());
+            userOrderDetailResult.setOrderNo(itemList.get(0).getOrderNo());
             userOrderDetailResult.setOrderStatus(detailList.get(0).getOrderStatus());
             userOrderDetailResult.setItemList(resultItemList);
         }

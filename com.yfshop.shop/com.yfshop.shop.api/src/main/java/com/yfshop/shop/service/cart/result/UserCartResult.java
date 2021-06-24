@@ -98,4 +98,6 @@ public class UserCartResult implements Serializable {
      * 一级分类id
      */
     private Integer categoryId;
+
+    private String skuType;
 }
