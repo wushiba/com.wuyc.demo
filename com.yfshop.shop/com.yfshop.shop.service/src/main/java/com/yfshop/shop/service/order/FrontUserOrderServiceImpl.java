@@ -364,6 +364,8 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
                     userCart.getItemId(), userCart.getSkuId(), userCart.getSkuTitle(), userCart.getSkuSalePrice(), userCart.getSkuCover(), userCart.getFreight(), userCart.getCouponPrice(),
                     userCart.getSkuSalePrice(), userCart.getPayPrice(), userCouponId, UserOrderStatusEnum.WAIT_PAY.getCode(), userCart.getSpecValueIdPath(), userCart.getSpecNameValueJson());
         }
+        insertUserOrderAddress(orderId, addressInfo.getMobile(), addressInfo.getRealname(), addressInfo.getProvince(), addressInfo.getProvinceId(), addressInfo.getCity(),
+                addressInfo.getCityId(), addressInfo.getDistrict(), addressInfo.getDistrictId(), addressInfo.getAddress());
         Map<String, Object> resultMap = new HashMap<>(4);
         resultMap.put("orderId", orderId);
         resultMap.put("isPay", "N");
@@ -606,7 +608,7 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
         o.setId(orderId);
         o.setOutOrderNo(orderRequest.getOutTradeNo());
         orderMapper.updateById(o);
-        logger.debug("唤起订单{},支付->{}",orderId,order.getPayPrice().toString());
+        logger.debug("唤起订单{},支付->{}", orderId, order.getPayPrice().toString());
         return payOrderResult;
     }
 
@@ -850,6 +852,7 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
                     userCartSummary.setTotalFreight(couponPostageRule.getIsTrue());
                     userCartSummary.setItemCount(userCartSummary.getItemCount() + 1);
                     UserCartResult child = BeanUtil.convert(item, UserCartResult.class);
+                    child.setNum(1);
                     child.setCouponPrice(new BigDecimal(userCoupon.getCouponPrice()));
                     child.setPayPrice(item.getSkuSalePrice().subtract(new BigDecimal(userCoupon.getCouponPrice())).add(couponPostageRule.getIsTrue()));
                     child.setFreight(couponPostageRule.getIsTrue());

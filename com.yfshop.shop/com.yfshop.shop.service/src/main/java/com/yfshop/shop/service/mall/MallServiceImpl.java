@@ -6,6 +6,7 @@ import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.yfshop.code.mapper.*;
 import com.yfshop.code.model.*;
 import com.yfshop.common.constants.CacheConstants;
@@ -15,6 +16,7 @@ import com.yfshop.common.exception.Asserts;
 import com.yfshop.common.service.RedisService;
 import com.yfshop.common.util.BeanUtil;
 import com.yfshop.shop.dao.ItemDao;
+import com.yfshop.shop.dao.UserDao;
 import com.yfshop.shop.service.mall.req.QueryItemDetailReq;
 import com.yfshop.shop.service.mall.req.QueryItemReq;
 import com.yfshop.shop.service.mall.result.BannerResult;
@@ -66,6 +68,8 @@ public class MallServiceImpl implements MallService {
     private UserCartMapper userCartMapper;
     @Resource
     private UserMapper userMapper;
+    @Resource
+    private UserDao userDao;
     @Resource
     private RedisService redisService;
 
@@ -251,14 +255,12 @@ public class MallServiceImpl implements MallService {
             count = Integer.valueOf(value.toString());
         }
         int index = RandomUtil.randomInt(count);
-        List<User> userList = userMapper.selectList(Wrappers.lambdaQuery(User.class)
-                .select(User::getNickname)
-                .ge(User::getId, index)
-                .apply(" limit 100"));
+        List<String> users = userDao.findByIndex(index, 100);
+
         List<String> items = new ArrayList<>();
-        for (int i = 0; i < userList.size(); i++) {
-            if (StringUtils.isNotBlank(userList.get(0).getNickname())) {
-                String name = StringUtils.abbreviate(userList.get(0).getNickname(), 7);
+        for (int i = 0; i < users.size(); i++) {
+            if (StringUtils.isNotBlank(users.get(0))) {
+                String name = StringUtils.abbreviate(users.get(0), 7);
                 String date = "";
                 if (i < 10) {
                     date = "刚刚";
