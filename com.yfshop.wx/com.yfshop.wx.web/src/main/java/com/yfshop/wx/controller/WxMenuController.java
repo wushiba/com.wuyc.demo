@@ -102,45 +102,30 @@ public class WxMenuController {
         WxMenu menu = new WxMenu();
 
         WxMenuButton healthy = new WxMenuButton();
-        healthy.setName("健康馆");
+        healthy.setName("5折好货");
+        healthy.setType(MenuButtonType.VIEW);
+        healthy.setUrl("https://m.yufanlook.com/#/ActPage");
 
-        WxMenuButton healthyOne = new WxMenuButton();
-        healthyOne.setType(MenuButtonType.VIEW);
-        healthyOne.setName("职场减压");
-        healthyOne.setUrl("https://mp.weixin.qq.com/s/5YNRLv_bGqpVRCcXv8BkpQ");
-        healthy.getSubButtons().add(healthyOne);
-
-        WxMenuButton healthyTwo = new WxMenuButton();
-        healthyTwo.setType(MenuButtonType.VIEW);
-        healthyTwo.setName("儿童成长");
-        healthyTwo.setUrl("https://mp.weixin.qq.com/s/oCwG6brmj2L7SBm85TRCfA");
-        healthy.getSubButtons().add(healthyTwo);
-
-        WxMenuButton healthyThree = new WxMenuButton();
-        healthyThree.setType(MenuButtonType.VIEW);
-        healthyThree.setName("孝敬爸妈");
-        healthyThree.setUrl("https://mp.weixin.qq.com/s/qifIGtBqE6_L8SuZ8Iu34Q");
-        healthy.getSubButtons().add(healthyThree);
 
         WxMenuButton action = new WxMenuButton();
-        action.setName("618活动");
+        action.setName("进入商城");
 
         WxMenuButton actionOne = new WxMenuButton();
         actionOne.setType(MenuButtonType.VIEW);
-        actionOne.setName("我的奖券");
-        actionOne.setUrl("https://m.yufanlook.com/#/MyPage");
+        actionOne.setName("健康商城");
+        actionOne.setUrl("https://m.yufanlook.com/#/allPage");
         action.getSubButtons().add(actionOne);
 
         WxMenuButton actionTwo = new WxMenuButton();
         actionTwo.setType(MenuButtonType.VIEW);
-        actionTwo.setName("限时孝心");
-        actionTwo.setUrl("https://m.yufanlook.com/#/ActPage");
+        actionTwo.setName("爆款火锅");
+        actionTwo.setUrl("https://m.yufanlook.com/#/allPage?id=3");
         action.getSubButtons().add(actionTwo);
 
         WxMenuButton actionThree = new WxMenuButton();
         actionThree.setType(MenuButtonType.VIEW);
-        actionThree.setName("雨帆商城");
-        actionThree.setUrl("https://m.yufanlook.com/#/allPage");
+        actionThree.setName("我的奖券");
+        actionThree.setUrl("https://m.yufanlook.com/#/MyPage");
         action.getSubButtons().add(actionThree);
 
 
@@ -174,22 +159,22 @@ public class WxMenuController {
         return this.wxService.getMenuService().menuCreate(menu);
     }
 
-
-    /**
-     * <pre>
-     * 自定义菜单删除接口
-     * 详情请见: https://mp.weixin.qq.com/wiki?t=resource/res_main&id=mp1421141015&token=&lang=zh_CN
-     * </pre>
-     */
-    @GetMapping("/delete/{pwd}")
-    public void menuDelete(@PathVariable String pwd) throws WxErrorException {
-        Asserts.assertEquals("64293481", pwd, 500, "无效的请求");
-        String appid = wxMpProperties.getConfigs().get(0).getAppId();
-        if (!this.wxService.switchover(appid)) {
-            throw new IllegalArgumentException(String.format("未找到对应appid=[%s]的配置，请核实！", appid));
-        }
-        this.wxService.switchoverTo(appid).getMenuService().menuDelete();
-    }
+//
+//    /**
+//     * <pre>
+//     * 自定义菜单删除接口
+//     * 详情请见: https://mp.weixin.qq.com/wiki?t=resource/res_main&id=mp1421141015&token=&lang=zh_CN
+//     * </pre>
+//     */
+//    @GetMapping("/delete/{pwd}")
+//    public void menuDelete(@PathVariable String pwd) throws WxErrorException {
+//        Asserts.assertEquals("64293481", pwd, 500, "无效的请求");
+//        String appid = wxMpProperties.getConfigs().get(0).getAppId();
+//        if (!this.wxService.switchover(appid)) {
+//            throw new IllegalArgumentException(String.format("未找到对应appid=[%s]的配置，请核实！", appid));
+//        }
+//        this.wxService.switchoverTo(appid).getMenuService().menuDelete();
+//    }
 
 
 }

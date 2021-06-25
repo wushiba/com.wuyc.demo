@@ -7,8 +7,10 @@ import com.yfshop.admin.api.user.result.UserResult;
 import com.yfshop.code.mapper.UserMapper;
 import com.yfshop.code.model.User;
 import com.yfshop.common.exception.ApiException;
+import com.yfshop.common.service.RedisService;
 import com.yfshop.common.util.BeanUtil;
 import org.apache.dubbo.config.annotation.DubboService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Resource;
@@ -19,6 +21,9 @@ public class UserServiceImpl implements UserService {
 
     @Resource
     private UserMapper userMapper;
+
+    @Autowired
+    private RedisService redisService;
 
     @Override
     public UserResult getUserByOpenId(String openId) throws ApiException {
@@ -80,6 +85,15 @@ public class UserServiceImpl implements UserService {
             userMapper.updateById(user);
         }
         return user.getId();
+    }
+
+    @Override
+    public String getSubscribeMsg() {
+        Object msg = redisService.get("WX_SubscribeMsg");
+        if (msg!=null){
+            return msg.toString();
+        }
+        return null;
     }
 
 }

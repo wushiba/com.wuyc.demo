@@ -21,4 +21,6 @@ public interface UserService {
     Integer checkSubscribe(String openId);
 
     Integer saveUser(UserReq convert) throws ApiException;
+
+    String getSubscribeMsg();
 }

@@ -141,7 +141,7 @@ public class FrontUserCouponServiceImpl implements FrontUserCouponService {
         }
 
         queryWrapper.orderByDesc(UserCoupon::getId);
-        List<UserCoupon> dataList = userCouponMapper.selectList(queryWrapper);
+        List<UserCoupon> dataList = userCouponMapper.selectList(queryWrapper.orderByDesc(UserCoupon::getCouponPrice));
         List<YfUserCouponResult> resultList = BeanUtil.convertList(dataList, YfUserCouponResult.class);
 
         if (userCouponReq.getItemId() == null) {

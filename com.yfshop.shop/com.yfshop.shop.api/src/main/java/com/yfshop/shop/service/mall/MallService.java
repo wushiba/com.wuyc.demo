@@ -32,11 +32,15 @@ public interface MallService {
 
     /**
      * 修改商品sku库存
-     * @param   skuId     skuId
-     * @param   num       扣减库存的数量
-     * @return  Integer > 0 ,说明成功， 小于0抛异常
+     *
+     * @param skuId skuId
+     * @param num   扣减库存的数量
+     * @return Integer > 0 ,说明成功， 小于0抛异常
      * @throws ApiException
      */
     Integer updateItemSkuStock(Integer skuId, Integer num) throws ApiException;
 
+    Long getBuyGoodsCount(Integer itemId) throws ApiException;
+
+    List<String> getBuyGoodsUser();
 }

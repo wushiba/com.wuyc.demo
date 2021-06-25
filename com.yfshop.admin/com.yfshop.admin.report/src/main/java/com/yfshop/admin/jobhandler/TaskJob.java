@@ -1,18 +1,13 @@
 package com.yfshop.admin.jobhandler;
 
+import cn.hutool.core.util.RandomUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.xxl.job.core.handler.annotation.XxlJob;
 import com.xxl.job.core.log.XxlJobFileAppender;
 import com.yfshop.admin.dao.UserCouponDao;
 import com.yfshop.admin.task.ActCodeTask;
-import com.yfshop.code.mapper.ActCodeBatchMapper;
-import com.yfshop.code.mapper.CouponExpiredConfigMapper;
-import com.yfshop.code.mapper.UserMapper;
-import com.yfshop.code.mapper.VisitLogMapper;
-import com.yfshop.code.model.ActCodeBatch;
-import com.yfshop.code.model.CouponExpiredConfig;
-import com.yfshop.code.model.User;
-import com.yfshop.code.model.UserCoupon;
+import com.yfshop.code.mapper.*;
+import com.yfshop.code.model.*;
 import com.yfshop.wx.api.service.MpService;
 import me.chanjar.weixin.mp.bean.template.WxMpTemplateData;
 import me.chanjar.weixin.mp.bean.template.WxMpTemplateMessage;
@@ -29,6 +24,7 @@ import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -60,6 +56,9 @@ public class TaskJob {
 
     @Resource
     private VisitLogMapper visitLogMapper;
+
+    @Resource
+    private ItemMapper itemMapper;
 
     @Value("${xxl.job.executor.logpath}")
     String logPath;
@@ -164,7 +163,22 @@ public class TaskJob {
 
     @XxlJob("deleteExpiredLogs")
     public void deleteExpiredLogs() throws Exception {
-        //visitLogMapper.delete()
+        VisitLog visitLog = visitLogMapper.selectOne(Wrappers.lambdaQuery(VisitLog.class).select(VisitLog::getId).apply("create_time >= DATE_SUB(CURRENT_DATE,interval 1 day)"));
+        if (visitLog != null && visitLog.getId() != null) {
+            visitLogMapper.delete(Wrappers.lambdaQuery(VisitLog.class).le(VisitLog::getId, visitLog.getId()));
+        }
     }
 
+
+    @XxlJob("buyGoods")
+    public void buyGoods() {
+        List<Item> items = itemMapper.selectList(Wrappers.lambdaQuery(Item.class).eq(Item::getIsEnable, "Y").eq(Item::getIsDelete, "N"));
+        if (!CollectionUtils.isEmpty(items)) {
+            Collections.shuffle(items);
+            items = items.subList(0, items.size() > 10 ? 9 : items.size() - 1);
+            items.forEach(item -> {
+                redisTemplate.opsForValue().increment("BuyGoods:" + item.getId(), RandomUtil.randomInt(1, 10));
+            });
+        }
+    }
 }

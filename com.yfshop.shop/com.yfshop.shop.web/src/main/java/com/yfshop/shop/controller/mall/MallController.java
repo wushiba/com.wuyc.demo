@@ -86,4 +86,20 @@ public class MallController implements BaseController {
             throw new ApiException(500, "查询banner失败");
         }
     }
+
+    @ApiOperation(value = "查询商品购买数量", httpMethod = "GET")
+    @RequestMapping(value = "/getBuyGoodsCount", method = {RequestMethod.GET, RequestMethod.POST})
+    @ResponseBody
+    public CommonResult<Long> getBuyGoodsCount(Integer itemId) {
+       return CommonResult.success(mallService.getBuyGoodsCount(itemId));
+    }
+
+
+    @ApiOperation(value = "查询商品购买数量", httpMethod = "GET")
+    @RequestMapping(value = "/getBuyGoodsUser", method = {RequestMethod.GET, RequestMethod.POST})
+    @ResponseBody
+    public CommonResult<List<String>> getBuyGoodsUser() {
+        return CommonResult.success(mallService.getBuyGoodsUser());
+    }
+
 }
