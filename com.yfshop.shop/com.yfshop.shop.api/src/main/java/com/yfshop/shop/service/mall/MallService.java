@@ -26,6 +26,8 @@ public interface MallService {
 
     List<BannerResult> queryLoopBannerList();
 
+    List<BannerResult> queryPersonalCenterBannerList();
+
     ItemSkuResult getItemSkuBySkuId(Integer skuId) throws ApiException;
 
     /**

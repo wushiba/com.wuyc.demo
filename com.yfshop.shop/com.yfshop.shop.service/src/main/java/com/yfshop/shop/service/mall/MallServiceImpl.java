@@ -181,6 +181,7 @@ public class MallServiceImpl implements MallService {
         //        return banners.stream().map(Banner::getImageUrl).collect(Collectors.toList());
     }
 
+
     @Cacheable(cacheManager = CacheConstants.CACHE_MANAGE_NAME,
             cacheNames = CacheConstants.MALL_BANNER_CACHE_NAME,
             key = "'" + CacheConstants.MALL_BANNER_CACHE_KEY_PREFIX + "' + #root.methodName")
@@ -191,6 +192,18 @@ public class MallServiceImpl implements MallService {
                 .eq(Banner::getIsEnable, "Y").orderByAsc(Banner::getSort));
         return BeanUtil.convertList(banners, BannerResult.class);
         //        return banners.stream().map(Banner::getImageUrl).collect(Collectors.toList());
+    }
+
+
+    @Cacheable(cacheManager = CacheConstants.CACHE_MANAGE_NAME,
+            cacheNames = CacheConstants.MALL_BANNER_CACHE_NAME,
+            key = "'" + CacheConstants.MALL_BANNER_CACHE_KEY_PREFIX + "' + #root.methodName")
+    @Override
+    public List<BannerResult> queryPersonalCenterBannerList() {
+        List<Banner> banners = bannerMapper.selectList(Wrappers.lambdaQuery(Banner.class)
+                .eq(Banner::getPositions, BannerPositionsEnum.PERSONAL_CENTER.getCode())
+                .eq(Banner::getIsEnable, "Y").orderByAsc(Banner::getSort));
+        return BeanUtil.convertList(banners, BannerResult.class);
     }
 
 

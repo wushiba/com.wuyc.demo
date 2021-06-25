@@ -25,7 +25,7 @@ public class CreateBannerReq implements Serializable {
 
     @ApiModelProperty(value = "banner类型", allowableValues = "home|banner", required = true)
     @NotBlank(message = "banner类型不能为空")
-    @CheckEnum(value = BannerPositionsEnum.class, message = "banner类型只能是home|banner")
+    @CheckEnum(value = BannerPositionsEnum.class, message = "banner类型只能是home|banner|personal_center")
     private String positions;
 
     @ApiModelProperty(value = "banner图片链接", required = true)
