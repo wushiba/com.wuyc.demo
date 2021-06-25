@@ -259,8 +259,8 @@ public class MallServiceImpl implements MallService {
 
         List<String> items = new ArrayList<>();
         for (int i = 0; i < users.size(); i++) {
-            if (StringUtils.isNotBlank(users.get(0))) {
-                String name = StringUtils.abbreviate(users.get(0), 7);
+            if (StringUtils.isNotBlank(users.get(i))) {
+                String name = StringUtils.abbreviate(users.get(i), 7);
                 String date = "";
                 if (i < 10) {
                     date = "刚刚";
