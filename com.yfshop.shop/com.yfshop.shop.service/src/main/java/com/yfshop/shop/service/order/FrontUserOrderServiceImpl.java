@@ -362,7 +362,7 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
         for (UserCartResult userCart : userCartSummary.getCarts()) {
             insertUserOrderDetail(userId, userName, orderId, null, null, null, ReceiveWayEnum.PS.getCode(), "N", userCart.getNum(),
                     userCart.getItemId(), userCart.getSkuId(), userCart.getSkuTitle(), userCart.getSkuSalePrice(), userCart.getSkuCover(), userCart.getFreight(), userCart.getCouponPrice(),
-                    userCart.getSkuSalePrice(), userCart.getPayPrice(), userCouponId, UserOrderStatusEnum.WAIT_PAY.getCode(), userCart.getSpecValueIdPath(), userCart.getSpecNameValueJson());
+                    userCart.getSkuSalePrice(), userCart.getPayPrice(), userCart.getUserCouponId(), UserOrderStatusEnum.WAIT_PAY.getCode(), userCart.getSpecValueIdPath(), userCart.getSpecNameValueJson());
         }
         insertUserOrderAddress(orderId, addressInfo.getMobile(), addressInfo.getRealname(), addressInfo.getProvince(), addressInfo.getProvinceId(), addressInfo.getCity(),
                 addressInfo.getCityId(), addressInfo.getDistrict(), addressInfo.getDistrictId(), addressInfo.getAddress());
@@ -451,7 +451,7 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
         for (UserCartResult userCart : userCartSummary.getCarts()) {
             insertUserOrderDetail(userId, userName, orderId, null, null, null, ReceiveWayEnum.PS.getCode(), "N", userCart.getNum(),
                     userCart.getItemId(), userCart.getSkuId(), userCart.getSkuTitle(), userCart.getSkuSalePrice(), userCart.getSkuCover(), userCart.getFreight(), userCart.getCouponPrice(),
-                    userCart.getSkuSalePrice(), userCart.getPayPrice(), userCouponId, UserOrderStatusEnum.WAIT_PAY.getCode(), userCart.getSpecValueIdPath(), userCart.getSpecNameValueJson());
+                    userCart.getSkuSalePrice(), userCart.getPayPrice(), userCart.getUserCouponId(), UserOrderStatusEnum.WAIT_PAY.getCode(), userCart.getSpecValueIdPath(), userCart.getSpecNameValueJson());
         }
         insertUserOrderAddress(orderId, addressInfo.getMobile(), addressInfo.getRealname(), addressInfo.getProvince(), addressInfo.getProvinceId(), addressInfo.getCity(),
                 addressInfo.getCityId(), addressInfo.getDistrict(), addressInfo.getDistrictId(), addressInfo.getAddress());
@@ -859,6 +859,7 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
                     child.setCouponPrice(new BigDecimal(userCoupon.getCouponPrice()));
                     child.setPayPrice(item.getSkuSalePrice().subtract(new BigDecimal(userCoupon.getCouponPrice())).add(couponPostageRule.getIsTrue()));
                     child.setFreight(couponPostageRule.getIsTrue());
+                    child.setUserCouponId(userCoupon.getId());
                     allCardList.add(child);
                     count = count - 1;
                     item.setNum(count);
