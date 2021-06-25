@@ -323,9 +323,9 @@ public class UserCartServiceImpl implements UserCartService {
                     pay = pay.add(cartResult.getSkuSalePrice().multiply(new BigDecimal(cartResult.getNum())));
                 }
                 if (pay.compareTo(value.getConditions()) >= 0) {
-                    userCartSummary.setTotalFreight(value.getIsTrue());
+                    userCartSummary.setTotalFreight(userCartSummary.getTotalFreight().add(value.getIsTrue()));
                 } else {
-                    userCartSummary.setTotalFreight(value.getIsFalse());
+                    userCartSummary.setTotalFreight(userCartSummary.getTotalFreight().add(value.getIsFalse()));
                 }
             }
         });

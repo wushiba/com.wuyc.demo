@@ -903,10 +903,10 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
                 }
                 if (pay.compareTo(value.getConditions()) >= 0) {
                     freight = value.getIsTrue().divide(new BigDecimal(sum), 2, RoundingMode.HALF_UP);
-                    userCartSummary.setTotalFreight(value.getIsTrue());
+                    userCartSummary.setTotalFreight(userCartSummary.getTotalFreight().add(value.getIsTrue()));
                 } else {
                     freight = value.getIsTrue().divide(new BigDecimal(sum), 2, RoundingMode.HALF_UP);
-                    userCartSummary.setTotalFreight(value.getIsFalse());
+                    userCartSummary.setTotalFreight(userCartSummary.getTotalFreight().add(value.getIsFalse()));
                 }
                 for (UserCartResult cartResult : childItem) {
                     UserCartResult child = BeanUtil.convert(cartResult, UserCartResult.class);
