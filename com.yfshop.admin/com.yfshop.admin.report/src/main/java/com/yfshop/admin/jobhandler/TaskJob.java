@@ -57,8 +57,6 @@ public class TaskJob {
     @Resource
     private VisitLogMapper visitLogMapper;
 
-    @Resource
-    private ItemMapper itemMapper;
 
     @Value("${xxl.job.executor.logpath}")
     String logPath;
@@ -167,16 +165,5 @@ public class TaskJob {
         if (visitLog != null && visitLog.getId() != null) {
             visitLogMapper.delete(Wrappers.lambdaQuery(VisitLog.class).le(VisitLog::getId, visitLog.getId()));
         }
-    }
-
-
-    @XxlJob("buyGoods")
-    public void buyGoods() {
-        List<Item> items = itemMapper.selectList(Wrappers.lambdaQuery(Item.class).eq(Item::getIsEnable, "Y").eq(Item::getIsDelete, "N"));
-        items.forEach(item -> {
-            logger.info("BuyGoods:"+ item.getId());
-            redisTemplate.opsForValue().increment("BuyGoods:" + item.getId(), RandomUtil.randomInt(1, 10));
-        });
-
     }
 }
