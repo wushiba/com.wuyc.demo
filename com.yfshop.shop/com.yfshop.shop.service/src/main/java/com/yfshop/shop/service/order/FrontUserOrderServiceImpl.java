@@ -332,7 +332,7 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
         BigDecimal orderFreight = new BigDecimal(0);
         // 扣库存, 修改优惠券状态
         mallService.updateItemSkuStock(itemSku.getId(), num);
-        if (userCoupon.getId() != null) {
+        if (userCoupon != null) {
             frontUserCouponService.useUserCoupon(userCoupon.getId());
         }
         Item item = itemMapper.selectById(itemSku.getItemId());
@@ -426,6 +426,9 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
             userCart.setCategoryId(itemSku.getCategoryId());
             userCart.setSkuType(itemSku.getSkuType());
             userCart.setIsAvailable("Y".equals(item.getIsEnable()) && "N".equals(item.getIsDelete()) ? "Y" : "N");
+        }
+        if (userCoupon != null) {
+            frontUserCouponService.useUserCoupon(userCoupon.getId());
         }
         UserCartSummary userCartSummary = calculationSummary(resultList, userCoupon);
         Asserts.assertTrue(userCartSummary.getOrderPrice().longValue() > 0, 500, "支付金额不能小于0元");
