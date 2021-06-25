@@ -321,7 +321,7 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
         Asserts.assertNonNull(addressInfo, 500, "收货地址不存在");
         checkPrizeAddress(skuId, addressInfo.getProvince());
         List<UserCartResult> resultList = new ArrayList<>();
-        UserCoupon userCoupon = new UserCoupon();
+        UserCoupon userCoupon = null;
         BigDecimal couponPrice = BigDecimal.ZERO;
         if (userCouponId != null) {
             userCoupon = userCouponMapper.selectById(userCouponId);
@@ -399,7 +399,7 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
         Asserts.assertCollectionNotEmpty(userCartList, 500, "购物车id不正确");
         Asserts.assertEquals(userCartList.size(), cartIdList.size(), 500, "购物车数据不正确，请刷新重试");
 
-        UserCoupon userCoupon = new UserCoupon();
+        UserCoupon userCoupon = null;
         BigDecimal couponPrice = BigDecimal.ZERO;
         if (userCouponId != null) {
             userCoupon = userCouponMapper.selectById(userCouponId);
