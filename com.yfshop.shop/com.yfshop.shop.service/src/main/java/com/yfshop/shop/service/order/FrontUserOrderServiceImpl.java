@@ -595,11 +595,7 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
         orderRequest.setOpenid(user.getOpenId());
         orderRequest.setSpbillCreateIp(ipStr);
         orderRequest.setNotifyUrl(wxPayNotifyUrl + PayPrefixEnum.USER_ORDER.getBizType());
-        if ("pro".equalsIgnoreCase(SpringUtil.getActiveProfile())) {
-            orderRequest.setTotalFee(BaseWxPayRequest.yuanToFen(order.getPayPrice().toString()));
-        } else {
-            orderRequest.setTotalFee(1);
-        }
+        orderRequest.setTotalFee(BaseWxPayRequest.yuanToFen(order.getPayPrice().toString()));
         orderRequest.setTimeStart(DateFormatUtils.format(new Date(), "yyyyMMddHHmmss"));
         orderRequest.setOutTradeNo(PayPrefixEnum.USER_ORDER.getPrefix() + order.getId() + "-" + order.getPayEntryCount());
         orderRequest.setTimeExpire(DateFormatUtils.format(new Date(System.currentTimeMillis() + (1000 * 60 * 15)), "yyyyMMddHHmmss"));
@@ -610,6 +606,7 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
         o.setId(orderId);
         o.setOutOrderNo(orderRequest.getOutTradeNo());
         orderMapper.updateById(o);
+        logger.debug("唤起订单{},支付->{}",orderId,order.getPayPrice().toString());
         return payOrderResult;
     }
 
@@ -768,7 +765,7 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
         orderDetail.setOrderNo(String.format("%s%04d", DateFormatUtils.format(new Date(), "yyMMddHHmmss"), orderCount % 10000));
         orderDetailMapper.insert(orderDetail);
         //添加购买记录假的
-        addBugRecord(itemId,itemCount);
+        addBugRecord(itemId, itemCount);
         return orderDetail;
     }
 
@@ -829,6 +826,7 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
 
 
     private UserCartSummary calculationSummary(List<UserCartResult> userCartResult, UserCoupon userCoupon) {
+        logger.debug("结算前商品->{},优惠券使用->{}", userCartResult.toString(), userCoupon != null ? userCoupon.toString() : "");
         List<UserCartResult> allCardList = new ArrayList<>();
         UserCartSummary userCartSummary = UserCartSummary.emptySummary();
         Map<Integer, PostageRules> postageRulesMap = new HashMap<>();
@@ -923,6 +921,7 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
         });
         userCartSummary.setPayMoney(userCartSummary.getPayMoney().add(userCartSummary.getTotalFreight()));
         userCartSummary.setCarts(allCardList);
+        logger.debug("结算后商品->{},优惠券使用->{}", allCardList.toString(), userCoupon != null ? userCoupon.toString() : "");
         return userCartSummary;
     }
 
