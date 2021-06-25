@@ -259,8 +259,9 @@ public class MallServiceImpl implements MallService {
 
         List<String> items = new ArrayList<>();
         for (int i = 0; i < users.size(); i++) {
+            String name = users.get(i);
             if (StringUtils.isNotBlank(users.get(i))) {
-                String name = StringUtils.abbreviate(users.get(i), 7);
+                name = name.length() > 4 ? name.substring(0, 4).concat("...") : name;
                 String date = "";
                 if (i < 10) {
                     date = "刚刚";
@@ -278,7 +279,6 @@ public class MallServiceImpl implements MallService {
                 items.add(String.format("%s%s正在抢购这个商品", name, date));
             }
         }
-
 
         return items;
     }
