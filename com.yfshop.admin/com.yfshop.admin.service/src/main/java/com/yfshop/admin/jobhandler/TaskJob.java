@@ -56,7 +56,6 @@ public class TaskJob {
     public void buyGoods() {
         List<Item> items = itemMapper.selectList(Wrappers.lambdaQuery(Item.class).eq(Item::getIsEnable, "Y").eq(Item::getIsDelete, "N"));
         items.forEach(item -> {
-            logger.info("BuyGoods:" + item.getId());
             redisService.incr("BuyGoods:" + item.getId(), RandomUtil.randomInt(1, 10));
         });
 
