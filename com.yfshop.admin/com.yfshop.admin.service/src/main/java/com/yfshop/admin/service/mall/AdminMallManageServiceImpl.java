@@ -154,7 +154,7 @@ public class AdminMallManageServiceImpl implements AdminMallManageService {
     @Override
     public IPage<BannerResult> pageQueryBanner(Integer pageIndex, Integer pageSize, String positions) {
         LambdaQueryWrapper<Banner> queryWrapper = Wrappers.lambdaQuery(Banner.class)
-                .eq(Banner::getPositions, positions)
+                .eq(StringUtils.isNotBlank(positions), Banner::getPositions, positions)
                 .orderByDesc(Banner::getCreateTime);
         Page<Banner> page = bannerMapper.selectPage(new Page<>(pageIndex, pageSize), queryWrapper);
         // wrapper
