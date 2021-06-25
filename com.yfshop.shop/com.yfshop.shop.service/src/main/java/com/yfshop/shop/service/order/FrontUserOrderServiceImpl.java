@@ -219,6 +219,7 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
             userOrderDetailResult.setOrderId(order.getId());
             userOrderDetailResult.setOrderDetailId(itemList.get(0).getId());
             userOrderDetailResult.setOrderNo(itemList.get(0).getOrderNo());
+            userOrderDetailResult.setCouponPrice(itemList.get(0).getCouponPrice());
             userOrderDetailResult.setOrderStatus(detailList.get(0).getOrderStatus());
             userOrderDetailResult.setItemList(resultItemList);
         }
