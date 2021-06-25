@@ -21,7 +21,6 @@ import com.yfshop.common.api.CommonResult;
 import com.yfshop.common.base.BaseController;
 import com.yfshop.common.enums.BannerPositionsEnum;
 import com.yfshop.common.validate.annotation.CandidateValue;
-import com.yfshop.common.validate.annotation.CheckEnum;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
@@ -326,9 +325,8 @@ public class AdminMallManageController implements BaseController {
     @SaCheckRole(value = "sys")
     public CommonResult<IPage<BannerResult>> pageQueryBanner(@RequestParam(name = "pageIndex", required = false, defaultValue = "1") Integer pageIndex,
                                                              @RequestParam(name = "pageSize", required = false, defaultValue = "10") Integer pageSize,
-                                                             @CheckEnum(value = BannerPositionsEnum.class, message = "banner类型只能是home|banner|personal_center")
-                                                             @NotBlank(message = "banner类型不能为空") String positions) {
-        return CommonResult.success(adminMallManageService.pageQueryBanner(pageIndex, pageSize, positions));
+                                                             String positions) {
+        return CommonResult.success(adminMallManageService.pageQueryBanner(pageIndex, pageSize, StringUtils.isNotBlank(positions) ? positions : null));
     }
 
     @ApiOperation(value = "编辑banner", httpMethod = "GET")
