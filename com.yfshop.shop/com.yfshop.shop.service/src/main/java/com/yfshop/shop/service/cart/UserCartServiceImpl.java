@@ -66,7 +66,7 @@ public class UserCartServiceImpl implements UserCartService {
         }
         // 查询用户所有的购物车列表
         List<UserCart> userCarts = cartMapper.selectList(Wrappers.lambdaQuery(UserCart.class)
-                .eq(UserCart::getUserId, userId).orderByDesc(UserCart::getId));
+                .eq(UserCart::getUserId, userId).orderByDesc(UserCart::getCreateTime));
         // 查询sku信息
         List<Integer> skuIdList = userCarts.stream().map(UserCart::getSkuId).collect(Collectors.toList());
         Map<Integer, ItemSku> skuIndexMap = CollectionUtil.isEmpty(skuIdList) ? new HashMap<>(0) :
