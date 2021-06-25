@@ -1,25 +1,13 @@
 package com.yfshop.shop.service.mall;
 
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.util.CharUtil;
+import cn.hutool.core.util.RandomUtil;
+import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
-import com.yfshop.code.mapper.BannerMapper;
-import com.yfshop.code.mapper.ItemCategoryMapper;
-import com.yfshop.code.mapper.ItemContentMapper;
-import com.yfshop.code.mapper.ItemImageMapper;
-import com.yfshop.code.mapper.ItemMapper;
-import com.yfshop.code.mapper.ItemSkuMapper;
-import com.yfshop.code.mapper.ItemSpecNameMapper;
-import com.yfshop.code.mapper.ItemSpecValueMapper;
-import com.yfshop.code.mapper.UserCartMapper;
-import com.yfshop.code.model.Banner;
-import com.yfshop.code.model.Item;
-import com.yfshop.code.model.ItemCategory;
-import com.yfshop.code.model.ItemContent;
-import com.yfshop.code.model.ItemImage;
-import com.yfshop.code.model.ItemSku;
-import com.yfshop.code.model.ItemSpecName;
-import com.yfshop.code.model.ItemSpecValue;
+import com.yfshop.code.mapper.*;
+import com.yfshop.code.model.*;
 import com.yfshop.common.constants.CacheConstants;
 import com.yfshop.common.enums.BannerPositionsEnum;
 import com.yfshop.common.exception.ApiException;
@@ -37,6 +25,7 @@ import com.yfshop.shop.service.mall.result.ItemResult;
 import com.yfshop.shop.service.mall.result.ItemSkuResult;
 import com.yfshop.shop.service.mall.result.ItemSpecNameResult;
 import com.yfshop.shop.service.mall.result.ItemSpecValueResult;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.transaction.annotation.Transactional;
@@ -76,6 +65,8 @@ public class MallServiceImpl implements MallService {
     @Resource
     private UserCartMapper userCartMapper;
     @Resource
+    private UserMapper userMapper;
+    @Resource
     private RedisService redisService;
 
     @Cacheable(cacheManager = CacheConstants.CACHE_MANAGE_NAME,
@@ -98,7 +89,7 @@ public class MallServiceImpl implements MallService {
         //        }
         List<Item> items = itemMapper.selectList(Wrappers.lambdaQuery(Item.class)
                 .eq(req.getCategoryId() != null, Item::getCategoryId, req.getCategoryId())
-                .eq(Item::getIsEnable, "Y").eq(Item::getIsDelete, "N"));
+                .eq(Item::getIsEnable, "Y").eq(Item::getIsDelete, "N").orderByAsc(Item::getSort));
         List<ItemResult> list = BeanUtil.convertList(items, ItemResult.class);
         list.parallelStream().forEach(itemResult -> {
             ItemSku itemSku = skuMapper.selectOne(Wrappers.lambdaQuery(ItemSku.class)
@@ -227,6 +218,54 @@ public class MallServiceImpl implements MallService {
         int result = itemDao.updateItemSkuStock(skuId, num);
         Asserts.assertFalse(result <= 0, 500, "库存不足，请稍后重试");
         return result;
+    }
+
+    @Override
+    public Long getBuyGoodsCount(Integer itemId) throws ApiException {
+        Object value = redisService.get("BuyGoods:" + itemId);
+        return value == null ? 0 : Long.valueOf(value.toString());
+    }
+
+    @Override
+    public List<String> getBuyGoodsUser() {
+        Integer count = 0;
+        Object value = redisService.get("UserCount");
+        if (value == null) {
+            count = userMapper.selectCount(Wrappers.lambdaQuery());
+            redisService.set("UserCount", count);
+            redisService.expire("UserCount", 60 * 60 * 6);
+        } else {
+            count = Integer.valueOf(value.toString());
+        }
+        int index = RandomUtil.randomInt(count);
+        List<User> userList = userMapper.selectList(Wrappers.lambdaQuery(User.class)
+                .select(User::getNickname)
+                .ge(User::getId, index)
+                .apply(" limit 100"));
+        List<String> items = new ArrayList<>();
+        for (int i = 0; i < userList.size(); i++) {
+            if (StringUtils.isNotBlank(userList.get(0).getNickname())) {
+                String name = StringUtils.abbreviate(userList.get(0).getNickname(), 7);
+                String date = "";
+                if (i < 10) {
+                    date = "刚刚";
+                } else if (i >= 10 && i < 20) {
+                    date = "1分钟前";
+                } else if (i >= 20 && i < 40) {
+                    date = "3分钟前";
+                } else if (i >= 40 && i < 60) {
+                    date = "5分钟前";
+                } else if (i >= 60 && i < 80) {
+                    date = "8分钟分钟前";
+                } else {
+                    date = "10分钟前";
+                }
+                items.add(String.format("%s%s正在抢购这个商品", name, date));
+            }
+        }
+
+
+        return items;
     }
 
 }

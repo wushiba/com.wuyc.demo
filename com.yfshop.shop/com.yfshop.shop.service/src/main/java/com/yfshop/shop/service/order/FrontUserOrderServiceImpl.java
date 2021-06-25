@@ -2,6 +2,7 @@ package com.yfshop.shop.service.order;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.util.RandomUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.github.binarywang.wxpay.bean.order.WxPayMpOrderResult;
@@ -766,6 +767,8 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
         Long orderCount = redisService.incr(CacheConstants.ORDER_DATE_COUNT + dataStr, 1, 1, TimeUnit.DAYS);
         orderDetail.setOrderNo(String.format("%s%04d", DateFormatUtils.format(new Date(), "yyMMddHHmmss"), orderCount % 10000));
         orderDetailMapper.insert(orderDetail);
+        //添加购买记录假的
+        addBugRecord(itemId,itemCount);
         return orderDetail;
     }
 
@@ -921,6 +924,15 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
         userCartSummary.setPayMoney(userCartSummary.getPayMoney().add(userCartSummary.getTotalFreight()));
         userCartSummary.setCarts(allCardList);
         return userCartSummary;
+    }
+
+
+    public void addBugRecord(Integer itemId, int count) {
+        try {
+            redisService.incr("BuyGoods:" + itemId, count);
+        } catch (Exception e) {
+
+        }
     }
 }
 

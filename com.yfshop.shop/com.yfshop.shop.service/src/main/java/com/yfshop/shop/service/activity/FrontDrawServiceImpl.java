@@ -132,10 +132,10 @@ public class FrontDrawServiceImpl implements FrontDrawService {
         Asserts.assertNonNull(actCodeBatchDetail, 500, "请扫描正确的券码");
         Integer drawActivityId = actCodeBatchDetail.getActId();
         // 判断是否使用, 根据actCode查询用户优惠券表
-        if (!"2bfdd1cc48ac96a9".equalsIgnoreCase(actCode)) {
-            UserCoupon userCoupon = userCouponMapper.selectOne(Wrappers.lambdaQuery(UserCoupon.class).eq(UserCoupon::getActCode, actCode));
-            Asserts.assertNull(userCoupon, 503, "请勿重复扫码抽奖");
-        }
+
+        UserCoupon userCoupon = userCouponMapper.selectOne(Wrappers.lambdaQuery(UserCoupon.class).eq(UserCoupon::getActCode, actCode));
+        Asserts.assertNull(userCoupon, 503, "请勿重复扫码抽奖");
+
 
         // 获取奖品，每个奖品登记优惠券id， 可以走缓存
         YfDrawActivityResult yfDrawActivityResult = getDrawActivityDetailById(drawActivityId);
