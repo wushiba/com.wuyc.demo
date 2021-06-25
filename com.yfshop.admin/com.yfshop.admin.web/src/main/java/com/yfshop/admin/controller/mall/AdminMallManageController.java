@@ -21,6 +21,7 @@ import com.yfshop.common.api.CommonResult;
 import com.yfshop.common.base.BaseController;
 import com.yfshop.common.enums.BannerPositionsEnum;
 import com.yfshop.common.validate.annotation.CandidateValue;
+import com.yfshop.common.validate.annotation.CheckEnum;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
@@ -282,6 +283,71 @@ public class AdminMallManageController implements BaseController {
         req.setSort(sort);
         return CommonResult.success(adminMallManageService.editBanner(req));
     }
+
+    ///////////////////////////////////////////////////////////////////////////////
+    @ApiOperation(value = "创建banner", httpMethod = "GET")
+    @ApiImplicitParams(value = {
+            @ApiImplicitParam(paramType = "query", name = "bannerName", value = "banner名称", required = true),
+            @ApiImplicitParam(paramType = "query", name = "imageUrl", value = "banner图片地址", required = true),
+            @ApiImplicitParam(paramType = "query", name = "jumpUrl", value = "跳转链接", required = true),
+            @ApiImplicitParam(paramType = "query", name = "isEnable", value = "是否上架(Y|N)", required = true),
+            @ApiImplicitParam(paramType = "query", name = "sort", value = "排序字段", required = false),
+            @ApiImplicitParam(paramType = "query", name = "positions", value = "banner类型(home|banner|personal_center)", required = false)
+    })
+    @RequestMapping(value = "/createBanner", method = {RequestMethod.GET, RequestMethod.POST})
+    @ResponseBody
+    @SaCheckLogin
+    @SaCheckRole(value = "sys")
+    public CommonResult<Void> createBanner(@Valid CreateBannerReq req) {
+        return CommonResult.success(adminMallManageService.createBanner(req));
+    }
+
+    @ApiOperation(value = "删除banner", httpMethod = "GET")
+    @ApiImplicitParams(value = {
+            @ApiImplicitParam(paramType = "query", name = "bannerId", value = "bannerId", required = true)
+    })
+    @RequestMapping(value = "/deleteBanner", method = {RequestMethod.GET, RequestMethod.POST})
+    @ResponseBody
+    @SaCheckLogin
+    @SaCheckRole(value = "sys")
+    public CommonResult<Void> deleteBanner(@NotNull(message = "bannerId不能为空") Integer bannerId) {
+        return CommonResult.success(adminMallManageService.deleteBanner(bannerId));
+    }
+
+    @ApiOperation(value = "分页查询banner", httpMethod = "GET")
+    @ApiImplicitParams(value = {
+            @ApiImplicitParam(paramType = "query", name = "pageIndex", value = "页码", required = false),
+            @ApiImplicitParam(paramType = "query", name = "pageSize", value = "每页显示个数", required = false),
+            @ApiImplicitParam(paramType = "query", name = "positions", value = "banner类型(home|banner|personal_center)", required = false)
+    })
+    @RequestMapping(value = "/pageQueryBanner", method = {RequestMethod.GET, RequestMethod.POST})
+    @ResponseBody
+    @SaCheckLogin
+    @SaCheckRole(value = "sys")
+    public CommonResult<IPage<BannerResult>> pageQueryBanner(@RequestParam(name = "pageIndex", required = false, defaultValue = "1") Integer pageIndex,
+                                                             @RequestParam(name = "pageSize", required = false, defaultValue = "10") Integer pageSize,
+                                                             @CheckEnum(value = BannerPositionsEnum.class, message = "banner类型只能是home|banner|personal_center")
+                                                             @NotBlank(message = "banner类型不能为空") String positions) {
+        return CommonResult.success(adminMallManageService.pageQueryBanner(pageIndex, pageSize, positions));
+    }
+
+    @ApiOperation(value = "编辑banner", httpMethod = "GET")
+    @ApiImplicitParams(value = {
+            @ApiImplicitParam(paramType = "query", name = "bannerId", value = "bannerId", required = true),
+            @ApiImplicitParam(paramType = "query", name = "bannerName", value = "banner名称", required = true),
+            @ApiImplicitParam(paramType = "query", name = "imageUrl", value = "banner图片地址", required = true),
+            @ApiImplicitParam(paramType = "query", name = "jumpUrl", value = "跳转链接", required = true),
+            @ApiImplicitParam(paramType = "query", name = "isEnable", value = "是否上架(Y|N)", required = true),
+            @ApiImplicitParam(paramType = "query", name = "sort", value = "排序字段", required = false)
+    })
+    @RequestMapping(value = "/editBanner", method = {RequestMethod.GET, RequestMethod.POST})
+    @ResponseBody
+    @SaCheckLogin
+    @SaCheckRole(value = "sys")
+    public CommonResult<Void> editBanner(@Valid UpdateBannerReq req) {
+        return CommonResult.success(adminMallManageService.editBanner(req));
+    }
+    ///////////////////////////////////////////////////////////////////////////////
 
     @ApiOperation(value = "创建商品", httpMethod = "GET")
     @RequestMapping(value = "/createItem", method = {RequestMethod.POST})

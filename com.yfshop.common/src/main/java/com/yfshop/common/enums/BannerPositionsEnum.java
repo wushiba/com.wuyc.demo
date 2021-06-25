@@ -8,7 +8,10 @@ public enum BannerPositionsEnum {
 
     HOME("home", "首页"),
 
-    BANNER("banner", "轮播");
+    BANNER("banner", "轮播"),
+
+    PERSONAL_CENTER("personal_center", "个人中心"),
+    ;
 
     /**
      * 枚举编码
