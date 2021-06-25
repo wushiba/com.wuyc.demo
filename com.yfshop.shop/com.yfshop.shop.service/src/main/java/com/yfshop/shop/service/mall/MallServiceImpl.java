@@ -93,7 +93,7 @@ public class MallServiceImpl implements MallService {
         //        }
         List<Item> items = itemMapper.selectList(Wrappers.lambdaQuery(Item.class)
                 .eq(req.getCategoryId() != null, Item::getCategoryId, req.getCategoryId())
-                .eq(Item::getIsEnable, "Y").eq(Item::getIsDelete, "N").orderByAsc(Item::getSort));
+                .eq(Item::getIsEnable, "Y").eq(Item::getIsDelete, "N").orderByAsc(Item::getSort,Item::getId));
         List<ItemResult> list = BeanUtil.convertList(items, ItemResult.class);
         list.parallelStream().forEach(itemResult -> {
             ItemSku itemSku = skuMapper.selectOne(Wrappers.lambdaQuery(ItemSku.class)
