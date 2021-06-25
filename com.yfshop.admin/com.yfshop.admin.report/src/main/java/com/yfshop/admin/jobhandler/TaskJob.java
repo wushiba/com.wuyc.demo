@@ -174,8 +174,6 @@ public class TaskJob {
     public void buyGoods() {
         List<Item> items = itemMapper.selectList(Wrappers.lambdaQuery(Item.class).eq(Item::getIsEnable, "Y").eq(Item::getIsDelete, "N"));
         if (!CollectionUtils.isEmpty(items)) {
-            Collections.shuffle(items);
-            items = items.subList(0, items.size() > 10 ? 9 : items.size() - 1);
             items.forEach(item -> {
                 redisTemplate.opsForValue().increment("BuyGoods:" + item.getId(), RandomUtil.randomInt(1, 10));
             });
