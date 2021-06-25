@@ -66,7 +66,7 @@ public class UserCartServiceImpl implements UserCartService {
         }
         // 查询用户所有的购物车列表
         List<UserCart> userCarts = cartMapper.selectList(Wrappers.lambdaQuery(UserCart.class)
-                .eq(UserCart::getUserId, userId));
+                .eq(UserCart::getUserId, userId).orderByDesc(UserCart::getId));
         // 查询sku信息
         List<Integer> skuIdList = userCarts.stream().map(UserCart::getSkuId).collect(Collectors.toList());
         Map<Integer, ItemSku> skuIndexMap = CollectionUtil.isEmpty(skuIdList) ? new HashMap<>(0) :
@@ -82,9 +82,6 @@ public class UserCartServiceImpl implements UserCartService {
                 userCartResult.setIsAvailable("Y");
             }
         }
-        userCartResults.sort((c1, c2) -> c1.getIsAvailable().equalsIgnoreCase(c2.getIsAvailable()) ? 0 :
-                ("Y".equalsIgnoreCase(c1.getIsAvailable()) ? 1 : ("Y".equalsIgnoreCase(c2.getIsAvailable()) ? 1 : -1))
-        );
         return userCartResults;
     }
 
