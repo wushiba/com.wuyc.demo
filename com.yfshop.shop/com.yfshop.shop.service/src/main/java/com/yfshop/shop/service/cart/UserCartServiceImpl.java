@@ -320,7 +320,7 @@ public class UserCartServiceImpl implements UserCartService {
             //排除是火锅套餐
             if (!(category == 3 && !tcCategory.isEmpty())) {
                 for (UserCartResult cartResult : childItem) {
-                    pay.add(cartResult.getSkuSalePrice().multiply(new BigDecimal(cartResult.getNum())));
+                    pay = pay.add(cartResult.getSkuSalePrice().multiply(new BigDecimal(cartResult.getNum())));
                 }
                 if (pay.compareTo(value.getConditions()) >= 0) {
                     userCartSummary.setTotalFreight(value.getIsTrue());

@@ -219,7 +219,6 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
             userOrderDetailResult.setOrderId(order.getId());
             userOrderDetailResult.setOrderDetailId(itemList.get(0).getId());
             userOrderDetailResult.setOrderNo(itemList.get(0).getOrderNo());
-            userOrderDetailResult.setCouponPrice(itemList.get(0).getCouponPrice());
             userOrderDetailResult.setOrderStatus(detailList.get(0).getOrderStatus());
             userOrderDetailResult.setItemList(resultItemList);
         }
@@ -327,7 +326,7 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
         if (userCouponId != null) {
             userCoupon = userCouponMapper.selectById(userCouponId);
             this.checkUserCoupon(userCoupon, itemSku.getItemId());
-            couponPrice.add(new BigDecimal(userCoupon.getCouponPrice()));
+            couponPrice = couponPrice.add(new BigDecimal(userCoupon.getCouponPrice()));
         }
 
         BigDecimal orderFreight = new BigDecimal(0);
@@ -405,7 +404,7 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
         if (userCouponId != null) {
             userCoupon = userCouponMapper.selectById(userCouponId);
             this.checkUserCoupon(userCoupon, userCartList.get(0).getItemId());
-            couponPrice.add(new BigDecimal(userCoupon.getCouponPrice()));
+            couponPrice = couponPrice.add(new BigDecimal(userCoupon.getCouponPrice()));
         }
         List<UserCartResult> resultList = BeanUtil.convertList(userCartList, UserCartResult.class);
         List<Integer> skuIdList = userCartList.stream().map(UserCart::getSkuId).collect(Collectors.toList());
@@ -900,7 +899,7 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
                 BigDecimal freight = null;
                 for (UserCartResult cartResult : childItem) {
                     sum += cartResult.getNum();
-                    pay.add(cartResult.getSkuSalePrice().multiply(new BigDecimal(cartResult.getNum())));
+                    pay = pay.add(cartResult.getSkuSalePrice().multiply(new BigDecimal(cartResult.getNum())));
                 }
                 if (pay.compareTo(value.getConditions()) >= 0) {
                     freight = value.getIsTrue().divide(new BigDecimal(sum), 2, RoundingMode.HALF_UP);
