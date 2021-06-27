@@ -857,7 +857,8 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
                     UserCartResult child = BeanUtil.convert(item, UserCartResult.class);
                     child.setNum(1);
                     child.setCouponPrice(new BigDecimal(userCoupon.getCouponPrice()));
-                    child.setPayPrice(item.getSkuSalePrice().subtract(new BigDecimal(userCoupon.getCouponPrice())).add(couponPostageRule.getIsTrue()));
+                    child.setOrderPrice(item.getSkuSalePrice().subtract(new BigDecimal(userCoupon.getCouponPrice())));
+                    child.setPayPrice(child.getOrderPrice().add(couponPostageRule.getIsTrue()));
                     child.setFreight(couponPostageRule.getIsTrue());
                     child.setUserCouponId(userCoupon.getId());
                     allCardList.add(child);
