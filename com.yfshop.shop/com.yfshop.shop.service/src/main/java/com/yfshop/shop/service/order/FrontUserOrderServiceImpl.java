@@ -913,7 +913,7 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
                     UserCartResult child = BeanUtil.convert(cartResult, UserCartResult.class);
                     child.setCouponPrice(BigDecimal.ZERO);
                     child.setFreight(new BigDecimal(cartResult.getNum()).multiply(freight));
-                    child.setPayPrice(child.getSkuSalePrice().add(child.getFreight()));
+                    child.setPayPrice(child.getSkuSalePrice().multiply(new BigDecimal(cartResult.getNum())).add(child.getFreight()));
                     allCardList.add(child);
                 }
             } else {
@@ -921,7 +921,7 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
                     UserCartResult child = BeanUtil.convert(cartResult, UserCartResult.class);
                     child.setCouponPrice(BigDecimal.ZERO);
                     child.setFreight(BigDecimal.ZERO);
-                    child.setPayPrice(child.getSkuSalePrice());
+                    child.setPayPrice(child.getSkuSalePrice().multiply(new BigDecimal(cartResult.getNum())));
                     allCardList.add(child);
                 }
             }
