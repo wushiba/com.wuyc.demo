@@ -906,7 +906,7 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
                     freight = value.getIsTrue().divide(new BigDecimal(sum), 2, RoundingMode.HALF_UP);
                     userCartSummary.setTotalFreight(userCartSummary.getTotalFreight().add(value.getIsTrue()));
                 } else {
-                    freight = value.getIsTrue().divide(new BigDecimal(sum), 2, RoundingMode.HALF_UP);
+                    freight = value.getIsFalse().divide(new BigDecimal(sum), 2, RoundingMode.HALF_UP);
                     userCartSummary.setTotalFreight(userCartSummary.getTotalFreight().add(value.getIsFalse()));
                 }
                 for (UserCartResult cartResult : childItem) {
