@@ -85,6 +85,8 @@ public class UserCartResult implements Serializable {
 
     private BigDecimal payPrice;
 
+    private BigDecimal orderPrice;
+
     private BigDecimal couponPrice;
 
     private Long userCouponId;

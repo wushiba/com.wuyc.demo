@@ -362,7 +362,7 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
         for (UserCartResult userCart : userCartSummary.getCarts()) {
             insertUserOrderDetail(userId, userName, orderId, null, null, null, ReceiveWayEnum.PS.getCode(), "N", userCart.getNum(),
                     userCart.getItemId(), userCart.getSkuId(), userCart.getSkuTitle(), userCart.getSkuSalePrice(), userCart.getSkuCover(), userCart.getFreight(), userCart.getCouponPrice(),
-                    userCart.getSkuSalePrice(), userCart.getPayPrice(), userCart.getUserCouponId(), UserOrderStatusEnum.WAIT_PAY.getCode(), userCart.getSpecValueIdPath(), userCart.getSpecNameValueJson());
+                    userCart.getOrderPrice(), userCart.getPayPrice(), userCart.getUserCouponId(), UserOrderStatusEnum.WAIT_PAY.getCode(), userCart.getSpecValueIdPath(), userCart.getSpecNameValueJson());
         }
         insertUserOrderAddress(orderId, addressInfo.getMobile(), addressInfo.getRealname(), addressInfo.getProvince(), addressInfo.getProvinceId(), addressInfo.getCity(),
                 addressInfo.getCityId(), addressInfo.getDistrict(), addressInfo.getDistrictId(), addressInfo.getAddress());
@@ -451,7 +451,7 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
         for (UserCartResult userCart : userCartSummary.getCarts()) {
             insertUserOrderDetail(userId, userName, orderId, null, null, null, ReceiveWayEnum.PS.getCode(), "N", userCart.getNum(),
                     userCart.getItemId(), userCart.getSkuId(), userCart.getSkuTitle(), userCart.getSkuSalePrice(), userCart.getSkuCover(), userCart.getFreight(), userCart.getCouponPrice(),
-                    userCart.getSkuSalePrice(), userCart.getPayPrice(), userCart.getUserCouponId(), UserOrderStatusEnum.WAIT_PAY.getCode(), userCart.getSpecValueIdPath(), userCart.getSpecNameValueJson());
+                    userCart.getOrderPrice(), userCart.getPayPrice(), userCart.getUserCouponId(), UserOrderStatusEnum.WAIT_PAY.getCode(), userCart.getSpecValueIdPath(), userCart.getSpecNameValueJson());
         }
         insertUserOrderAddress(orderId, addressInfo.getMobile(), addressInfo.getRealname(), addressInfo.getProvince(), addressInfo.getProvinceId(), addressInfo.getCity(),
                 addressInfo.getCityId(), addressInfo.getDistrict(), addressInfo.getDistrictId(), addressInfo.getAddress());
@@ -913,7 +913,8 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
                     UserCartResult child = BeanUtil.convert(cartResult, UserCartResult.class);
                     child.setCouponPrice(BigDecimal.ZERO);
                     child.setFreight(new BigDecimal(cartResult.getNum()).multiply(freight));
-                    child.setPayPrice(child.getSkuSalePrice().multiply(new BigDecimal(cartResult.getNum())).add(child.getFreight()));
+                    child.setOrderPrice(child.getSkuSalePrice().multiply(new BigDecimal(cartResult.getNum())));
+                    child.setPayPrice(child.getOrderPrice().add(child.getFreight()));
                     allCardList.add(child);
                 }
             } else {
@@ -921,7 +922,8 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
                     UserCartResult child = BeanUtil.convert(cartResult, UserCartResult.class);
                     child.setCouponPrice(BigDecimal.ZERO);
                     child.setFreight(BigDecimal.ZERO);
-                    child.setPayPrice(child.getSkuSalePrice().multiply(new BigDecimal(cartResult.getNum())));
+                    child.setOrderPrice(child.getSkuSalePrice().multiply(new BigDecimal(cartResult.getNum())));
+                    child.setPayPrice(child.getOrderPrice());
                     allCardList.add(child);
                 }
             }
