@@ -325,7 +325,7 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
         BigDecimal couponPrice = BigDecimal.ZERO;
         if (userCouponId != null) {
             userCoupon = userCouponMapper.selectById(userCouponId);
-            this.checkUserCoupon(userCoupon, itemSku.getItemId());
+            this.checkUserCoupon(userId,userCoupon, itemSku.getItemId());
             couponPrice = couponPrice.add(new BigDecimal(userCoupon.getCouponPrice()));
         }
 
@@ -403,7 +403,7 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
         BigDecimal couponPrice = BigDecimal.ZERO;
         if (userCouponId != null) {
             userCoupon = userCouponMapper.selectById(userCouponId);
-            this.checkUserCoupon(userCoupon, userCartList.get(0).getItemId());
+            this.checkUserCoupon(userId,userCoupon, userCartList.get(0).getItemId());
             couponPrice = couponPrice.add(new BigDecimal(userCoupon.getCouponPrice()));
         }
         List<UserCartResult> resultList = BeanUtil.convertList(userCartList, UserCartResult.class);
@@ -491,7 +491,7 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
         for (Long userCouponId : userCouponIdList) {
             List<UserCoupon> dataList = userCouponMap.get(userCouponId);
             Asserts.assertCollectionNotEmpty(dataList, 500, "用户优惠券不存在");
-            this.checkUserCoupon(dataList.get(0), itemIdList.get(0));
+            this.checkUserCoupon(userId,dataList.get(0), itemIdList.get(0));
         }
 
         // 校验抽奖活动,当前有且仅有一个活动进行中
@@ -813,8 +813,9 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
      * @param userCoupon
      * @throws ApiException
      */
-    private void checkUserCoupon(UserCoupon userCoupon, Integer itemId) throws ApiException {
+    private void checkUserCoupon(Integer userId,UserCoupon userCoupon, Integer itemId) throws ApiException {
         Asserts.assertNonNull(userCoupon, 500, "用户优惠券不存在");
+        Asserts.assertTrue(userCoupon.getUserId().equals(userId),500,"优惠券不合法");
         Asserts.assertFalse(userCoupon.getValidEndTime().isBefore(LocalDateTime.now()), 500, "优惠券已过期");
         Asserts.assertEquals(userCoupon.getUseStatus(), UserCouponStatusEnum.NO_USE.getCode(), 500, "优惠券状态不正确");
         Asserts.assertTrue("ALL".equalsIgnoreCase(userCoupon.getUseRangeType()) ||
