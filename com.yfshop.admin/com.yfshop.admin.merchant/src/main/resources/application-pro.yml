@@ -16,6 +16,8 @@ dubbo:
     timeout: 30000
     retries: 0
     check: false
+    threadpool: fixed
+    threads: 500
   scan:
     base-packages: com.yfshop.admin
 
