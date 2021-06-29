@@ -51,8 +51,6 @@ dubbo:
     retries: 0
   consumer:
     check: false
-    threadpool: fixed
-    threads: 500
 
 wxPay:
   notifyUrl: http://wx.yufanlook.com/wx/pay/notify/order/

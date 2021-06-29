@@ -68,8 +68,6 @@ dubbo:
     retries: 0
   consumer:
     check: false
-    threadpool: fixed
-    threads: 500
 oss:
   endpoint: oss-cn-shenzhen.aliyuncs.com
   domain: yf-oss-pro.oss-cn-shenzhen.aliyuncs.com
