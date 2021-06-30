@@ -171,7 +171,11 @@ public class AdminMallManageServiceImpl implements AdminMallManageService {
         category.setUpdateTime(LocalDateTime.now());
         category.setCategoryName(req.getCategoryName());
         category.setIsEnable(req.getIsEnable());
-        category.setSort(req.getSort());
+        if (req.getSort() != null) {
+            category.setSort(req.getSort());
+        } else {
+            category.setSort(999);
+        }
         categoryMapper.insert(category);
         return null;
     }
@@ -184,7 +188,9 @@ public class AdminMallManageServiceImpl implements AdminMallManageService {
         category.setUpdateTime(LocalDateTime.now());
         category.setCategoryName(req.getCategoryName());
         category.setIsEnable(req.getIsEnable());
-        category.setSort(req.getSort());
+        if (req.getSort() != null) {
+            category.setSort(req.getSort());
+        }
         int rows = categoryMapper.updateById(category);
         Asserts.assertTrue(rows > 0, 500, "编辑失败");
         return null;

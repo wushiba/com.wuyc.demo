@@ -29,5 +29,5 @@ public class CreateItemCategoryReq implements Serializable {
     private String isEnable = "Y";
 
     @ApiModelProperty(value = "排序字段")
-    private Integer sort = 0;
+    private Integer sort;
 }
