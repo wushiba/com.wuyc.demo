@@ -79,46 +79,45 @@ public class FrontMerchantServiceImpl implements FrontMerchantService {
      * @throws ApiException
      */
     @Override
+
     public List<MerchantResult> findNearMerchantList(Integer districtId, Double longitude, Double latitude) throws ApiException {
         List<MerchantResult> resultList = new ArrayList<>();
-        int limit = 100;
+        if (longitude==null||latitude==null) return resultList;
+        int limit = 30;
         // 中心位置半径100km内的前100个门店
         Circle circle = new Circle(new Point(longitude, latitude), new Distance(CacheConstants.USER_MERCHANT_DISTANCE, RedisGeoCommands.DistanceUnit.KILOMETERS));
         RedisGeoCommands.GeoRadiusCommandArgs args = RedisGeoCommands.GeoRadiusCommandArgs.newGeoRadiusArgs().includeCoordinates().includeDistance().sortAscending().limit(limit);
         GeoResults<RedisGeoCommands.GeoLocation<Object>> geoLocationGeoResults = redisTemplate.opsForGeo().radius(CacheConstants.MERCHANT_GRO_DATA, circle, args);
         List<Integer> merchantIds = new ArrayList<>();
-        Map<Integer, Distance> mapDistance = new HashMap<>();
+        Map<Integer, GeoResult<RedisGeoCommands.GeoLocation<Object>>> mapDistance = new HashMap<>();
         if (geoLocationGeoResults != null) {
             for (GeoResult<RedisGeoCommands.GeoLocation<Object>> locationGeoResult : geoLocationGeoResults) {
                 RedisGeoCommands.GeoLocation<Object> content = locationGeoResult.getContent();
-                Distance dist = locationGeoResult.getDistance();
                 Object merchantId = content.getName();
                 merchantIds.add(Integer.valueOf(merchantId.toString()));
-                mapDistance.put(Integer.valueOf(merchantId.toString()), dist);
+                mapDistance.put(Integer.valueOf(merchantId.toString()), locationGeoResult);
             }
         }
         if (CollectionUtils.isEmpty(merchantIds)) {
             return resultList;
         }
-        Map<Integer, MerchantDetail> merchantDetailMap = merchantDetailMapper.selectList(Wrappers.lambdaQuery(MerchantDetail.class).in(MerchantDetail::getMerchantId, merchantIds)).stream().collect(Collectors.toMap((item) -> item.getMerchantId(), item -> item));
         List<Merchant> list = merchantMapper.selectList(Wrappers.lambdaQuery(Merchant.class)
                 .in(Merchant::getId, merchantIds)
                 .eq(Merchant::getIsDelete, 'N')
                 .eq(Merchant::getIsEnable, 'Y'));
         list.forEach(item -> {
             MerchantResult result = BeanUtil.convert(item, MerchantResult.class);
-            Distance distance = mapDistance.get(item.getId());
+            GeoResult<RedisGeoCommands.GeoLocation<Object>> geoResult = mapDistance.get(item.getId());
+            Point point = geoResult.getContent().getPoint();
+            Distance distance = geoResult.getDistance();
             result.setDistanceValue(distance.getValue());
             if ("km".equals(distance.getUnit()) && distance.getValue() < 0) {
                 result.setDistance(String.format("%.1f千米", distance.getValue()));
             } else {
                 result.setDistance(String.format("%.1f米", (distance.getValue() * 1000)));
             }
-            MerchantDetail merchantDetail = merchantDetailMap.get(item.getId());
-            if (merchantDetail != null) {
-                result.setLatitude(merchantDetail.getLatitude());
-                result.setLongitude(merchantDetail.getLongitude());
-            }
+            result.setLongitude(point.getX());
+            result.setLatitude(point.getY());
             resultList.add(result);
         });
         resultList.sort(Comparator.comparing(MerchantResult::getDistanceValue));
