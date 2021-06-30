@@ -118,7 +118,7 @@ public class WxMenuController {
 
         WxMenuButton actionTwo = new WxMenuButton();
         actionTwo.setType(MenuButtonType.VIEW);
-        actionTwo.setName("爆款火锅");
+        actionTwo.setName("到家火锅");
         actionTwo.setUrl("https://m.yufanlook.com/#/allPage?id=3");
         action.getSubButtons().add(actionTwo);
 
