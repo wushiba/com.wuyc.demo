@@ -82,6 +82,7 @@ public class FrontMerchantServiceImpl implements FrontMerchantService {
 
     public List<MerchantResult> findNearMerchantList(Integer districtId, Double longitude, Double latitude) throws ApiException {
         List<MerchantResult> resultList = new ArrayList<>();
+        if (longitude==null||latitude==null) return resultList;
         int limit = 30;
         // 中心位置半径100km内的前100个门店
         Circle circle = new Circle(new Point(longitude, latitude), new Distance(CacheConstants.USER_MERCHANT_DISTANCE, RedisGeoCommands.DistanceUnit.KILOMETERS));
