@@ -202,6 +202,18 @@ public class MallServiceImpl implements MallService {
     }
 
 
+    @Cacheable(cacheManager = CacheConstants.CACHE_MANAGE_NAME,
+            cacheNames = CacheConstants.MALL_BANNER_CACHE_NAME,
+            key = "'" + CacheConstants.MALL_BANNER_CACHE_KEY_PREFIX + "' + #root.methodName")
+    @Override
+    public List<BannerResult> queryCategoryBannerList() {
+        List<Banner> banners = bannerMapper.selectList(Wrappers.lambdaQuery(Banner.class)
+                .eq(Banner::getPositions, BannerPositionsEnum.CATEGORY.getCode())
+                .eq(Banner::getIsEnable, "Y").orderByAsc(Banner::getSort));
+        return BeanUtil.convertList(banners, BannerResult.class);
+    }
+
+
     @Override
     public ItemSkuResult getItemSkuBySkuId(Integer skuId) throws ApiException {
         Asserts.assertNonNull(skuId, 500, "商品skuId不可以为空");

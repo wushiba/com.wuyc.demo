@@ -75,11 +75,13 @@ public class MallController implements BaseController {
         CompletableFuture<List<BannerResult>> homeBannersFuture = CompletableFuture.supplyAsync(() -> mallService.queryHomeBannerList());
         CompletableFuture<List<BannerResult>> loopBannersFuture = CompletableFuture.supplyAsync(() -> mallService.queryLoopBannerList());
         CompletableFuture<List<BannerResult>> personalCenterBannersFuture = CompletableFuture.supplyAsync(() -> mallService.queryPersonalCenterBannerList());
+        CompletableFuture<List<BannerResult>> categoryBannersFuture = CompletableFuture.supplyAsync(() -> mallService.queryCategoryBannerList());
         Map<String, List<BannerResult>> data = new HashMap<>(3);
         try {
             data.put(BannerPositionsEnum.HOME.getCode(), homeBannersFuture.get(10, TimeUnit.SECONDS));
             data.put(BannerPositionsEnum.BANNER.getCode(), loopBannersFuture.get(10, TimeUnit.SECONDS));
             data.put(BannerPositionsEnum.PERSONAL_CENTER.getCode(), personalCenterBannersFuture.get(10, TimeUnit.SECONDS));
+            data.put(BannerPositionsEnum.CATEGORY.getCode(), categoryBannersFuture.get(10, TimeUnit.SECONDS));
             return CommonResult.success(data);
         } catch (Exception e) {
             logger.error("查询banner失败", e);
