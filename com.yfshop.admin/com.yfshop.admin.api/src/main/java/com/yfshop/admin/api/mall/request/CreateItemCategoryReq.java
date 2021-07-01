@@ -26,7 +26,7 @@ public class CreateItemCategoryReq implements Serializable {
     @ApiModelProperty(value = "是否上架", allowableValues = "Y|N", required = true)
     @NotBlank(message = "是否上架不能为空")
     @CandidateValue(candidateValue = {"Y", "N"}, message = "是否上架值只能是Y|N")
-    private String isEnable = "Y";
+    private String isEnable;
 
     @ApiModelProperty(value = "排序字段")
     private Integer sort;

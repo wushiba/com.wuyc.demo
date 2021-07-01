@@ -11,6 +11,8 @@ public enum BannerPositionsEnum {
     BANNER("banner", "轮播"),
 
     PERSONAL_CENTER("personal_center", "个人中心"),
+
+    CATEGORY("category", "分类"),
     ;
 
     /**

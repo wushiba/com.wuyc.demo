@@ -28,6 +28,8 @@ public interface MallService {
 
     List<BannerResult> queryPersonalCenterBannerList();
 
+    List<BannerResult> queryCategoryBannerList();
+
     ItemSkuResult getItemSkuBySkuId(Integer skuId) throws ApiException;
 
     /**
