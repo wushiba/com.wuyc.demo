@@ -301,10 +301,10 @@ public class FrontUserCouponServiceImpl implements FrontUserCouponService {
             String url = "";
             switch (userCoupon.getDrawPrizeLevel()) {
                 case 1:
-                    url = String.format("%s#/MyOrderPayForSelf?fromType=1&skuId=2032001&num=1", shopUrl);
+                    url = String.format("%s#/MyOrderPay?fromType=1&skuId=2030001&num=1", shopUrl);
                     break;
                 case 2:
-                    url = String.format("%s#/MyOrderPay?fromType=1&skuId=2030001&num=1", shopUrl);
+                    url = String.format("%s#/MyOrderPayForSelf?fromType=1&skuId=2032001&num=1", shopUrl);
                     break;
                 default:
                     url = String.format("%s#/AllPage?id=3", shopUrl);
