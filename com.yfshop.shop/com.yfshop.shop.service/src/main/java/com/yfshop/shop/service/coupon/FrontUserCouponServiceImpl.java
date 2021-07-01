@@ -289,7 +289,7 @@ public class FrontUserCouponServiceImpl implements FrontUserCouponService {
         userCouponMapper.insert(userCoupon);
         logger.info("======结束创建优惠券用户userId=" + userId + ",actCode=" + actCodeBatchDetailResult.getActCode() + ",userCoupon=" + JSON.toJSONString(userCoupon));
         frontDrawRecordService.saveDrawRecord(userId, userCoupon.getId(), actCodeBatchDetailResult, drawPrizeResult);
-        sendWinningMsg(user.getOpenId(), drawPrizeResult.getPrizeLevel(), userCoupon.getCouponId());
+        sendWinningMsg(user.getOpenId(), drawPrizeResult.getPrizeLevel(), userCoupon.id());
         return BeanUtil.convert(userCoupon, YfUserCouponResult.class);
     }
 
@@ -297,7 +297,6 @@ public class FrontUserCouponServiceImpl implements FrontUserCouponService {
     @Override
     public String getCouponRouteUrl(Integer id) {
         UserCoupon userCoupon = userCouponMapper.selectById(id);
-        logger.info("优惠券id->{},{}",id,userCoupon);
         if (userCoupon != null && !UserCouponStatusEnum.NO_USE.getCode().equals(userCoupon.getUseStatus())) {
             return String.format("%s#/MyOrderDetail?orderId=%d", shopUrl, userCoupon.getOrderId());
         } else if (userCoupon != null) {
@@ -324,7 +323,7 @@ public class FrontUserCouponServiceImpl implements FrontUserCouponService {
      *
      * @param openId
      */
-    private void sendWinningMsg(String openId, Integer level, Integer couponId) {
+    private void sendWinningMsg(String openId, Integer level, Integer userCouponId) {
         try {
             String first = null;
             String keyword1 = null;
@@ -352,7 +351,7 @@ public class FrontUserCouponServiceImpl implements FrontUserCouponService {
                         .templateId("pro".equalsIgnoreCase(SpringUtil.getActiveProfile()) ? "26gbak7X0fBjNlYdtXMUxHVz3N0G4bwq-xMRoe0k2FM" : "vPdtuE-E9rL-vry45AZienszFIM-lOf1ng8sTfduumU")
                         .toUser(openId)
                         .data(data)
-                        .url(String.format("%s/front/route/coupon?id=%d", shopUrl, couponId))
+                        .url(String.format("%s/front/route/coupon?id=%d", shopUrl, userCouponId))
                         .build();
                 mpService.sendWxMpTemplateMsg(wxMpTemplateMessage);
             }
