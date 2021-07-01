@@ -297,7 +297,7 @@ public class FrontUserCouponServiceImpl implements FrontUserCouponService {
     @Override
     public String getCouponRouteUrl(Long id) {
         UserCoupon userCoupon = userCouponMapper.selectById(id);
-         if (userCoupon != null) {
+         if (userCoupon != null&&UserCouponStatusEnum.NO_USE.getCode().equals(userCoupon.getUseStatus())) {
             String url = "";
             switch (userCoupon.getCouponPrice()) {
                 case 1:
