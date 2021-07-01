@@ -299,6 +299,20 @@ public class FrontUserCouponServiceImpl implements FrontUserCouponService {
         UserCoupon userCoupon = userCouponMapper.selectById(id);
         if (userCoupon != null && !UserCouponStatusEnum.NO_USE.getCode().equals(userCoupon.getUseStatus())) {
             return String.format("%s#/MyOrderDetail?orderId=%d", shopUrl, userCoupon.getOrderId());
+        } else if (userCoupon != null) {
+            String url = "";
+            switch (userCoupon.getCouponPrice()) {
+                case 1:
+                    url = String.format("%s#/MyOrderPayForSelf?fromType=1&skuId=2032001&num=1", shopUrl);
+                    break;
+                case 2:
+                    url = String.format("%s#/MyOrderPay?fromType=1&skuId=2030001&num=1", shopUrl);
+                    break;
+                default:
+                    url = String.format("%s#/AllPage?id=3", shopUrl);
+                    break;
+            }
+            return url;
         } else {
             return String.format("%s#/CouponList", shopUrl);
         }
