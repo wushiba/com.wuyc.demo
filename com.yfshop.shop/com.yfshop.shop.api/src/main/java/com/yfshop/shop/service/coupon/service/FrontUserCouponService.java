@@ -74,5 +74,5 @@ public interface FrontUserCouponService {
      * @param id
      * @return
      */
-    String getCouponRouteUrl(Integer id);
+    String getCouponRouteUrl(Long id);
 }

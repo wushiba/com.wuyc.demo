@@ -289,13 +289,13 @@ public class FrontUserCouponServiceImpl implements FrontUserCouponService {
         userCouponMapper.insert(userCoupon);
         logger.info("======结束创建优惠券用户userId=" + userId + ",actCode=" + actCodeBatchDetailResult.getActCode() + ",userCoupon=" + JSON.toJSONString(userCoupon));
         frontDrawRecordService.saveDrawRecord(userId, userCoupon.getId(), actCodeBatchDetailResult, drawPrizeResult);
-        sendWinningMsg(user.getOpenId(), drawPrizeResult.getPrizeLevel(), userCoupon.id());
+        sendWinningMsg(user.getOpenId(), drawPrizeResult.getPrizeLevel(), userCoupon.getId());
         return BeanUtil.convert(userCoupon, YfUserCouponResult.class);
     }
 
 
     @Override
-    public String getCouponRouteUrl(Integer id) {
+    public String getCouponRouteUrl(Long id) {
         UserCoupon userCoupon = userCouponMapper.selectById(id);
         if (userCoupon != null && !UserCouponStatusEnum.NO_USE.getCode().equals(userCoupon.getUseStatus())) {
             return String.format("%s#/MyOrderDetail?orderId=%d", shopUrl, userCoupon.getOrderId());
@@ -323,7 +323,7 @@ public class FrontUserCouponServiceImpl implements FrontUserCouponService {
      *
      * @param openId
      */
-    private void sendWinningMsg(String openId, Integer level, Integer userCouponId) {
+    private void sendWinningMsg(String openId, Integer level, Long userCouponId) {
         try {
             String first = null;
             String keyword1 = null;
