@@ -27,6 +27,7 @@ import com.yfshop.shop.service.mall.result.ItemResult;
 import com.yfshop.shop.service.mall.result.ItemSkuResult;
 import com.yfshop.shop.service.mall.result.ItemSpecNameResult;
 import com.yfshop.shop.service.mall.result.ItemSpecValueResult;
+import io.swagger.models.auth.In;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.cache.annotation.Cacheable;
@@ -93,7 +94,7 @@ public class MallServiceImpl implements MallService {
         //        }
         List<Item> items = itemMapper.selectList(Wrappers.lambdaQuery(Item.class)
                 .eq(req.getCategoryId() != null, Item::getCategoryId, req.getCategoryId())
-                .eq(Item::getIsEnable, "Y").eq(Item::getIsDelete, "N").orderByAsc(Item::getSort,Item::getId));
+                .eq(Item::getIsEnable, "Y").eq(Item::getIsDelete, "N").orderByAsc(Item::getSort, Item::getId));
         List<ItemResult> list = BeanUtil.convertList(items, ItemResult.class);
         list.parallelStream().forEach(itemResult -> {
             ItemSku itemSku = skuMapper.selectOne(Wrappers.lambdaQuery(ItemSku.class)
@@ -281,6 +282,35 @@ public class MallServiceImpl implements MallService {
         }
 
         return items;
+    }
+
+
+    @Cacheable(cacheManager = CacheConstants.CACHE_MANAGE_NAME,
+            cacheNames = CacheConstants.MALL_HOT_ITEMS_CACHE_NAME,
+            key = "'" + CacheConstants.MALL_HOT_ITEMS_CACHE_KEY_PREFIX + "' + #root.args[0].categoryId")
+    @Override
+    public List<ItemResult> queryHotItems() {
+        List<ItemResult> list = new ArrayList<>();
+        List<Integer> ids = itemDao.getHotItemList();
+        if (CollectionUtil.isEmpty(ids)) return list;
+
+        Map<Integer, Item> items = itemMapper.selectList(Wrappers.lambdaQuery(Item.class)
+                .in(Item::getId, ids)
+                .eq(Item::getIsEnable, "Y").eq(Item::getIsDelete, "N")).stream().collect(Collectors.toMap(Item::getId, s -> s));
+        for (Integer id : ids) {
+            Item item = items.get(id);
+            if (item != null) {
+                list.add(BeanUtil.convert(item, ItemResult.class));
+            }
+        }
+        list.parallelStream().forEach(itemResult -> {
+            ItemSku itemSku = skuMapper.selectOne(Wrappers.lambdaQuery(ItemSku.class)
+                    .eq(ItemSku::getItemId, itemResult.getId()).eq(ItemSku::getIsEnable, "Y").orderByAsc(ItemSku::getSkuSalePrice));
+            itemResult.setMinSalePrice(itemSku.getSkuSalePrice());
+            itemResult.setItemMarketPrice(itemSku.getSkuMarketPrice());
+            itemResult.setItemPrice(itemSku.getSkuSalePrice());
+        });
+        return list;
     }
 
 }

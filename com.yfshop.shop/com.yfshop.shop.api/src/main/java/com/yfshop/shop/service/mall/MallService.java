@@ -43,4 +43,6 @@ public interface MallService {
     Long getBuyGoodsCount(Integer itemId) throws ApiException;
 
     List<String> getBuyGoodsUser();
+
+    List<ItemResult> queryHotItems();
 }

@@ -92,6 +92,7 @@ public class FrontOrderController implements BaseController {
 
     @RequestMapping(value = "/coupon/findList", method = {RequestMethod.GET, RequestMethod.POST})
     @ResponseBody
+    @SaCheckLogin
     public CommonResult<List<YfUserCouponResult>> findUserCouponList(QueryUserCouponReq userCouponReq) {
         userCouponReq.setUserId(getCurrentUserId());
         return CommonResult.success(frontUserCouponService.findUserCouponList(userCouponReq));
@@ -100,6 +101,7 @@ public class FrontOrderController implements BaseController {
 
     @RequestMapping(value = "/coupon/getAll", method = {RequestMethod.GET, RequestMethod.POST})
     @ResponseBody
+    @SaCheckLogin
     public CommonResult<List<YfUserCouponResult>> getUserCouponAll(QueryUserCouponReq userCouponReq) {
         userCouponReq.setUserId(getCurrentUserId());
         return CommonResult.success(frontUserCouponService.getUserCouponAll(userCouponReq));
@@ -115,6 +117,7 @@ public class FrontOrderController implements BaseController {
      */
     @RequestMapping(value = "/order/calc/findItemList", method = {RequestMethod.GET, RequestMethod.POST})
     @ResponseBody
+    @SaCheckLogin
     public CommonResult<List<UserCartResult>> findItemInfo(Integer skuId, Integer num, String cartIds) {
         return CommonResult.success(userCartService.findItemList(skuId, num, cartIds));
     }

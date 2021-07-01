@@ -1,6 +1,7 @@
 package com.yfshop.shop.service.coupon;
 
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.extra.spring.SpringUtil;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
@@ -288,17 +289,27 @@ public class FrontUserCouponServiceImpl implements FrontUserCouponService {
         userCouponMapper.insert(userCoupon);
         logger.info("======结束创建优惠券用户userId=" + userId + ",actCode=" + actCodeBatchDetailResult.getActCode() + ",userCoupon=" + JSON.toJSONString(userCoupon));
         frontDrawRecordService.saveDrawRecord(userId, userCoupon.getId(), actCodeBatchDetailResult, drawPrizeResult);
-        sendWinningMsg(user.getOpenId(), drawPrizeResult.getPrizeLevel());
+        sendWinningMsg(user.getOpenId(), drawPrizeResult.getPrizeLevel(), userCoupon.getCouponId());
         return BeanUtil.convert(userCoupon, YfUserCouponResult.class);
     }
 
+
+    @Override
+    public String getCouponRouteUrl(Integer id) {
+        UserCoupon userCoupon = userCouponMapper.selectById(id);
+        if (userCoupon != null && !UserCouponStatusEnum.NO_USE.getCode().equals(userCoupon.getUseStatus())) {
+            return String.format("%s#/MyOrderDetail?orderId=%d", shopUrl, userCoupon.getOrderId());
+        } else {
+            return String.format("%s#/CouponList", shopUrl);
+        }
+    }
 
     /**
      * 发送用户中奖消息
      *
      * @param openId
      */
-    private void sendWinningMsg(String openId, Integer level) {
+    private void sendWinningMsg(String openId, Integer level, Integer couponId) {
         try {
             String first = null;
             String keyword1 = null;
@@ -321,12 +332,12 @@ public class FrontUserCouponServiceImpl implements FrontUserCouponService {
                 data.add(new WxMpTemplateData("first", first));
                 data.add(new WxMpTemplateData("keyword1", keyword1));
                 data.add(new WxMpTemplateData("keyword2", DateUtil.format(new Date(), "yyyy-MM-dd HH:mm:ss")));
-                data.add(new WxMpTemplateData("remark", "请在有效期之前尽快领取哦~"));
+                data.add(new WxMpTemplateData("remark", "点我，在线领取奖品！"));
                 WxMpTemplateMessage wxMpTemplateMessage = WxMpTemplateMessage.builder()
-                        .templateId("26gbak7X0fBjNlYdtXMUxHVz3N0G4bwq-xMRoe0k2FM")
+                        .templateId("pro".equalsIgnoreCase(SpringUtil.getActiveProfile()) ? "26gbak7X0fBjNlYdtXMUxHVz3N0G4bwq-xMRoe0k2FM" : "vPdtuE-E9rL-vry45AZienszFIM-lOf1ng8sTfduumU")
                         .toUser(openId)
                         .data(data)
-                        .url(String.format("%s#/CouponList", shopUrl))
+                        .url(String.format("%s/front/route/coupon?id=%d", shopUrl, couponId))
                         .build();
                 mpService.sendWxMpTemplateMsg(wxMpTemplateMessage);
             }

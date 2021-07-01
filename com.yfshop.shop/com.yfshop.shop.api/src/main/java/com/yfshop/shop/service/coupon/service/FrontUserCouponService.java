@@ -69,4 +69,10 @@ public interface FrontUserCouponService {
     public YfUserCouponResult createUserCouponByPrize(Integer userId, YfActCodeBatchDetailResult actCodeBatchDetailResult, YfDrawPrizeResult drawPrizeResult) throws ApiException;
 
 
+    /**
+     * 获取优惠券跳转链接
+     * @param id
+     * @return
+     */
+    String getCouponRouteUrl(Integer id);
 }

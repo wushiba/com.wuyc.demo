@@ -102,4 +102,15 @@ public class MallController implements BaseController {
         return CommonResult.success(mallService.getBuyGoodsUser());
     }
 
+
+
+    @ApiOperation(value = "根据分类ID查询商品列表", httpMethod = "GET")
+    @ApiImplicitParams(value = {
+            @ApiImplicitParam(paramType = "query", name = "categoryId", value = "分类ID")
+    })
+    @RequestMapping(value = "/queryHotItems", method = {RequestMethod.GET, RequestMethod.POST})
+    @ResponseBody
+    public CommonResult<List<ItemResult>> queryHotItems() {
+        return CommonResult.success(mallService.queryHotItems());
+    }
 }

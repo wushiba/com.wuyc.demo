@@ -1,5 +1,6 @@
 package com.yfshop.shop.controller.upload;
 
+import cn.dev33.satoken.annotation.SaCheckLogin;
 import cn.hutool.core.date.DateUtil;
 import com.yfshop.common.api.CommonResult;
 import com.yfshop.common.api.ResultCode;
@@ -34,6 +35,7 @@ public class UploadController {
 
     @RequestMapping("/image")
     @ResponseBody
+    @SaCheckLogin
     public CommonResult uploadImage(@RequestParam("file") MultipartFile file) throws IOException {
         logger.info("======================================进入上传文件uploadImage");
         if (file.isEmpty()) {
