@@ -299,7 +299,7 @@ public class FrontUserCouponServiceImpl implements FrontUserCouponService {
         UserCoupon userCoupon = userCouponMapper.selectById(id);
          if (userCoupon != null&&UserCouponStatusEnum.NO_USE.getCode().equals(userCoupon.getUseStatus())) {
             String url = "";
-            switch (userCoupon.getCouponPrice()) {
+            switch (userCoupon.getDrawPrizeLevel()) {
                 case 1:
                     url = String.format("%s#/MyOrderPayForSelf?fromType=1&skuId=2032001&num=1", shopUrl);
                     break;
