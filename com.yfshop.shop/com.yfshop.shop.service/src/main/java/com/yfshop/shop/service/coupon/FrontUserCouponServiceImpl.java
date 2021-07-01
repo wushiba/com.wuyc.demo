@@ -162,11 +162,13 @@ public class FrontUserCouponServiceImpl implements FrontUserCouponService {
             //获取自提门店详细
             if ((UserCouponStatusEnum.HAS_USE.getCode().equals(item.getUseStatus()) || UserCouponStatusEnum.IN_USE.getCode().equals(item.getUseStatus())) && item.getOrderId() != null) {
                 OrderDetail orderDetail = orderDetailMapper.selectOne(Wrappers.lambdaQuery(OrderDetail.class).eq(OrderDetail::getOrderId, item.getOrderId()));
-                if (orderDetail != null && orderDetail.getMerchantId() != null) {
+                if (orderDetail != null) {
                     item.setOrderDetailId(orderDetail.getId());
-                    Merchant merchant = merchantMapper.selectById(orderDetail.getMerchantId());
-                    if (merchant != null) {
-                        item.setMerchantName(merchant.getMerchantName());
+                    if (orderDetail.getMerchantId() != null) {
+                        Merchant merchant = merchantMapper.selectById(orderDetail.getMerchantId());
+                        if (merchant != null) {
+                            item.setMerchantName(merchant.getMerchantName());
+                        }
                     }
                 }
             }
