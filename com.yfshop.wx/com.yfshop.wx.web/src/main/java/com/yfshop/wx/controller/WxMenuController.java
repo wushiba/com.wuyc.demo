@@ -102,10 +102,9 @@ public class WxMenuController {
         WxMenu menu = new WxMenu();
 
         WxMenuButton healthy = new WxMenuButton();
-        healthy.setName("5折好货");
         healthy.setType(MenuButtonType.VIEW);
-        healthy.setUrl("https://m.yufanlook.com/#/ActPage");
-
+        healthy.setName("我的奖券");
+        healthy.setUrl("https://m.yufanlook.com/#/MyPage");
 
         WxMenuButton action = new WxMenuButton();
         action.setName("进入商城");
@@ -124,10 +123,9 @@ public class WxMenuController {
 
         WxMenuButton actionThree = new WxMenuButton();
         actionThree.setType(MenuButtonType.VIEW);
-        actionThree.setName("我的奖券");
-        actionThree.setUrl("https://m.yufanlook.com/#/MyPage");
+        actionThree.setName("5折好货");
+        actionThree.setUrl("https://m.yufanlook.com/#/ActPage");
         action.getSubButtons().add(actionThree);
-
 
         WxMenuButton kf = new WxMenuButton();
         kf.setName("客服中心");
