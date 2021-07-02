@@ -327,16 +327,16 @@ public class FrontUserCouponServiceImpl implements FrontUserCouponService {
             String keyword1 = null;
             switch (level) {
                 case 1:
-                    first = "恭喜您获得2元换购1688元椰岛轻奢鹿龟酒一瓶的资格。";
+                    first = "【点我领取奖品】恭喜您获得2元换购1688元椰岛轻奢鹿龟酒一瓶的资格。";
                     keyword1 = "1688元椰岛轻奢鹿龟酒";
                     break;
                 case 2:
-                    first = "恭喜您获得2元换购椰岛135ml鹿龟酒一瓶的资格。";
+                    first = "【点我领取奖品】恭喜您获得2元换购椰岛135ml鹿龟酒一瓶的资格。";
                     keyword1 = "椰岛135ml鹿龟酒一瓶";
                     break;
                 case 3:
-                    first = "恭喜您获得锦炉火锅30元抵扣券。";
-                    keyword1 = "锦炉火锅30元抵扣券";
+                    first = "【点我领取奖品】恭喜您获得锦炉火锅30元代金券。";
+                    keyword1 = "锦炉火锅30元代金券";
                     break;
             }
             if (StringUtils.isNotBlank(first) && StringUtils.isNotBlank(keyword1)) {
