@@ -7,7 +7,9 @@ import com.google.common.collect.Lists;
 
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -32,6 +34,7 @@ import com.yfshop.common.exception.Asserts;
 import com.yfshop.common.util.BeanUtil;
 import com.yfshop.wx.api.request.WxPayRefundReq;
 import com.yfshop.wx.api.service.MpService;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
@@ -72,10 +75,12 @@ public class AdminUserOrderServiceImpl implements AdminUserOrderService {
     private WxPayNotifyMapper wxPayNotifyMapper;
     @Resource
     private WxPayRefundMapper wxPayRefundMapper;
+    @Resource
+    private ItemMapper itemMapper;
     @DubboReference
     private MpService mpService;
     @DubboReference
-    StOrderService stOrderService;
+    private StOrderService stOrderService;
 
     /**
      * 用户付款后修改订单状态
@@ -170,11 +175,27 @@ public class AdminUserOrderServiceImpl implements AdminUserOrderService {
 
     @Override
     public IPage<OrderResult> list(QueryOrderReq req) throws ApiException {
+        List<Integer> itemIds = new ArrayList<>();
+        DrawRecord drawRecord = null;
+        if (req.getCategoryId() != null) {
+            itemIds = itemMapper.selectList(Wrappers.lambdaQuery(Item.class).eq(Item::getCategoryId, req.getCategoryId())).stream().map(Item::getId).collect(Collectors.toList());
+        }
+        if (StringUtils.isNotBlank(req.getTraceNo())) {
+            drawRecord = drawRecordMapper.selectOne(Wrappers.lambdaQuery(DrawRecord.class).eq(DrawRecord::getTraceNo, req.getTraceNo()));
+        } else if (StringUtils.isNotBlank(req.getTraceNo())) {
+            drawRecord = drawRecordMapper.selectOne(Wrappers.lambdaQuery(DrawRecord.class).eq(DrawRecord::getActCode, req.getActCode()));
+        }
         LambdaQueryWrapper<OrderDetail> wrapper = Wrappers.lambdaQuery(OrderDetail.class)
-                .like(StringUtils.isNoneBlank(req.getUserName()), OrderDetail::getUserName, req.getUserName())
+                .eq(req.getOrderId() != null, OrderDetail::getOrderId, req.getOrderId())
                 .eq(StringUtils.isNoneBlank(req.getOrderNo()), OrderDetail::getOrderNo, req.getOrderNo())
                 .eq(StringUtils.isNoneBlank(req.getReceiveWay()), OrderDetail::getReceiveWay, req.getReceiveWay())
                 .eq(StringUtils.isNoneBlank(req.getOrderStatus()), OrderDetail::getOrderStatus, req.getOrderStatus())
+                .eq(drawRecord != null, OrderDetail::getUserCouponId, drawRecord.getUserCouponId())
+                .isNotNull("Y".equals(req.getIsUseCoupon()), OrderDetail::getUserCouponId)
+                .isNull("N".equals(req.getIsUseCoupon()), OrderDetail::getUserCouponId)
+                .like(StringUtils.isNoneBlank(req.getUserName()), OrderDetail::getUserName, req.getUserName())
+                .like(StringUtils.isNoneBlank(req.getItemTitle()), OrderDetail::getItemTitle, req.getItemTitle())
+                .in(CollectionUtils.isNotEmpty(itemIds), OrderDetail::getItemId, itemIds)
                 .ge(req.getStartTime() != null, OrderDetail::getCreateTime, req.getStartTime())
                 .lt(req.getEndTime() != null, OrderDetail::getCreateTime, req.getEndTime())
                 .orderByDesc(OrderDetail::getId);

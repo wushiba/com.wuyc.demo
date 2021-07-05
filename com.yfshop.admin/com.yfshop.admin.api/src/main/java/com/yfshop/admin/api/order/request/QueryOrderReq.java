@@ -8,10 +8,17 @@ import java.util.Date;
 
 @Data
 public class QueryOrderReq implements Serializable {
+    private Integer orderId;
     private String orderNo;
     private String userName;
     private String receiveWay;
     private String orderStatus;
+    private String itemTitle;
+    private String isUseCoupon;
+    private String expressNo;
+    private String actCode;
+    private String traceNo;
+    private Integer categoryId;
     private Date startTime;
     private Date endTime;
     private Integer pageIndex = 1;

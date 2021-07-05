@@ -212,7 +212,12 @@ public class AdminMallManageServiceImpl implements AdminMallManageService {
                         .eq(ItemCategory::getIsEnable, isEnable ? "Y" : "N")
                         .orderByDesc(ItemCategory::getCreateTime);
         List<ItemCategory> itemCategories = categoryMapper.selectList(wrapper);
-        return BeanUtil.convertList(itemCategories, ItemCategoryResult.class);
+        Map<Integer, Long> itemCountMap = itemMapper.selectList(Wrappers.lambdaQuery(Item.class)).stream().collect(Collectors.groupingBy(Item::getCategoryId, Collectors.counting()));
+        List<ItemCategoryResult> result = BeanUtil.convertList(itemCategories, ItemCategoryResult.class);
+        result.forEach(item -> {
+            item.setItemCount(itemCountMap.get(item.getId()));
+        });
+        return result;
     }
 
     @Transactional(rollbackFor = Exception.class)

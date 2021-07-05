@@ -407,8 +407,8 @@ class MerchantInfoController extends AbstractBaseController {
     @RequestMapping(value = "/findNearMerchantList", method = {RequestMethod.GET, RequestMethod.POST})
     @ResponseBody
     @SaCheckLogin
-    public CommonResult<List<MerchantResult>> findNearMerchantList(Integer districtId, Double longitude, Double latitude) {
-        return CommonResult.success(merchantInfoService.findNearMerchantList(getCurrentAdminUserId(), districtId, longitude, latitude));
+    public CommonResult<List<MerchantResult>> findNearMerchantList(String key,Integer districtId, Double longitude, Double latitude) {
+        return CommonResult.success(merchantInfoService.findNearMerchantList(key,getCurrentAdminUserId(), districtId, longitude, latitude));
     }
 
 

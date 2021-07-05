@@ -665,36 +665,44 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
     @Override
     public MerchantGroupResult merchantGroup(MerchantGroupReq merchantGroupReq) throws ApiException {
         MerchantGroupResult merchantGroupResult = new MerchantGroupResult();
-        //Integer myselfCount = getCurrentWebsiteCount(merchantGroupReq.getMerchantId());
         Merchant merchant = merchantMapper.selectById(merchantGroupReq.getMerchantId());
-        Integer count = getAllWebsiteCodeCount(merchantGroupReq.getMerchantId());
         merchantGroupResult.setMerchantId(merchant.getId());
         merchantGroupResult.setMerchantName(merchant.getMerchantName());
         merchantGroupResult.setContacts(merchant.getContacts());
         merchantGroupResult.setMobile(merchant.getMobile());
-        merchantGroupResult.setCount(count);
-        LambdaQueryWrapper lambdaQueryWrapper = Wrappers.<Merchant>lambdaQuery()
+        merchantGroupResult.setCount(getAllWebsiteCodeCount(merchantGroupReq.getMerchantId()));
+        merchantGroupResult.setTotalExchange(getCurrentExchange(merchant.getId(), null, null));
+        LambdaQueryWrapper<Merchant> lambdaQueryWrapper = Wrappers.<Merchant>lambdaQuery()
                 .eq(Merchant::getPid, merchantGroupReq.getMerchantId())
                 .ne(Merchant::getRoleAlias, "wd")
                 .eq(Merchant::getIsEnable, "Y")
                 .eq(Merchant::getIsDelete, "N");
-        List<Merchant> merchantList = merchantMapper.selectList(lambdaQueryWrapper);
+        lambdaQueryWrapper.and(StringUtils.isNotBlank(merchantGroupReq.getKey()), wrapper -> {
+            wrapper.like(Merchant::getMerchantName, merchantGroupReq.getKey())
+                    .or()
+                    .like(Merchant::getContacts, merchantGroupReq.getKey())
+                    .or()
+                    .like(Merchant::getMobile, merchantGroupReq.getKey());
+        });
+        IPage<Merchant> iPage = merchantMapper.selectPage(new Page<>(merchantGroupReq.getPageIndex(), merchantGroupReq.getPageSize()), lambdaQueryWrapper);
         List<MerchantGroupResult> merchantGroupResults = new ArrayList<>();
-        MerchantMyselfResult myselfResult = getMyselfWebsite(merchant.getId(), merchantGroupReq.getStartTime(), merchantGroupReq.getEndTime());
-        if (myselfResult.getCount() > 0) {
-            MerchantGroupResult myself = new MerchantGroupResult();
-            myself.setHaveWebsite(true);
-            myself.setMerchantId(merchant.getId());
-            myself.setMerchantName(merchant.getMerchantName());
-            myself.setContacts(merchant.getContacts());
-            myself.setMobile(merchant.getMobile());
-            myself.setCurrentExchange(myselfResult.getCurrentExchange());
-            myself.setTotalExchange(myselfResult.getTotalExchange());
-            myself.setCurrentGoodsRecord(myselfResult.getCurrentGoodsRecord());
-            myself.setCount(myselfResult.getCount());
-            merchantGroupResults.add(myself);
+        if (merchantGroupReq.getPageIndex() == 1) {
+            MerchantMyselfResult myselfResult = getMyselfWebsite(merchant.getId(), merchantGroupReq.getStartTime(), merchantGroupReq.getEndTime());
+            if (myselfResult.getCount() > 0) {
+                MerchantGroupResult myself = new MerchantGroupResult();
+                myself.setHaveWebsite(true);
+                myself.setMerchantId(merchant.getId());
+                myself.setMerchantName(merchant.getMerchantName());
+                myself.setContacts(merchant.getContacts());
+                myself.setMobile(merchant.getMobile());
+                myself.setCurrentExchange(myselfResult.getCurrentExchange());
+                myself.setTotalExchange(myselfResult.getTotalExchange());
+                myself.setCurrentGoodsRecord(myselfResult.getCurrentGoodsRecord());
+                myself.setCount(myselfResult.getCount());
+                merchantGroupResults.add(myself);
+            }
         }
-        merchantList.forEach(item -> {
+        iPage.getRecords().forEach(item -> {
             MerchantGroupResult child = new MerchantGroupResult();
             child.setMerchantId(item.getId());
             child.setMerchantName(item.getMerchantName());
@@ -707,6 +715,10 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
             merchantGroupResults.add(child);
         });
         merchantGroupResult.setList(merchantGroupResults);
+        merchantGroupResult.setTotal(iPage.getTotal());
+        merchantGroupResult.setCurrent(iPage.getCurrent());
+        merchantGroupResult.setSize(iPage.getSize());
+        merchantGroupResult.setPages(iPage.getPages());
         return merchantGroupResult;
     }
 
@@ -802,21 +814,34 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
 
     @Override
     public MerchantGroupResult getWebsiteList(Integer merchantId, MerchantGroupReq merchantGroupReq) {
+        List<Merchant> merchantList = new ArrayList<>();
         MerchantGroupResult merchantGroupResult = new MerchantGroupResult();
-        AtomicInteger count = new AtomicInteger();
-        LambdaQueryWrapper lambdaQueryWrapper = Wrappers.<Merchant>lambdaQuery()
+        //AtomicInteger count = new AtomicInteger();
+        LambdaQueryWrapper<Merchant> lambdaQueryWrapper = Wrappers.<Merchant>lambdaQuery()
                 .eq(Merchant::getPid, merchantGroupReq.getMerchantId())
                 .eq(Merchant::getRoleAlias, "wd")
                 .eq(Merchant::getIsEnable, "Y")
                 .eq(Merchant::getIsDelete, "N");
-        List<Merchant> merchantList = merchantMapper.selectList(lambdaQueryWrapper);
+        lambdaQueryWrapper.and(StringUtils.isNotBlank(merchantGroupReq.getKey()), wrapper -> {
+            wrapper.like(Merchant::getMerchantName, merchantGroupReq.getKey())
+                    .or()
+                    .like(Merchant::getContacts, merchantGroupReq.getKey())
+                    .or()
+                    .like(Merchant::getMobile, merchantGroupReq.getKey());
+
+        });
+
+        IPage<Merchant> iPage = merchantMapper.selectPage(new Page<>(merchantGroupReq.getPageIndex(), merchantGroupReq.getPageSize()), lambdaQueryWrapper);
         /**
          * 判断自己有没有绑定网点码，如果有将自己插入到第一个
          */
-        if (getWebsiteCodeBindCount(merchantGroupReq.getMerchantId()) > 0) {
-            Merchant merchant = merchantMapper.selectById(merchantGroupReq.getMerchantId());
-            merchantList.add(0, merchant);
+        if (merchantGroupReq.getPageIndex() == 1) {
+            if (getWebsiteCodeBindCount(merchantGroupReq.getMerchantId()) > 0) {
+                Merchant merchant = merchantMapper.selectById(merchantGroupReq.getMerchantId());
+                merchantList.add(merchant);
+            }
         }
+        merchantList.addAll(iPage.getRecords());
         List<MerchantGroupResult> merchantGroupResults = new ArrayList<>();
         merchantList.forEach(item -> {
             MerchantGroupResult child = new MerchantGroupResult();
@@ -828,10 +853,11 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
             child.setTotalExchange(getCurrentExchangeByPid(item.getId(), null, null));
             child.setCurrentGoodsRecord(websiteGoodsRecordDao.sumGoodsRecordByMerchantId(item.getId(), merchantGroupReq.getStartTime(), merchantGroupReq.getEndTime()));
             child.setCount(getCurrentWebsiteCodeCount(item.getId(), merchantId));
-            count.addAndGet(child.getCount());
+            //count.addAndGet(child.getCount());
             merchantGroupResults.add(child);
         });
-        merchantGroupResult.setCount(count.get());
+        merchantGroupResult.setCount(getAllWebsiteCodeCount(merchantGroupReq.getMerchantId()));
+        merchantGroupResult.setTotalExchange(getCurrentExchange(merchantGroupReq.getMerchantId(), null, null));
         merchantGroupResult.setList(merchantGroupResults);
         return merchantGroupResult;
     }
@@ -839,10 +865,11 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
 
     @Override
     public WebsiteCodeGroupResult getWebsiteCodeData(Integer merchantId, WebsiteCodeDataReq websiteCodeDataReq) {
+        Integer currentMerchantId = websiteCodeDataReq.getMerchantId() == null ? merchantId : websiteCodeDataReq.getMerchantId();
         WebsiteCodeGroupResult websiteCodeGroupResult = new WebsiteCodeGroupResult();
         List<WebsiteCodeDataResult> websiteCodeDataResults = new ArrayList<>();
         List<WebsiteCodeDetail> websiteCodeDetailList = websiteCodeDetailMapper.selectList(Wrappers.<WebsiteCodeDetail>lambdaQuery()
-                .eq(WebsiteCodeDetail::getMerchantId, websiteCodeDataReq.getMerchantId() == null ? merchantId : websiteCodeDataReq.getMerchantId())
+                .eq(WebsiteCodeDetail::getMerchantId, currentMerchantId)
                 .like(websiteCodeDataReq.getMerchantId() != null, WebsiteCodeDetail::getMerchantPidPath, "." + merchantId + ".")
                 .eq(WebsiteCodeDetail::getIsActivate, "Y"));
         AtomicInteger currentCurrentExchange = new AtomicInteger();
@@ -862,18 +889,18 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
         });
         websiteCodeGroupResult.setList(websiteCodeDataResults);
         websiteCodeGroupResult.setCount(totalExchange.get());
-        websiteCodeGroupResult.setCurrentGoodsRecord(websiteGoodsRecordDao.sumGoodsRecordByMerchantId(websiteCodeDataReq.getMerchantId() == null ? merchantId : websiteCodeDataReq.getMerchantId(), websiteCodeDataReq.getStartTime(), websiteCodeDataReq.getEndTime()));
+        websiteCodeGroupResult.setCurrentGoodsRecord(websiteGoodsRecordDao.sumGoodsRecordByMerchantId(currentMerchantId, websiteCodeDataReq.getStartTime(), websiteCodeDataReq.getEndTime()));
         websiteCodeGroupResult.setCurrentExchange(currentCurrentExchange.get());
         websiteCodeGroupResult.setTotalExchange(totalExchange.get());
         return websiteCodeGroupResult;
     }
 
     @Override
-    public List<MerchantResult> findNearMerchantList(Integer merchantId, Integer districtId, Double
+    public List<MerchantResult> findNearMerchantList(String key, Integer merchantId, Integer districtId, Double
             longitude, Double latitude) {
         if (longitude == null || longitude == null) return new ArrayList<>();
         List<MerchantResult> resultList = new ArrayList<>();
-        int limit = 30;
+        int limit = 100;
         // 中心位置半径100km内的前100个门店
         Circle circle = new Circle(new Point(longitude, latitude), new Distance(CacheConstants.USER_MERCHANT_DISTANCE, RedisGeoCommands.DistanceUnit.KILOMETERS));
         RedisGeoCommands.GeoRadiusCommandArgs args = RedisGeoCommands.GeoRadiusCommandArgs.newGeoRadiusArgs().includeCoordinates().includeDistance().sortAscending().limit(limit);
@@ -894,7 +921,13 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
         List<Merchant> list = merchantMapper.selectList(Wrappers.lambdaQuery(Merchant.class)
                 .in(Merchant::getId, merchantIds)
                 .eq(Merchant::getIsDelete, 'N')
-                .eq(Merchant::getIsEnable, 'Y'));
+                .eq(Merchant::getIsEnable, 'Y').and(StringUtils.isNotBlank(key), wrapper -> {
+                    wrapper.like(Merchant::getMerchantName, key)
+                            .or()
+                            .like(Merchant::getContacts, key)
+                            .or()
+                            .like(Merchant::getMobile, key);
+                }));
         Merchant merchant = merchantMapper.selectById(merchantId);
         list = list.stream().filter(data -> data.getPidPath().startsWith(merchant.getPidPath()))
                 .collect(Collectors.toList());

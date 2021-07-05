@@ -10,8 +10,11 @@ import java.util.Date;
 public class MerchantGroupReq implements Serializable {
     private Date startTime;
     private Date endTime;
+    private String key;
     private Integer merchantId;
-    
+    private Integer pageIndex = 1;
+    private Integer pageSize = 10;
+
     public Date getEndTime() {
         if (endTime == null) {
             endTime = getStartTime();

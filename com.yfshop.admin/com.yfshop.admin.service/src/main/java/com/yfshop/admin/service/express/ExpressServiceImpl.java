@@ -18,10 +18,13 @@ import com.yfshop.admin.api.express.result.ExpressResult;
 import com.yfshop.admin.api.express.result.SfExpressResult;
 import com.yfshop.admin.api.express.result.StoExpressResult;
 import com.yfshop.code.mapper.ExpressMapper;
+import com.yfshop.code.mapper.OrderAddressMapper;
 import com.yfshop.code.mapper.OrderDetailMapper;
 import com.yfshop.code.model.Express;
+import com.yfshop.code.model.OrderAddress;
 import com.yfshop.code.model.OrderDetail;
 import com.yfshop.common.constants.CacheConstants;
+import com.yfshop.common.enums.ReceiveWayEnum;
 import com.yfshop.common.exception.ApiException;
 import com.yfshop.common.service.RedisService;
 import com.yfshop.common.util.JuHeExpressDeliveryUtils;
@@ -40,6 +43,8 @@ import java.util.concurrent.atomic.AtomicReference;
 public class ExpressServiceImpl implements ExpressService {
     @Resource
     private OrderDetailMapper orderDetailMapper;
+    @Resource
+    private OrderAddressMapper orderAddressMapper;
     @Resource
     private RedisService redisService;
     @Resource
@@ -61,21 +66,20 @@ public class ExpressServiceImpl implements ExpressService {
 
     @Override
     public ExpressOrderResult queryExpress(Long id) throws ApiException {
-        ExpressOrderResult expressOrderResult = new ExpressOrderResult();
         OrderDetail orderDetail = orderDetailMapper.selectById(id);
-        List<ExpressResult> list = queryStExpress(orderDetail.getExpressNo());
-        expressOrderResult.setExpressNo(orderDetail.getExpressNo());
-        expressOrderResult.setExpressName(orderDetail.getExpressCompany());
-        expressOrderResult.setList(list);
-        return expressOrderResult;
+        if (ReceiveWayEnum.ZT.getCode().equals(orderDetail.getReceiveWay())) return new ExpressOrderResult();
+        OrderAddress orderAddress = orderAddressMapper.selectOne(Wrappers.lambdaQuery(OrderAddress.class).eq(OrderAddress::getOrderId, id));
+        if (orderAddress == null) return new ExpressOrderResult();
+        return queryByExpressNo(orderDetail.getExpressNo(), orderDetail.getExpressCompany(), orderAddress.getMobile());
     }
 
     @Override
     public ExpressOrderResult queryByExpressNo(String expressNo, String expressName, String receiverMobile) throws ApiException {
         ExpressOrderResult expressOrderResult = new ExpressOrderResult();
+        if (StringUtils.isBlank(expressNo)) return expressOrderResult;
         expressOrderResult.setExpressName(expressName);
         expressOrderResult.setExpressNo(expressNo);
-        String value = map.get(expressName != null ? expressName.replace("快递", "").replace("速运","") : expressName);
+        String value = map.get(expressName != null ? expressName.replace("快递", "").replace("速运", "") : expressName);
         if (value == null) {
             expressOrderResult.setList(new ArrayList<>());
         }

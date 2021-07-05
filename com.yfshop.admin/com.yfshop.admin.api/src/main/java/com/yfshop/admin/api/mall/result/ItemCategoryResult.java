@@ -40,4 +40,6 @@ public class ItemCategoryResult implements Serializable {
      * 排序字段
      */
     private Integer sort;
+
+    private Long itemCount;
 }

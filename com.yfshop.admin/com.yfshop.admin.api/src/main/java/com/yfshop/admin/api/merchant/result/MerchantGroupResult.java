@@ -17,6 +17,9 @@ public class MerchantGroupResult implements Serializable {
     private Integer currentExchange;
     private Integer totalExchange;
     private Integer currentGoodsRecord;
+    private Long pages;
+    private Long current;
+    private Long total;
+    private Long size;
     private List<MerchantGroupResult> list = new ArrayList<>();
-
 }
