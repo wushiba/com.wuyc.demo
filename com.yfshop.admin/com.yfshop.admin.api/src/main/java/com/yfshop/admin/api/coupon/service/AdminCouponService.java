@@ -3,6 +3,7 @@ package com.yfshop.admin.api.coupon.service;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.yfshop.admin.api.coupon.request.CreateCouponReq;
 import com.yfshop.admin.api.coupon.request.QueryCouponReq;
+import com.yfshop.admin.api.coupon.result.CouponRulesResult;
 import com.yfshop.admin.api.coupon.result.YfCouponResult;
 import com.yfshop.common.exception.ApiException;
 
@@ -70,5 +71,8 @@ public interface AdminCouponService {
 	 * @Description:
 	 */
 	public void updateCouponStatus(Integer couponId, String isEnable) throws ApiException;
+
+
+	public List<CouponRulesResult> getCouponRulesList();
 	
 }

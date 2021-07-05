@@ -10,7 +10,9 @@ import com.yfshop.code.mapper.UserCouponMapper;
 import com.yfshop.code.model.UserCoupon;
 import com.yfshop.common.exception.ApiException;
 import com.yfshop.common.util.BeanUtil;
+import org.apache.dubbo.config.annotation.DubboService;
 import org.apache.dubbo.config.annotation.Service;
+import org.springframework.scheduling.annotation.Async;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -22,7 +24,7 @@ import java.util.List;
  * @Since:2021-03-23 16:24:25
  * @Version:1.1.0
  */
-@Service(dynamic = true)
+@DubboService
 public class YfUserCouponServiceImpl implements AdminUserCouponService {
 
     @Resource
@@ -64,6 +66,13 @@ public class YfUserCouponServiceImpl implements AdminUserCouponService {
         List<UserCoupon> dataList = userCouponMapper.selectList(queryWrapper);
         return BeanUtil.convertList(dataList, YfUserCouponResult.class);
     }
+
+    @Override
+    @Async
+    public void sendUserCoupon(Long orderId) throws ApiException {
+
+    }
+
 
 }
 

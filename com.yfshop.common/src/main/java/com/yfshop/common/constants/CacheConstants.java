@@ -100,4 +100,8 @@ public interface CacheConstants {
     String HEALTHY_ITEM_DETAIL_KEY_PREFIX = "healthy_item_detail_";
     String HEALTHY_ACTIVITIES_KEY_PREFIX = "healthy_activities_";
     String EXPRESS_KEY_PREFIX = "express_";
+
+    /** 优惠券缓存 */
+    String MALL_COUPON_RULES_NAME = "MallCouponRulesName";
+    String MALL_COUPON_RULES_KEY_PREFIX = "mall_coupon_rules";
 }

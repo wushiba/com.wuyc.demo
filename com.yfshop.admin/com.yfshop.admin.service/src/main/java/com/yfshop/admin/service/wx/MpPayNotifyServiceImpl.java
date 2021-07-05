@@ -28,6 +28,7 @@ public class MpPayNotifyServiceImpl implements MpPayNotifyService {
     @Resource
     private WxPayNotifyMapper wxPayNotifyMapper;
 
+
     @Override
     @Async
     public void payOrderNotify(String bizType, WxPayOrderNotifyReq notifyResult) {

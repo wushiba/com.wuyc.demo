@@ -6,21 +6,26 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.yfshop.admin.api.coupon.request.CreateCouponReq;
 import com.yfshop.admin.api.coupon.request.QueryCouponReq;
+import com.yfshop.admin.api.coupon.result.CouponRulesResult;
 import com.yfshop.admin.api.coupon.result.YfCouponResult;
 import com.yfshop.admin.api.coupon.service.AdminCouponService;
 import com.yfshop.code.mapper.CouponMapper;
+import com.yfshop.code.mapper.CouponRulesMapper;
 import com.yfshop.code.mapper.ItemMapper;
 import com.yfshop.code.mapper.UserCouponMapper;
 import com.yfshop.code.model.Coupon;
 import com.yfshop.code.model.Item;
 import com.yfshop.code.model.RlItemHotpot;
 import com.yfshop.code.model.UserCoupon;
+import com.yfshop.common.constants.CacheConstants;
 import com.yfshop.common.enums.UserCouponStatusEnum;
 import com.yfshop.common.exception.ApiException;
 import com.yfshop.common.exception.Asserts;
 import com.yfshop.common.util.BeanUtil;
 import com.yfshop.common.util.DateUtil;
+import org.apache.dubbo.config.annotation.DubboService;
 import org.apache.dubbo.config.annotation.Service;
+import org.springframework.cache.annotation.Cacheable;
 
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
@@ -38,7 +43,7 @@ import java.util.stream.Collectors;
  * @Since:2021-03-23 13:47:17
  * @Version:1.1.0
  */
-@Service(dynamic = true)
+@DubboService
 public class YfCouponServiceImpl implements AdminCouponService {
 
     @Resource
@@ -47,6 +52,8 @@ public class YfCouponServiceImpl implements AdminCouponService {
     private ItemMapper itemMapper;
     @Resource
     private UserCouponMapper userCouponMapper;
+    @Resource
+    private CouponRulesMapper couponRulesMapper;
 
     @Override
     public YfCouponResult getYfCouponById(Integer id) throws ApiException {
@@ -118,6 +125,15 @@ public class YfCouponServiceImpl implements AdminCouponService {
         couponMapper.updateById(coupon);
     }
 
+    @Cacheable(cacheManager = CacheConstants.CACHE_MANAGE_NAME,
+            cacheNames = CacheConstants.MALL_COUPON_RULES_NAME,
+            key = "'" + CacheConstants.MALL_COUPON_RULES_KEY_PREFIX + "'")
+    @Override
+    public List<CouponRulesResult> getCouponRulesList() {
+
+        return null;
+    }
+
     public void checkCouponParams(CreateCouponReq couponReq) {
         // DATE_RANGE(日期范围), TODAY(领取当天), FIX_DAY(固定天数)
         String validType = couponReq.getValidType();
@@ -175,6 +191,7 @@ public class YfCouponServiceImpl implements AdminCouponService {
         });
         return list;
     }
+
 
 }
 

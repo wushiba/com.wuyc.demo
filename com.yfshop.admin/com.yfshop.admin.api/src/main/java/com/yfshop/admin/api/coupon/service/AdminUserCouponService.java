@@ -39,4 +39,6 @@ public interface AdminUserCouponService {
 	 */
 	public List<YfUserCouponResult> getAll(QueryUserCouponReq yfUserCouponResult) throws ApiException;
 
+	public void sendUserCoupon(Long orderId)throws ApiException;
+
 }
