@@ -16,6 +16,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.binarywang.wxpay.exception.WxPayException;
+import com.yfshop.admin.api.coupon.service.AdminUserCouponService;
 import com.yfshop.admin.api.order.request.OrderExpressReq;
 import com.yfshop.admin.api.order.request.QueryOrderReq;
 import com.yfshop.admin.api.order.result.OrderDetailResult;
@@ -40,6 +41,7 @@ import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
@@ -81,6 +83,8 @@ public class AdminUserOrderServiceImpl implements AdminUserOrderService {
     private MpService mpService;
     @DubboReference
     private StOrderService stOrderService;
+    @Autowired
+    private AdminUserCouponService adminUserCouponService;
 
     /**
      * 用户付款后修改订单状态
@@ -134,6 +138,7 @@ public class AdminUserOrderServiceImpl implements AdminUserOrderService {
                 }
             }
         });
+        adminUserCouponService.sendUserCoupon(orderId);
         return null;
     }
 
@@ -181,13 +186,13 @@ public class AdminUserOrderServiceImpl implements AdminUserOrderService {
         if (req.getCategoryId() != null) {
             itemIds = itemMapper.selectList(Wrappers.lambdaQuery(Item.class).eq(Item::getCategoryId, req.getCategoryId())).stream().map(Item::getId).collect(Collectors.toList());
         }
-        if (StringUtils.isNotBlank(req.getActCode())||StringUtils.isNotBlank(req.getTraceNo())) {
+        if (StringUtils.isNotBlank(req.getActCode()) || StringUtils.isNotBlank(req.getTraceNo())) {
             drawRecord = drawRecordMapper.selectOne(Wrappers.lambdaQuery(DrawRecord.class)
-                    .eq(StringUtils.isNotBlank(req.getActCode()),DrawRecord::getActCode, req.getActCode())
-                    .eq(StringUtils.isNotBlank(req.getTraceNo()),DrawRecord::getTraceNo, req.getTraceNo()));
+                    .eq(StringUtils.isNotBlank(req.getActCode()), DrawRecord::getActCode, req.getActCode())
+                    .eq(StringUtils.isNotBlank(req.getTraceNo()), DrawRecord::getTraceNo, req.getTraceNo()));
         }
         if (StringUtils.isNotBlank(req.getReceiverMobile()) || StringUtils.isNotBlank(req.getReceiverName())) {
-            orderIds=orderAddressMapper.selectList(Wrappers.lambdaQuery(OrderAddress.class)
+            orderIds = orderAddressMapper.selectList(Wrappers.lambdaQuery(OrderAddress.class)
                     .like(StringUtils.isNotBlank(req.getReceiverMobile()), OrderAddress::getMobile, req.getReceiverMobile())
                     .like(StringUtils.isNotBlank(req.getReceiverName()), OrderAddress::getRealname, req.getReceiverName())
             ).stream().map(OrderAddress::getOrderId).collect(Collectors.toList());
@@ -198,12 +203,12 @@ public class AdminUserOrderServiceImpl implements AdminUserOrderService {
                 .eq(StringUtils.isNoneBlank(req.getOrderNo()), OrderDetail::getOrderNo, req.getOrderNo())
                 .eq(StringUtils.isNoneBlank(req.getReceiveWay()), OrderDetail::getReceiveWay, req.getReceiveWay())
                 .eq(StringUtils.isNoneBlank(req.getOrderStatus()), OrderDetail::getOrderStatus, req.getOrderStatus())
-                .eq(drawRecord != null, OrderDetail::getUserCouponId, drawRecord.getUserCouponId())
+                .eq(drawRecord != null && drawRecord.getUserCouponId() != null, OrderDetail::getUserCouponId, drawRecord.getUserCouponId())
                 .isNotNull("Y".equals(req.getIsUseCoupon()), OrderDetail::getUserCouponId)
                 .isNull("N".equals(req.getIsUseCoupon()), OrderDetail::getUserCouponId)
                 .like(StringUtils.isNoneBlank(req.getUserName()), OrderDetail::getUserName, req.getUserName())
                 .like(StringUtils.isNoneBlank(req.getItemTitle()), OrderDetail::getItemTitle, req.getItemTitle())
-                .eq(req.getCouponName()!=null,OrderDetail::getCouponPrice,req.getCouponName())
+                .eq(req.getCouponName() != null, OrderDetail::getCouponPrice, req.getCouponName())
                 .in(CollectionUtils.isNotEmpty(itemIds), OrderDetail::getItemId, itemIds)
                 .in(CollectionUtils.isNotEmpty(orderIds), OrderDetail::getOrderId, orderIds)
                 .ge(req.getStartTime() != null, OrderDetail::getCreateTime, req.getStartTime())
