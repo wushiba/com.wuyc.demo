@@ -19,6 +19,9 @@ public class QueryOrderReq implements Serializable {
     private String actCode;
     private String traceNo;
     private Integer categoryId;
+    private String receiverName;
+    private String receiverMobile;
+    private Double couponName;
     private Date startTime;
     private Date endTime;
     private Integer pageIndex = 1;

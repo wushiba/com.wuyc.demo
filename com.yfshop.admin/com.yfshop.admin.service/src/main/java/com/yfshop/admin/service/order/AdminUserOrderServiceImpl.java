@@ -176,14 +176,22 @@ public class AdminUserOrderServiceImpl implements AdminUserOrderService {
     @Override
     public IPage<OrderResult> list(QueryOrderReq req) throws ApiException {
         List<Integer> itemIds = new ArrayList<>();
+        List<Long> orderIds = new ArrayList<>();
         DrawRecord drawRecord = null;
         if (req.getCategoryId() != null) {
             itemIds = itemMapper.selectList(Wrappers.lambdaQuery(Item.class).eq(Item::getCategoryId, req.getCategoryId())).stream().map(Item::getId).collect(Collectors.toList());
         }
-        if (StringUtils.isNotBlank(req.getTraceNo())) {
-            drawRecord = drawRecordMapper.selectOne(Wrappers.lambdaQuery(DrawRecord.class).eq(DrawRecord::getTraceNo, req.getTraceNo()));
-        } else if (StringUtils.isNotBlank(req.getTraceNo())) {
-            drawRecord = drawRecordMapper.selectOne(Wrappers.lambdaQuery(DrawRecord.class).eq(DrawRecord::getActCode, req.getActCode()));
+        if (StringUtils.isNotBlank(req.getActCode())||StringUtils.isNotBlank(req.getTraceNo())) {
+            drawRecord = drawRecordMapper.selectOne(Wrappers.lambdaQuery(DrawRecord.class)
+                    .eq(StringUtils.isNotBlank(req.getActCode()),DrawRecord::getActCode, req.getActCode())
+                    .eq(StringUtils.isNotBlank(req.getTraceNo()),DrawRecord::getTraceNo, req.getTraceNo()));
+        }
+        if (StringUtils.isNotBlank(req.getReceiverMobile()) || StringUtils.isNotBlank(req.getReceiverName())) {
+            orderIds=orderAddressMapper.selectList(Wrappers.lambdaQuery(OrderAddress.class)
+                    .like(StringUtils.isNotBlank(req.getReceiverMobile()), OrderAddress::getMobile, req.getReceiverMobile())
+                    .like(StringUtils.isNotBlank(req.getReceiverName()), OrderAddress::getRealname, req.getReceiverName())
+            ).stream().map(OrderAddress::getOrderId).collect(Collectors.toList());
+
         }
         LambdaQueryWrapper<OrderDetail> wrapper = Wrappers.lambdaQuery(OrderDetail.class)
                 .eq(req.getOrderId() != null, OrderDetail::getOrderId, req.getOrderId())
@@ -195,7 +203,9 @@ public class AdminUserOrderServiceImpl implements AdminUserOrderService {
                 .isNull("N".equals(req.getIsUseCoupon()), OrderDetail::getUserCouponId)
                 .like(StringUtils.isNoneBlank(req.getUserName()), OrderDetail::getUserName, req.getUserName())
                 .like(StringUtils.isNoneBlank(req.getItemTitle()), OrderDetail::getItemTitle, req.getItemTitle())
+                .eq(req.getCouponName()!=null,OrderDetail::getCouponPrice,req.getCouponName())
                 .in(CollectionUtils.isNotEmpty(itemIds), OrderDetail::getItemId, itemIds)
+                .in(CollectionUtils.isNotEmpty(orderIds), OrderDetail::getOrderId, orderIds)
                 .ge(req.getStartTime() != null, OrderDetail::getCreateTime, req.getStartTime())
                 .lt(req.getEndTime() != null, OrderDetail::getCreateTime, req.getEndTime())
                 .orderByDesc(OrderDetail::getId);
