@@ -1,14 +1,13 @@
 package com.yfshop.admin.api.coupon.request;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.yfshop.common.validate.annotation.CandidateValue;
 import io.swagger.annotations.ApiModel;
 import lombok.Data;
+
 import javax.validation.constraints.NotBlank;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.Date;
 
 @ApiModel
 @Data

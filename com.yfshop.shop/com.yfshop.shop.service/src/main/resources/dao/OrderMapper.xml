@@ -20,4 +20,10 @@
         where id = #{orderId} and is_pay = 'I'
     </update>
 
+
+    <update id="updateOrderPayBillStatus">
+        update yf_order
+        set is_pay = 'Y',bill_no = #{billNo}, pay_time = now()
+        where id = #{orderId} and is_pay = 'I'
+    </update>
 </mapper>

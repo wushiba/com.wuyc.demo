@@ -1,8 +1,10 @@
 package com.yfshop.admin.api.coupon.result;
 
+import com.yfshop.common.validate.annotation.CandidateValue;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import javax.validation.constraints.NotBlank;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -32,6 +34,15 @@ public class CouponRulesResult implements Serializable {
     private String itemIds;
 
     private Integer limitCount;
+
+    private String couponResource;
+
+    private String couponDesc;
+
+    private String couponRulesItemIds;
+
+    private BigDecimal couponRulesConditions;
+
 
 
 }

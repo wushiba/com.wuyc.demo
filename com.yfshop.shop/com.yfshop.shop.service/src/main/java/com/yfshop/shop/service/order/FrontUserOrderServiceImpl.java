@@ -117,6 +117,12 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
     private ItemSkuMapper skuMapper;
     @Resource
     private ItemMapper itemMapper;
+    @Resource
+    private CouponRulesMapper couponRulesMapper;
+    @Resource
+    private CouponMapper couponMapper;
+    @Resource
+    private DrawRecordMapper drawRecordMapper;
     private final static String drawCanUseRegion = "湖南,湖北,江西,四川,重庆,江苏,浙江,安徽,福建,广东,广西,河南,云南,贵州,山东,陕西,海南,山西,上海";
 
     /**
@@ -605,15 +611,117 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
         orderRequest.setTimeStart(DateFormatUtils.format(new Date(), "yyyyMMddHHmmss"));
         orderRequest.setOutTradeNo(PayPrefixEnum.USER_ORDER.getPrefix() + order.getId() + "-" + order.getPayEntryCount());
         orderRequest.setTimeExpire(DateFormatUtils.format(new Date(System.currentTimeMillis() + (1000 * 60 * 15)), "yyyyMMddHHmmss"));
-        WxPayMpOrderResult payOrderResult = mpPayService.createPayOrder(orderRequest);
-        // 修改订单支付重试次数, 防止唤起支付后不立马支付
-        orderDao.updateOrderPayEntryCount(orderId);
-        Order o = new Order();
-        o.setId(orderId);
-        o.setOutOrderNo(orderRequest.getOutTradeNo());
-        orderMapper.updateById(o);
-        logger.debug("唤起订单{},支付->{}", orderId, order.getPayPrice().toString());
-        return payOrderResult;
+        if ("pro".equalsIgnoreCase(SpringUtil.getActiveProfile())) {
+            WxPayMpOrderResult payOrderResult = mpPayService.createPayOrder(orderRequest);
+            // 修改订单支付重试次数, 防止唤起支付后不立马支付
+            orderDao.updateOrderPayEntryCount(orderId);
+            Order o = new Order();
+            o.setId(orderId);
+            o.setOutOrderNo(orderRequest.getOutTradeNo());
+            orderMapper.updateById(o);
+            logger.debug("唤起订单{},支付->{}", orderId, order.getPayPrice().toString());
+            return payOrderResult;
+        } else {
+            sendTestOrderSuccess(orderId,RandomUtil.randomNumbers(36));
+            return new WxPayMpOrderResult();
+        }
+    }
+
+
+    private void sendTestOrderSuccess(Long orderId,String billNo){
+        logger.info("====进入订单支付成功通知orderId=" + orderId + ",billNo=" + billNo);
+        Asserts.assertNonNull(orderId, 500, "主订单id不可以为空");
+        Order order = orderMapper.selectById(orderId);
+        //Order order = orderDao.selectByIdForUpdate(orderId);
+        Asserts.assertNonNull(order, 500, "订单不存在");
+        Asserts.assertEquals(order.getIsPay(), "I", 500, "订单未处于支付中");
+        String orderStatus = "ZT".equalsIgnoreCase(order.getReceiveWay()) ? UserOrderStatusEnum.SUCCESS.getCode() : UserOrderStatusEnum.WAIT_DELIVERY.getCode();
+        // 修改订单状态，用乐观锁
+        int result = orderDao.updateOrderPayBillStatus(orderId, billNo);
+        if (result <= 0) {
+            Asserts.assertNotEquals(order.getIsPay(), "Y", 500, "订单不可以重复修改状态");
+        }
+        OrderDetail orderDetail = new OrderDetail();
+        orderDetail.setIsPay("Y");
+        orderDetail.setOrderStatus(orderStatus);
+        orderDetailMapper.update(orderDetail, Wrappers.<OrderDetail>lambdaQuery().
+                eq(OrderDetail::getOrderId, orderId));
+
+        List<OrderDetail> orderDetailList = orderDetailMapper.selectList(Wrappers.<OrderDetail>lambdaQuery().
+                eq(OrderDetail::getOrderId, orderId));
+        orderDetailList.forEach(item -> {
+            if (item.getUserCouponId() != null) {
+                UserCoupon userCoupon = new UserCoupon();
+                userCoupon.setId(item.getUserCouponId());
+                userCoupon.setUseStatus(UserCouponStatusEnum.HAS_USE.getCode());
+                userCouponMapper.updateById(userCoupon);
+                DrawRecord drawRecord = new DrawRecord();
+                drawRecord.setUseStatus(UserCouponStatusEnum.HAS_USE.getCode());
+                drawRecordMapper.update(drawRecord, Wrappers.<DrawRecord>lambdaQuery()
+                        .eq(DrawRecord::getUserCouponId, item.getUserCouponId()));
+            }
+        });
+        sendTestUserCoupon(orderId);
+    }
+
+
+    private void sendTestUserCoupon(Long orderId) throws ApiException {
+        List<OrderDetail> orderDetailList = orderDetailMapper.selectList(Wrappers.<OrderDetail>lambdaQuery().
+                eq(OrderDetail::getOrderId, orderId));
+        List<CouponRules> couponRulesResults = new ArrayList<>();
+        if (org.apache.commons.collections4.CollectionUtils.isNotEmpty(orderDetailList)) {
+            Integer userId = orderDetailList.get(0).getUserId();
+            User user = userMapper.selectById(userId);
+            List<CouponRules> couponRulesResultList = couponRulesMapper.selectList(Wrappers.lambdaQuery());
+            for (CouponRules result : couponRulesResultList) {
+                //通用直接获取订单支付总额
+                if ("ALL".equals(result.getItemIds())) {
+                    Order order = orderMapper.selectById(orderId);
+                    if (order.getPayPrice().compareTo(result.getConditions()) >= 0) {
+                        couponRulesResults.add(result);
+                    }
+                } else {
+                    //判断是否支付金额是否满足发券逻辑
+                    BigDecimal bigDecimal = BigDecimal.ZERO;
+                    orderDetailList.forEach(item -> {
+                        if (result.getItemIds().contains(item.getItemId() + ",")) {
+                            bigDecimal.add(item.getPayPrice());
+                        }
+                    });
+                    if (bigDecimal.compareTo(result.getConditions()) >= 0) {
+                        couponRulesResults.add(result);
+                    }
+                }
+            }
+            couponRulesResults.forEach(item -> {
+                Integer count = userCouponMapper.selectCount(Wrappers.lambdaQuery(UserCoupon.class)
+                        .eq(UserCoupon::getUserId, userId)
+                        .eq(UserCoupon::getCouponId, item.getCouponId()));
+                //判断卡券是否上限
+                if (count < item.getLimitCount()) {
+                    Coupon coupon = couponMapper.selectById(item.getCouponId());
+                    UserCoupon userCoupon = new UserCoupon();
+                    userCoupon.setCreateTime(LocalDateTime.now());
+                    userCoupon.setUpdateTime(LocalDateTime.now());
+                    userCoupon.setUserId(userId);
+                    userCoupon.setCouponId(coupon.getId());
+                    userCoupon.setCouponTitle(coupon.getCouponTitle());
+                    userCoupon.setCouponResource(coupon.getCouponResource());
+                    userCoupon.setCouponPrice(coupon.getCouponPrice());
+                    userCoupon.setUseConditionPrice(coupon.getUseConditionPrice());
+                    userCoupon.setUseRangeType(coupon.getUseRangeType());
+                    userCoupon.setCanUseItemIds(coupon.getCanUseItemIds());
+                    userCoupon.setValidStartTime(LocalDateTime.now());
+                    userCoupon.setValidEndTime(coupon.getValidEndTime());
+                    if (user != null) {
+                        userCoupon.setNickname(user.getNickname());
+                    }
+                    userCoupon.setUseStatus(UserCouponStatusEnum.NO_USE.getCode());
+                    userCoupon.setSrcOrderId(orderId);
+                    userCouponMapper.insert(userCoupon);
+                }
+            });
+        }
     }
 
     @Override
