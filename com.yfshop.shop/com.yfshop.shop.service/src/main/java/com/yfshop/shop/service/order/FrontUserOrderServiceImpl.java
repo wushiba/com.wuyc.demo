@@ -623,10 +623,6 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
             logger.debug("唤起订单{},支付->{}", orderId, order.getPayPrice().toString());
             return payOrderResult;
         } else {
-            Map<String, Object> paramMap = new HashMap<>();
-            paramMap.put("orderId", orderId);
-            paramMap.put("billNo", RandomUtil.randomNumbers(36));
-            HttpUtil.post("https://prev-upms.yufanlook.com/admin/order/testOrder", paramMap);
             // 修改订单支付重试次数, 防止唤起支付后不立马支付
             orderDao.updateOrderPayEntryCount(orderId);
             Order o = new Order();
@@ -634,6 +630,10 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
             o.setOutOrderNo(orderRequest.getOutTradeNo());
             orderMapper.updateById(o);
             logger.debug("唤起订单{},支付->{}", orderId, order.getPayPrice().toString());
+            Map<String, Object> paramMap = new HashMap<>();
+            paramMap.put("orderId", orderId);
+            paramMap.put("billNo", RandomUtil.randomNumbers(36));
+            HttpUtil.post("https://prev-upms.yufanlook.com/admin/order/testOrder", paramMap);
             return new WxPayMpOrderResult();
         }
 
