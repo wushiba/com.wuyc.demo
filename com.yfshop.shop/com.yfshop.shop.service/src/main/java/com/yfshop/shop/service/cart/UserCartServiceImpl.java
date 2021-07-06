@@ -267,7 +267,7 @@ public class UserCartServiceImpl implements UserCartService {
         Map<Integer, List<UserCartResult>> childItemList = new HashMap<>();
         Set<Integer> tcCategory = new HashSet<>();
         PostageRules couponPostageRule = null;
-        if (userCoupon != null) {
+        if (userCoupon != null && "draw".equalsIgnoreCase(userCoupon.getCouponResource())) {
             couponPostageRule = postageRulesMapper.selectOne(Wrappers.lambdaQuery(PostageRules.class).eq(PostageRules::getCouponId, userCoupon.getCouponId()));
         }
         for (UserCartResult item : userCartResult) {
@@ -318,6 +318,9 @@ public class UserCartServiceImpl implements UserCartService {
             if (!(category == 3 && !tcCategory.isEmpty())) {
                 for (UserCartResult cartResult : childItem) {
                     pay = pay.add(cartResult.getSkuSalePrice().multiply(new BigDecimal(cartResult.getNum())));
+                }
+                if (category == 3 && userCoupon != null && "SHOP".equalsIgnoreCase(userCoupon.getCouponDesc())) {
+                    pay = pay.subtract(new BigDecimal(userCoupon.getCouponPrice()));
                 }
                 if (pay.compareTo(value.getConditions()) >= 0) {
                     userCartSummary.setTotalFreight(userCartSummary.getTotalFreight().add(value.getIsTrue()));

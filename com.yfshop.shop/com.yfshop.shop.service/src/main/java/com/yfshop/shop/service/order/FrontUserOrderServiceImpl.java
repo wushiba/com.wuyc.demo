@@ -864,7 +864,7 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
         Map<Integer, List<UserCartResult>> childItemList = new HashMap<>();
         Set<Integer> tcCategory = new HashSet<>();
         PostageRules couponPostageRule = null;
-        if (userCoupon != null) {
+        if (userCoupon != null && "draw".equalsIgnoreCase(userCoupon.getCouponResource())) {
             couponPostageRule = postageRulesMapper.selectOne(Wrappers.lambdaQuery(PostageRules.class).eq(PostageRules::getCouponId, userCoupon.getCouponId()));
         }
         for (UserCartResult item : userCartResult) {
@@ -929,6 +929,10 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
                     sum += cartResult.getNum();
                     pay = pay.add(cartResult.getSkuSalePrice().multiply(new BigDecimal(cartResult.getNum())));
                 }
+                if (category == 3 && userCoupon != null && "SHOP".equalsIgnoreCase(userCoupon.getCouponDesc())) {
+                    pay = pay.subtract(new BigDecimal(userCoupon.getCouponPrice()));
+                }
+
                 if (pay.compareTo(value.getConditions()) >= 0) {
                     freight = value.getIsTrue().divide(new BigDecimal(sum), 2, RoundingMode.HALF_UP);
                     userCartSummary.setTotalFreight(userCartSummary.getTotalFreight().add(value.getIsTrue()));
@@ -955,6 +959,19 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
                 }
             }
         });
+
+        if (userCoupon != null && "SHOP".equalsIgnoreCase(userCoupon.getCouponDesc())) {
+            List<UserCartResult> hotItems = allCardList.stream().filter(item -> item.getCategoryId() == 3).collect(Collectors.toList());
+            Integer sum = hotItems.stream().mapToInt(UserCartResult::getNum).sum();
+            if (!CollectionUtil.isEmpty(hotItems)) {
+                BigDecimal couponPrice = new BigDecimal(userCoupon.getCouponPrice()).divide(new BigDecimal(sum), 2, RoundingMode.HALF_UP);
+                for (UserCartResult item : hotItems) {
+                    item.setUserCouponId(userCoupon.getId());
+                    item.setCouponPrice(couponPrice.multiply(new BigDecimal(item.getNum())));
+                    item.setPayPrice(item.getPayPrice().subtract(item.getCouponPrice()));
+                }
+            }
+        }
         userCartSummary.setPayMoney(userCartSummary.getPayMoney().add(userCartSummary.getTotalFreight()));
         userCartSummary.setCarts(allCardList);
         logger.debug("结算后商品->{},优惠券使用->{}", allCardList.toString(), userCoupon != null ? userCoupon.toString() : "");
