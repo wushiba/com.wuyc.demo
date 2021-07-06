@@ -319,7 +319,7 @@ public class UserCartServiceImpl implements UserCartService {
                 for (UserCartResult cartResult : childItem) {
                     pay = pay.add(cartResult.getSkuSalePrice().multiply(new BigDecimal(cartResult.getNum())));
                 }
-                if (category == 3 && userCoupon != null && "SHOP".equalsIgnoreCase(userCoupon.getCouponDesc())) {
+                if (category == 3 && userCoupon != null && "SHOP".equalsIgnoreCase(userCoupon.getCouponResource())) {
                     pay = pay.subtract(new BigDecimal(userCoupon.getCouponPrice()));
                 }
                 if (pay.compareTo(value.getConditions()) >= 0) {

@@ -960,7 +960,7 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
             }
         });
 
-        if (userCoupon != null && "SHOP".equalsIgnoreCase(userCoupon.getCouponDesc())) {
+        if (userCoupon != null && "SHOP".equalsIgnoreCase(userCoupon.getCouponResource())) {
             List<UserCartResult> hotItems = allCardList.stream().filter(item -> item.getCategoryId() == 3).collect(Collectors.toList());
             Integer sum = hotItems.stream().mapToInt(UserCartResult::getNum).sum();
             if (!CollectionUtil.isEmpty(hotItems)) {
