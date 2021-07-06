@@ -180,9 +180,9 @@ public class FrontUserCouponServiceImpl implements FrontUserCouponService {
             ItemSku sku = skuIndexMap.get(u.getSkuId());
             if (sku != null && sku.getCategoryId() == 3) {
                 if ("TC".equals(sku.getSkuType())) {
+                    pay = pay.add(sku.getSkuSalePrice().multiply(new BigDecimal(u.getNum())));
                     isTc = true;
                 }
-                pay = pay.add(sku.getSkuSalePrice().multiply(new BigDecimal(u.getNum())));
             }
             if (!isTc) {
                 PostageRules postageRules = postageRulesMapper.selectById(4);
