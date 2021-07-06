@@ -3,6 +3,7 @@ package com.yfshop.shop.service.order.service;
 import com.github.binarywang.wxpay.bean.order.WxPayMpOrderResult;
 import com.github.binarywang.wxpay.exception.WxPayException;
 import com.yfshop.common.exception.ApiException;
+import com.yfshop.shop.service.coupon.result.YfUserCouponResult;
 import com.yfshop.shop.service.order.result.YfUserOrderDetailResult;
 import com.yfshop.shop.service.order.result.YfUserOrderListResult;
 
@@ -131,4 +132,6 @@ public interface FrontUserOrderService {
      * @throws ApiException
      */
     Void userOrderCancelPay(Long orderId) throws ApiException;
+
+    YfUserCouponResult getOrderCoupon(Integer userId,Long orderId);
 }

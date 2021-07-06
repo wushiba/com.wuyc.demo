@@ -118,7 +118,7 @@ public class FrontUserCouponServiceImpl implements FrontUserCouponService {
         Asserts.assertNonNull(userCouponReq.getUserId(), 500, "用户id不可以为空");
 
         LambdaQueryWrapper<UserCoupon> queryWrapper = Wrappers.lambdaQuery(UserCoupon.class)
-                .eq(UserCoupon::getUserId, userCouponReq.getUserId());
+                .eq(UserCoupon::getUserId, userCouponReq.getUserId()).ne(UserCoupon::getCouponResource,"JD");
 
         if ("Y".equalsIgnoreCase(userCouponReq.getIsCanUse())) {
             queryWrapper.eq(UserCoupon::getUseStatus, UserCouponStatusEnum.NO_USE.getCode())
@@ -156,7 +156,7 @@ public class FrontUserCouponServiceImpl implements FrontUserCouponService {
     @Override
     public List<YfUserCouponResult> getUserCouponAll(QueryUserCouponReq userCouponReq) throws ApiException {
         LambdaQueryWrapper<UserCoupon> queryWrapper = Wrappers.lambdaQuery(UserCoupon.class)
-                .eq(UserCoupon::getUserId, userCouponReq.getUserId()).orderByDesc(UserCoupon::getCouponDesc);
+                .eq(UserCoupon::getUserId, userCouponReq.getUserId()).ne(UserCoupon::getCouponResource, "JD").orderByDesc(UserCoupon::getCouponDesc);
         List<UserCoupon> dataList = userCouponMapper.selectList(queryWrapper);
         List<YfUserCouponResult> resultList = BeanUtil.convertList(dataList, YfUserCouponResult.class);
         resultList.forEach(item -> {
@@ -186,6 +186,7 @@ public class FrontUserCouponServiceImpl implements FrontUserCouponService {
 
         LambdaQueryWrapper<UserCoupon> queryWrapper = Wrappers.lambdaQuery(UserCoupon.class)
                 .eq(UserCoupon::getCouponResource, userCouponReq.getCouponResource())
+                .ne(UserCoupon::getCouponResource, "JD")
                 .orderByDesc(UserCoupon::getId);
         Page<UserCoupon> userCouponPage = userCouponMapper.selectPage(new Page<>(1, 10), queryWrapper);
         List<YfUserCouponResult> resultList = BeanUtil.convertList(userCouponPage.getRecords(), YfUserCouponResult.class);
@@ -297,7 +298,7 @@ public class FrontUserCouponServiceImpl implements FrontUserCouponService {
     @Override
     public String getCouponRouteUrl(Long id) {
         UserCoupon userCoupon = userCouponMapper.selectById(id);
-         if (userCoupon != null&&UserCouponStatusEnum.NO_USE.getCode().equals(userCoupon.getUseStatus())) {
+        if (userCoupon != null && UserCouponStatusEnum.NO_USE.getCode().equals(userCoupon.getUseStatus())) {
             String url = "";
             switch (userCoupon.getDrawPrizeLevel()) {
                 case 1:

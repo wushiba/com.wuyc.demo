@@ -1,5 +1,7 @@
 package com.yfshop.admin.service.coupon;
 
+import java.math.BigDecimal;
+
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -13,10 +15,7 @@ import com.yfshop.code.mapper.CouponMapper;
 import com.yfshop.code.mapper.CouponRulesMapper;
 import com.yfshop.code.mapper.ItemMapper;
 import com.yfshop.code.mapper.UserCouponMapper;
-import com.yfshop.code.model.Coupon;
-import com.yfshop.code.model.Item;
-import com.yfshop.code.model.RlItemHotpot;
-import com.yfshop.code.model.UserCoupon;
+import com.yfshop.code.model.*;
 import com.yfshop.common.constants.CacheConstants;
 import com.yfshop.common.enums.UserCouponStatusEnum;
 import com.yfshop.common.exception.ApiException;
@@ -26,6 +25,7 @@ import com.yfshop.common.util.DateUtil;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.apache.dubbo.config.annotation.Service;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
@@ -89,49 +89,72 @@ public class YfCouponServiceImpl implements AdminCouponService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void insertYfCoupon(CreateCouponReq couponReq) throws ApiException {
         checkCouponParams(couponReq);
         Coupon coupon = BeanUtil.convert(couponReq, Coupon.class);
         coupon.setCreateTime(LocalDateTime.now());
-
-//        if ("DATE_RANGE".equalsIgnoreCase(couponReq.getValidType())) {
-//            coupon.setValidStartTime(DateUtil.dateToLocalDateTime(couponReq.getValidStartTime()));
-//            coupon.setValidEndTime(DateUtil.dateToLocalDateTime(couponReq.getValidEndTime()));
-//        }
         coupon.setIsDelete("N");
         coupon.setIsEnable("N");
         couponMapper.insert(coupon);
+        CouponRules couponRules = new CouponRules();
+        couponRules.setCreateTime(LocalDateTime.now());
+        couponRules.setUpdateTime(LocalDateTime.now());
+        couponRules.setCouponId(coupon.getId());
+        couponRules.setConditions(couponReq.getCouponRulesConditions());
+        couponRules.setItemIds(couponReq.getCouponRulesItemIds());
+        couponRules.setIsEnable("N");
+        couponRules.setLimitCount(couponReq.getLimitAmount());
+        couponRules.setCouponId(coupon.getId());
+        couponRulesMapper.delete(Wrappers.lambdaQuery(CouponRules.class).eq(CouponRules::getCouponId, coupon.getId()));
+        couponRulesMapper.insert(couponRules);
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void updateYfCoupon(CreateCouponReq couponReq) throws ApiException {
         checkCouponParams(couponReq);
         Coupon coupon = BeanUtil.convert(couponReq, Coupon.class);
         couponMapper.updateById(coupon);
+        CouponRules couponRules = new CouponRules();
+        couponRules.setCouponId(coupon.getId());
+        couponRules.setConditions(couponReq.getCouponRulesConditions());
+        couponRules.setItemIds(couponReq.getCouponRulesItemIds());
+        couponRules.setLimitCount(couponReq.getLimitAmount());
+        couponRules.setCouponId(coupon.getId());
+        couponRulesMapper.update(couponRules, Wrappers.lambdaQuery(CouponRules.class).eq(CouponRules::getCouponId, coupon.getId()));
+
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void deleteYfCoupon(Integer couponId) throws ApiException {
         Coupon coupon = couponMapper.selectById(couponId);
         Asserts.assertNonNull(coupon, 500, "优惠券不存在");
         couponMapper.deleteById(couponId);
+        couponRulesMapper.delete(Wrappers.lambdaQuery(CouponRules.class).eq(CouponRules::getCouponId, coupon.getId()));
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void updateCouponStatus(Integer couponId, String isEnable) throws ApiException {
         Coupon coupon = couponMapper.selectById(couponId);
         Asserts.assertNonNull(coupon, 500, "优惠券不存在");
         coupon.setIsEnable(isEnable);
         couponMapper.updateById(coupon);
+        CouponRules couponRules = new CouponRules();
+        couponRules.setIsEnable(coupon.getIsEnable());
+        couponRulesMapper.update(couponRules, Wrappers.lambdaQuery(CouponRules.class).eq(CouponRules::getCouponId, coupon.getId()));
     }
+
 
     @Cacheable(cacheManager = CacheConstants.CACHE_MANAGE_NAME,
             cacheNames = CacheConstants.MALL_COUPON_RULES_NAME,
             key = "'" + CacheConstants.MALL_COUPON_RULES_KEY_PREFIX + "'")
     @Override
     public List<CouponRulesResult> getCouponRulesList() {
-
-        return null;
+        List<CouponRules> couponRulesList = couponRulesMapper.selectList(Wrappers.lambdaQuery(CouponRules.class).eq(CouponRules::getIsEnable, "Y"));
+        return BeanUtil.convertList(couponRulesList, CouponRulesResult.class);
     }
 
     public void checkCouponParams(CreateCouponReq couponReq) {

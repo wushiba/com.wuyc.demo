@@ -12,11 +12,12 @@
         <result column="jump_url" property="jumpUrl" />
         <result column="conditions" property="conditions" />
         <result column="item_ids" property="itemIds" />
+        <result column="is_enable" property="isEnable" />
     </resultMap>
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        id, create_time, update_time, coupon_id, coupon_type, jump_url, conditions, item_ids
+        id, create_time, update_time, coupon_id, coupon_type, jump_url, conditions, item_ids, is_enable
     </sql>
 
 </mapper>

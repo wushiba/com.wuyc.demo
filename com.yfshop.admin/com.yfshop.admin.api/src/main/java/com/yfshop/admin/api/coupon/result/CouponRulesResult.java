@@ -20,12 +20,6 @@ public class CouponRulesResult implements Serializable {
 
     private Integer couponId;
 
-    /**
-     * ZY 自营 、QT 其他
-     */
-    private String couponType;
-
-    private String jumpUrl;
 
     /**
      * 满足金额触发
@@ -36,6 +30,8 @@ public class CouponRulesResult implements Serializable {
      * ALL 全场，指定商品
      */
     private String itemIds;
+
+    private Integer limitCount;
 
 
 }

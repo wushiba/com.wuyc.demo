@@ -1,12 +1,15 @@
 package com.yfshop.code.model;
 
 import java.math.BigDecimal;
+
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.extension.activerecord.Model;
 import com.baomidou.mybatisplus.annotation.TableId;
+
 import java.time.LocalDateTime;
 import java.io.Serializable;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -50,15 +53,21 @@ public class UserCoupon extends Model<UserCoupon> {
      */
     private String couponResource;
 
-    /** 用户扫码抽奖的码，yf_act_code_batch_detail表的actCode */
+    /**
+     * 用户扫码抽奖的码，yf_act_code_batch_detail表的actCode
+     */
     private String actCode;
 
     private Integer drawPrizeLevel;
 
-    /** 抽奖活动id */
+    /**
+     * 抽奖活动id
+     */
     private Integer drawActivityId;
 
-    /** 抽奖奖品图标 */
+    /**
+     * 抽奖奖品图标
+     */
     private String drawPrizeIcon;
 
     /**
@@ -112,6 +121,7 @@ public class UserCoupon extends Model<UserCoupon> {
      */
     private Long orderId;
 
+    private Long srcOrderId;
 
     @Override
     protected Serializable pkVal() {

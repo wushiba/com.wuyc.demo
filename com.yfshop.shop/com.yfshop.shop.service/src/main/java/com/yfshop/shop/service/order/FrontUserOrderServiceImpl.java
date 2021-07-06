@@ -31,6 +31,7 @@ import com.yfshop.shop.service.cart.UserCartService;
 import com.yfshop.shop.service.cart.result.UserCartResult;
 import com.yfshop.shop.service.cart.result.UserCartSummary;
 import com.yfshop.shop.service.coupon.FrontUserCouponServiceImpl;
+import com.yfshop.shop.service.coupon.result.YfUserCouponResult;
 import com.yfshop.shop.service.coupon.service.FrontUserCouponService;
 import com.yfshop.shop.service.mall.MallService;
 import com.yfshop.shop.service.mall.req.QueryItemDetailReq;
@@ -325,7 +326,7 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
         BigDecimal couponPrice = BigDecimal.ZERO;
         if (userCouponId != null) {
             userCoupon = userCouponMapper.selectById(userCouponId);
-            this.checkUserCoupon(userId,userCoupon, itemSku.getItemId());
+            this.checkUserCoupon(userId, userCoupon, itemSku.getItemId());
             couponPrice = couponPrice.add(new BigDecimal(userCoupon.getCouponPrice()));
         }
 
@@ -403,7 +404,7 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
         BigDecimal couponPrice = BigDecimal.ZERO;
         if (userCouponId != null) {
             userCoupon = userCouponMapper.selectById(userCouponId);
-            this.checkUserCoupon(userId,userCoupon, userCartList.get(0).getItemId());
+            this.checkUserCoupon(userId, userCoupon, userCartList.get(0).getItemId());
             couponPrice = couponPrice.add(new BigDecimal(userCoupon.getCouponPrice()));
         }
         List<UserCartResult> resultList = BeanUtil.convertList(userCartList, UserCartResult.class);
@@ -491,7 +492,7 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
         for (Long userCouponId : userCouponIdList) {
             List<UserCoupon> dataList = userCouponMap.get(userCouponId);
             Asserts.assertCollectionNotEmpty(dataList, 500, "用户优惠券不存在");
-            this.checkUserCoupon(userId,dataList.get(0), itemIdList.get(0));
+            this.checkUserCoupon(userId, dataList.get(0), itemIdList.get(0));
         }
 
         // 校验抽奖活动,当前有且仅有一个活动进行中
@@ -813,9 +814,9 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
      * @param userCoupon
      * @throws ApiException
      */
-    private void checkUserCoupon(Integer userId,UserCoupon userCoupon, Integer itemId) throws ApiException {
+    private void checkUserCoupon(Integer userId, UserCoupon userCoupon, Integer itemId) throws ApiException {
         Asserts.assertNonNull(userCoupon, 500, "用户优惠券不存在");
-        Asserts.assertTrue(userCoupon.getUserId().equals(userId),500,"优惠券不合法");
+        Asserts.assertTrue(userCoupon.getUserId().equals(userId), 500, "优惠券不合法");
         Asserts.assertFalse(userCoupon.getValidEndTime().isBefore(LocalDateTime.now()), 500, "优惠券已过期");
         Asserts.assertEquals(userCoupon.getUseStatus(), UserCouponStatusEnum.NO_USE.getCode(), 500, "优惠券状态不正确");
         Asserts.assertTrue("ALL".equalsIgnoreCase(userCoupon.getUseRangeType()) ||
@@ -936,6 +937,20 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
         return userCartSummary;
     }
 
+
+    @Override
+    public YfUserCouponResult getOrderCoupon(Integer userId, Long orderId) {
+        YfUserCouponResult yfUserCouponResult = new YfUserCouponResult();
+        yfUserCouponResult.setIsEnable("N");
+        UserCoupon userCoupon = userCouponMapper.selectOne(Wrappers.lambdaQuery(UserCoupon.class)
+                .eq(UserCoupon::getUserId, userId)
+                .eq(UserCoupon::getSrcOrderId, orderId));
+        if (userCoupon != null) {
+            BeanUtil.convert(userCoupon, YfUserCouponResult.class);
+            yfUserCouponResult.setIsEnable("Y");
+        }
+        return yfUserCouponResult;
+    }
 
     public void addBugRecord(Integer itemId, int count) {
         try {

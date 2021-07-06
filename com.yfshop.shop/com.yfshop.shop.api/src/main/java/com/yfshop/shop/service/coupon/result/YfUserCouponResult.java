@@ -147,4 +147,7 @@ public class YfUserCouponResult implements Serializable {
     private Long orderDetailId;
 
 
+    private String isEnable;
+
+
 }

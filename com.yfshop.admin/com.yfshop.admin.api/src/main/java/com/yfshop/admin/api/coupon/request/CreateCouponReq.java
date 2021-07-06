@@ -59,9 +59,15 @@ public class CreateCouponReq implements Serializable {
     private String canUseItemIds;
 
     @NotBlank(message = "领取场景不能为空")
-    @CandidateValue(candidateValue = {"DRAW", "SHOP"}, message = "领取场景标识不正确")
+    @CandidateValue(candidateValue = {"DRAW", "SHOP","JD"}, message = "领取场景标识不正确")
     private String couponResource;
 
     @NotBlank(message = "优惠券描述不能为空")
     private String couponDesc;
+
+    private String couponRulesItemIds;
+
+    private BigDecimal couponRulesConditions;
+
+
 }

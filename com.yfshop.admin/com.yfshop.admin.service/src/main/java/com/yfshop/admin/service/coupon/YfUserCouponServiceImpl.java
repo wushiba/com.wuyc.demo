@@ -1,20 +1,29 @@
 package com.yfshop.admin.service.coupon;
 
+import java.time.LocalDateTime;
+
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.yfshop.admin.api.coupon.request.QueryUserCouponReq;
+import com.yfshop.admin.api.coupon.result.CouponRulesResult;
 import com.yfshop.admin.api.coupon.result.YfUserCouponResult;
+import com.yfshop.admin.api.coupon.service.AdminCouponService;
 import com.yfshop.admin.api.coupon.service.AdminUserCouponService;
-import com.yfshop.code.mapper.UserCouponMapper;
-import com.yfshop.code.model.UserCoupon;
+import com.yfshop.code.mapper.*;
+import com.yfshop.code.model.*;
+import com.yfshop.common.enums.UserCouponStatusEnum;
 import com.yfshop.common.exception.ApiException;
 import com.yfshop.common.util.BeanUtil;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.apache.dubbo.config.annotation.Service;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -29,6 +38,16 @@ public class YfUserCouponServiceImpl implements AdminUserCouponService {
 
     @Resource
     private UserCouponMapper userCouponMapper;
+    @Resource
+    private CouponMapper couponMapper;
+    @Autowired
+    private AdminCouponService adminCouponService;
+    @Resource
+    private OrderDetailMapper orderDetailMapper;
+    @Resource
+    private OrderMapper orderMapper;
+    @Resource
+    private UserMapper userMapper;
 
     @Override
     public YfUserCouponResult getYfUserCouponById(Integer id) throws ApiException {
@@ -67,10 +86,71 @@ public class YfUserCouponServiceImpl implements AdminUserCouponService {
         return BeanUtil.convertList(dataList, YfUserCouponResult.class);
     }
 
+    /**
+     * 支付成功后调用发券逻辑
+     *
+     * @param orderId
+     * @throws ApiException
+     */
     @Override
     @Async
     public void sendUserCoupon(Long orderId) throws ApiException {
-
+        List<OrderDetail> orderDetailList = orderDetailMapper.selectList(Wrappers.<OrderDetail>lambdaQuery().
+                eq(OrderDetail::getOrderId, orderId));
+        List<CouponRulesResult> couponRulesResults = new ArrayList<>();
+        if (CollectionUtils.isNotEmpty(orderDetailList)) {
+            Integer userId = orderDetailList.get(0).getUserId();
+            User user = userMapper.selectById(userId);
+            List<CouponRulesResult> couponRulesResultList = adminCouponService.getCouponRulesList();
+            for (CouponRulesResult result : couponRulesResultList) {
+                //通用直接获取订单支付总额
+                if ("ALL".equals(result.getItemIds())) {
+                    Order order = orderMapper.selectById(orderId);
+                    if (order.getPayPrice().compareTo(result.getConditions()) >= 0) {
+                        couponRulesResults.add(result);
+                    }
+                } else {
+                    //判断是否支付金额是否满足发券逻辑
+                    BigDecimal bigDecimal = BigDecimal.ZERO;
+                    orderDetailList.forEach(item -> {
+                        if (result.getItemIds().contains(item.getItemId() + ",")) {
+                            bigDecimal.add(item.getPayPrice());
+                        }
+                    });
+                    if (bigDecimal.compareTo(result.getConditions()) >= 0) {
+                        couponRulesResults.add(result);
+                    }
+                }
+            }
+            couponRulesResults.forEach(item -> {
+                Integer count = userCouponMapper.selectCount(Wrappers.lambdaQuery(UserCoupon.class)
+                        .eq(UserCoupon::getUserId, userId)
+                        .eq(UserCoupon::getCouponId, item.getCouponId()));
+                //判断卡券是否上限
+                if (count < item.getLimitCount()) {
+                    Coupon coupon = couponMapper.selectById(item.getCouponId());
+                    UserCoupon userCoupon = new UserCoupon();
+                    userCoupon.setCreateTime(LocalDateTime.now());
+                    userCoupon.setUpdateTime(LocalDateTime.now());
+                    userCoupon.setUserId(userId);
+                    userCoupon.setCouponId(coupon.getId());
+                    userCoupon.setCouponTitle(coupon.getCouponTitle());
+                    userCoupon.setCouponResource(coupon.getCouponResource());
+                    userCoupon.setCouponPrice(coupon.getCouponPrice());
+                    userCoupon.setUseConditionPrice(coupon.getUseConditionPrice());
+                    userCoupon.setUseRangeType(coupon.getUseRangeType());
+                    userCoupon.setCanUseItemIds(coupon.getCanUseItemIds());
+                    userCoupon.setValidStartTime(LocalDateTime.now());
+                    userCoupon.setValidEndTime(coupon.getValidEndTime());
+                    if (user != null) {
+                        userCoupon.setNickname(user.getNickname());
+                    }
+                    userCoupon.setUseStatus(UserCouponStatusEnum.NO_USE.getCode());
+                    userCoupon.setSrcOrderId(orderId);
+                    userCouponMapper.insert(userCoupon);
+                }
+            });
+        }
     }
 
 

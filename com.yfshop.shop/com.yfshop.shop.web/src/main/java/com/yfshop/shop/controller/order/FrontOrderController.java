@@ -253,4 +253,12 @@ public class FrontOrderController implements BaseController {
     }
 
 
+    @RequestMapping(value = "/order/coupon", method = {RequestMethod.GET, RequestMethod.POST})
+    @ResponseBody
+    @SaCheckLogin
+    public CommonResult<YfUserCouponResult> getOrderCoupon(Long orderId) {
+        return CommonResult.success(frontUserOrderService.getOrderCoupon(getCurrentUserId(),orderId));
+    }
+
+
 }
