@@ -1,5 +1,6 @@
 package com.yfshop.shop.service.order;
 
+import cn.hutool.Hutool;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.RandomUtil;
@@ -411,7 +412,7 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
         BigDecimal couponPrice = BigDecimal.ZERO;
         if (userCouponId != null) {
             userCoupon = userCouponMapper.selectById(userCouponId);
-            this.checkUserCoupon(userId, userCoupon, userCartList.get(0).getItemId());
+            this.checkUserCouponAnyMatch(userId, userCoupon, userCartList.stream().map(UserCart::getItemId).map(String::valueOf).collect(Collectors.toList()));
             couponPrice = couponPrice.add(new BigDecimal(userCoupon.getCouponPrice()));
         }
         List<UserCartResult> resultList = BeanUtil.convertList(userCartList, UserCartResult.class);
@@ -847,6 +848,16 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
                 userCoupon.getCanUseItemIds().contains(itemId + ""), 500, "请使用正确的优惠券");
     }
 
+
+    private void checkUserCouponAnyMatch(Integer userId, UserCoupon userCoupon, List<String> itemIds) throws ApiException {
+        Asserts.assertNonNull(userCoupon, 500, "用户优惠券不存在");
+        Asserts.assertTrue(userCoupon.getUserId().equals(userId), 500, "优惠券不合法");
+        Asserts.assertFalse(userCoupon.getValidEndTime().isBefore(LocalDateTime.now()), 500, "优惠券已过期");
+        Asserts.assertEquals(userCoupon.getUseStatus(), UserCouponStatusEnum.NO_USE.getCode(), 500, "优惠券状态不正确");
+        Collection<String> intersection = CollectionUtil.intersection(itemIds, Arrays.stream(userCoupon.getCanUseItemIds().split(",")).collect(Collectors.toList()));
+        Asserts.assertTrue("ALL".equalsIgnoreCase(userCoupon.getUseRangeType()) || CollectionUtil.isNotEmpty(intersection), 500, "请使用正确的优惠券");
+    }
+
     private void checkPrizeAddress(Integer skuId, String provinceName) throws ApiException {
         if (skuId.equals(2030001) || skuId.equals(2032001)) {
             if (!drawCanUseRegion.contains(provinceName.substring(0, 2))) {
@@ -967,7 +978,7 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
         });
 
         if (userCoupon != null && "SHOP".equalsIgnoreCase(userCoupon.getCouponResource())) {
-            List<UserCartResult> hotItems = allCardList.stream().filter(item -> item.getCategoryId() == 3&&"DP".equalsIgnoreCase(item.getSkuType())).collect(Collectors.toList());
+            List<UserCartResult> hotItems = allCardList.stream().filter(item -> item.getCategoryId() == 3 && "DP".equalsIgnoreCase(item.getSkuType())).collect(Collectors.toList());
             Integer sum = hotItems.stream().mapToInt(UserCartResult::getNum).sum();
             if (!CollectionUtil.isEmpty(hotItems)) {
                 BigDecimal couponPrice = new BigDecimal(userCoupon.getCouponPrice()).divide(new BigDecimal(sum), 2, RoundingMode.HALF_UP);
