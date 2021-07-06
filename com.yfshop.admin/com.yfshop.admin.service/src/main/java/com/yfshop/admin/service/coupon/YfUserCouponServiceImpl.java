@@ -132,11 +132,14 @@ public class YfUserCouponServiceImpl implements AdminUserCouponService {
                 couponRulesResults.add(value);
             });
             couponRulesResults.forEach(item -> {
-                Integer count = userCouponMapper.selectCount(Wrappers.lambdaQuery(UserCoupon.class)
-                        .eq(UserCoupon::getUserId, userId)
-                        .eq(UserCoupon::getCouponId, item.getCouponId()));
+                Integer count = 0;
+                if (item.getLimitCount() > 0) {
+                    count = userCouponMapper.selectCount(Wrappers.lambdaQuery(UserCoupon.class)
+                            .eq(UserCoupon::getUserId, userId)
+                            .eq(UserCoupon::getCouponId, item.getCouponId()));
+                }
                 //判断卡券是否上限
-                if (count < item.getLimitCount()) {
+                if (count == 0 || count < item.getLimitCount()) {
                     Coupon coupon = couponMapper.selectById(item.getCouponId());
                     UserCoupon userCoupon = new UserCoupon();
                     userCoupon.setCreateTime(LocalDateTime.now());
