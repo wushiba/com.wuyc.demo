@@ -2,6 +2,7 @@ package com.yfshop.admin.service.order;
 
 import java.math.BigDecimal;
 
+import cn.hutool.extra.spring.SpringUtil;
 import com.github.binarywang.wxpay.bean.request.WxPayRefundRequest;
 import com.google.common.collect.Lists;
 
@@ -132,7 +133,7 @@ public class AdminUserOrderServiceImpl implements AdminUserOrderService {
                         .eq(DrawRecord::getUserCouponId, item.getUserCouponId()));
                 //二等奖优惠券申通无忧下单
                 logger.info("商品sku={},发货方式={}", item.getSkuId(), item.getReceiveWay());
-                if (item.getSkuId().equals(2032001) && ReceiveWayEnum.PS.getCode().equals(item.getReceiveWay())) {
+                if ("pro".equalsIgnoreCase(SpringUtil.getActiveProfile()) && item.getSkuId().equals(2032001) && ReceiveWayEnum.PS.getCode().equals(item.getReceiveWay())) {
                     logger.info("====通知申通下单发货=====" + item.getId());
                     stOrderService.pushStOrder(item.getOrderId(), item.getId());
                 }

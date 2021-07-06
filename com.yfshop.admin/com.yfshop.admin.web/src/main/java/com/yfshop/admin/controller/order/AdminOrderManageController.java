@@ -5,6 +5,7 @@ import cn.afterturn.easypoi.excel.entity.ExportParams;
 import cn.dev33.satoken.annotation.SaCheckLogin;
 import cn.dev33.satoken.annotation.SaCheckRole;
 import cn.hutool.core.io.IoUtil;
+import cn.hutool.extra.spring.SpringUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.github.binarywang.wxpay.exception.WxPayException;
 import com.yfshop.admin.api.draw.request.QueryDrawRecordExportReq;
@@ -95,7 +96,7 @@ public class AdminOrderManageController implements BaseController {
     }
 
     @SneakyThrows
-    @RequestMapping(value = "/export", method = {RequestMethod.POST,RequestMethod.GET})
+    @RequestMapping(value = "/export", method = {RequestMethod.POST, RequestMethod.GET})
     @ResponseBody
     @SaCheckLogin
     @SaCheckRole(value = "sys")
@@ -115,6 +116,17 @@ public class AdminOrderManageController implements BaseController {
             writer.close();
         }
         return null;
+    }
+
+
+    @RequestMapping(value = "/testOrder", method = {RequestMethod.POST})
+    @ResponseBody
+    public CommonResult<Void> testOrder(Long orderId, String billNo) {
+        if ("pro".equalsIgnoreCase(SpringUtil.getActiveProfile())) {
+            return CommonResult.failed("非法接口调用");
+        } else {
+            return CommonResult.success(adminUserOrderService.updateOrderPayStatus(orderId, billNo));
+        }
     }
 
 }
