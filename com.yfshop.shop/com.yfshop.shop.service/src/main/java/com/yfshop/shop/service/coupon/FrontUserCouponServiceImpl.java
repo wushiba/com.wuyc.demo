@@ -40,6 +40,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -118,7 +119,7 @@ public class FrontUserCouponServiceImpl implements FrontUserCouponService {
         Asserts.assertNonNull(userCouponReq.getUserId(), 500, "用户id不可以为空");
 
         LambdaQueryWrapper<UserCoupon> queryWrapper = Wrappers.lambdaQuery(UserCoupon.class)
-                .eq(UserCoupon::getUserId, userCouponReq.getUserId()).ne(UserCoupon::getCouponResource,"JD");
+                .eq(UserCoupon::getUserId, userCouponReq.getUserId()).ne(UserCoupon::getCouponResource, "JD");
 
         if ("Y".equalsIgnoreCase(userCouponReq.getIsCanUse())) {
             queryWrapper.eq(UserCoupon::getUseStatus, UserCouponStatusEnum.NO_USE.getCode())
@@ -146,6 +147,10 @@ public class FrontUserCouponServiceImpl implements FrontUserCouponService {
         List<YfUserCouponResult> resultList = BeanUtil.convertList(dataList, YfUserCouponResult.class);
 
         if (userCouponReq.getItemId() == null) {
+            if (StringUtils.isNotBlank(userCouponReq.getPayMoney())) {
+                BigDecimal pay = new BigDecimal(userCouponReq.getPayMoney());
+                return resultList.stream().filter(data -> pay.compareTo(data.getUseConditionPrice()) >= 0).collect(Collectors.toList());
+            }
             return resultList;
         }
         return resultList.stream().filter(data -> "ALL".equalsIgnoreCase(data.getUseRangeType()) ||
