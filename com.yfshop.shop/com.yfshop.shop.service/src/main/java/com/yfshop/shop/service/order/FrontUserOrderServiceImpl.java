@@ -929,7 +929,7 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
                     sum += cartResult.getNum();
                     pay = pay.add(cartResult.getSkuSalePrice().multiply(new BigDecimal(cartResult.getNum())));
                 }
-                if (category == 3 && userCoupon != null && "SHOP".equalsIgnoreCase(userCoupon.getCouponDesc())) {
+                if (category == 3 && userCoupon != null && "SHOP".equalsIgnoreCase(userCoupon.getCouponResource())) {
                     BigDecimal couponPrice = new BigDecimal(userCoupon.getCouponPrice());
                     pay = pay.subtract(couponPrice);
                     userCartSummary.setPayMoney(userCartSummary.getPayMoney().subtract(couponPrice));
@@ -951,6 +951,10 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
                     allCardList.add(child);
                 }
             } else {
+                if (category == 3 && userCoupon != null && "SHOP".equalsIgnoreCase(userCoupon.getCouponResource())) {
+                    BigDecimal couponPrice = new BigDecimal(userCoupon.getCouponPrice());
+                    userCartSummary.setPayMoney(userCartSummary.getPayMoney().subtract(couponPrice));
+                }
                 for (UserCartResult cartResult : childItem) {
                     UserCartResult child = BeanUtil.convert(cartResult, UserCartResult.class);
                     child.setCouponPrice(BigDecimal.ZERO);
@@ -963,7 +967,7 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
         });
 
         if (userCoupon != null && "SHOP".equalsIgnoreCase(userCoupon.getCouponResource())) {
-            List<UserCartResult> hotItems = allCardList.stream().filter(item -> item.getCategoryId() == 3).collect(Collectors.toList());
+            List<UserCartResult> hotItems = allCardList.stream().filter(item -> item.getCategoryId() == 3&&"DP".equalsIgnoreCase(item.getSkuType())).collect(Collectors.toList());
             Integer sum = hotItems.stream().mapToInt(UserCartResult::getNum).sum();
             if (!CollectionUtil.isEmpty(hotItems)) {
                 BigDecimal couponPrice = new BigDecimal(userCoupon.getCouponPrice()).divide(new BigDecimal(sum), 2, RoundingMode.HALF_UP);

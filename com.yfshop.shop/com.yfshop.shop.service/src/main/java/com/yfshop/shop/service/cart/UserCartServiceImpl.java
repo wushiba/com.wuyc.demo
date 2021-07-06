@@ -329,6 +329,11 @@ public class UserCartServiceImpl implements UserCartService {
                 } else {
                     userCartSummary.setTotalFreight(userCartSummary.getTotalFreight().add(value.getIsFalse()));
                 }
+            } else {
+                if (category == 3 && userCoupon != null && "SHOP".equalsIgnoreCase(userCoupon.getCouponResource())) {
+                    BigDecimal couponPrice = new BigDecimal(userCoupon.getCouponPrice());
+                    userCartSummary.setPayMoney(userCartSummary.getPayMoney().subtract(couponPrice));
+                }
             }
         });
         userCartSummary.setPayMoney(userCartSummary.getPayMoney().add(userCartSummary.getTotalFreight()));
