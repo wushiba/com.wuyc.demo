@@ -114,13 +114,17 @@ public class YfUserCouponServiceImpl implements AdminUserCouponService {
                     }
                 } else {
                     //判断是否支付金额是否满足发券逻辑
-                    BigDecimal bigDecimal = BigDecimal.ZERO;
-                    orderDetailList.forEach(item -> {
+                    BigDecimal bigDecimal = null;
+                    for (OrderDetail item : orderDetailList) {
                         if (result.getItemIds().contains(item.getItemId() + "")) {
-                            bigDecimal.add(item.getPayPrice());
+                            if (bigDecimal == null) {
+                                bigDecimal = item.getPayPrice();
+                            } else {
+                                bigDecimal.add(item.getPayPrice());
+                            }
                         }
-                    });
-                    if (bigDecimal.compareTo(result.getConditions()) >= 0) {
+                    }
+                    if (bigDecimal != null && bigDecimal.compareTo(result.getConditions()) >= 0) {
                         CouponRulesResult t = temp.get(result.getItemIds());
                         if (t == null || result.getConditions().compareTo(t.getConditions()) > 0) {
                             temp.put(result.getItemIds(), result);
@@ -159,12 +163,12 @@ public class YfUserCouponServiceImpl implements AdminUserCouponService {
                     }
                     userCoupon.setUseStatus(UserCouponStatusEnum.NO_USE.getCode());
                     userCoupon.setSrcOrderId(orderId);
+                    userCoupon.setCouponDesc(coupon.getCouponDesc());
                     userCouponMapper.insert(userCoupon);
                 }
             });
         }
     }
-
 
 }
 
