@@ -685,7 +685,7 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
                     //判断是否支付金额是否满足发券逻辑
                     BigDecimal bigDecimal = BigDecimal.ZERO;
                     orderDetailList.forEach(item -> {
-                        if (result.getItemIds().contains(item.getItemId() + ",")) {
+                        if (result.getItemIds().contains(item.getItemId()+"")) {
                             bigDecimal.add(item.getPayPrice());
                         }
                     });

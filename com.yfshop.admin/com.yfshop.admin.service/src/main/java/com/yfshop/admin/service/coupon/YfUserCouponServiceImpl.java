@@ -24,7 +24,9 @@ import org.springframework.scheduling.annotation.Async;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @Title:用户优惠券Service实现
@@ -99,6 +101,7 @@ public class YfUserCouponServiceImpl implements AdminUserCouponService {
                 eq(OrderDetail::getOrderId, orderId));
         List<CouponRulesResult> couponRulesResults = new ArrayList<>();
         if (CollectionUtils.isNotEmpty(orderDetailList)) {
+            Map<String, CouponRulesResult> temp = new HashMap<>();
             Integer userId = orderDetailList.get(0).getUserId();
             User user = userMapper.selectById(userId);
             List<CouponRulesResult> couponRulesResultList = adminCouponService.getCouponRulesList();
@@ -113,15 +116,21 @@ public class YfUserCouponServiceImpl implements AdminUserCouponService {
                     //判断是否支付金额是否满足发券逻辑
                     BigDecimal bigDecimal = BigDecimal.ZERO;
                     orderDetailList.forEach(item -> {
-                        if (result.getItemIds().contains(item.getItemId() + ",")) {
+                        if (result.getItemIds().contains(item.getItemId() + "")) {
                             bigDecimal.add(item.getPayPrice());
                         }
                     });
                     if (bigDecimal.compareTo(result.getConditions()) >= 0) {
-                        couponRulesResults.add(result);
+                        CouponRulesResult t = temp.get(result.getItemIds());
+                        if (t == null || result.getConditions().compareTo(t.getConditions()) > 0) {
+                            temp.put(result.getItemIds(), result);
+                        }
                     }
                 }
             }
+            temp.forEach((key, value) -> {
+                couponRulesResults.add(value);
+            });
             couponRulesResults.forEach(item -> {
                 Integer count = userCouponMapper.selectCount(Wrappers.lambdaQuery(UserCoupon.class)
                         .eq(UserCoupon::getUserId, userId)
