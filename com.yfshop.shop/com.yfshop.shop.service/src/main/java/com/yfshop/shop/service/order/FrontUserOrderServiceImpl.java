@@ -622,13 +622,13 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
             logger.debug("唤起订单{},支付->{}", orderId, order.getPayPrice().toString());
             return payOrderResult;
         } else {
-            sendTestOrderSuccess(orderId,RandomUtil.randomNumbers(36));
+            sendTestOrderSuccess(orderId, RandomUtil.randomNumbers(36));
             return new WxPayMpOrderResult();
         }
     }
 
-
-    private void sendTestOrderSuccess(Long orderId,String billNo){
+    //test
+    private void sendTestOrderSuccess(Long orderId, String billNo) {
         logger.info("====进入订单支付成功通知orderId=" + orderId + ",billNo=" + billNo);
         Asserts.assertNonNull(orderId, 500, "主订单id不可以为空");
         Order order = orderMapper.selectById(orderId);
@@ -664,7 +664,7 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
         sendTestUserCoupon(orderId);
     }
 
-
+    //test
     private void sendTestUserCoupon(Long orderId) throws ApiException {
         List<OrderDetail> orderDetailList = orderDetailMapper.selectList(Wrappers.<OrderDetail>lambdaQuery().
                 eq(OrderDetail::getOrderId, orderId));
@@ -673,6 +673,7 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
             Integer userId = orderDetailList.get(0).getUserId();
             User user = userMapper.selectById(userId);
             List<CouponRules> couponRulesResultList = couponRulesMapper.selectList(Wrappers.lambdaQuery());
+            Map<String, CouponRules> temp = new HashMap<>();
             for (CouponRules result : couponRulesResultList) {
                 //通用直接获取订单支付总额
                 if ("ALL".equals(result.getItemIds())) {
@@ -689,10 +690,16 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
                         }
                     });
                     if (bigDecimal.compareTo(result.getConditions()) >= 0) {
-                        couponRulesResults.add(result);
+                        CouponRules t = temp.get(result.getItemIds());
+                        if (t == null || result.getConditions().compareTo(t.getConditions()) > 0) {
+                            temp.put(result.getItemIds(), result);
+                        }
                     }
                 }
             }
+            temp.forEach((key, value) -> {
+                couponRulesResults.add(value);
+            });
             couponRulesResults.forEach(item -> {
                 Integer count = userCouponMapper.selectCount(Wrappers.lambdaQuery(UserCoupon.class)
                         .eq(UserCoupon::getUserId, userId)
