@@ -20,6 +20,7 @@ import com.yfshop.shop.dao.UserCouponDao;
 import com.yfshop.shop.service.activity.result.YfActCodeBatchDetailResult;
 import com.yfshop.shop.service.activity.result.YfDrawPrizeResult;
 import com.yfshop.shop.service.activity.service.FrontDrawRecordService;
+import com.yfshop.shop.service.cart.result.UserCartResult;
 import com.yfshop.shop.service.coupon.request.QueryUserCouponReq;
 import com.yfshop.shop.service.coupon.result.YfCouponResult;
 import com.yfshop.shop.service.coupon.result.YfUserCouponResult;
@@ -44,9 +45,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -81,6 +80,14 @@ public class FrontUserCouponServiceImpl implements FrontUserCouponService {
     private OrderDetailMapper orderDetailMapper;
     @Resource
     private MerchantMapper merchantMapper;
+    @Resource
+    private UserCartMapper userCartMapper;
+    @Resource
+    private UserCartMapper cartMapper;
+    @Resource
+    private ItemSkuMapper skuMapper;
+    @Resource
+    private PostageRulesMapper postageRulesMapper;
     @DubboReference
     private MpService mpService;
     @Value("${shop.url}")
@@ -147,8 +154,8 @@ public class FrontUserCouponServiceImpl implements FrontUserCouponService {
         List<YfUserCouponResult> resultList = BeanUtil.convertList(dataList, YfUserCouponResult.class);
 
         if (userCouponReq.getItemId() == null) {
-            if (StringUtils.isNotBlank(userCouponReq.getPayMoney())) {
-                BigDecimal pay = new BigDecimal(userCouponReq.getPayMoney());
+            if (StringUtils.isNotBlank(userCouponReq.getCartIds())) {
+                BigDecimal pay = getDpPayMoney(userCouponReq.getCartIds());
                 return resultList.stream().filter(data -> pay.compareTo(data.getUseConditionPrice()) >= 0).collect(Collectors.toList());
             }
             return resultList;
@@ -157,6 +164,39 @@ public class FrontUserCouponServiceImpl implements FrontUserCouponService {
                 data.getCanUseItemIds().contains(userCouponReq.getItemId() + "")).collect(Collectors.toList());
     }
 
+
+    private BigDecimal getDpPayMoney(String cartIds) {
+        //69
+        BigDecimal pay = BigDecimal.ZERO;
+        List<Integer> cartIdList = Arrays.stream(org.apache.commons.lang3.StringUtils.split(cartIds, ","))
+                .map(Integer::valueOf)
+                .collect(Collectors.toList());
+        List<UserCart> userCartList = cartMapper.selectList(Wrappers.lambdaQuery(UserCart.class)
+                .in(UserCart::getId, cartIdList));
+        List<Integer> skuIdList = userCartList.stream().map(UserCart::getSkuId).collect(Collectors.toList());
+        Map<Integer, ItemSku> skuIndexMap = skuMapper.selectBatchIds(skuIdList).stream().collect(Collectors.toMap(ItemSku::getId, s -> s));
+        boolean isTc = false;
+        for (UserCart u : userCartList) {
+            ItemSku sku = skuIndexMap.get(u.getSkuId());
+            if (sku != null && sku.getCategoryId() == 3) {
+                if ("TC".equals(sku.getSkuType())) {
+                    isTc = true;
+                }
+                pay = pay.add(sku.getSkuSalePrice().multiply(new BigDecimal(u.getNum())));
+            }
+            if (!isTc) {
+                PostageRules postageRules = postageRulesMapper.selectById(4);
+                if (postageRules != null) {
+                    if (pay.compareTo(postageRules.getConditions()) >= 0) {
+                        pay = pay.add(postageRules.getIsTrue());
+                    } else {
+                        pay = pay.add(postageRules.getIsFalse());
+                    }
+                }
+            }
+        }
+        return pay;
+    }
 
     @Override
     public List<YfUserCouponResult> getUserCouponAll(QueryUserCouponReq userCouponReq) throws ApiException {
