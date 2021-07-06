@@ -970,7 +970,7 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
                 .eq(UserCoupon::getUserId, userId)
                 .eq(UserCoupon::getSrcOrderId, orderId));
         if (userCoupon != null) {
-            BeanUtil.convert(userCoupon, YfUserCouponResult.class);
+            yfUserCouponResult = BeanUtil.convert(userCoupon, YfUserCouponResult.class);
             yfUserCouponResult.setIsEnable("Y");
         }
         return yfUserCouponResult;
