@@ -396,7 +396,7 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
         List<Integer> cartIdList = Arrays.stream(StringUtils.split(cartIds, ",")).map(Integer::valueOf)
                 .collect(Collectors.toList());
         Asserts.assertCollectionNotEmpty(cartIdList, 500, "购物车id不可以为空");
-        Asserts.assertFalse(cartIdList.size() > 1 && userCouponId != null, 500, "您不能使用优惠券");
+        Asserts.assertFalse(userCouponId != null, 500, "您不能使用优惠券");
 
         UserAddressResult addressInfo = userAddressService.queryUserAddresses(userId).stream()
                 .filter(data -> data.getId().intValue() == addressId).findFirst().orElse(null);
