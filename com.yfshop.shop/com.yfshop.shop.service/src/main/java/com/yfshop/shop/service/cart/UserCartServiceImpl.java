@@ -273,7 +273,7 @@ public class UserCartServiceImpl implements UserCartService {
         for (UserCartResult item : userCartResult) {
             if ("Y".equals(item.getIsAvailable())) {
                 //优惠券减扣
-                if (userCoupon != null) {
+                if (userCoupon != null && "draw".equalsIgnoreCase(userCoupon.getCouponResource())) {
                     userCartSummary.setPayMoney(item.getSkuSalePrice().subtract(new BigDecimal(userCoupon.getCouponPrice())));
                 }
                 int count = item.getNum();
@@ -320,7 +320,9 @@ public class UserCartServiceImpl implements UserCartService {
                     pay = pay.add(cartResult.getSkuSalePrice().multiply(new BigDecimal(cartResult.getNum())));
                 }
                 if (category == 3 && userCoupon != null && "SHOP".equalsIgnoreCase(userCoupon.getCouponResource())) {
+                    BigDecimal couponPrice = new BigDecimal(userCoupon.getCouponPrice());
                     pay = pay.subtract(new BigDecimal(userCoupon.getCouponPrice()));
+                    userCartSummary.setPayMoney(userCartSummary.getPayMoney().subtract(couponPrice));
                 }
                 if (pay.compareTo(value.getConditions()) >= 0) {
                     userCartSummary.setTotalFreight(userCartSummary.getTotalFreight().add(value.getIsTrue()));

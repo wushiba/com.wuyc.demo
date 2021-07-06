@@ -870,7 +870,7 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
         for (UserCartResult item : userCartResult) {
             if ("Y".equals(item.getIsAvailable())) {
                 //优惠券减扣
-                if (userCoupon != null) {
+                if (userCoupon != null && "draw".equalsIgnoreCase(userCoupon.getCouponResource())) {
                     userCartSummary.setPayMoney(item.getSkuSalePrice().subtract(new BigDecimal(userCoupon.getCouponPrice())));
                 }
                 //优惠券减扣下的邮费计算
@@ -930,7 +930,9 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
                     pay = pay.add(cartResult.getSkuSalePrice().multiply(new BigDecimal(cartResult.getNum())));
                 }
                 if (category == 3 && userCoupon != null && "SHOP".equalsIgnoreCase(userCoupon.getCouponDesc())) {
-                    pay = pay.subtract(new BigDecimal(userCoupon.getCouponPrice()));
+                    BigDecimal couponPrice = new BigDecimal(userCoupon.getCouponPrice());
+                    pay = pay.subtract(couponPrice);
+                    userCartSummary.setPayMoney(userCartSummary.getPayMoney().subtract(couponPrice));
                 }
 
                 if (pay.compareTo(value.getConditions()) >= 0) {
