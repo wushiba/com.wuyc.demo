@@ -120,7 +120,7 @@ public class YfUserCouponServiceImpl implements AdminUserCouponService {
                             if (bigDecimal == null) {
                                 bigDecimal = item.getPayPrice();
                             } else {
-                                bigDecimal.add(item.getPayPrice());
+                                bigDecimal = bigDecimal.add(item.getPayPrice());
                             }
                         }
                     }
