@@ -983,9 +983,9 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
             longitude, Double latitude) {
         if (longitude == null || longitude == null) return new ArrayList<>();
         List<MerchantResult> resultList = new ArrayList<>();
-        int limit = 100;
+        int limit = 500;
         // 中心位置半径100km内的前100个门店
-        Circle circle = new Circle(new Point(longitude, latitude), new Distance(CacheConstants.USER_MERCHANT_DISTANCE, RedisGeoCommands.DistanceUnit.KILOMETERS));
+        Circle circle = new Circle(new Point(longitude, latitude), new Distance(100, RedisGeoCommands.DistanceUnit.KILOMETERS));
         RedisGeoCommands.GeoRadiusCommandArgs args = RedisGeoCommands.GeoRadiusCommandArgs.newGeoRadiusArgs().includeCoordinates().includeDistance().sortAscending().limit(limit);
         GeoResults<RedisGeoCommands.GeoLocation<Object>> geoLocationGeoResults = redisTemplate.opsForGeo().radius(CacheConstants.MERCHANT_GRO_DATA, circle, args);
         List<Integer> merchantIds = new ArrayList<>();
