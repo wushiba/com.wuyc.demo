@@ -1007,7 +1007,8 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
         yfUserCouponResult.setIsEnable("N");
         UserCoupon userCoupon = userCouponMapper.selectOne(Wrappers.lambdaQuery(UserCoupon.class)
                 .eq(UserCoupon::getUserId, userId)
-                .eq(UserCoupon::getSrcOrderId, orderId));
+                .eq(UserCoupon::getSrcOrderId, orderId)
+                .orderByAsc(UserCoupon::getCouponResource));
         if (userCoupon != null) {
             yfUserCouponResult = BeanUtil.convert(userCoupon, YfUserCouponResult.class);
             yfUserCouponResult.setIsEnable("Y");
