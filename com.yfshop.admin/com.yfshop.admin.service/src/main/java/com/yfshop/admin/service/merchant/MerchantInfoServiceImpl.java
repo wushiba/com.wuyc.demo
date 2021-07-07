@@ -938,16 +938,15 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
             Distance distance = geoResult.getDistance();
             result.setDistanceValue(distance.getValue());
             if ("km".equals(distance.getUnit()) && distance.getValue() < 0) {
-                result.setDistance(String.format("%.1f千米", distance.getValue() + ""));
+                result.setDistance(String.format("%.1f千米", distance.getValue()));
             } else {
-                result.setDistance(String.format("%.1f米", (distance.getValue() * 1000) + ""));
+                result.setDistance(String.format("%.1f米", (distance.getValue() * 1000)));
             }
             result.setLongitude(point.getX());
             result.setLatitude(point.getY());
             resultList.add(result);
         });
         resultList.sort(Comparator.comparing(MerchantResult::getDistanceValue));
-        System.out.println(resultList);
         return resultList;
 
     }
