@@ -1049,17 +1049,17 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
         websiteGoodsRecordMapper.insert(websiteGoodsRecord);
         if (websiteCode.getOpenId() != null) {
             List<WxMpTemplateData> data = new ArrayList<>();
-            data.add(new WxMpTemplateData("first.DATA", "二等奖135ml椰岛鹿龟酒已经完成补货！"));
-            data.add(new WxMpTemplateData("keyword1.DATA", "135ml椰岛鹿龟酒"));
-            data.add(new WxMpTemplateData("keyword2.DATA", count + "瓶"));
-            data.add(new WxMpTemplateData("keyword3.DATA", DateFormatUtils.format(new Date(), "yyyy-MM-dd HH:mm:ss")));
-            data.add(new WxMpTemplateData("keyword4.DATA", merchant.getMerchantName()));
-            data.add(new WxMpTemplateData("remark.DATA", "二等奖135ml椰岛鹿龟酒已经完成补货！"));
+            data.add(new WxMpTemplateData("first", "二等奖135ml椰岛鹿龟酒已经完成补货！"));
+            data.add(new WxMpTemplateData("keyword1", "135ml椰岛鹿龟酒"));
+            data.add(new WxMpTemplateData("keyword2", count + "瓶"));
+            data.add(new WxMpTemplateData("keyword3", DateFormatUtils.format(new Date(), "yyyy-MM-dd HH:mm:ss")));
+            data.add(new WxMpTemplateData("keyword4", merchant.getMerchantName()));
+            data.add(new WxMpTemplateData("remark", "二等奖135ml椰岛鹿龟酒已经完成补货！"));
             WxMpTemplateMessage wxMpTemplateMessage = WxMpTemplateMessage.builder()
                     .toUser(merchant.getOpenId())
                     .templateId("jzGtPNFoz6lzKi1c7q6ELj3BinPBFdtujMVeM4lSobs")
                     .data(data)
-                    .url(String.format("%s#/MerchantReplenishDetail", merchantUrl))
+                    //.url(String.format("%s#/MerchantReplenishDetail", merchantUrl))
                     .build();
             mpService.sendWxMpTemplateMsg(wxMpTemplateMessage);
         }
