@@ -25,6 +25,8 @@ public class QueryUserCouponReq implements Serializable {
 
     private Integer itemId;
 
+    private Integer num;
+
     private Integer skuId;
 
     private Long orderId;

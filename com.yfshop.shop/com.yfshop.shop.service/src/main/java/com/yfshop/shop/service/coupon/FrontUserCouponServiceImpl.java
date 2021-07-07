@@ -159,11 +159,31 @@ public class FrontUserCouponServiceImpl implements FrontUserCouponService {
                 return resultList.stream().filter(data -> pay.compareTo(data.getUseConditionPrice()) >= 0).sorted((o1, o2) -> o2.getCouponPrice().compareTo(o1.getCouponPrice())).collect(Collectors.toList());
             }
             return resultList;
+        } else {
+            ItemSku sku = skuMapper.selectOne(Wrappers.lambdaQuery(ItemSku.class).eq(ItemSku::getItemId, userCouponReq.getItemId()));
+            if ("DP".equalsIgnoreCase(sku.getSkuType())) {
+                BigDecimal pay = getDpPayMoney(sku, userCouponReq.getNum());
+                return resultList.stream().filter(data -> "SHOP".equalsIgnoreCase(data.getCouponResource()) && pay.compareTo(data.getUseConditionPrice()) >= 0).sorted((o1, o2) -> o2.getCouponPrice().compareTo(o1.getCouponPrice())).collect(Collectors.toList());
+            }
         }
         return resultList.stream().filter(data -> "ALL".equalsIgnoreCase(data.getUseRangeType()) ||
                 data.getCanUseItemIds().contains(userCouponReq.getItemId() + "")).collect(Collectors.toList());
     }
 
+
+    private BigDecimal getDpPayMoney(ItemSku sku, Integer num) {
+        //69
+        BigDecimal pay = sku.getSkuSalePrice().multiply(new BigDecimal(num));
+        PostageRules postageRules = postageRulesMapper.selectById(4);
+        if (postageRules != null) {
+            if (pay.compareTo(postageRules.getConditions()) >= 0) {
+                pay = pay.add(postageRules.getIsTrue());
+            } else {
+                pay = pay.add(postageRules.getIsFalse());
+            }
+        }
+        return pay;
+    }
 
     private BigDecimal getDpPayMoney(String cartIds) {
         //69

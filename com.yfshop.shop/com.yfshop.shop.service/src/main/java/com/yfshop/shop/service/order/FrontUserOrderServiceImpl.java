@@ -979,12 +979,15 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
 
         if (userCoupon != null && "SHOP".equalsIgnoreCase(userCoupon.getCouponResource())) {
             List<UserCartResult> hotItems = allCardList.stream().filter(item -> item.getCategoryId() == 3 && "DP".equalsIgnoreCase(item.getSkuType())).collect(Collectors.toList());
-            Integer sum = hotItems.stream().mapToInt(UserCartResult::getNum).sum();
+            BigDecimal dpSum = BigDecimal.ZERO;
+            for (UserCartResult hotItem : hotItems) {
+                dpSum = dpSum.add(hotItem.getPayPrice());
+            }
             if (!CollectionUtil.isEmpty(hotItems)) {
-                BigDecimal couponPrice = new BigDecimal(userCoupon.getCouponPrice()).divide(new BigDecimal(sum), 2, RoundingMode.HALF_UP);
+                BigDecimal couponPrice = new BigDecimal(userCoupon.getCouponPrice());
                 for (UserCartResult item : hotItems) {
                     item.setUserCouponId(userCoupon.getId());
-                    item.setCouponPrice(couponPrice.multiply(new BigDecimal(item.getNum())));
+                    item.setCouponPrice(item.getPayPrice().divide(dpSum, 2, RoundingMode.HALF_UP).multiply(couponPrice));
                     item.setPayPrice(item.getPayPrice().subtract(item.getCouponPrice()));
                 }
             }
