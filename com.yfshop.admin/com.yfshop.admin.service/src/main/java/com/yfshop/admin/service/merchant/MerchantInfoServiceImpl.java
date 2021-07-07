@@ -947,6 +947,7 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
             resultList.add(result);
         });
         resultList.sort(Comparator.comparing(MerchantResult::getDistanceValue));
+        System.out.println(resultList);
         return resultList;
 
     }
