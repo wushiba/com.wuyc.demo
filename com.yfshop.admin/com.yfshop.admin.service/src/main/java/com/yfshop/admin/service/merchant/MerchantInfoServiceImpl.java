@@ -661,9 +661,56 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
         }
     }
 
-
     @Override
     public MerchantGroupResult merchantGroup(MerchantGroupReq merchantGroupReq) throws ApiException {
+        MerchantGroupResult merchantGroupResult = new MerchantGroupResult();
+        //Integer myselfCount = getCurrentWebsiteCount(merchantGroupReq.getMerchantId());
+        Merchant merchant = merchantMapper.selectById(merchantGroupReq.getMerchantId());
+        Integer count = getAllWebsiteCodeCount(merchantGroupReq.getMerchantId());
+        merchantGroupResult.setMerchantId(merchant.getId());
+        merchantGroupResult.setMerchantName(merchant.getMerchantName());
+        merchantGroupResult.setContacts(merchant.getContacts());
+        merchantGroupResult.setMobile(merchant.getMobile());
+        merchantGroupResult.setCount(count);
+        LambdaQueryWrapper lambdaQueryWrapper = Wrappers.<Merchant>lambdaQuery()
+                .eq(Merchant::getPid, merchantGroupReq.getMerchantId())
+                .ne(Merchant::getRoleAlias, "wd")
+                .eq(Merchant::getIsEnable, "Y")
+                .eq(Merchant::getIsDelete, "N");
+        List<Merchant> merchantList = merchantMapper.selectList(lambdaQueryWrapper);
+        List<MerchantGroupResult> merchantGroupResults = new ArrayList<>();
+        MerchantMyselfResult myselfResult = getMyselfWebsite(merchant.getId(), merchantGroupReq.getStartTime(), merchantGroupReq.getEndTime());
+        if (myselfResult.getCount() > 0) {
+            MerchantGroupResult myself = new MerchantGroupResult();
+            myself.setHaveWebsite(true);
+            myself.setMerchantId(merchant.getId());
+            myself.setMerchantName(merchant.getMerchantName());
+            myself.setContacts(merchant.getContacts());
+            myself.setMobile(merchant.getMobile());
+            myself.setCurrentExchange(myselfResult.getCurrentExchange());
+            myself.setTotalExchange(myselfResult.getTotalExchange());
+            myself.setCurrentGoodsRecord(myselfResult.getCurrentGoodsRecord());
+            myself.setCount(myselfResult.getCount());
+            merchantGroupResults.add(myself);
+        }
+        merchantList.forEach(item -> {
+            MerchantGroupResult child = new MerchantGroupResult();
+            child.setMerchantId(item.getId());
+            child.setMerchantName(item.getMerchantName());
+            child.setContacts(item.getContacts());
+            child.setMobile(item.getMobile());
+            child.setCurrentExchange(getCurrentExchange(item.getId(), merchantGroupReq.getStartTime(), merchantGroupReq.getEndTime()));
+            child.setTotalExchange(getCurrentExchange(item.getId(), null, null));
+            child.setCurrentGoodsRecord(websiteGoodsRecordDao.sumAllGoodsRecord(item.getId(), merchantGroupReq.getStartTime(), merchantGroupReq.getEndTime()));
+            child.setCount(getAllWebsiteCodeCount(item.getId()));
+            merchantGroupResults.add(child);
+        });
+        merchantGroupResult.setList(merchantGroupResults);
+        return merchantGroupResult;
+    }
+
+    //@Override
+    public MerchantGroupResult merchantGroupNew(MerchantGroupReq merchantGroupReq) throws ApiException {
         MerchantGroupResult merchantGroupResult = new MerchantGroupResult();
         Merchant merchant = merchantMapper.selectById(merchantGroupReq.getMerchantId());
         merchantGroupResult.setMerchantId(merchant.getId());
@@ -814,6 +861,42 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
 
     @Override
     public MerchantGroupResult getWebsiteList(Integer merchantId, MerchantGroupReq merchantGroupReq) {
+        MerchantGroupResult merchantGroupResult = new MerchantGroupResult();
+        AtomicInteger count = new AtomicInteger();
+        LambdaQueryWrapper lambdaQueryWrapper = Wrappers.<Merchant>lambdaQuery()
+                .eq(Merchant::getPid, merchantGroupReq.getMerchantId())
+                .eq(Merchant::getRoleAlias, "wd")
+                .eq(Merchant::getIsEnable, "Y")
+                .eq(Merchant::getIsDelete, "N");
+        List<Merchant> merchantList = merchantMapper.selectList(lambdaQueryWrapper);
+        /**
+         * 判断自己有没有绑定网点码，如果有将自己插入到第一个
+         */
+        if (getWebsiteCodeBindCount(merchantGroupReq.getMerchantId()) > 0) {
+            Merchant merchant = merchantMapper.selectById(merchantGroupReq.getMerchantId());
+            merchantList.add(0, merchant);
+        }
+        List<MerchantGroupResult> merchantGroupResults = new ArrayList<>();
+        merchantList.forEach(item -> {
+            MerchantGroupResult child = new MerchantGroupResult();
+            child.setMerchantId(item.getId());
+            child.setMerchantName(item.getMerchantName());
+            child.setMobile(item.getMobile());
+            child.setContacts(item.getContacts());
+            child.setCurrentExchange(getCurrentExchangeByPid(item.getId(), merchantGroupReq.getStartTime(), merchantGroupReq.getEndTime()));
+            child.setTotalExchange(getCurrentExchangeByPid(item.getId(), null, null));
+            child.setCurrentGoodsRecord(websiteGoodsRecordDao.sumGoodsRecordByMerchantId(item.getId(), merchantGroupReq.getStartTime(), merchantGroupReq.getEndTime()));
+            child.setCount(getCurrentWebsiteCodeCount(item.getId(), merchantId));
+            count.addAndGet(child.getCount());
+            merchantGroupResults.add(child);
+        });
+        merchantGroupResult.setCount(count.get());
+        merchantGroupResult.setList(merchantGroupResults);
+        return merchantGroupResult;
+    }
+
+    //@Override
+    public MerchantGroupResult getWebsiteListNew(Integer merchantId, MerchantGroupReq merchantGroupReq) {
         List<Merchant> merchantList = new ArrayList<>();
         MerchantGroupResult merchantGroupResult = new MerchantGroupResult();
         //AtomicInteger count = new AtomicInteger();

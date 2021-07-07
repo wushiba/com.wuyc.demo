@@ -58,6 +58,7 @@ import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.math.MathContext;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -987,7 +988,7 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
                 BigDecimal couponPrice = new BigDecimal(userCoupon.getCouponPrice());
                 for (UserCartResult item : hotItems) {
                     item.setUserCouponId(userCoupon.getId());
-                    item.setCouponPrice(item.getPayPrice().divide(dpSum, 2, RoundingMode.HALF_UP).multiply(couponPrice));
+                    item.setCouponPrice(item.getPayPrice().divide(dpSum, 4, RoundingMode.HALF_UP).multiply(couponPrice).setScale(2, RoundingMode.HALF_UP));
                     item.setPayPrice(item.getPayPrice().subtract(item.getCouponPrice()));
                 }
             }
