@@ -1,5 +1,6 @@
 package com.yfshop.shop.controller.draw;
 
+import cn.dev33.satoken.annotation.SaCheckLogin;
 import com.yfshop.common.api.CommonResult;
 import com.yfshop.common.base.BaseController;
 import com.yfshop.common.enums.CouponResourceEnum;
@@ -38,12 +39,14 @@ public class FrontDrawController implements BaseController {
     }
 
     @RequestMapping(value = "user/clickDraw", method = {RequestMethod.GET, RequestMethod.POST})
+    @SaCheckLogin
     @ResponseBody
     public CommonResult<YfUserCouponResult> userClickDraw(String actCode) {
         return CommonResult.success(frontDrawService.userClickDraw(getCurrentUserId(), getRequestIpStr(), actCode));
     }
 
     @RequestMapping(value = "record/findList", method = {RequestMethod.GET, RequestMethod.POST})
+    @SaCheckLogin
     @ResponseBody
     public CommonResult<List<YfUserCouponResult>> findDrawRecordList() {
         QueryUserCouponReq req = new QueryUserCouponReq();
@@ -52,24 +55,25 @@ public class FrontDrawController implements BaseController {
         return CommonResult.success(frontUserCouponService.findUserCouponList(req));
     }
 
-    @RequestMapping(value = "all/record/findList", method = {RequestMethod.GET, RequestMethod.POST})
-    @ResponseBody
-    public CommonResult<List<YfUserCouponResult>> findAllUserDrawRecordList() {
-        QueryUserCouponReq req = new QueryUserCouponReq();
-        req.setCouponResource(CouponResourceEnum.DRAW.getCode());
-        return CommonResult.success(frontUserCouponService.findAllUserDrawRecordList(req));
-    }
+//    @RequestMapping(value = "all/record/findList", method = {RequestMethod.GET, RequestMethod.POST})
+//    @SaCheckLogin
+//    @ResponseBody
+//    public CommonResult<List<YfUserCouponResult>> findAllUserDrawRecordList() {
+//        QueryUserCouponReq req = new QueryUserCouponReq();
+//        req.setCouponResource(CouponResourceEnum.DRAW.getCode());
+//        return CommonResult.success(frontUserCouponService.findAllUserDrawRecordList(req));
+//    }
 
-    @RequestMapping(value = "user/white/add", method = {RequestMethod.POST})
-    @ResponseBody
-    public CommonResult<Long> addDrawUserWhite(Integer userId) {
-        return CommonResult.success(frontDrawService.addDrawUserWhite(userId));
-    }
-
-    @RequestMapping(value = "user/white/delete", method = {RequestMethod.POST})
-    @ResponseBody
-    public CommonResult<Long> deleteDrawUserWhite(Integer userId) {
-        return CommonResult.success(frontDrawService.addDrawUserWhite(userId));
-    }
+//    @RequestMapping(value = "user/white/add", method = {RequestMethod.POST})
+//    @ResponseBody
+//    public CommonResult<Long> addDrawUserWhite(Integer userId) {
+//        return CommonResult.success(frontDrawService.addDrawUserWhite(userId));
+//    }
+//
+//    @RequestMapping(value = "user/white/delete", method = {RequestMethod.POST})
+//    @ResponseBody
+//    public CommonResult<Long> deleteDrawUserWhite(Integer userId) {
+//        return CommonResult.success(frontDrawService.addDrawUserWhite(userId));
+//    }
 
 }

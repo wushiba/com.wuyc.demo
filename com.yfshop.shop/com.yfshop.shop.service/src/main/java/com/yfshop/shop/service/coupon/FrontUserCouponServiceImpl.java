@@ -185,14 +185,14 @@ public class FrontUserCouponServiceImpl implements FrontUserCouponService {
                     pay = pay.add(sku.getSkuSalePrice().multiply(new BigDecimal(u.getNum())));
                 }
             }
-            if (!isTc) {
-                PostageRules postageRules = postageRulesMapper.selectById(4);
-                if (postageRules != null) {
-                    if (pay.compareTo(postageRules.getConditions()) >= 0) {
-                        pay = pay.add(postageRules.getIsTrue());
-                    } else {
-                        pay = pay.add(postageRules.getIsFalse());
-                    }
+        }
+        PostageRules postageRules = postageRulesMapper.selectById(4);
+        if (!isTc) {
+            if (postageRules != null) {
+                if (pay.compareTo(postageRules.getConditions()) >= 0) {
+                    pay = pay.add(postageRules.getIsTrue());
+                } else {
+                    pay = pay.add(postageRules.getIsFalse());
                 }
             }
         }
