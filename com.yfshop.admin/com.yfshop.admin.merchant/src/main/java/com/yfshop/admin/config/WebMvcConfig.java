@@ -20,33 +20,34 @@ import java.util.concurrent.CompletableFuture;
  */
 @Configuration
 public class WebMvcConfig extends BaseWebMvcConfig {
-    @DubboReference(group = "MerchantLogService")
-    LogService logService;
+//    @DubboReference(group = "MerchantLogService")
+//    LogService logService;
 
     @Bean
     public WebSystemOperateLogAspect webSystemOperateLogAspect() {
-        return new WebSystemOperateLogAspect() {
-            @Override
-            protected void saveLog(VisitInfo visitInfo) {
-                try {
-                    visitInfo.setUserId(StpUtil.isLogin() ? StpUtil.getLoginIdAsInt() : null);
-                } catch (Exception e) {
-
-                }
-                CompletableFuture.runAsync(() -> {
-                    CreateVisitLogReq req = new CreateVisitLogReq();
-                    req.setInterfaceClass(visitInfo.getMethodInfo());
-                    req.setRequestUrl(visitInfo.getRequestUrl());
-                    req.setVisitorClientIp(visitInfo.getVisitorClientIp());
-                    req.setTimeConsume(visitInfo.getTimeConsume());
-                    req.setParameterContent(JSON.toJSONString(visitInfo.getRequestParameter()));
-                    req.setReturnResult(JSON.toJSONString(visitInfo.getReturnResult()));
-                    req.setOperatorId(visitInfo.getUserId());
-                    req.setPlatform("merchant");
-                    logService.createVisitLog(req);
-                });
-            }
-        };
+        return new WebSystemOperateLogAspect();
+//        return new WebSystemOperateLogAspect() {
+//            @Override
+//            protected void saveLog(VisitInfo visitInfo) {
+//                try {
+//                    visitInfo.setUserId(StpUtil.isLogin() ? StpUtil.getLoginIdAsInt() : null);
+//                } catch (Exception e) {
+//
+//                }
+//                CompletableFuture.runAsync(() -> {
+//                    CreateVisitLogReq req = new CreateVisitLogReq();
+//                    req.setInterfaceClass(visitInfo.getMethodInfo());
+//                    req.setRequestUrl(visitInfo.getRequestUrl());
+//                    req.setVisitorClientIp(visitInfo.getVisitorClientIp());
+//                    req.setTimeConsume(visitInfo.getTimeConsume());
+//                    req.setParameterContent(JSON.toJSONString(visitInfo.getRequestParameter()));
+//                    req.setReturnResult(JSON.toJSONString(visitInfo.getReturnResult()));
+//                    req.setOperatorId(visitInfo.getUserId());
+//                    req.setPlatform("merchant");
+//                    logService.createVisitLog(req);
+//                });
+//            }
+//        };
     }
 
 }

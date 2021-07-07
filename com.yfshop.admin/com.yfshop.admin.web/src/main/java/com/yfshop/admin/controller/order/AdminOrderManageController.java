@@ -8,6 +8,7 @@ import cn.hutool.core.io.IoUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.github.binarywang.wxpay.exception.WxPayException;
+import com.yfshop.admin.api.coupon.service.AdminUserCouponService;
 import com.yfshop.admin.api.draw.request.QueryDrawRecordExportReq;
 import com.yfshop.admin.api.draw.result.DrawRecordExportResult;
 import com.yfshop.admin.api.order.request.OrderExpressReq;
@@ -49,6 +50,8 @@ public class AdminOrderManageController implements BaseController {
     @DubboReference(check = false)
     private AdminUserOrderExportService adminUserOrderExportService;
 
+    @DubboReference(check = false)
+    private AdminUserCouponService adminUserCouponService;
 
     @RequestMapping(value = "/list", method = {RequestMethod.POST})
     @ResponseBody
@@ -129,4 +132,15 @@ public class AdminOrderManageController implements BaseController {
         }
     }
 
+
+    @RequestMapping(value = "/sendUserCoupon", method = {RequestMethod.POST})
+    @ResponseBody
+    public CommonResult<Void> sendUserCoupon(Long orderId) {
+        if ("pro".equalsIgnoreCase(SpringUtil.getActiveProfile())) {
+            return CommonResult.failed("非法接口调用");
+        } else {
+            adminUserCouponService.sendUserCoupon(orderId);
+            return CommonResult.success(null);
+        }
+    }
 }
