@@ -156,7 +156,7 @@ public class FrontUserCouponServiceImpl implements FrontUserCouponService {
         if (userCouponReq.getItemId() == null) {
             if (StringUtils.isNotBlank(userCouponReq.getCartIds())) {
                 BigDecimal pay = getDpPayMoney(userCouponReq.getCartIds());
-                return resultList.stream().filter(data -> pay.compareTo(data.getUseConditionPrice()) >= 0).collect(Collectors.toList());
+                return resultList.stream().filter(data -> pay.compareTo(data.getUseConditionPrice()) >= 0).sorted((o1, o2) -> o2.getCouponPrice().compareTo(o1.getCouponPrice())).collect(Collectors.toList());
             }
             return resultList;
         }
