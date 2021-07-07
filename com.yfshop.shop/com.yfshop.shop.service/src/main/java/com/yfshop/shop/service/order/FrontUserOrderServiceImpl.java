@@ -868,7 +868,7 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
     }
 
 
-    private UserCartSummary calculationSummary(List<UserCartResult> userCartResult, UserCoupon userCoupon) {
+    private UserCartSummary calculationSummary(List<UserCartResult> userCartResult, UserCoupon userCoupon) throws ApiException {
         logger.debug("结算前商品->{},优惠券使用->{}", userCartResult.toString(), userCoupon != null ? userCoupon.toString() : "");
         List<UserCartResult> allCardList = new ArrayList<>();
         UserCartSummary userCartSummary = UserCartSummary.emptySummary();
@@ -980,12 +980,13 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
 
         if (userCoupon != null && "SHOP".equalsIgnoreCase(userCoupon.getCouponResource())) {
             List<UserCartResult> hotItems = allCardList.stream().filter(item -> item.getCategoryId() == 3 && "DP".equalsIgnoreCase(item.getSkuType())).collect(Collectors.toList());
-            BigDecimal dpSum = BigDecimal.ZERO;
-            for (UserCartResult hotItem : hotItems) {
-                dpSum = dpSum.add(hotItem.getPayPrice());
-            }
             if (!CollectionUtil.isEmpty(hotItems)) {
+                BigDecimal dpSum = BigDecimal.ZERO;
+                for (UserCartResult hotItem : hotItems) {
+                    dpSum = dpSum.add(hotItem.getPayPrice());
+                }
                 BigDecimal couponPrice = new BigDecimal(userCoupon.getCouponPrice());
+                Asserts.assertTrue(dpSum.compareTo(userCoupon.getUseConditionPrice()) >= 0, 500, "优惠券不合法！");
                 for (UserCartResult item : hotItems) {
                     item.setUserCouponId(userCoupon.getId());
                     item.setCouponPrice(item.getPayPrice().divide(dpSum, 4, RoundingMode.HALF_UP).multiply(couponPrice).setScale(2, RoundingMode.HALF_UP));
