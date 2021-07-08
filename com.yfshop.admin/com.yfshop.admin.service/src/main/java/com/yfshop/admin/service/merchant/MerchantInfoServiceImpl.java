@@ -996,7 +996,7 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
                             .or()
                             .like(Merchant::getMobile, search)));
             List<Integer> ids = merchantList.stream().map(Merchant::getId).collect(Collectors.toList());
-            Map<Integer, MerchantDetail> detailMaps = merchantDetailMapper.selectBatchIds(ids).stream().collect(Collectors.toMap(MerchantDetail::getMerchantId, Function.identity()));
+            Map<Integer, MerchantDetail> detailMaps = merchantDetailMapper.selectList(Wrappers.lambdaQuery(MerchantDetail.class).in(MerchantDetail::getMerchantId, ids)).stream().collect(Collectors.toMap(MerchantDetail::getMerchantId, Function.identity()));
             merchantList.forEach(item -> {
                 MerchantDetail merchantDetail = detailMaps.get(item.getId());
                 if (merchantDetail != null) {
