@@ -981,55 +981,62 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
     @Override
     public List<MerchantResult> findNearMerchantList(String key, Integer merchantId, Integer districtId, Double
             longitude, Double latitude) {
-        if (longitude == null || longitude == null) return new ArrayList<>();
         List<MerchantResult> resultList = new ArrayList<>();
-        int limit = 500;
-        // 中心位置半径100km内的前100个门店
-        Circle circle = new Circle(new Point(longitude, latitude), new Distance(100, RedisGeoCommands.DistanceUnit.KILOMETERS));
-        RedisGeoCommands.GeoRadiusCommandArgs args = RedisGeoCommands.GeoRadiusCommandArgs.newGeoRadiusArgs().includeCoordinates().includeDistance().sortAscending().limit(limit);
-        GeoResults<RedisGeoCommands.GeoLocation<Object>> geoLocationGeoResults = redisTemplate.opsForGeo().radius(CacheConstants.MERCHANT_GRO_DATA, circle, args);
-        List<Integer> merchantIds = new ArrayList<>();
-        Map<Integer, GeoResult<RedisGeoCommands.GeoLocation<Object>>> mapDistance = new HashMap<>();
-        if (geoLocationGeoResults != null) {
-            for (GeoResult<RedisGeoCommands.GeoLocation<Object>> locationGeoResult : geoLocationGeoResults) {
-                RedisGeoCommands.GeoLocation<Object> content = locationGeoResult.getContent();
-                Object id = content.getName();
-                merchantIds.add(Integer.valueOf(id.toString()));
-                mapDistance.put(Integer.valueOf(id.toString()), locationGeoResult);
-            }
-        }
-        if (CollectionUtils.isEmpty(merchantIds)) {
-            return resultList;
-        }
-        List<Merchant> list = merchantMapper.selectList(Wrappers.lambdaQuery(Merchant.class)
-                .in(Merchant::getId, merchantIds)
-                .eq(Merchant::getIsDelete, 'N')
-                .eq(Merchant::getIsEnable, 'Y').and(StringUtils.isNotBlank(key), wrapper -> {
-                    wrapper.like(Merchant::getMerchantName, key)
+        Merchant merchant = merchantMapper.selectById(merchantId);
+        if (StringUtils.isNotBlank(key)) {
+            merchantMapper.selectList(Wrappers.lambdaQuery(Merchant.class)
+                    .eq(Merchant::getIsDelete, 'N')
+                    .eq(Merchant::getIsEnable, 'Y')
+                    .likeRight(Merchant::getPidPath, merchant.getPidPath())
+                    .and(wrapper -> wrapper
+                            .like(Merchant::getMerchantName, key)
                             .or()
                             .like(Merchant::getContacts, key)
                             .or()
-                            .like(Merchant::getMobile, key);
-                }));
-        Merchant merchant = merchantMapper.selectById(merchantId);
-        list = list.stream().filter(data -> data.getPidPath().startsWith(merchant.getPidPath()))
-                .collect(Collectors.toList());
-        list.forEach(item -> {
-            MerchantResult result = BeanUtil.convert(item, MerchantResult.class);
-            GeoResult<RedisGeoCommands.GeoLocation<Object>> geoResult = mapDistance.get(item.getId());
-            Point point = geoResult.getContent().getPoint();
-            Distance distance = geoResult.getDistance();
-            result.setDistanceValue(distance.getValue());
-            if ("km".equals(distance.getUnit()) && distance.getValue() < 0) {
-                result.setDistance(String.format("%.1f千米", distance.getValue()));
-            } else {
-                result.setDistance(String.format("%.1f米", (distance.getValue() * 1000)));
+                            .like(Merchant::getMobile, key)));
+        } else {
+            if (longitude == null || longitude == null) return resultList;
+            int limit = 100;
+            // 中心位置半径100km内的前100个门店
+            Circle circle = new Circle(new Point(longitude, latitude), new Distance(50, RedisGeoCommands.DistanceUnit.KILOMETERS));
+            RedisGeoCommands.GeoRadiusCommandArgs args = RedisGeoCommands.GeoRadiusCommandArgs.newGeoRadiusArgs().includeCoordinates().includeDistance().sortAscending().limit(limit);
+            GeoResults<RedisGeoCommands.GeoLocation<Object>> geoLocationGeoResults = redisTemplate.opsForGeo().radius(CacheConstants.MERCHANT_GRO_DATA, circle, args);
+            List<Integer> merchantIds = new ArrayList<>();
+            Map<Integer, GeoResult<RedisGeoCommands.GeoLocation<Object>>> mapDistance = new HashMap<>();
+            if (geoLocationGeoResults != null) {
+                for (GeoResult<RedisGeoCommands.GeoLocation<Object>> locationGeoResult : geoLocationGeoResults) {
+                    RedisGeoCommands.GeoLocation<Object> content = locationGeoResult.getContent();
+                    Object id = content.getName();
+                    merchantIds.add(Integer.valueOf(id.toString()));
+                    mapDistance.put(Integer.valueOf(id.toString()), locationGeoResult);
+                }
             }
-            result.setLongitude(point.getX());
-            result.setLatitude(point.getY());
-            resultList.add(result);
-        });
-        resultList.sort(Comparator.comparing(MerchantResult::getDistanceValue));
+            if (CollectionUtils.isEmpty(merchantIds)) {
+                return resultList;
+            }
+            List<Merchant> list = merchantMapper.selectList(Wrappers.lambdaQuery(Merchant.class)
+                    .in(Merchant::getId, merchantIds)
+                    .eq(Merchant::getIsDelete, 'N')
+                    .eq(Merchant::getIsEnable, 'Y'));
+            list = list.stream().filter(data -> data.getPidPath().startsWith(merchant.getPidPath()))
+                    .collect(Collectors.toList());
+            list.forEach(item -> {
+                MerchantResult result = BeanUtil.convert(item, MerchantResult.class);
+                GeoResult<RedisGeoCommands.GeoLocation<Object>> geoResult = mapDistance.get(item.getId());
+                Point point = geoResult.getContent().getPoint();
+                Distance distance = geoResult.getDistance();
+                result.setDistanceValue(distance.getValue());
+                if ("km".equals(distance.getUnit()) && distance.getValue() < 0) {
+                    result.setDistance(String.format("%.1f千米", distance.getValue()));
+                } else {
+                    result.setDistance(String.format("%.1f米", (distance.getValue() * 1000)));
+                }
+                result.setLongitude(point.getX());
+                result.setLatitude(point.getY());
+                resultList.add(result);
+            });
+            resultList.sort(Comparator.comparing(MerchantResult::getDistanceValue));
+        }
         return resultList;
 
     }
