@@ -984,16 +984,28 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
         List<MerchantResult> resultList = new ArrayList<>();
         Merchant merchant = merchantMapper.selectById(merchantId);
         if (StringUtils.isNotBlank(key)) {
-            merchantMapper.selectList(Wrappers.lambdaQuery(Merchant.class)
+            String search = key.trim();
+            List<Merchant> merchantList = merchantMapper.selectList(Wrappers.lambdaQuery(Merchant.class)
                     .eq(Merchant::getIsDelete, 'N')
                     .eq(Merchant::getIsEnable, 'Y')
                     .likeRight(Merchant::getPidPath, merchant.getPidPath())
                     .and(wrapper -> wrapper
-                            .like(Merchant::getMerchantName, key)
+                            .like(Merchant::getMerchantName, search)
                             .or()
-                            .like(Merchant::getContacts, key)
+                            .like(Merchant::getContacts, search)
                             .or()
-                            .like(Merchant::getMobile, key)));
+                            .like(Merchant::getMobile, search)));
+            List<Integer> ids = merchantList.stream().map(Merchant::getId).collect(Collectors.toList());
+            Map<Integer, MerchantDetail> detailMaps = merchantDetailMapper.selectBatchIds(ids).stream().collect(Collectors.toMap(MerchantDetail::getMerchantId, Function.identity()));
+            merchantList.forEach(item -> {
+                MerchantDetail merchantDetail = detailMaps.get(item.getId());
+                if (merchantDetail != null) {
+                    MerchantResult result = BeanUtil.convert(item, MerchantResult.class);
+                    result.setLongitude(result.getLongitude());
+                    result.setLatitude(result.getLatitude());
+                    resultList.add(result);
+                }
+            });
         } else {
             if (longitude == null || longitude == null) return resultList;
             int limit = 100;

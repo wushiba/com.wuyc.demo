@@ -203,6 +203,7 @@ public class AdminUserOrderServiceImpl implements AdminUserOrderService {
                 .eq(req.getOrderId() != null, OrderDetail::getOrderId, req.getOrderId())
                 .eq(StringUtils.isNoneBlank(req.getOrderNo()), OrderDetail::getOrderNo, req.getOrderNo())
                 .eq(StringUtils.isNoneBlank(req.getReceiveWay()), OrderDetail::getReceiveWay, req.getReceiveWay())
+                .eq(StringUtils.isNoneBlank(req.getExpressNo()), OrderDetail::getExpressNo, req.getExpressNo())
                 .eq(StringUtils.isNoneBlank(req.getOrderStatus()), OrderDetail::getOrderStatus, req.getOrderStatus())
                 .eq(drawRecord != null, OrderDetail::getUserCouponId, drawRecord == null ? null : drawRecord.getUserCouponId())
                 .isNotNull("Y".equals(req.getIsUseCoupon()), OrderDetail::getUserCouponId)
