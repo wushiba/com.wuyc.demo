@@ -68,7 +68,7 @@ public class ExpressServiceImpl implements ExpressService {
     public ExpressOrderResult queryExpress(Long id) throws ApiException {
         OrderDetail orderDetail = orderDetailMapper.selectById(id);
         if (ReceiveWayEnum.ZT.getCode().equals(orderDetail.getReceiveWay())) return new ExpressOrderResult();
-        OrderAddress orderAddress = orderAddressMapper.selectOne(Wrappers.lambdaQuery(OrderAddress.class).eq(OrderAddress::getOrderId, id));
+        OrderAddress orderAddress = orderAddressMapper.selectOne(Wrappers.lambdaQuery(OrderAddress.class).eq(OrderAddress::getOrderId, orderDetail.getOrderId()));
         if (orderAddress == null) return new ExpressOrderResult();
         return queryByExpressNo(orderDetail.getExpressNo(), orderDetail.getExpressCompany(), orderAddress.getMobile());
     }
