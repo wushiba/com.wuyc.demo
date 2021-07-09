@@ -941,6 +941,7 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
         });
         merchantGroupResult.setCount(getAllWebsiteCodeCount(merchantGroupReq.getMerchantId()));
         merchantGroupResult.setTotalExchange(getCurrentExchange(merchantGroupReq.getMerchantId(), null, null));
+        merchantGroupResult.setCurrentGoodsRecord();
         merchantGroupResult.setList(merchantGroupResults);
         return merchantGroupResult;
     }
