@@ -719,7 +719,7 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
         merchantGroupResult.setMobile(merchant.getMobile());
         merchantGroupResult.setCount(getAllWebsiteCodeCount(merchantGroupReq.getMerchantId()));
         merchantGroupResult.setTotalExchange(getCurrentExchange(merchant.getId(), null, null));
-        merchantGroupResult.setCurrentGoodsRecord((websiteGoodsRecordDao.sumGoodsRecordByMerchantId(merchant.getId(), null, null)));
+        merchantGroupResult.setCurrentGoodsRecord((websiteGoodsRecordDao.sumAllGoodsRecord(merchant.getId(), null, null)));
         LambdaQueryWrapper<Merchant> lambdaQueryWrapper = Wrappers.<Merchant>lambdaQuery()
                 .eq(Merchant::getPid, merchantGroupReq.getMerchantId())
                 .ne(Merchant::getRoleAlias, "wd")
