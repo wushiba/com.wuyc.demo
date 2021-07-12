@@ -50,6 +50,10 @@ public class OrderDetailResult implements Serializable {
 
     private String websiteInfo;
 
+    private String actCode;
+
+    private String tractNo;
+
     @Data
     public static class OrderDetails implements Serializable {
         @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", locale = "zh", timezone = "GMT+8")

@@ -9,6 +9,7 @@ import com.yfshop.code.mapper.*;
 import com.yfshop.code.model.*;
 import com.yfshop.common.exception.ApiException;
 import com.yfshop.common.util.BeanUtil;
+import com.yfshop.common.util.DateUtil;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboService;
@@ -57,6 +58,7 @@ public class AdminUserOrderExportServiceImpl implements AdminUserOrderExportServ
                 .eq(req.getOrderId() != null, OrderDetail::getOrderId, req.getOrderId())
                 .eq(StringUtils.isNoneBlank(req.getOrderNo()), OrderDetail::getOrderNo, req.getOrderNo())
                 .eq(StringUtils.isNoneBlank(req.getReceiveWay()), OrderDetail::getReceiveWay, req.getReceiveWay())
+                .eq(StringUtils.isNoneBlank(req.getExpressNo()), OrderDetail::getExpressNo, req.getExpressNo())
                 .eq(StringUtils.isNoneBlank(req.getOrderStatus()), OrderDetail::getOrderStatus, req.getOrderStatus())
                 .eq(drawRecord != null, OrderDetail::getUserCouponId, drawRecord == null ? null : drawRecord.getUserCouponId())
                 .isNotNull("Y".equals(req.getIsUseCoupon()), OrderDetail::getUserCouponId)
@@ -71,23 +73,26 @@ public class AdminUserOrderExportServiceImpl implements AdminUserOrderExportServ
                 .orderByDesc(OrderDetail::getId);
         List<OrderDetail> orderDetailList = orderDetailMapper.selectList(wrapper);
         List<Long> orderIds = orderDetailList.stream().map(OrderDetail::getOrderId).distinct().collect(Collectors.toList());
-        List<OrderExportResult> resultList = BeanUtil.convertList(orderDetailList, OrderExportResult.class);
         Map<Long, Order> orderMap = orderMapper.selectBatchIds(orderIds).stream().collect(Collectors.toMap(Order::getId, Function.identity()));
         Map<Long, OrderAddress> orderAddressMap = orderAddressMapper.selectList(Wrappers.lambdaQuery(OrderAddress.class).in(OrderAddress::getOrderId, orderIds)).stream().collect(Collectors.toMap(OrderAddress::getOrderId, Function.identity()));
-        resultList.forEach(item -> {
+        List<OrderExportResult> resultList = new ArrayList<>();
+        orderDetailList.forEach(item -> {
+            OrderExportResult exportResult = BeanUtil.convert(item, OrderExportResult.class);
+            exportResult.setCreateTime(DateUtil.localDateTimeToDate(item.getCreateTime()));
             Order o = orderMap.get(item.getOrderId());
             if (o != null) {
-                item.setPayTime(o.getPayTime());
+                exportResult.setPayTime(DateUtil.localDateTimeToDate(o.getPayTime()));
             }
             OrderAddress orderAddress = orderAddressMap.get(item.getOrderId());
             if (orderAddress != null) {
-                item.setAddress(orderAddress.getAddress());
-                item.setCity(orderAddress.getCity());
-                item.setProvince(orderAddress.getProvince());
-                item.setDistrict(orderAddress.getDistrict());
-                item.setRealname(orderAddress.getRealname());
-                item.setMobile(orderAddress.getMobile());
+                exportResult.setAddress(orderAddress.getAddress());
+                exportResult.setCity(orderAddress.getCity());
+                exportResult.setProvince(orderAddress.getProvince());
+                exportResult.setDistrict(orderAddress.getDistrict());
+                exportResult.setRealname(orderAddress.getRealname());
+                exportResult.setMobile(orderAddress.getMobile());
             }
+            resultList.add(exportResult);
         });
 
         return resultList;

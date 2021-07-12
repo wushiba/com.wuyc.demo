@@ -1,6 +1,7 @@
 package com.yfshop.admin.api.order.result;
 
 import cn.afterturn.easypoi.excel.annotation.Excel;
+import cn.afterturn.easypoi.excel.annotation.ExcelTarget;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.yfshop.common.enums.UserOrderStatusEnum;
 import lombok.Data;
@@ -9,11 +10,13 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Date;
 
 @Data
+@ExcelTarget("OrderExportResult")
 public class OrderExportResult implements Serializable {
-    @Excel(name = "下单时间", width = 18)
-    private LocalDateTime createTime;
+    @Excel(name = "激活时间", format = "yyyy-MM-dd HH:mm:ss",width=40)
+    private Date createTime;
 
     /**
      * 用户id编号
@@ -34,9 +37,9 @@ public class OrderExportResult implements Serializable {
     private Integer itemCount;
 
     @Excel(name = "数量", width = 18)
-    private LocalDateTime payTime;
+    private Date payTime;
 
-    @Excel(name = "支付金额", width = 18)
+    @Excel(name = "激活时间", format = "yyyy-MM-dd HH:mm:ss",width=40)
     /** 支付金额 */
     private BigDecimal payPrice;
 
@@ -93,13 +96,6 @@ public class OrderExportResult implements Serializable {
     @Excel(name = "物流单号", width = 18)
     private String expressNo;
 
-    public String getCreateTime() {
-        return createTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-    }
-
-    public String getPayTime() {
-        return payTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-    }
 
     public String getOrderStatus() {
         return UserOrderStatusEnum.getByCode(orderStatus).getDescription();

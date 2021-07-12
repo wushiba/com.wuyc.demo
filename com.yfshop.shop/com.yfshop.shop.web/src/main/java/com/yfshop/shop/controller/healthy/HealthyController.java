@@ -98,4 +98,16 @@ public class HealthyController implements BaseController {
     public CommonResult<Void> confirmHealthySubOrder(@NotNull(message = "订单ID不能为空") Long id) {
         return CommonResult.success(healthyService.confirmHealthySubOrder(id));
     }
+
+    @RequestMapping(value = "/remainderGoods", method = {RequestMethod.GET, RequestMethod.POST})
+    @ResponseBody
+    public CommonResult<Integer> remainderGoods(@NotNull(message = "商品ID不能为空") Integer itemId) {
+        return CommonResult.success(healthyService.remainderGoods(itemId));
+    }
+
+    @RequestMapping(value = "/buyGoods", method = {RequestMethod.GET, RequestMethod.POST})
+    @ResponseBody
+    public CommonResult<Long> buyGoods(@NotNull(message = "商品ID不能为空") Integer itemId) {
+        return CommonResult.success(healthyService.buyGoods(itemId));
+    }
 }
