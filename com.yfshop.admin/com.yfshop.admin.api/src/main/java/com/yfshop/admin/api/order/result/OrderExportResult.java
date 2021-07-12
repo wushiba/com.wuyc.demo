@@ -36,10 +36,10 @@ public class OrderExportResult implements Serializable {
     @Excel(name = "数量", width = 18)
     private Integer itemCount;
 
-    @Excel(name = "数量", width = 18)
+    @Excel(name = "激活时间", format = "yyyy-MM-dd HH:mm:ss",width=40)
     private Date payTime;
 
-    @Excel(name = "激活时间", format = "yyyy-MM-dd HH:mm:ss",width=40)
+    @Excel(name = "支付金额")
     /** 支付金额 */
     private BigDecimal payPrice;
 
