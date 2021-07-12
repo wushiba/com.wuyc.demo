@@ -80,7 +80,7 @@ public class AdminUserOrderExportServiceImpl implements AdminUserOrderExportServ
             OrderExportResult exportResult = BeanUtil.convert(item, OrderExportResult.class);
             exportResult.setCreateTime(DateUtil.localDateTimeToDate(item.getCreateTime()));
             Order o = orderMap.get(item.getOrderId());
-            if (o != null) {
+            if (o != null && o.getPayTime() != null) {
                 exportResult.setPayTime(DateUtil.localDateTimeToDate(o.getPayTime()));
             }
             OrderAddress orderAddress = orderAddressMap.get(item.getOrderId());
