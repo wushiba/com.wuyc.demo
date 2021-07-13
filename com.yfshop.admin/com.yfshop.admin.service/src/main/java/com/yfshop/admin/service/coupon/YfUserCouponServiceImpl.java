@@ -3,6 +3,7 @@ package com.yfshop.admin.service.coupon;
 import java.time.LocalDateTime;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.yfshop.admin.api.coupon.request.QueryUserCouponReq;
@@ -16,6 +17,7 @@ import com.yfshop.common.enums.UserCouponStatusEnum;
 import com.yfshop.common.exception.ApiException;
 import com.yfshop.common.util.BeanUtil;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.apache.dubbo.config.annotation.Service;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,17 +66,15 @@ public class YfUserCouponServiceImpl implements AdminUserCouponService {
     }
 
     @Override
-    public Page<YfUserCouponResult> findYfUserCouponListByPage(QueryUserCouponReq req) throws ApiException {
+    public IPage<YfUserCouponResult> findYfUserCouponListByPage(QueryUserCouponReq req) throws ApiException {
         LambdaQueryWrapper<UserCoupon> queryWrapper = Wrappers.lambdaQuery(UserCoupon.class)
                 .eq(req.getCouponId() != null, UserCoupon::getCouponId, req.getCouponId())
                 .eq(req.getUseStatus() != null, UserCoupon::getUseStatus, req.getUseStatus())
                 .eq(req.getOrderId() != null, UserCoupon::getOrderId, req.getOrderId())
-                .eq(req.getUserName() != null, UserCoupon::getNickname, req.getUserName())
+                .eq(StringUtils.isNotBlank(req.getUserName()), UserCoupon::getNickname, req.getUserName())
                 .orderByDesc(UserCoupon::getId);
-        Page<UserCoupon> itemPage = userCouponMapper.selectPage(new Page<>(req.getPageIndex(), req.getPageSize()), queryWrapper);
-        Page<YfUserCouponResult> page = new Page<>(itemPage.getCurrent(), itemPage.getSize(), itemPage.getTotal());
-        page.setRecords(BeanUtil.convertList(itemPage.getRecords(), YfUserCouponResult.class));
-        return page;
+        IPage<UserCoupon> itemPage = userCouponMapper.selectPage(new Page<>(req.getPageIndex(), req.getPageSize()), queryWrapper);
+        return BeanUtil.iPageConvert(itemPage, YfUserCouponResult.class);
     }
 
     @Override
