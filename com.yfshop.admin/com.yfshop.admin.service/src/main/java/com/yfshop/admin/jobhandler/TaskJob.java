@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.xxl.job.core.handler.annotation.XxlJob;
 import com.xxl.job.core.log.XxlJobFileAppender;
 import com.yfshop.admin.task.OrderTask;
+import com.yfshop.code.mapper.HealthyItemMapper;
 import com.yfshop.code.mapper.ItemMapper;
 import com.yfshop.code.model.HealthyItem;
 import com.yfshop.code.model.Item;
@@ -35,7 +36,7 @@ public class TaskJob {
     @Resource
     private ItemMapper itemMapper;
     @Resource
-    private HealthyItem healthyItem;
+    private HealthyItemMapper healthyItemMapper;
 
     @PostConstruct
     public void init() {
@@ -70,7 +71,7 @@ public class TaskJob {
     @XxlJob("healthyRemainderGoods")
     public void HealthyRemainderGoods() {
         String dataStr = DateUtil.format(LocalDateTime.now(), "yyyyMMdd");
-        List<HealthyItem> items = healthyItem.selectList(Wrappers.lambdaQuery(HealthyItem.class).eq(HealthyItem::getIsEnable, "Y").eq(HealthyItem::getIsDelete, "N"));
+        List<HealthyItem> items = healthyItemMapper.selectList(Wrappers.lambdaQuery(HealthyItem.class).eq(HealthyItem::getIsEnable, "Y").eq(HealthyItem::getIsDelete, "N"));
         items.forEach(item -> {
             String key = "HealthyRemainderGoods:" + dataStr + ":" + item.getId();
             redisService.incr(key, 1, 1, TimeUnit.DAYS);
@@ -79,7 +80,7 @@ public class TaskJob {
 
     @XxlJob("healthyBugGoods")
     public void healthyBugGoods() {
-        List<HealthyItem> items = healthyItem.selectList(Wrappers.lambdaQuery(HealthyItem.class).eq(HealthyItem::getIsEnable, "Y").eq(HealthyItem::getIsDelete, "N"));
+        List<HealthyItem> items = healthyItemMapper.selectList(Wrappers.lambdaQuery(HealthyItem.class).eq(HealthyItem::getIsEnable, "Y").eq(HealthyItem::getIsDelete, "N"));
         items.forEach(item -> {
             String key = "HealthyBugGoods:" + item.getId();
             redisService.incr(key, RandomUtil.randomInt(1, 10));
