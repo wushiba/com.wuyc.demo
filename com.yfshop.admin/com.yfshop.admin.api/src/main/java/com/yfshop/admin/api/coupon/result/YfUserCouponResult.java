@@ -71,11 +71,11 @@ public class YfUserCouponResult implements Serializable{
 	
     /**  */
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", locale = "zh", timezone = "GMT+8")
-    private Date validStartTime;
+    private LocalDateTime validStartTime;
 	
     /**  */
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", locale = "zh", timezone = "GMT+8")
-    private Date validEndTime;
+    private LocalDateTime validEndTime;
 	
     /** 用户昵称 */
     private String nickname;
@@ -93,7 +93,7 @@ public class YfUserCouponResult implements Serializable{
     private Date useTime;
 	
     /** 订单编号 */
-    private Integer orderId;
+    private Long orderId;
 	
 	// ------------------------------------------------------------ 附加字段 start ---------------------------------------------------------------------
 	
