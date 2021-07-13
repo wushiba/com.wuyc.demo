@@ -19,7 +19,7 @@
 	<property name="log.home_dir" value="/home/www/output/logs/yufan-shop-web"/>
 	<property name="log.app_name" value="vip.log"/>
 	<!-- 日志最大的历史 30天 -->
-	<property name="log.maxHistory" value="7"/>
+	<property name="log.maxHistory" value="3"/>
 	<property name="log.maxSize" value="100MB"/>
 	<!-- 日志界别 -->
 	<property name="log.level" value="INFO"/>
