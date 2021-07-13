@@ -198,7 +198,7 @@
 		<!-- 控制台输出 -->
 		<appender-ref ref="CONSOLE"/>
 		<!-- 不管什么包下的日志都输出文件 -->
-<!--		<appender-ref ref="APP"/>-->
+		<appender-ref ref="APP"/>
 		<appender-ref ref="ERROR"/>
 		<appender-ref ref="INFO"/>
 <!--		<appender-ref ref="WARN"/>-->
