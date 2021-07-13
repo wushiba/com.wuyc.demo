@@ -3,6 +3,7 @@ package com.yfshop.admin.service.coupon;
 import java.math.BigDecimal;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -22,6 +23,7 @@ import com.yfshop.common.exception.ApiException;
 import com.yfshop.common.exception.Asserts;
 import com.yfshop.common.util.BeanUtil;
 import com.yfshop.common.util.DateUtil;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.apache.dubbo.config.annotation.Service;
 import org.springframework.cache.annotation.Cacheable;
@@ -68,13 +70,13 @@ public class YfCouponServiceImpl implements AdminCouponService {
     }
 
     @Override
-    public Page<YfCouponResult> findYfCouponListByPage(QueryCouponReq req) throws ApiException {
+    public IPage<YfCouponResult> findYfCouponListByPage(QueryCouponReq req) throws ApiException {
         Page<Coupon> page = new Page<>(req.getPageIndex(), req.getPageSize());
         LambdaQueryWrapper<Coupon> queryWrapper = Wrappers.<Coupon>lambdaQuery()
                 .eq(StringUtils.isNotBlank(req.getIsEnable()), Coupon::getIsEnable, req.getIsEnable())
                 .like(StringUtils.isNotBlank(req.getCouponTitle()), Coupon::getCouponTitle, req.getCouponTitle());
-        Page<Coupon> pageData = couponMapper.selectPage(page, queryWrapper);
-        Page<YfCouponResult> data = new Page<>(req.getPageIndex(), req.getPageSize(), page.getTotal());
+        IPage<Coupon> pageData = couponMapper.selectPage(page, queryWrapper);
+        IPage<YfCouponResult> data = BeanUtil.iPageConvert(pageData,YfCouponResult.class);
         data.setRecords(getCouponResultList(pageData.getRecords()));
         return data;
     }
@@ -189,6 +191,7 @@ public class YfCouponServiceImpl implements AdminCouponService {
 
 
     private List<YfCouponResult> getCouponResultList(List<Coupon> dataList) {
+        if (CollectionUtils.isEmpty(dataList)) return new ArrayList<>();
         List<YfCouponResult> list = BeanUtil.convertList(dataList, YfCouponResult.class);
         List<Integer> ids = dataList.stream()
                 .filter(item -> StringUtils.isNotBlank(item.getCanUseItemIds()))
