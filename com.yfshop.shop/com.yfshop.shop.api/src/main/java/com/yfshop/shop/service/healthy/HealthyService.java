@@ -41,4 +41,8 @@ public interface HealthyService {
     List<Date> previewShowShipPlans(@Valid @NotNull PreviewShowShipPlansReq req) throws ApiException;
 
     Void confirmHealthySubOrder(Long id);
+
+    Integer remainderGoods(Integer id);
+
+    Long buyGoods(Integer itemId);
 }

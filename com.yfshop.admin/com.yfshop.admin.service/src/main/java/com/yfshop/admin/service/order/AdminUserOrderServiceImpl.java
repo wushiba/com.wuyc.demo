@@ -323,6 +323,14 @@ public class AdminUserOrderServiceImpl implements AdminUserOrderService {
                 }
             }
         }
+        if (orderDetail.getUserCouponId() != null) {
+            DrawRecord drawRecord = drawRecordMapper.selectOne(Wrappers.lambdaQuery(DrawRecord.class)
+                    .eq(DrawRecord::getUserCouponId, orderDetail.getUserCouponId()));
+            if (drawRecord != null) {
+                orderDetailResult.setTractNo(drawRecord.getTraceNo());
+                orderDetailResult.setActCode(drawRecord.getActCode());
+            }
+        }
         return orderDetailResult;
     }
 

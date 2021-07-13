@@ -11,6 +11,7 @@ import com.github.binarywang.wxpay.exception.WxPayException;
 import com.yfshop.admin.api.coupon.service.AdminUserCouponService;
 import com.yfshop.admin.api.draw.request.QueryDrawRecordExportReq;
 import com.yfshop.admin.api.draw.result.DrawRecordExportResult;
+import com.yfshop.admin.api.merchant.MerchantExcel;
 import com.yfshop.admin.api.order.request.OrderExpressReq;
 import com.yfshop.admin.api.order.request.QueryOrderReq;
 import com.yfshop.admin.api.order.result.OrderDetailResult;
@@ -21,6 +22,7 @@ import com.yfshop.admin.api.order.service.AdminUserOrderService;
 import com.yfshop.admin.api.website.request.WebsiteCodeExpressReq;
 import com.yfshop.common.api.CommonResult;
 import com.yfshop.common.base.BaseController;
+import com.yfshop.common.util.ExcelUtils;
 import io.swagger.annotations.ApiOperation;
 import lombok.SneakyThrows;
 import org.apache.dubbo.config.annotation.DubboReference;
@@ -103,21 +105,10 @@ public class AdminOrderManageController implements BaseController {
     @ResponseBody
     @SaCheckLogin
     @SaCheckRole(value = "sys")
-    public Void getOrderExport(QueryOrderReq recordReq, HttpServletResponse response) {
+    public Void getOrderExport(QueryOrderReq recordReq) {
         List<OrderExportResult> exportList = adminUserOrderExportService.orderExport(recordReq);
-        Workbook writer = ExcelExportUtil.exportExcel(new ExportParams("订单记录详情", "订单记录"), DrawRecordExportResult.class, exportList);
-        response.setContentType("application/vnd.ms-excel;charset=utf-8");
-        //test.xls是弹出下载对话框的文件名，不能为中文，中文请自行编码
-        String name = "订单记录详情";
-        response.setHeader("Content-Disposition", "attachment;filename=" + URLEncoder.encode(name, "UTF-8") + ".xls");
-        try (ServletOutputStream out = response.getOutputStream()) {
-            writer.write(out);
-            IoUtil.close(out);
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            writer.close();
-        }
+        ExcelUtils.exportExcel(exportList, "订单记录详情", "订单记录",
+                OrderExportResult.class, "订单记录详情.xls", getCurrentResponse());
         return null;
     }
 

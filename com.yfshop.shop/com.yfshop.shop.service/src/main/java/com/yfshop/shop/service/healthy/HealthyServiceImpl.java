@@ -36,6 +36,7 @@ import com.yfshop.common.exception.ApiException;
 import com.yfshop.common.exception.Asserts;
 import com.yfshop.common.healthy.enums.HealthyOrderStatusEnum;
 import com.yfshop.common.healthy.enums.HealthySubOrderStatusEnum;
+import com.yfshop.common.service.RedisService;
 import com.yfshop.common.util.BeanUtil;
 import com.yfshop.shop.service.address.UserAddressService;
 import com.yfshop.shop.service.address.result.UserAddressResult;
@@ -75,6 +76,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -120,6 +122,8 @@ public class HealthyServiceImpl implements HealthyService {
     private String shopUrl;
     @DubboReference(check = false)
     private MpService mpService;
+    @Resource
+    private RedisService redisService;
 
     @Transactional(rollbackFor = Exception.class)
     @Override
@@ -198,6 +202,7 @@ public class HealthyServiceImpl implements HealthyService {
         orderRequest.setSpbillCreateIp(req.getClientIp());
         orderRequest.setTimeStart(DateFormatUtils.format(new Date(), "yyyyMMddHHmmss"));
         orderRequest.setTimeExpire(DateFormatUtils.format(new Date(System.currentTimeMillis() + (1000 * 60 * 15)), "yyyyMMddHHmmss"));
+        healthyRemainderGoods(itemId);
 
         // wechat pay info
         if ("pro".equalsIgnoreCase(SpringUtil.getActiveProfile())) {
@@ -407,7 +412,42 @@ public class HealthyServiceImpl implements HealthyService {
         return null;
     }
 
+    @Override
+    public Integer remainderGoods(Integer id) {
+        String dataStr = DateUtil.format(LocalDateTime.now(), "yyyyMMdd");
+        String key = "HealthyRemainderGoods:" + dataStr + ":" + id;
+        Object object = redisService.get(key);
+        if (object != null) {
+            Integer count = Integer.valueOf(object.toString());
+            count = 2000 - count;
+            return count > 10 ? count : 10;
+        } else {
+            return 2000;
+        }
+    }
+
+    @Override
+    public Long buyGoods(Integer itemId) {
+        String key = "HealthyBugGoods:" + itemId;
+        Object object = redisService.get(key);
+        if (object != null) {
+           return Long.valueOf(object.toString());
+
+        } else {
+            return 0L;
+        }
+    }
+
     private String generateOrderNo(Integer userId) {
         return "H" + String.format("%06d", userId) + DateTime.now().toString("yyyyMMddHHmmssSSS") + RandomUtil.randomInt(10000, 100000);
     }
+
+    private void healthyRemainderGoods(Integer id) {
+        String dataStr = DateUtil.format(LocalDateTime.now(), "yyyyMMdd");
+        String key = "HealthyRemainderGoods:" + dataStr + ":" + id;
+        redisService.incr(key, 1, 1, TimeUnit.DAYS);
+        redisService.incr("HealthyBugGoods:" + id,1);
+    }
+
+
 }
