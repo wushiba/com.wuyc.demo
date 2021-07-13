@@ -234,7 +234,11 @@ public class HealthyServiceImpl implements HealthyService {
                 .orderByAsc(HealthyItem::getSort));
         List<HealthyItemResult> list = items.stream().map(item -> BeanUtil.convert(item, HealthyItemResult.class))
                 .collect(Collectors.toList());
-        list.forEach(item -> item.setPostRules(Arrays.asList(StringUtils.split(item.getPostRule(), ","))));
+        list.forEach(item -> {
+            item.setPostRules(Arrays.asList(StringUtils.split(item.getPostRule(), ",")));
+            item.setRemainderCount(remainderGoods(item.getId()));
+            item.setBuyCount(buyGoods(item.getId()));
+        });
         return list;
     }
 
@@ -431,7 +435,7 @@ public class HealthyServiceImpl implements HealthyService {
         String key = "HealthyBugGoods:" + itemId;
         Object object = redisService.get(key);
         if (object != null) {
-           return Long.valueOf(object.toString());
+            return Long.valueOf(object.toString());
 
         } else {
             return 0L;
@@ -446,7 +450,7 @@ public class HealthyServiceImpl implements HealthyService {
         String dataStr = DateUtil.format(LocalDateTime.now(), "yyyyMMdd");
         String key = "HealthyRemainderGoods:" + dataStr + ":" + id;
         redisService.incr(key, 1, 1, TimeUnit.DAYS);
-        redisService.incr("HealthyBugGoods:" + id,1);
+        redisService.incr("HealthyBugGoods:" + id, 1);
     }
 
 

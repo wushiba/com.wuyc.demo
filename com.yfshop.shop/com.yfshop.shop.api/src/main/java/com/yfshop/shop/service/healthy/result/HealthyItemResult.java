@@ -91,4 +91,8 @@ public class HealthyItemResult implements Serializable {
     private String content;
 
     private List<String> images;
+
+    private Integer remainderCount;
+
+    private Long buyCount;
 }
