@@ -90,7 +90,8 @@ public class YfUserCouponResult implements Serializable{
     private String couponDesc;
 	
     /**  */
-    private Date useTime;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", locale = "zh", timezone = "GMT+8")
+    private LocalDateTime useTime;
 	
     /** 订单编号 */
     private Long orderId;
