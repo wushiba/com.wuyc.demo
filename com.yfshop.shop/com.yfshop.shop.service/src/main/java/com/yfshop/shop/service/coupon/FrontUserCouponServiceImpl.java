@@ -46,6 +46,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -166,6 +167,14 @@ public class FrontUserCouponServiceImpl implements FrontUserCouponService {
                 return resultList.stream().filter(data -> "SHOP".equalsIgnoreCase(data.getCouponResource()) && pay.compareTo(data.getUseConditionPrice()) >= 0).sorted((o1, o2) -> o2.getCouponPrice().compareTo(o1.getCouponPrice())).collect(Collectors.toList());
             }
         }
+        List<Integer> couponIds = resultList.stream().map(YfUserCouponResult::getCouponId).distinct().collect(Collectors.toList());
+        Map<Integer, Coupon> couponMap = couponMapper.selectBatchIds(couponIds).stream().collect(Collectors.toMap(Coupon::getId, Function.identity()));
+        resultList.stream().forEach(item -> {
+            Coupon coupon = couponMap.get(item.getCouponId());
+            if (coupon != null) {
+                item.setCanUseItemIds(coupon.getCanUseItemIds());
+            }
+        });
         return resultList.stream().filter(data -> "ALL".equalsIgnoreCase(data.getUseRangeType()) ||
                 data.getCanUseItemIds().contains(userCouponReq.getItemId() + "")).collect(Collectors.toList());
     }

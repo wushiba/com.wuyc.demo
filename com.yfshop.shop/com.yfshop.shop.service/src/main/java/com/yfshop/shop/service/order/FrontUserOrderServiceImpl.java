@@ -145,8 +145,8 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
         if (CollectionUtil.isEmpty(userCouponList)) {
             return false;
         }
-
-        if ("ALL".equalsIgnoreCase(userCouponList.get(0).getUseRangeType()) || userCouponList.get(0).getCanUseItemIds().contains(itemId + "")) {
+        Coupon coupon = couponMapper.selectById(userCouponList.get(0).getCouponId());
+        if ("ALL".equalsIgnoreCase(userCouponList.get(0).getUseRangeType()) || (coupon != null && coupon.getCanUseItemIds().contains(itemId + ""))) {
             return true;
         } else {
             return false;
@@ -845,8 +845,9 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
         Asserts.assertTrue(userCoupon.getUserId().equals(userId), 500, "优惠券不合法");
         Asserts.assertFalse(userCoupon.getValidEndTime().isBefore(LocalDateTime.now()), 500, "优惠券已过期");
         Asserts.assertEquals(userCoupon.getUseStatus(), UserCouponStatusEnum.NO_USE.getCode(), 500, "优惠券状态不正确");
-        Asserts.assertTrue("ALL".equalsIgnoreCase(userCoupon.getUseRangeType()) ||
-                userCoupon.getCanUseItemIds().contains(itemId + ""), 500, "请使用正确的优惠券");
+        Coupon coupon = couponMapper.selectById(userCoupon.getCouponId());
+        Asserts.assertTrue("ALL".equalsIgnoreCase(userCoupon.getUseRangeType()) || (coupon != null &&
+                coupon.getCanUseItemIds().contains(itemId + "")), 500, "请使用正确的优惠券");
     }
 
 
