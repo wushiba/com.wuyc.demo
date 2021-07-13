@@ -31,10 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -76,7 +73,7 @@ public class YfCouponServiceImpl implements AdminCouponService {
                 .eq(StringUtils.isNotBlank(req.getIsEnable()), Coupon::getIsEnable, req.getIsEnable())
                 .like(StringUtils.isNotBlank(req.getCouponTitle()), Coupon::getCouponTitle, req.getCouponTitle());
         IPage<Coupon> pageData = couponMapper.selectPage(page, queryWrapper);
-        IPage<YfCouponResult> data = BeanUtil.iPageConvert(pageData,YfCouponResult.class);
+        IPage<YfCouponResult> data = BeanUtil.iPageConvert(pageData, YfCouponResult.class);
         data.setRecords(getCouponResultList(pageData.getRecords()));
         return data;
     }
@@ -198,13 +195,17 @@ public class YfCouponServiceImpl implements AdminCouponService {
                 .flatMap((item) -> Arrays.stream(item.getCanUseItemIds().split(","))
                         .map(Integer::valueOf))
                 .distinct().collect(Collectors.toList());
-        Map<Integer, String> itemMaps = itemMapper.selectBatchIds(ids).stream().collect(Collectors.toMap(Item::getId, Item::getItemTitle));
+        Map<Integer, String> itemMaps = new HashMap<>();
+        if (CollectionUtils.isNotEmpty(ids)) {
+            itemMaps = itemMapper.selectBatchIds(ids).stream().collect(Collectors.toMap(Item::getId, Item::getItemTitle));
+        }
+        Map<Integer, String> finalItemMaps = itemMaps;
         list.forEach(item -> {
             if (StringUtils.isNotBlank(item.getCanUseItemIds())) {
                 List<Integer> itemIds = Arrays.stream(item.getCanUseItemIds().split(",")).map(Integer::valueOf).collect(Collectors.toList());
                 List<String> titles = new ArrayList<>();
                 itemIds.forEach(i -> {
-                    String title = itemMaps.get(i);
+                    String title = finalItemMaps.get(i);
                     if (title != null) {
                         titles.add(title);
                     }
