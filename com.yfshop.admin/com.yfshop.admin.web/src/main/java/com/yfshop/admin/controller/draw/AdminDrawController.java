@@ -117,7 +117,7 @@ public class AdminDrawController implements BaseController {
     @ResponseBody
     @SaCheckLogin
     @SaCheckRole(value = "sys")
-    public CommonResult<Page<YfCouponResult>> findCouponList(QueryCouponReq req) {
+    public CommonResult<IPage<YfCouponResult>> findCouponList(QueryCouponReq req) {
         return CommonResult.success(adminCouponService.findYfCouponListByPage(req));
     }
 
