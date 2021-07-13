@@ -167,7 +167,7 @@
 
 	<!--设置一个向上传递的appender,所有级别的日志都会输出-->
 	<appender name="APP" class="ch.qos.logback.core.rolling.RollingFileAppender">
-		<file>${log.home_dir}/info/${log.app_name}.log</file>
+		<file>${log.home_dir}/app/${log.app_name}.log</file>
 		<rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
 			<fileNamePattern>${log.home_dir}/app/%d{yyyy-MM-dd}-${log.app_name}-%i.log</fileNamePattern>
 			<maxHistory>${log.maxHistory}</maxHistory>
