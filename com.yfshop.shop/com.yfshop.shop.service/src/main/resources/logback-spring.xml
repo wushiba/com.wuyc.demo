@@ -113,6 +113,7 @@
 
 	<!-- INFO级别日志 appender -->
 	<appender name="INFO" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>${log.home_dir}/info/${log.app_name}.log</file>
 		<filter class="ch.qos.logback.classic.filter.LevelFilter">
 			<level>INFO</level>
 			<onMatch>ACCEPT</onMatch>
@@ -167,7 +168,6 @@
 
 	<!--设置一个向上传递的appender,所有级别的日志都会输出-->
 	<appender name="APP" class="ch.qos.logback.core.rolling.RollingFileAppender">
-		<file>${log.home_dir}/app/${log.app_name}.log</file>
 		<rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
 			<fileNamePattern>${log.home_dir}/app/%d{yyyy-MM-dd}-${log.app_name}-%i.log</fileNamePattern>
 			<maxHistory>${log.maxHistory}</maxHistory>
@@ -198,11 +198,11 @@
 		<!-- 控制台输出 -->
 		<appender-ref ref="CONSOLE"/>
 		<!-- 不管什么包下的日志都输出文件 -->
-		<appender-ref ref="APP"/>
+<!--		<appender-ref ref="APP"/>-->
 		<appender-ref ref="ERROR"/>
 		<appender-ref ref="INFO"/>
 <!--		<appender-ref ref="WARN"/>-->
-		<appender-ref ref="DEBUG"/>
+<!--		<appender-ref ref="DEBUG"/>-->
 <!--		<appender-ref ref="TRACE"/>-->
 	</root>
 </configuration>
