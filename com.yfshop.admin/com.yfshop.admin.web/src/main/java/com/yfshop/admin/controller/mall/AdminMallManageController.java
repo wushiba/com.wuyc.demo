@@ -9,6 +9,7 @@ import com.yfshop.admin.api.mall.request.CreateItemCategoryReq;
 import com.yfshop.admin.api.mall.request.GenerateItemSkuReq;
 import com.yfshop.admin.api.mall.request.ItemCreateReq;
 import com.yfshop.admin.api.mall.request.ItemUpdateReq;
+import com.yfshop.admin.api.mall.request.QueryBannerReq;
 import com.yfshop.admin.api.mall.request.QueryItemReq;
 import com.yfshop.admin.api.mall.request.SaveItemSkuReq;
 import com.yfshop.admin.api.mall.request.UpdateBannerReq;
@@ -167,9 +168,9 @@ public class AdminMallManageController implements BaseController {
     @ResponseBody
     @SaCheckLogin
     @SaCheckRole(value = "sys")
-    public CommonResult<IPage<BannerResult>> pageQueryHomeBanner(@RequestParam(name = "pageIndex", required = false, defaultValue = "1") Integer pageIndex,
-                                                                 @RequestParam(name = "pageSize", required = false, defaultValue = "10") Integer pageSize) {
-        return CommonResult.success(adminMallManageService.pageQueryBanner(pageIndex, pageSize, BannerPositionsEnum.HOME.getCode()));
+    public CommonResult<IPage<BannerResult>> pageQueryHomeBanner(QueryBannerReq req) {
+        req.setPositions(BannerPositionsEnum.HOME.getCode());
+        return CommonResult.success(adminMallManageService.pageQueryBanner(req));
     }
 
     @ApiOperation(value = "编辑首页banner", httpMethod = "GET")
@@ -249,9 +250,9 @@ public class AdminMallManageController implements BaseController {
     @ResponseBody
     @SaCheckLogin
     @SaCheckRole(value = "sys")
-    public CommonResult<IPage<BannerResult>> pageQueryLoopBanner(@RequestParam(name = "pageIndex", required = false, defaultValue = "1") Integer pageIndex,
-                                                                 @RequestParam(name = "pageSize", required = false, defaultValue = "10") Integer pageSize) {
-        return CommonResult.success(adminMallManageService.pageQueryBanner(pageIndex, pageSize, BannerPositionsEnum.BANNER.getCode()));
+    public CommonResult<IPage<BannerResult>> pageQueryLoopBanner(QueryBannerReq req) {
+        req.setPositions(BannerPositionsEnum.BANNER.getCode());
+        return CommonResult.success(adminMallManageService.pageQueryBanner(req));
     }
 
     @ApiOperation(value = "编辑轮播banner", httpMethod = "GET")
@@ -323,10 +324,8 @@ public class AdminMallManageController implements BaseController {
     @ResponseBody
     @SaCheckLogin
     @SaCheckRole(value = "sys")
-    public CommonResult<IPage<BannerResult>> pageQueryBanner(@RequestParam(name = "pageIndex", required = false, defaultValue = "1") Integer pageIndex,
-                                                             @RequestParam(name = "pageSize", required = false, defaultValue = "10") Integer pageSize,
-                                                             String positions) {
-        return CommonResult.success(adminMallManageService.pageQueryBanner(pageIndex, pageSize, StringUtils.isNotBlank(positions) ? positions : null));
+    public CommonResult<IPage<BannerResult>> pageQueryBanner(QueryBannerReq req) {
+        return CommonResult.success(adminMallManageService.pageQueryBanner(req));
     }
 
     @ApiOperation(value = "编辑banner", httpMethod = "GET")

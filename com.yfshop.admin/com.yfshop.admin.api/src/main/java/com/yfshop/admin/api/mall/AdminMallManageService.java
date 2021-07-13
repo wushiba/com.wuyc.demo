@@ -6,6 +6,7 @@ import com.yfshop.admin.api.mall.request.CreateItemCategoryReq;
 import com.yfshop.admin.api.mall.request.GenerateItemSkuReq;
 import com.yfshop.admin.api.mall.request.ItemCreateReq;
 import com.yfshop.admin.api.mall.request.ItemUpdateReq;
+import com.yfshop.admin.api.mall.request.QueryBannerReq;
 import com.yfshop.admin.api.mall.request.QueryItemReq;
 import com.yfshop.admin.api.mall.request.RecreateItemSkuReq;
 import com.yfshop.admin.api.mall.request.SaveItemSkuReq;
@@ -64,6 +65,14 @@ public interface AdminMallManageService {
      * @return the page data
      */
     IPage<BannerResult> pageQueryBanner(Integer pageIndex, Integer pageSize, String positions);
+
+    /**
+     * 分页查询首页banner
+     *
+     * @param req the req
+     * @return the page data
+     */
+    IPage<BannerResult> pageQueryBanner(QueryBannerReq req);
 
     /**
      * 创建分类
