@@ -256,7 +256,7 @@ public class AdminMallManageServiceImpl implements AdminMallManageService {
                 .eq(req.getCategoryId() != null, Item::getCategoryId, req.getCategoryId())
                 .eq(StringUtils.isNotBlank(req.getIsEnable()), Item::getIsEnable, req.getIsEnable())
                 .like(StringUtils.isNotBlank(req.getItemTitle()), Item::getItemTitle, req.getItemTitle())
-                .orderByDesc(Item::getCreateTime);
+                .orderByAsc(Item::getSort);
         Page<Item> itemPage = itemMapper.selectPage(new Page<>(req.getPageIndex(), req.getPageSize()), queryWrapper);
         List<Integer> categoryIds = itemPage.getRecords().stream().map(Item::getCategoryId).distinct().collect(Collectors.toList());
         Map<Integer, String> categoryMap = categoryMapper.selectBatchIds(categoryIds).stream().collect(Collectors.toMap((item) -> item.getId(), (item) -> item.getCategoryName()));
