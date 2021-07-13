@@ -97,17 +97,18 @@ public class YfCouponServiceImpl implements AdminCouponService {
         coupon.setIsDelete("N");
         coupon.setIsEnable("N");
         couponMapper.insert(coupon);
-        CouponRules couponRules = new CouponRules();
-        couponRules.setCreateTime(LocalDateTime.now());
-        couponRules.setUpdateTime(LocalDateTime.now());
-        couponRules.setCouponId(coupon.getId());
-        couponRules.setConditions(couponReq.getCouponRulesConditions());
-        couponRules.setItemIds(couponReq.getCouponRulesItemIds());
-        couponRules.setIsEnable("N");
-        couponRules.setLimitCount(couponReq.getLimitAmount());
-        couponRules.setCouponId(coupon.getId());
-        couponRulesMapper.delete(Wrappers.lambdaQuery(CouponRules.class).eq(CouponRules::getCouponId, coupon.getId()));
-        couponRulesMapper.insert(couponRules);
+        if (!"draw".equalsIgnoreCase(coupon.getCouponResource())) {
+            CouponRules couponRules = new CouponRules();
+            couponRules.setCreateTime(LocalDateTime.now());
+            couponRules.setUpdateTime(LocalDateTime.now());
+            couponRules.setCouponId(coupon.getId());
+            couponRules.setConditions(couponReq.getCouponRulesConditions());
+            couponRules.setItemIds(couponReq.getCouponRulesItemIds());
+            couponRules.setIsEnable("N");
+            couponRules.setLimitCount(couponReq.getLimitAmount());
+            couponRules.setCouponId(coupon.getId());
+            couponRulesMapper.insert(couponRules);
+        }
     }
 
     @Override
@@ -116,13 +117,16 @@ public class YfCouponServiceImpl implements AdminCouponService {
         checkCouponParams(couponReq);
         Coupon coupon = BeanUtil.convert(couponReq, Coupon.class);
         couponMapper.updateById(coupon);
-        CouponRules couponRules = new CouponRules();
-        couponRules.setCouponId(coupon.getId());
-        couponRules.setConditions(couponReq.getCouponRulesConditions());
-        couponRules.setItemIds(couponReq.getCouponRulesItemIds());
-        couponRules.setLimitCount(couponReq.getLimitAmount());
-        couponRules.setCouponId(coupon.getId());
-        couponRulesMapper.update(couponRules, Wrappers.lambdaQuery(CouponRules.class).eq(CouponRules::getCouponId, coupon.getId()));
+        if (!"draw".equalsIgnoreCase(coupon.getCouponResource())) {
+            CouponRules couponRules = new CouponRules();
+            couponRules.setCouponId(coupon.getId());
+            couponRules.setConditions(couponReq.getCouponRulesConditions());
+            couponRules.setItemIds(couponReq.getCouponRulesItemIds());
+            couponRules.setLimitCount(couponReq.getLimitAmount());
+            couponRules.setCouponId(coupon.getId());
+            couponRulesMapper.update(couponRules, Wrappers.lambdaQuery(CouponRules.class)
+                    .eq(CouponRules::getCouponId, coupon.getId()));
+        }
 
     }
 
@@ -211,6 +215,13 @@ public class YfCouponServiceImpl implements AdminCouponService {
                     .in(UserCoupon::getUseStatus, UserCouponStatusEnum.HAS_USE.getCode(), UserCouponStatusEnum.IN_USE.getCode()));
             item.setUseAmount(useAmount);
             item.setReceiveAmount(receiveAmount);
+            if (!"draw".equalsIgnoreCase(item.getCouponResource())) {
+                CouponRules rules = couponRulesMapper.selectOne(Wrappers.lambdaQuery(CouponRules.class).eq(CouponRules::getCouponId, item.getId()));
+                if (rules != null) {
+                    item.setCouponRulesConditions(rules.getConditions());
+                    item.setCouponRulesItemIds(rules.getItemIds());
+                }
+            }
         });
         return list;
     }

@@ -20,6 +20,8 @@ public class QueryUserCouponReq implements Serializable {
 
     private Long orderId;
 
+    private String userName;
+
     private Integer pageIndex;
 
     private Integer pageSize;

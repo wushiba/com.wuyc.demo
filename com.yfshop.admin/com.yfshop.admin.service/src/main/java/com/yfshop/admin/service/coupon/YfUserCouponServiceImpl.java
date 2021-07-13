@@ -69,6 +69,7 @@ public class YfUserCouponServiceImpl implements AdminUserCouponService {
                 .eq(req.getCouponId() != null, UserCoupon::getCouponId, req.getCouponId())
                 .eq(req.getUseStatus() != null, UserCoupon::getUseStatus, req.getUseStatus())
                 .eq(req.getOrderId() != null, UserCoupon::getOrderId, req.getOrderId())
+                .eq(req.getUserName() != null, UserCoupon::getNickname, req.getUserName())
                 .orderByDesc(UserCoupon::getId);
         Page<UserCoupon> itemPage = userCouponMapper.selectPage(new Page<>(req.getPageIndex(), req.getPageSize()), queryWrapper);
         Page<YfUserCouponResult> page = new Page<>(itemPage.getCurrent(), itemPage.getSize(), itemPage.getTotal());

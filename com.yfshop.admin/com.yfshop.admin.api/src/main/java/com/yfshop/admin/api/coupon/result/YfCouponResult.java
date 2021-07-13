@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Date;
 
@@ -104,6 +105,10 @@ public class YfCouponResult implements Serializable {
      * 优惠券描述
      */
     private String couponDesc;
+
+    private String couponRulesItemIds;
+
+    private BigDecimal couponRulesConditions;
 
     /**
      * 是否上架 Y|N
