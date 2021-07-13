@@ -52,4 +52,7 @@ public class ItemCreateReq implements Serializable {
     @ApiModelProperty(value = "商品详情")
     @NotBlank(message = "商品详情不能为空")
     private String itemContent;
+
+    @ApiModelProperty(value = "排序字段")
+    private Integer sort;
 }

@@ -16,6 +16,7 @@ import com.yfshop.admin.api.mall.request.GenerateItemSkuReq;
 import com.yfshop.admin.api.mall.request.ItemCreateReq;
 import com.yfshop.admin.api.mall.request.ItemSpecNameAndValue;
 import com.yfshop.admin.api.mall.request.ItemUpdateReq;
+import com.yfshop.admin.api.mall.request.QueryBannerReq;
 import com.yfshop.admin.api.mall.request.QueryItemReq;
 import com.yfshop.admin.api.mall.request.RecreateItemSkuReq;
 import com.yfshop.admin.api.mall.request.SaveItemSkuReq;
@@ -159,6 +160,21 @@ public class AdminMallManageServiceImpl implements AdminMallManageService {
         Page<Banner> page = bannerMapper.selectPage(new Page<>(pageIndex, pageSize), queryWrapper);
         // wrapper
         Page<BannerResult> data = new Page<>(pageIndex, pageSize, page.getTotal());
+        data.setRecords(BeanUtil.convertList(page.getRecords(), BannerResult.class));
+        return data;
+    }
+
+    @Override
+    public IPage<BannerResult> pageQueryBanner(QueryBannerReq req) {
+        if (req == null) {
+            return new Page<>();
+        }
+        LambdaQueryWrapper<Banner> queryWrapper = Wrappers.lambdaQuery(Banner.class)
+                .like(StringUtils.isNotBlank(req.getBannerName()), Banner::getBannerName, req.getBannerName())
+                .eq(StringUtils.isNotBlank(req.getPositions()), Banner::getPositions, req.getPositions())
+                .orderByDesc(Banner::getCreateTime);
+        Page<Banner> page = bannerMapper.selectPage(new Page<>(req.getPageIndex(), req.getPageSize()), queryWrapper);
+        Page<BannerResult> data = new Page<>(req.getPageIndex(), req.getPageSize(), page.getTotal());
         data.setRecords(BeanUtil.convertList(page.getRecords(), BannerResult.class));
         return data;
     }
@@ -382,7 +398,11 @@ public class AdminMallManageServiceImpl implements AdminMallManageService {
         item.setItemCover(IterUtil.getFirst(req.getItemImages()));
         item.setIsDelete("N");
         item.setSpecNum(0);
-        item.setSort(0);
+        if (req.getSort() != null) {
+            item.setSort(req.getSort());
+        } else {
+            item.setSort(999);
+        }
         itemMapper.insert(item);
 
         // 创建商品详情
@@ -426,6 +446,9 @@ public class AdminMallManageServiceImpl implements AdminMallManageService {
         item.setItemSubTitle(req.getItemSubTitle());
         item.setIsEnable(req.getIsEnable());
         item.setItemCover(IterUtil.getFirst(req.getItemImages()));
+        if (req.getSort() != null) {
+            item.setSort(req.getSort());
+        }
         int rows = itemMapper.updateById(item);
         Asserts.assertTrue(rows > 0, 500, "编辑失败");
 
