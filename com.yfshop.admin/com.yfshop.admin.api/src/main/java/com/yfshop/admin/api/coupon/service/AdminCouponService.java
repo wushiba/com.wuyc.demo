@@ -1,5 +1,6 @@
 package com.yfshop.admin.api.coupon.service;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.yfshop.admin.api.coupon.request.CreateCouponReq;
 import com.yfshop.admin.api.coupon.request.QueryCouponReq;
@@ -34,7 +35,7 @@ public interface AdminCouponService {
 	 * @return 
 	 * @Description:
 	 */
-	public Page<YfCouponResult> findYfCouponListByPage(QueryCouponReq req) throws ApiException;
+	public IPage<YfCouponResult> findYfCouponListByPage(QueryCouponReq req) throws ApiException;
 
 	/**
 	 * 得到所有平台优惠券YfCoupon

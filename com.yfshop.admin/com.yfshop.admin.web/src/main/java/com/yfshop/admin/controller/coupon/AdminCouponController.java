@@ -41,7 +41,7 @@ public class AdminCouponController implements BaseController {
     @ResponseBody
     @SaCheckLogin
     @SaCheckRole(value = "sys")
-    public CommonResult<Page<YfCouponResult>> findList(QueryCouponReq req) {
+    public CommonResult<IPage<YfCouponResult>> findList(QueryCouponReq req) {
         return CommonResult.success(adminCouponService.findYfCouponListByPage(req));
     }
 
