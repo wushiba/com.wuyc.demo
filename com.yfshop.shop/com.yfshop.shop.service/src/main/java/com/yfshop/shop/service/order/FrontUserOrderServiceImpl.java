@@ -856,7 +856,11 @@ public class FrontUserOrderServiceImpl implements FrontUserOrderService {
         Asserts.assertTrue(userCoupon.getUserId().equals(userId), 500, "优惠券不合法");
         Asserts.assertFalse(userCoupon.getValidEndTime().isBefore(LocalDateTime.now()), 500, "优惠券已过期");
         Asserts.assertEquals(userCoupon.getUseStatus(), UserCouponStatusEnum.NO_USE.getCode(), 500, "优惠券状态不正确");
-        Collection<String> intersection = CollectionUtil.intersection(itemIds, Arrays.stream(userCoupon.getCanUseItemIds().split(",")).collect(Collectors.toList()));
+        Collection<String> intersection = null;
+        Coupon coupon = couponMapper.selectById(userCoupon.getCouponId());
+        if (coupon != null) {
+            intersection = CollectionUtil.intersection(itemIds, Arrays.stream(coupon.getCanUseItemIds().split(",")).collect(Collectors.toList()));
+        }
         Asserts.assertTrue("ALL".equalsIgnoreCase(userCoupon.getUseRangeType()) || CollectionUtil.isNotEmpty(intersection), 500, "请使用正确的优惠券");
     }
 
