@@ -17,7 +17,7 @@
 
 	<!-- 定义日志文件 输出位置 -->
 	<property name="log.home_dir" value="/home/www/output/logs/yufan-shop-service"/>
-	<property name="log.app_name" value="vip.log"/>
+	<property name="log.app_name" value="vip"/>
 	<!-- 日志最大的历史 30天 -->
 	<property name="log.maxHistory" value="3"/>
 	<property name="log.maxSize" value="100MB"/>
@@ -167,6 +167,7 @@
 
 	<!--设置一个向上传递的appender,所有级别的日志都会输出-->
 	<appender name="APP" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>${log.home_dir}/app/${log.app_name}.log</file>
 		<rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
 			<fileNamePattern>${log.home_dir}/app/%d{yyyy-MM-dd}-${log.app_name}-%i.log</fileNamePattern>
 			<maxHistory>${log.maxHistory}</maxHistory>
@@ -200,8 +201,8 @@
 		<appender-ref ref="APP"/>
 		<appender-ref ref="ERROR"/>
 		<appender-ref ref="INFO"/>
-		<appender-ref ref="WARN"/>
+<!--		<appender-ref ref="WARN"/>-->
 		<appender-ref ref="DEBUG"/>
-		<appender-ref ref="TRACE"/>
+<!--		<appender-ref ref="TRACE"/>-->
 	</root>
 </configuration>
