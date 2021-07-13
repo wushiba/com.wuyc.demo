@@ -28,16 +28,16 @@
 	<springProfile name="dev">
 		<property name="log.home_dir" value="H://logs/yufan-shop-web"/>
 		<property name="log.maxSize" value="10MB"/>
-		<property name="log.level" value="DEBUG"/>
+<!--		<property name="log.level" value="INFO"/>-->
 	</springProfile>
 
-	<springProfile name="uat">
-		<property name="log.level" value="DEBUG"/>
-	</springProfile>
+<!--	<springProfile name="uat">-->
+<!--		<property name="log.level" value="INFO"/>-->
+<!--	</springProfile>-->
 
-	<springProfile name="pro">
-		<property name="log.level" value="INFO"/>
-	</springProfile>
+<!--	<springProfile name="pro">-->
+<!--		<property name="log.level" value="INFO"/>-->
+<!--	</springProfile>-->
 	<!--*****************************************************************************-->
 	<!--自定义项 结束-->
 	<!--*****************************************************************************-->
