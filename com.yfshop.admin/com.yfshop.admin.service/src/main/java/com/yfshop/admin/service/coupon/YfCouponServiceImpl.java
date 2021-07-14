@@ -203,6 +203,9 @@ public class YfCouponServiceImpl implements AdminCouponService {
     private List<YfCouponResult> getCouponResultList(List<Coupon> dataList) {
         if (CollectionUtils.isEmpty(dataList)) return new ArrayList<>();
         List<YfCouponResult> list = BeanUtil.convertList(dataList, YfCouponResult.class);
+        for (int i = 0; i < list.size(); i++) {
+            list.get(i).setUseConditionPrice(dataList.get(i).getUseConditionPrice().doubleValue());
+        }
         List<Integer> ids = dataList.stream()
                 .filter(item -> StringUtils.isNotBlank(item.getCanUseItemIds()))
                 .flatMap((item) -> Arrays.stream(item.getCanUseItemIds().split(","))
