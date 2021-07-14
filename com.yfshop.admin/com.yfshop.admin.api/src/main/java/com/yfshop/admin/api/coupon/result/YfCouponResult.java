@@ -108,6 +108,8 @@ public class YfCouponResult implements Serializable {
 
     private String couponRulesItemIds;
 
+    private String couponRulesItemNames;
+
     private BigDecimal couponRulesConditions;
 
     /**
