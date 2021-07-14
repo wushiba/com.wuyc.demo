@@ -67,6 +67,13 @@ public interface AdminCouponService {
 	public void deleteYfCoupon(Integer couponId) throws ApiException;
 
 	/**
+	 * 查询平台优惠券
+	 * @param couponId
+	 * @Description:
+	 */
+	YfCouponResult findYfCoupon(Integer couponId) throws ApiException;
+
+	/**
 	 * 上下架平台优惠券
 	 * @param couponId
 	 * @Description:

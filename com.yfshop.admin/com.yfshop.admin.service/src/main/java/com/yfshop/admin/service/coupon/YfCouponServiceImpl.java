@@ -139,6 +139,19 @@ public class YfCouponServiceImpl implements AdminCouponService {
     }
 
     @Override
+    public YfCouponResult findYfCoupon(Integer couponId) throws ApiException {
+        if (couponId == null) {
+            return null;
+        }
+        Coupon coupon = couponMapper.selectById(couponId);
+        if (coupon == null) {
+            return null;
+        }
+        return getCouponResultList(Collections.singletonList(coupon))
+                .stream().findFirst().orElse(null);
+    }
+
+    @Override
     @Transactional(rollbackFor = Exception.class)
     public void updateCouponStatus(Integer couponId, String isEnable) throws ApiException {
         Coupon coupon = couponMapper.selectById(couponId);
