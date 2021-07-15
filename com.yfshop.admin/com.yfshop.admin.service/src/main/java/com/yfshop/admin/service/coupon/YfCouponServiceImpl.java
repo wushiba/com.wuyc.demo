@@ -1,7 +1,5 @@
 package com.yfshop.admin.service.coupon;
 
-import java.math.BigDecimal;
-
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
@@ -16,23 +14,28 @@ import com.yfshop.code.mapper.CouponMapper;
 import com.yfshop.code.mapper.CouponRulesMapper;
 import com.yfshop.code.mapper.ItemMapper;
 import com.yfshop.code.mapper.UserCouponMapper;
-import com.yfshop.code.model.*;
+import com.yfshop.code.model.Coupon;
+import com.yfshop.code.model.CouponRules;
+import com.yfshop.code.model.Item;
+import com.yfshop.code.model.UserCoupon;
 import com.yfshop.common.constants.CacheConstants;
 import com.yfshop.common.enums.UserCouponStatusEnum;
 import com.yfshop.common.exception.ApiException;
 import com.yfshop.common.exception.Asserts;
 import com.yfshop.common.util.BeanUtil;
-import com.yfshop.common.util.DateUtil;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.dubbo.config.annotation.DubboService;
-import org.apache.dubbo.config.annotation.Service;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
-import java.util.*;
-import java.util.function.Function;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -139,6 +142,19 @@ public class YfCouponServiceImpl implements AdminCouponService {
     }
 
     @Override
+    public YfCouponResult findYfCoupon(Integer couponId) throws ApiException {
+        if (couponId == null) {
+            return null;
+        }
+        Coupon coupon = couponMapper.selectById(couponId);
+        if (coupon == null) {
+            return null;
+        }
+        return getCouponResultList(Collections.singletonList(coupon))
+                .stream().findFirst().orElse(null);
+    }
+
+    @Override
     @Transactional(rollbackFor = Exception.class)
     public void updateCouponStatus(Integer couponId, String isEnable) throws ApiException {
         Coupon coupon = couponMapper.selectById(couponId);
@@ -190,6 +206,9 @@ public class YfCouponServiceImpl implements AdminCouponService {
     private List<YfCouponResult> getCouponResultList(List<Coupon> dataList) {
         if (CollectionUtils.isEmpty(dataList)) return new ArrayList<>();
         List<YfCouponResult> list = BeanUtil.convertList(dataList, YfCouponResult.class);
+        for (int i = 0; i < list.size(); i++) {
+            list.get(i).setUseConditionPrice(dataList.get(i).getUseConditionPrice().doubleValue());
+        }
         List<Integer> ids = dataList.stream()
                 .filter(item -> StringUtils.isNotBlank(item.getCanUseItemIds()))
                 .flatMap((item) -> Arrays.stream(item.getCanUseItemIds().split(","))
@@ -224,6 +243,15 @@ public class YfCouponServiceImpl implements AdminCouponService {
                 if (rules != null) {
                     item.setCouponRulesConditions(rules.getConditions());
                     item.setCouponRulesItemIds(rules.getItemIds());
+                    if (org.apache.commons.lang3.StringUtils.isNotBlank(rules.getItemIds())
+                            && !org.apache.commons.lang3.StringUtils.equalsIgnoreCase("ALL", rules.getItemIds())) {
+                        List<Integer> ruleItemIds = Arrays.stream(rules.getItemIds().split(",")).map(Integer::valueOf)
+                                .distinct().collect(Collectors.toList());
+                        List<Item> ruleItems = itemMapper.selectBatchIds(ruleItemIds);
+                        item.setCouponRulesItemNames(org.apache.commons.lang3.StringUtils
+                                .join(ruleItems.stream().map(Item::getItemTitle).collect(Collectors.toList()), ",")
+                        );
+                    }
                 }
             }
         });
