@@ -54,7 +54,7 @@ public class AdminWxPushTaskImplService implements WxPushTaskService {
     @Autowired
     private OssDownloader ossDownloader;
     @Override
-    public void createPushTask(WxPushTaskReq wxPushTaskReq) throws ApiException {
+    public Void createPushTask(WxPushTaskReq wxPushTaskReq) throws ApiException {
         List<WxPushTaskData> wxPushTaskDataList=new ArrayList<>();
         if ("EXCEL".equals(wxPushTaskReq.getSource())&& HttpUtil.isHttp(wxPushTaskReq.getFileUrl())){
             File dir = new File(dirPath, "excel");
@@ -64,7 +64,7 @@ public class AdminWxPushTaskImplService implements WxPushTaskService {
             File file = new File(dir, "push-"+DateUtil.format(new Date(), "yyMMddHHmmss") + ".xls");
             String fileUrl = ossDownloader.privateDownloadUrl(wxPushTaskReq.getFileUrl(), 60 * 5, null);
             HttpUtil.downloadFileFromUrl(fileUrl, file);
-            wxPushTaskDataList=ExcelUtils.importExcel(file.getPath(),0,0,WxPushTaskData.class);
+            wxPushTaskDataList=ExcelUtils.importExcel(file.getPath(),1,1,WxPushTaskData.class);
         }else{
             wxPushTaskDataList=wxPushTaskDao.getWxPushTaskData(wxPushTaskReq);
         }
@@ -87,20 +87,23 @@ public class AdminWxPushTaskImplService implements WxPushTaskService {
                 wxPushTaskDetailManager.saveBatch(pushTaskDetails);
             }
         }
+        return null;
     }
 
     @Override
-    public void closePushTask(Integer id) throws ApiException {
+    public Void closePushTask(Integer id) throws ApiException {
         WxPushTask wxPushTask = new WxPushTask();
         wxPushTask.setId(id);
         wxPushTask.setStatus("CLOSED");
         wxPushTaskMapper.updateById(wxPushTask);
+        return null;
     }
 
     @Override
-    public void editPushTask(WxPushTaskReq wxPushTaskReq) throws ApiException {
+    public Void editPushTask(WxPushTaskReq wxPushTaskReq) throws ApiException {
         WxPushTask wxPushTask= BeanUtil.convert(wxPushTaskReq,WxPushTask.class);
         wxPushTaskMapper.updateById(wxPushTask);
+        return null;
     }
 
     @Override

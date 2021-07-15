@@ -96,14 +96,18 @@ public class MallServiceImpl implements MallService {
                 .eq(req.getCategoryId() != null, Item::getCategoryId, req.getCategoryId())
                 .eq(Item::getIsEnable, "Y").eq(Item::getIsDelete, "N").orderByAsc(Item::getSort, Item::getId));
         List<ItemResult> list = BeanUtil.convertList(items, ItemResult.class);
-        list.parallelStream().forEach(itemResult -> {
+        List<ItemResult> result=new ArrayList<>();
+        list.stream().forEach(itemResult -> {
             ItemSku itemSku = skuMapper.selectOne(Wrappers.lambdaQuery(ItemSku.class)
                     .eq(ItemSku::getItemId, itemResult.getId()).eq(ItemSku::getIsEnable, "Y").orderByAsc(ItemSku::getSkuSalePrice));
-            itemResult.setMinSalePrice(itemSku.getSkuSalePrice());
-            itemResult.setItemMarketPrice(itemSku.getSkuMarketPrice());
-            itemResult.setItemPrice(itemSku.getSkuSalePrice());
+            if (itemSku!=null) {
+                itemResult.setMinSalePrice(itemSku.getSkuSalePrice());
+                itemResult.setItemMarketPrice(itemSku.getSkuMarketPrice());
+                itemResult.setItemPrice(itemSku.getSkuSalePrice());
+                result.add(itemResult);
+            }
         });
-        return list;
+        return result;
     }
 
     @Cacheable(cacheManager = CacheConstants.CACHE_MANAGE_NAME,

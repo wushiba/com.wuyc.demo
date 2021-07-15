@@ -11,11 +11,11 @@ import java.util.List;
 
 public interface WxPushTaskService {
 
-    void createPushTask(WxPushTaskReq wxPushTaskReq) throws ApiException;
+    Void createPushTask(WxPushTaskReq wxPushTaskReq) throws ApiException;
 
-    void closePushTask(Integer id) throws ApiException;
+    Void closePushTask(Integer id) throws ApiException;
 
-    void editPushTask(WxPushTaskReq wxPushTaskReq) throws ApiException;
+    Void editPushTask(WxPushTaskReq wxPushTaskReq) throws ApiException;
 
     Integer filterPushData(WxPushTaskReq wxPushTaskReq) throws ApiException;
 
