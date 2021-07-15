@@ -299,7 +299,7 @@ public class MallServiceImpl implements MallService {
 
     @Cacheable(cacheManager = CacheConstants.CACHE_MANAGE_NAME,
             cacheNames = CacheConstants.MALL_HOT_ITEMS_CACHE_NAME,
-            key = "'" + CacheConstants.MALL_HOT_ITEMS_CACHE_KEY_PREFIX + "' + #root.args[0].categoryId")
+            key = "'" + CacheConstants.MALL_HOT_ITEMS_CACHE_KEY_PREFIX + "'")
     @Override
     public List<ItemResult> queryHotItems() {
         List<ItemResult> list = new ArrayList<>();
