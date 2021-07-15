@@ -25,6 +25,7 @@ import com.yfshop.common.exception.Asserts;
 import com.yfshop.common.util.BeanUtil;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.dubbo.config.annotation.DubboService;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -92,6 +93,9 @@ public class YfCouponServiceImpl implements AdminCouponService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
+    @CacheEvict(cacheManager = CacheConstants.CACHE_MANAGE_NAME,
+            cacheNames = CacheConstants.MALL_COUPON_RULES_NAME,
+            key = "'" + CacheConstants.MALL_COUPON_RULES_KEY_PREFIX + "'")
     public void insertYfCoupon(CreateCouponReq couponReq) throws ApiException {
         checkCouponParams(couponReq);
         Coupon coupon = BeanUtil.convert(couponReq, Coupon.class);
@@ -115,6 +119,9 @@ public class YfCouponServiceImpl implements AdminCouponService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
+    @CacheEvict(cacheManager = CacheConstants.CACHE_MANAGE_NAME,
+            cacheNames = CacheConstants.MALL_COUPON_RULES_NAME,
+            key = "'" + CacheConstants.MALL_COUPON_RULES_KEY_PREFIX + "'")
     public void updateYfCoupon(CreateCouponReq couponReq) throws ApiException {
         checkCouponParams(couponReq);
         Coupon coupon = BeanUtil.convert(couponReq, Coupon.class);
@@ -134,6 +141,9 @@ public class YfCouponServiceImpl implements AdminCouponService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
+    @CacheEvict(cacheManager = CacheConstants.CACHE_MANAGE_NAME,
+            cacheNames = CacheConstants.MALL_COUPON_RULES_NAME,
+            key = "'" + CacheConstants.MALL_COUPON_RULES_KEY_PREFIX + "'")
     public void deleteYfCoupon(Integer couponId) throws ApiException {
         Coupon coupon = couponMapper.selectById(couponId);
         Asserts.assertNonNull(coupon, 500, "优惠券不存在");
@@ -156,6 +166,9 @@ public class YfCouponServiceImpl implements AdminCouponService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
+    @CacheEvict(cacheManager = CacheConstants.CACHE_MANAGE_NAME,
+            cacheNames = CacheConstants.MALL_COUPON_RULES_NAME,
+            key = "'" + CacheConstants.MALL_COUPON_RULES_KEY_PREFIX + "'")
     public void updateCouponStatus(Integer couponId, String isEnable) throws ApiException {
         Coupon coupon = couponMapper.selectById(couponId);
         Asserts.assertNonNull(coupon, 500, "优惠券不存在");
