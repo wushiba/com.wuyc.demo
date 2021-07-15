@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.yfshop.admin.dao.WxPushTaskDao">
+
+
+    <select id="getWxPushTaskData" resultType="com.yfshop.admin.api.push.result.WxPushTaskData">
+        SELECT
+            uu.id,
+            uu.open_id
+        from(
+        SELECT u.user_id, sum(CASE WHEN u.use_status= 'NO_USE'
+        AND u.draw_prize_level= 1 THEN 1 ELSE 0 END)  AS un_first_count, sum(CASE WHEN u.use_status= 'NO_USE'
+        AND u.draw_prize_level= 2 THEN 1 ELSE 0 END)  AS un_second_count, sum(CASE WHEN u.use_status= 'NO_USE'
+        AND u.draw_prize_level= 3 THEN 1 ELSE 0 END)  AS un_third_count, sum(CASE WHEN u.use_status= 'NO_USE'
+        AND u.`coupon_resource`= 'SHOP' THEN 1 ELSE 0 END)  AS un_other_count, sum(CASE WHEN u.use_status= 'HAS_USE' THEN 1 ELSE 0 END)  AS order_count
+        FROM yf_user_coupon u
+        WHERE 1=1
+        <if test="couponStartTime!=null and couponEndTime!=null">
+            AND u.create_time&gt;= #{couponStartTime}
+            AND u.create_time &lt; #{couponEndTime}
+        </if>
+        <if test="useStartTime!=null and useEndTime!=null">
+            AND u.use_time&gt;= #{useStartTime}
+            AND u.use_time &lt; #{useEndTime}
+        </if>
+        GROUP BY u.user_id) a
+        LEFT JOIN yf_user uu on uu.id= a.user_id
+        WHERE 1=1
+        <if test="subscribeStartTime!=null and subscribeEndTime!=null">
+            AND uu.subscribe= 'Y'
+            AND uu.update_time&gt;=  #{subscribeStartTime}
+            AND uu.update_time &lt;  #{subscribeEndTime}
+        </if>
+        <if test="firstCount!=null">
+            AND a.un_first_count&gt;= #{firstCount}
+        </if>
+        <if test="secondCount!=null">
+            AND a.un_second_count&gt;= #{secondCount}
+        </if>
+        <if test="thirdCount!=null">
+            AND a.un_third_count&gt;= #{thirdCount}
+        </if>
+        <if test="otherCount!=null">
+            AND a.otherCount&gt;= 0
+        </if>
+    </select>
+
+    <select id="getWxPushTaskDataCount" resultType="java.lang.Integer">
+        SELECT
+            count(1)
+        from(
+        SELECT u.user_id, sum(CASE WHEN u.use_status= 'NO_USE'
+        AND u.draw_prize_level= 1 THEN 1 ELSE 0 END)  AS un_first_count, sum(CASE WHEN u.use_status= 'NO_USE'
+        AND u.draw_prize_level= 2 THEN 1 ELSE 0 END)  AS un_second_count, sum(CASE WHEN u.use_status= 'NO_USE'
+        AND u.draw_prize_level= 3 THEN 1 ELSE 0 END)  AS un_third_count, sum(CASE WHEN u.use_status= 'NO_USE'
+        AND u.`coupon_resource`= 'SHOP' THEN 1 ELSE 0 END)  AS un_other_count, sum(CASE WHEN u.use_status= 'HAS_USE' THEN 1 ELSE 0 END)  AS order_count
+        FROM yf_user_coupon u
+        WHERE 1=1
+        <if test="couponStartTime!=null and couponEndTime!=null">
+            AND u.create_time&gt;= #{couponStartTime}
+            AND u.create_time &lt; #{couponEndTime}
+        </if>
+        <if test="useStartTime!=null and useEndTime!=null">
+            AND u.use_time&gt;= #{useStartTime}
+            AND u.use_time &lt; #{useEndTime}
+        </if>
+        GROUP BY u.user_id) a
+        LEFT JOIN yf_user uu on uu.id= a.user_id
+        WHERE 1=1
+        <if test="subscribeStartTime!=null and subscribeEndTime!=null">
+            AND uu.subscribe= 'Y'
+            AND uu.update_time&gt;=  #{subscribeStartTime}
+            AND uu.update_time &lt;  #{subscribeEndTime}
+        </if>
+        <if test="firstCount!=null">
+            AND a.un_first_count&gt;= #{firstCount}
+        </if>
+        <if test="secondCount!=null">
+            AND a.un_second_count&gt;= #{secondCount}
+        </if>
+        <if test="thirdCount!=null">
+            AND a.un_third_count&gt;= #{thirdCount}
+        </if>
+        <if test="otherCount!=null">
+            AND a.otherCount&gt;= 0
+        </if>
+    </select>
+</mapper>

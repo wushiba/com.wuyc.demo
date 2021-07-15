@@ -6,6 +6,7 @@ import com.xxl.job.core.handler.annotation.XxlJob;
 import com.xxl.job.core.log.XxlJobFileAppender;
 import com.yfshop.admin.dao.UserCouponDao;
 import com.yfshop.admin.task.ActCodeTask;
+import com.yfshop.admin.task.WxPushMsgTask;
 import com.yfshop.code.mapper.*;
 import com.yfshop.code.model.*;
 import com.yfshop.wx.api.service.MpService;
@@ -44,6 +45,9 @@ public class TaskJob {
 
     @Autowired
     private ActCodeTask actCodeTask;
+
+    @Autowired
+    private WxPushMsgTask wxPushMsgTask;
 
     @Autowired
     private RedisTemplate redisTemplate;
@@ -166,4 +170,11 @@ public class TaskJob {
             visitLogMapper.delete(Wrappers.lambdaQuery(VisitLog.class).le(VisitLog::getId, visitLog.getId()));
         }
     }
+
+    @XxlJob("wxPushTask")
+    public void wxPushTask() {
+
+        wxPushMsgTask.doTask();
+    }
+
 }

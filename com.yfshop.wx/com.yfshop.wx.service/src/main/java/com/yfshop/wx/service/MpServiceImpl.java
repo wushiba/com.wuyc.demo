@@ -1,25 +1,15 @@
 package com.yfshop.wx.service;
 
-import java.time.LocalDateTime;
-
-
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.github.binarywang.wxpay.bean.request.WxPayRefundRequest;
 import com.github.binarywang.wxpay.exception.WxPayException;
 import com.github.binarywang.wxpay.service.WxPayService;
 import com.google.gson.reflect.TypeToken;
-import com.yfshop.code.mapper.OrderDetailMapper;
-import com.yfshop.code.mapper.WxPayNotifyMapper;
-import com.yfshop.code.mapper.WxPayRefundMapper;
 import com.yfshop.code.mapper.WxTemplateMessageMapper;
-import com.yfshop.code.model.OrderDetail;
-import com.yfshop.code.model.WxPayNotify;
-import com.yfshop.code.model.WxPayRefund;
 import com.yfshop.code.model.WxTemplateMessage;
 import com.yfshop.common.util.DateUtil;
 import com.yfshop.wx.api.request.WxPayRefundReq;
 import com.yfshop.wx.api.service.MpService;
-import lombok.AllArgsConstructor;
 import me.chanjar.weixin.common.error.WxErrorException;
 import me.chanjar.weixin.mp.api.WxMpService;
 import me.chanjar.weixin.mp.bean.template.WxMpTemplateData;
@@ -28,11 +18,9 @@ import me.chanjar.weixin.mp.util.json.WxMpGsonBuilder;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
-import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
@@ -46,6 +34,12 @@ public class MpServiceImpl implements MpService {
     @Autowired
     private WxPayService wxService;
 
+
+    @Async
+    @Override
+    public void sendWxMsg(WxMpTemplateMessage wxMpTemplateMessage) throws WxErrorException {
+        wxMpService.getTemplateMsgService().sendTemplateMsg(wxMpTemplateMessage);
+    }
 
     @Async
     @Override
