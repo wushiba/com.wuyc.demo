@@ -145,27 +145,33 @@ public class YfUserCouponServiceImpl implements AdminUserCouponService {
                 }
                 //判断卡券是否上限
                 if (count == 0 || count < item.getLimitCount()) {
-                    Coupon coupon = couponMapper.selectById(item.getCouponId());
-                    UserCoupon userCoupon = new UserCoupon();
-                    userCoupon.setCreateTime(LocalDateTime.now());
-                    userCoupon.setUpdateTime(LocalDateTime.now());
-                    userCoupon.setUserId(userId);
-                    userCoupon.setCouponId(coupon.getId());
-                    userCoupon.setCouponTitle(coupon.getCouponTitle());
-                    userCoupon.setCouponResource(coupon.getCouponResource());
-                    userCoupon.setCouponPrice(coupon.getCouponPrice());
-                    userCoupon.setUseConditionPrice(coupon.getUseConditionPrice());
-                    userCoupon.setUseRangeType(coupon.getUseRangeType());
-                    userCoupon.setCanUseItemIds(coupon.getCanUseItemIds());
-                    userCoupon.setValidStartTime(LocalDateTime.now());
-                    userCoupon.setValidEndTime(coupon.getValidEndTime());
-                    if (user != null) {
-                        userCoupon.setNickname(user.getNickname());
+                    Coupon coupon = couponMapper.selectOne(Wrappers.lambdaQuery(Coupon.class)
+                            .eq(Coupon::getId,item.getCouponId())
+                            .eq(Coupon::getIsDelete,"N")
+                            .eq(Coupon::getIsEnable,"Y")
+                            .lt(Coupon::getValidEndTime,LocalDateTime.now()));
+                    if (coupon!=null) {
+                        UserCoupon userCoupon = new UserCoupon();
+                        userCoupon.setCreateTime(LocalDateTime.now());
+                        userCoupon.setUpdateTime(LocalDateTime.now());
+                        userCoupon.setUserId(userId);
+                        userCoupon.setCouponId(coupon.getId());
+                        userCoupon.setCouponTitle(coupon.getCouponTitle());
+                        userCoupon.setCouponResource(coupon.getCouponResource());
+                        userCoupon.setCouponPrice(coupon.getCouponPrice());
+                        userCoupon.setUseConditionPrice(coupon.getUseConditionPrice());
+                        userCoupon.setUseRangeType(coupon.getUseRangeType());
+                        userCoupon.setCanUseItemIds(coupon.getCanUseItemIds());
+                        userCoupon.setValidStartTime(LocalDateTime.now());
+                        userCoupon.setValidEndTime(coupon.getValidEndTime());
+                        if (user != null) {
+                            userCoupon.setNickname(user.getNickname());
+                        }
+                        userCoupon.setUseStatus(UserCouponStatusEnum.NO_USE.getCode());
+                        userCoupon.setSrcOrderId(orderId);
+                        userCoupon.setCouponDesc(coupon.getCouponDesc());
+                        userCouponMapper.insert(userCoupon);
                     }
-                    userCoupon.setUseStatus(UserCouponStatusEnum.NO_USE.getCode());
-                    userCoupon.setSrcOrderId(orderId);
-                    userCoupon.setCouponDesc(coupon.getCouponDesc());
-                    userCouponMapper.insert(userCoupon);
                 }
             });
         }
