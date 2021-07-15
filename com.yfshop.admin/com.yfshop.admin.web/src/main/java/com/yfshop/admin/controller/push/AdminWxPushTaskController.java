@@ -42,7 +42,7 @@ public class AdminWxPushTaskController implements BaseController {
     @DubboReference(check = false)
     private WxPushTaskService wxPushTaskService;
 
-    @RequestMapping(value = "/createPushTask", method = {RequestMethod.POST})
+    @RequestMapping(value = "/createPushTask", method = {RequestMethod.POST, RequestMethod.GET})
     @ResponseBody
     @SaCheckLogin
     @SaCheckRole(value = "sys")
@@ -51,7 +51,7 @@ public class AdminWxPushTaskController implements BaseController {
     }
 
 
-    @RequestMapping(value = "/closePushTask", method = {RequestMethod.POST})
+    @RequestMapping(value = "/closePushTask", method = {RequestMethod.POST, RequestMethod.GET})
     @ResponseBody
     @SaCheckLogin
     @SaCheckRole(value = "sys")
@@ -60,7 +60,7 @@ public class AdminWxPushTaskController implements BaseController {
     }
 
     @SaCheckLogin
-    @RequestMapping(value = "/editPushTask", method = {RequestMethod.POST})
+    @RequestMapping(value = "/editPushTask", method = {RequestMethod.POST, RequestMethod.GET})
     @SaCheckRole(value = "sys")
     @ResponseBody
     public CommonResult<Void> editPushTask(WxPushTaskReq req) {
@@ -69,7 +69,7 @@ public class AdminWxPushTaskController implements BaseController {
 
 
     @SaCheckLogin
-    @RequestMapping(value = "/filterPushDataCount", method = {RequestMethod.POST})
+    @RequestMapping(value = "/filterPushDataCount", method = {RequestMethod.POST, RequestMethod.GET})
     @SaCheckRole(value = "sys")
     @ResponseBody
     public CommonResult<Integer> filterPushDataCount(WxPushTaskReq req) {
@@ -77,7 +77,7 @@ public class AdminWxPushTaskController implements BaseController {
     }
 
     @SaCheckLogin
-    @RequestMapping(value = "/pushTaskList", method = {RequestMethod.POST})
+    @RequestMapping(value = "/pushTaskList", method = {RequestMethod.POST, RequestMethod.GET})
     @SaCheckRole(value = "sys")
     @ResponseBody
     public CommonResult<IPage> pushTaskList(WxPushTaskReq req) {

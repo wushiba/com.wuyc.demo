@@ -59,10 +59,6 @@ public class WxPushTaskReq implements Serializable {
 
     private Integer id;
 
-    private LocalDateTime createTime;
-
-    private LocalDateTime updateTime;
-
     /**
      * 推送主题
      */
