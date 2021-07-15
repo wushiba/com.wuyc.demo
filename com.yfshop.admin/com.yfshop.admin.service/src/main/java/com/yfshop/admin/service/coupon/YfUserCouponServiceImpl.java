@@ -149,7 +149,7 @@ public class YfUserCouponServiceImpl implements AdminUserCouponService {
                             .eq(Coupon::getId,item.getCouponId())
                             .eq(Coupon::getIsDelete,"N")
                             .eq(Coupon::getIsEnable,"Y")
-                            .lt(Coupon::getValidEndTime,LocalDateTime.now()));
+                            .gt(Coupon::getValidEndTime,LocalDateTime.now()));
                     if (coupon!=null) {
                         UserCoupon userCoupon = new UserCoupon();
                         userCoupon.setCreateTime(LocalDateTime.now());
