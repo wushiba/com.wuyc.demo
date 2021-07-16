@@ -61,64 +61,66 @@ public class OrderServiceImpl implements OrderService {
                     .eq(StringUtils.isNotBlank(orderReq.getPlatOrderNo()), OrderDetail::getOrderId, orderReq.getPlatOrderNo())
                     .ge(orderReq.getStartTime() != null, "JH_02".equals(orderReq.getTimeType()) ? OrderDetail::getCreateTime : OrderDetail::getUpdateTime, orderReq.getStartTime())
                     .le(orderReq.getEndTime() != null, "JH_02".equals(orderReq.getTimeType()) ? OrderDetail::getCreateTime : OrderDetail::getUpdateTime, orderReq.getEndTime());
-            IPage<OrderDetail> iPage = orderDetailMapper.selectPage(new Page(orderReq.getPageIndex(), orderReq.getPageSize()), lambdaQueryWrapper);
-            List<OrderDetail> orderDetails = iPage.getRecords();
-            Map<Long, List<OrderDetail>> OrderDetailList = orderDetails.stream().collect(Collectors.groupingBy(OrderDetail::getOrderId));
-            List<Long> orderIds = new ArrayList<>();
-            OrderDetailList.forEach((key, value) -> {
-                orderIds.add(key);
-            });
-            if (!CollectionUtils.isEmpty(orderIds)) {
-                List<Order> orders = orderMapper.selectBatchIds(orderIds);
-                List<OrderAddress> orderAddresses = orderAddressMapper.selectList(Wrappers.<OrderAddress>lambdaQuery().in(OrderAddress::getOrderId, orderIds));
-                Map<Long, Order> orderMap = orders.stream().collect(Collectors.toMap(Order::getId, Function.identity()));
-                Map<Long, OrderAddress> orderAddressMap = orderAddresses.stream().collect(Collectors.toMap(OrderAddress::getOrderId, Function.identity()));
-                OrderDetailList.forEach((key, value) -> {
-                    List<OrderResult.GoodInfo> goodInfos = new ArrayList<>();
-                    OrderAddress orderAddress = orderAddressMap.get(key);
-                    OrderResult.Order order = new OrderResult.Order();
-                    Order o = orderMap.get(key);
-                    order.setPlatOrderNo(key + "");
-                    order.setTradeStatus("JH_02");
-                    order.setTradeTime(cn.hutool.core.date.DateUtil.format(o.getCreateTime(), "yyyy-MM-dd HH:mm:ss"));
-                    order.setPayOrderNo(o.getBillNo());
-                    order.setProvince(orderAddress.getProvince());
-                    order.setCity(orderAddress.getCity());
-                    order.setArea(orderAddress.getDistrict());
-                    order.setAddress(orderAddress.getAddress());
-                    order.setMobile(orderAddress.getMobile());
-                    order.setPostFee(o.getFreight());
-                    order.setGoodsFee(o.getOrderPrice());
-                    order.setTotalMoney(o.getOrderPrice().add(o.getOrderPrice()));
-                    order.setRealPayMoney(o.getPayPrice());
-                    order.setFavourableMoney(o.getCouponPrice());
-                    order.setPayTime(cn.hutool.core.date.DateUtil.format(o.getPayTime(), "yyyy-MM-dd HH:mm:ss"));
-                    order.setReceiverName(orderAddress.getRealname());
-                    order.setNick(orderAddress.getRealname());
-                    order.setPayType("JH_WXWeb");
-                    order.setShouldPayType("担保交易");
-                    for (OrderDetail detail : value) {
-                        RlItemHotpot rlItemHotpot = skuMap.get(detail.getSkuId());
-                        OrderResult.GoodInfo goodInfo = new OrderResult.GoodInfo();
-                        goodInfo.setProductId(detail.getSkuId() + "");
-                        goodInfo.setSubOrderNo(detail.getOrderNo());
-                        goodInfo.setTradeGoodsNo(rlItemHotpot.getOutSkuNo());
-                        goodInfo.setPlatGoodsId(rlItemHotpot.getItemId() + "");
-                        goodInfo.setPlatSkuId(rlItemHotpot.getSkuId() + "");
-                        goodInfo.setOutItemId(rlItemHotpot.getOutItemNo());
-                        goodInfo.setOutSkuId(rlItemHotpot.getOutSkuNo());
-                        goodInfo.setTradeGoodsName(detail.getItemTitle());
-                        goodInfo.setTradeGoodsSpec(jsonFormatText(detail.getSpecNameValueJson()));
-                        goodInfo.setGoodsCount(detail.getItemCount());
-                        goodInfo.setPrice(detail.getItemPrice());
-                        goodInfo.setRemark(rlItemHotpot.getRemark());
-                        goodInfos.add(goodInfo);
-                    }
-                    order.setGoodInfos(goodInfos);
-                    orderList.add(order);
-                });
+            List<OrderDetail> orderDetailLists = orderDetailMapper.selectList(lambdaQueryWrapper);
+            List<Long> orderIds = orderDetailLists.stream().map(OrderDetail::getOrderId).distinct().collect(Collectors.toList());
+            if (!CollectionUtils.isEmpty(skuIds)) {
+                LambdaQueryWrapper<Order> orderLambdaQueryWrapper = Wrappers.<Order>lambdaQuery()
+                        .in(Order::getId, orderIds)
+                        .eq(StringUtils.isNotBlank(orderReq.getPlatOrderNo()), Order::getId, orderReq.getPlatOrderNo())
+                        .ge(orderReq.getStartTime() != null, "JH_02".equals(orderReq.getTimeType()) ? Order::getCreateTime : Order::getUpdateTime, orderReq.getStartTime())
+                        .le(orderReq.getEndTime() != null, "JH_02".equals(orderReq.getTimeType()) ? Order::getCreateTime : Order::getUpdateTime, orderReq.getEndTime());
+                IPage<Order> orderIPage = orderMapper.selectPage(new Page<>(orderReq.getPageIndex(), orderReq.getPageSize()), orderLambdaQueryWrapper);
+                if (!CollectionUtils.isEmpty(orderIPage.getRecords())) {
+                    List<OrderAddress> orderAddresses = orderAddressMapper.selectList(Wrappers.<OrderAddress>lambdaQuery().in(OrderAddress::getOrderId, orderIds));
+                    Map<Long, List<OrderDetail>> orderDetailMap = orderDetailLists.stream().collect(Collectors.groupingBy(OrderDetail::getOrderId));
+                    Map<Long, OrderAddress> orderAddressMap = orderAddresses.stream().collect(Collectors.toMap(OrderAddress::getOrderId, Function.identity()));
+                    orderIPage.getRecords().forEach(o->{
+                        List<OrderResult.GoodInfo> goodInfos = new ArrayList<>();
+                        OrderAddress orderAddress = orderAddressMap.get(o.getId());
+                        OrderResult.Order order = new OrderResult.Order();
+                        order.setPlatOrderNo(o.getId() + "");
+                        order.setTradeStatus("JH_02");
+                        order.setTradeTime(cn.hutool.core.date.DateUtil.format(o.getCreateTime(), "yyyy-MM-dd HH:mm:ss"));
+                        order.setPayOrderNo(o.getBillNo());
+                        order.setProvince(orderAddress.getProvince());
+                        order.setCity(orderAddress.getCity());
+                        order.setArea(orderAddress.getDistrict());
+                        order.setAddress(orderAddress.getAddress());
+                        order.setMobile(orderAddress.getMobile());
+                        order.setPostFee(o.getFreight());
+                        order.setGoodsFee(o.getOrderPrice());
+                        order.setTotalMoney(o.getOrderPrice());
+                        order.setRealPayMoney(o.getPayPrice());
+                        order.setFavourableMoney(o.getCouponPrice());
+                        order.setPayTime(cn.hutool.core.date.DateUtil.format(o.getPayTime(), "yyyy-MM-dd HH:mm:ss"));
+                        order.setReceiverName(orderAddress.getRealname());
+                        order.setNick(orderAddress.getRealname());
+                        order.setPayType("JH_WXWeb");
+                        order.setShouldPayType("担保交易");
+                        List<OrderDetail> value = orderDetailMap.get(o.getId());
+                        for (OrderDetail detail : value) {
+                            RlItemHotpot rlItemHotpot = skuMap.get(detail.getSkuId());
+                            OrderResult.GoodInfo goodInfo = new OrderResult.GoodInfo();
+                            goodInfo.setProductId(detail.getSkuId() + "");
+                            goodInfo.setSubOrderNo(detail.getOrderNo());
+                            goodInfo.setTradeGoodsNo(rlItemHotpot.getOutSkuNo());
+                            goodInfo.setPlatGoodsId(rlItemHotpot.getItemId() + "");
+                            goodInfo.setPlatSkuId(rlItemHotpot.getSkuId() + "");
+                            goodInfo.setOutItemId(rlItemHotpot.getOutItemNo());
+                            goodInfo.setOutSkuId(rlItemHotpot.getOutSkuNo());
+                            goodInfo.setTradeGoodsName(detail.getItemTitle());
+                            goodInfo.setTradeGoodsSpec(jsonFormatText(detail.getSpecNameValueJson()));
+                            goodInfo.setGoodsCount(detail.getItemCount());
+                            goodInfo.setPrice(detail.getItemPrice());
+                            goodInfo.setRemark(rlItemHotpot.getRemark());
+                            goodInfos.add(goodInfo);
+                        }
+                        order.setGoodInfos(goodInfos);
+                        orderList.add(order);
+                    });
+                }
+                numTotalOrder = (int) orderIPage.getTotal();
             }
-            numTotalOrder = orderDetailMapper.selectCount(lambdaQueryWrapper);
         }
         orderResult.setCode("10000");
         orderResult.setMessage("SUCCESS");
@@ -271,26 +273,25 @@ public class OrderServiceImpl implements OrderService {
                     .eq(OrderDetail::getOrderStatus, UserOrderStatusEnum.CLOSED.getCode())
                     .ge(refundReq.getBeginTime() != null, OrderDetail::getUpdateTime, refundReq.getBeginTime())
                     .le(refundReq.getEndTime() != null, OrderDetail::getUpdateTime, refundReq.getEndTime());
-            IPage<OrderDetail> iPage = orderDetailMapper.selectPage(new Page(refundReq.getPageIndex(), refundReq.getPageSize()), lambdaQueryWrapper);
-            List<OrderDetail> orderDetails = iPage.getRecords();
-            Map<Long, List<OrderDetail>> OrderDetailList = orderDetails.stream().collect(Collectors.groupingBy(OrderDetail::getOrderId));
-            List<Long> orderIds = new ArrayList<>();
-            OrderDetailList.forEach((key, value) -> {
-                orderIds.add(key);
-            });
-            if (!CollectionUtils.isEmpty(orderIds)) {
-                List<Order> orders = orderMapper.selectBatchIds(orderIds);
+            List<OrderDetail> orderDetailLists = orderDetailMapper.selectList(lambdaQueryWrapper);
+            List<Long> orderIds = orderDetailLists.stream().map(OrderDetail::getOrderId).distinct().collect(Collectors.toList());
+            LambdaQueryWrapper<Order> orderLambdaQueryWrapper = Wrappers.<Order>lambdaQuery()
+                    .in(Order::getId, orderIds)
+                    .ge(refundReq.getBeginTime() != null, Order::getUpdateTime, refundReq.getBeginTime())
+                    .le(refundReq.getEndTime() != null, Order::getUpdateTime, refundReq.getEndTime());
+            IPage<Order> orderIPage = orderMapper.selectPage(new Page<>(refundReq.getPageIndex(), refundReq.getPageSize()), orderLambdaQueryWrapper);
+            if (!CollectionUtils.isEmpty(orderIPage.getRecords())) {
                 List<OrderAddress> orderAddresses = orderAddressMapper.selectList(Wrappers.<OrderAddress>lambdaQuery().in(OrderAddress::getOrderId, orderIds));
-                Map<Long, Order> orderMap = orders.stream().collect(Collectors.toMap(Order::getId, Function.identity()));
+                Map<Long, List<OrderDetail>> orderDetailMap = orderDetailLists.stream().collect(Collectors.groupingBy(OrderDetail::getOrderId));
                 Map<Long, OrderAddress> orderAddressMap = orderAddresses.stream().collect(Collectors.toMap(OrderAddress::getOrderId, Function.identity()));
-                numTotalOrder = OrderDetailList.size();
-                OrderDetailList.forEach((key, value) -> {
+                numTotalOrder = (int) orderIPage.getTotal();
+                orderIPage.getRecords().forEach(o -> {
+                    List<OrderDetail> value=orderDetailMap.get(o.getId());
                     List<RefundResult.RefundGoods> goodInfos = new ArrayList<>();
-                    OrderAddress orderAddress = orderAddressMap.get(key);
-                    Order o = orderMap.get(key);
+                    OrderAddress orderAddress = orderAddressMap.get(o.getId());
                     RefundResult.Refunds order = new RefundResult.Refunds();
-                    order.setRefundNo("refundNo-shopOrder-" + key);
-                    order.setPlatOrderNo(key + "");
+                    order.setRefundNo("refundNo-shopOrder-" + o.getId());
+                    order.setPlatOrderNo(o.getId() + "");
                     List<String> subOrderNos = new ArrayList<>();
                     for (OrderDetail detail : value) {
                         subOrderNos.add(detail.getOrderNo());
