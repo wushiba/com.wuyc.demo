@@ -108,7 +108,7 @@ public class AdminWxPushTaskController implements BaseController {
     }
 
     @SneakyThrows
-    @RequestMapping(value = "/pushTaskStats", method = {RequestMethod.POST, RequestMethod.GET})
+    @RequestMapping(value = "/pushTemplateList", method = {RequestMethod.POST, RequestMethod.GET})
     @ResponseBody
     @SaCheckLogin
     @SaCheckRole(value = "sys")
