@@ -5,6 +5,7 @@ import com.yfshop.admin.api.push.request.WxPushTaskReq;
 import com.yfshop.admin.api.push.result.WxPushFailExportResult;
 import com.yfshop.admin.api.push.result.WxPushTaskResult;
 import com.yfshop.admin.api.push.result.WxPushTaskStatsResult;
+import com.yfshop.admin.api.push.result.WxPushTemplateResult;
 import com.yfshop.common.exception.ApiException;
 
 import java.util.List;
@@ -25,5 +26,5 @@ public interface WxPushTaskService {
 
     List<WxPushFailExportResult> pushFailExport(Integer id) throws ApiException;
 
-
+    List<WxPushTemplateResult> pushTemplateList() throws ApiException;
 }

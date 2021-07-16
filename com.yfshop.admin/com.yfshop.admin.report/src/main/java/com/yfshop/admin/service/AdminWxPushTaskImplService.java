@@ -4,24 +4,18 @@ import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.http.HttpUtil;
-import cn.hutool.poi.excel.ExcelUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.yfshop.admin.api.push.WxPushTaskService;
 import com.yfshop.admin.api.push.request.WxPushTaskReq;
-import com.yfshop.admin.api.push.result.WxPushFailExportResult;
-import com.yfshop.admin.api.push.result.WxPushTaskData;
-import com.yfshop.admin.api.push.result.WxPushTaskResult;
-import com.yfshop.admin.api.push.result.WxPushTaskStatsResult;
+import com.yfshop.admin.api.push.result.*;
 import com.yfshop.admin.dao.WxPushTaskDao;
 import com.yfshop.admin.tool.poster.kernal.oss.OssDownloader;
 import com.yfshop.code.manager.WxPushTaskDetailManager;
-import com.yfshop.code.mapper.DrawRecordMapper;
-import com.yfshop.code.mapper.UserMapper;
 import com.yfshop.code.mapper.WxPushTaskDetailMapper;
 import com.yfshop.code.mapper.WxPushTaskMapper;
-import com.yfshop.code.model.DrawRecord;
+import com.yfshop.code.mapper.WxTemplateMessageMapper;
 import com.yfshop.code.model.WxPushTask;
 import com.yfshop.code.model.WxPushTaskDetail;
 import com.yfshop.common.exception.ApiException;
@@ -33,9 +27,7 @@ import org.springframework.beans.factory.annotation.Value;
 
 import javax.annotation.Resource;
 import java.io.File;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -43,6 +35,9 @@ import java.util.List;
 public class AdminWxPushTaskImplService implements WxPushTaskService {
     @Resource
     private WxPushTaskMapper wxPushTaskMapper;
+
+    @Resource
+    private WxTemplateMessageMapper wxTemplateMessageMapper;
     @Resource
     private WxPushTaskDetailMapper wxPushTaskDetailMapper;
     @Resource
@@ -134,6 +129,12 @@ public class AdminWxPushTaskImplService implements WxPushTaskService {
     public List<WxPushFailExportResult> pushFailExport(Integer id) throws ApiException {
         List<WxPushTaskDetail> list = wxPushTaskDetailMapper.selectList(Wrappers.lambdaQuery(WxPushTaskDetail.class).eq(WxPushTaskDetail::getPushId, id).eq(WxPushTaskDetail::getStatus, "FAIL"));
         return BeanUtil.convertList(list, WxPushFailExportResult.class);
+    }
+
+    @Override
+    public List<WxPushTemplateResult> pushTemplateList() throws ApiException {
+
+        return BeanUtil.convertList(wxTemplateMessageMapper.selectList(Wrappers.emptyWrapper()),WxPushTemplateResult.class);
     }
 
 }

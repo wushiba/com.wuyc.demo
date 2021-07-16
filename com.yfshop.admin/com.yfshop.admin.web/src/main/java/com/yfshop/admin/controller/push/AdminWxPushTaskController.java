@@ -17,6 +17,7 @@ import com.yfshop.admin.api.push.WxPushTaskService;
 import com.yfshop.admin.api.push.request.WxPushTaskReq;
 import com.yfshop.admin.api.push.result.WxPushFailExportResult;
 import com.yfshop.admin.api.push.result.WxPushTaskStatsResult;
+import com.yfshop.admin.api.push.result.WxPushTemplateResult;
 import com.yfshop.common.api.CommonResult;
 import com.yfshop.common.base.BaseController;
 import com.yfshop.common.util.ExcelUtils;
@@ -104,6 +105,15 @@ public class AdminWxPushTaskController implements BaseController {
         ExcelUtils.exportExcel(exportList, "失败推送消息详情", "失败推送消息详情",
                 WxPushFailExportResult.class, "失败推送消息详情.xls", getCurrentResponse());
         return null;
+    }
+
+    @SneakyThrows
+    @RequestMapping(value = "/pushTaskStats", method = {RequestMethod.POST, RequestMethod.GET})
+    @ResponseBody
+    @SaCheckLogin
+    @SaCheckRole(value = "sys")
+    public CommonResult<List<WxPushTemplateResult>> pushTemplateList() {
+        return CommonResult.success(wxPushTaskService.pushTemplateList());
     }
 
 }
