@@ -2,17 +2,7 @@ package com.yfshop.admin.controller.push;
 
 import cn.dev33.satoken.annotation.SaCheckLogin;
 import cn.dev33.satoken.annotation.SaCheckRole;
-import cn.hutool.extra.spring.SpringUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.github.binarywang.wxpay.exception.WxPayException;
-import com.yfshop.admin.api.coupon.service.AdminUserCouponService;
-import com.yfshop.admin.api.order.request.OrderExpressReq;
-import com.yfshop.admin.api.order.request.QueryOrderReq;
-import com.yfshop.admin.api.order.result.OrderDetailResult;
-import com.yfshop.admin.api.order.result.OrderExportResult;
-import com.yfshop.admin.api.order.result.OrderResult;
-import com.yfshop.admin.api.order.service.AdminUserOrderExportService;
-import com.yfshop.admin.api.order.service.AdminUserOrderService;
 import com.yfshop.admin.api.push.WxPushTaskService;
 import com.yfshop.admin.api.push.request.WxPushTaskReq;
 import com.yfshop.admin.api.push.result.WxPushFailExportResult;
@@ -21,7 +11,6 @@ import com.yfshop.admin.api.push.result.WxPushTemplateResult;
 import com.yfshop.common.api.CommonResult;
 import com.yfshop.common.base.BaseController;
 import com.yfshop.common.util.ExcelUtils;
-import io.swagger.annotations.ApiOperation;
 import lombok.SneakyThrows;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.slf4j.Logger;
@@ -66,6 +55,14 @@ public class AdminWxPushTaskController implements BaseController {
     @ResponseBody
     public CommonResult<Void> editPushTask(WxPushTaskReq req) {
         return CommonResult.success(wxPushTaskService.editPushTask(req));
+    }
+
+    @SaCheckLogin
+    @RequestMapping(value = "/downloadFile", method = {RequestMethod.POST, RequestMethod.GET})
+    @SaCheckRole(value = "sys")
+    @ResponseBody
+    public CommonResult<String> downloadFile(Integer id) {
+        return CommonResult.success(wxPushTaskService.downloadFile(id));
     }
 
 

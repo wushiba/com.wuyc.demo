@@ -15,7 +15,7 @@ import com.yfshop.admin.tool.poster.kernal.oss.OssDownloader;
 import com.yfshop.code.manager.WxPushTaskDetailManager;
 import com.yfshop.code.mapper.WxPushTaskDetailMapper;
 import com.yfshop.code.mapper.WxPushTaskMapper;
-import com.yfshop.code.mapper.WxTemplateMessageMapper;
+import com.yfshop.code.mapper.WxPushTemplateMapper;
 import com.yfshop.code.model.WxPushTask;
 import com.yfshop.code.model.WxPushTaskDetail;
 import com.yfshop.common.exception.ApiException;
@@ -37,7 +37,7 @@ public class AdminWxPushTaskImplService implements WxPushTaskService {
     private WxPushTaskMapper wxPushTaskMapper;
 
     @Resource
-    private WxTemplateMessageMapper wxTemplateMessageMapper;
+    private WxPushTemplateMapper wxPushTemplateMapper;
     @Resource
     private WxPushTaskDetailMapper wxPushTaskDetailMapper;
     @Resource
@@ -101,6 +101,12 @@ public class AdminWxPushTaskImplService implements WxPushTaskService {
         return null;
     }
 
+
+    @Override
+    public String downloadFile(Integer id) throws ApiException {
+        return null;
+    }
+
     @Override
     public Integer filterPushData(WxPushTaskReq wxPushTaskReq) throws ApiException {
 
@@ -134,7 +140,7 @@ public class AdminWxPushTaskImplService implements WxPushTaskService {
     @Override
     public List<WxPushTemplateResult> pushTemplateList() throws ApiException {
 
-        return BeanUtil.convertList(wxTemplateMessageMapper.selectList(Wrappers.emptyWrapper()),WxPushTemplateResult.class);
+        return BeanUtil.convertList(wxPushTemplateMapper.selectList(Wrappers.emptyWrapper()),WxPushTemplateResult.class);
     }
 
 }
