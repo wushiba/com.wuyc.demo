@@ -68,6 +68,14 @@ public class AdminWxPushTaskController implements BaseController {
         return CommonResult.success(wxPushTaskService.editPushTask(req));
     }
 
+    @SaCheckLogin
+    @RequestMapping(value = "/downloadFile", method = {RequestMethod.POST, RequestMethod.GET})
+    @SaCheckRole(value = "sys")
+    @ResponseBody
+    public CommonResult<String> downloadFile(Integer id) {
+        return CommonResult.success(wxPushTaskService.downloadFile(id));
+    }
+
 
     @SaCheckLogin
     @RequestMapping(value = "/filterPushDataCount", method = {RequestMethod.POST, RequestMethod.GET})

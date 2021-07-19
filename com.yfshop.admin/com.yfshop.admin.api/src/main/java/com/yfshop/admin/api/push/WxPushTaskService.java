@@ -18,6 +18,8 @@ public interface WxPushTaskService {
 
     Void editPushTask(WxPushTaskReq wxPushTaskReq) throws ApiException;
 
+    String downloadFile(Integer id) throws ApiException;
+
     Integer filterPushData(WxPushTaskReq wxPushTaskReq) throws ApiException;
 
     IPage<WxPushTaskResult> pushTaskList(WxPushTaskReq wxPushTaskReq);
@@ -27,4 +29,5 @@ public interface WxPushTaskService {
     List<WxPushFailExportResult> pushFailExport(Integer id) throws ApiException;
 
     List<WxPushTemplateResult> pushTemplateList() throws ApiException;
+
 }

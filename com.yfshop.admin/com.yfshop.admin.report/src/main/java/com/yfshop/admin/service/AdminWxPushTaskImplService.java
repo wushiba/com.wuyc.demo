@@ -20,6 +20,7 @@ import com.yfshop.code.mapper.WxTemplateMessageMapper;
 import com.yfshop.code.model.WxPushTask;
 import com.yfshop.code.model.WxPushTaskDetail;
 import com.yfshop.common.exception.ApiException;
+import com.yfshop.common.exception.Asserts;
 import com.yfshop.common.util.BeanUtil;
 import com.yfshop.common.util.ExcelUtils;
 import org.apache.dubbo.config.annotation.DubboService;
@@ -49,20 +50,21 @@ public class AdminWxPushTaskImplService implements WxPushTaskService {
     private String dirPath = "/home/www/web-deploy/yufan-admin-report/websiteCode/";
     @Autowired
     private OssDownloader ossDownloader;
+
     @Override
     public Void createPushTask(WxPushTaskReq wxPushTaskReq) throws ApiException {
-        List<WxPushTaskData> wxPushTaskDataList=new ArrayList<>();
-        if ("EXCEL".equals(wxPushTaskReq.getSource())&& HttpUtil.isHttp(wxPushTaskReq.getFileUrl())){
+        List<WxPushTaskData> wxPushTaskDataList = new ArrayList<>();
+        if ("EXCEL".equals(wxPushTaskReq.getSource()) && HttpUtil.isHttp(wxPushTaskReq.getFileUrl())) {
             File dir = new File(dirPath, "excel");
             if (!dir.isDirectory()) {
                 dir.mkdirs();
             }
-            File file = new File(dir, "push-"+DateUtil.format(new Date(), "yyMMddHHmmss") + ".xls");
+            File file = new File(dir, "push-" + DateUtil.format(new Date(), "yyMMddHHmmss") + ".xls");
             String fileUrl = ossDownloader.privateDownloadUrl(wxPushTaskReq.getFileUrl(), 60 * 5, null);
             HttpUtil.downloadFileFromUrl(fileUrl, file);
-            wxPushTaskDataList=ExcelUtils.importExcel(file.getPath(),1,1,WxPushTaskData.class);
-        }else{
-            wxPushTaskDataList=wxPushTaskDao.getWxPushTaskData(wxPushTaskReq);
+            wxPushTaskDataList = ExcelUtils.importExcel(file.getPath(), 1, 1, WxPushTaskData.class);
+        } else {
+            wxPushTaskDataList = wxPushTaskDao.getWxPushTaskData(wxPushTaskReq);
         }
         if (CollectionUtil.isNotEmpty(wxPushTaskDataList)) {
             List<List<WxPushTaskData>> lists = ListUtil.split(wxPushTaskDataList, 100000);
@@ -97,9 +99,17 @@ public class AdminWxPushTaskImplService implements WxPushTaskService {
 
     @Override
     public Void editPushTask(WxPushTaskReq wxPushTaskReq) throws ApiException {
-        WxPushTask wxPushTask= BeanUtil.convert(wxPushTaskReq,WxPushTask.class);
+        WxPushTask wxPushTask = BeanUtil.convert(wxPushTaskReq, WxPushTask.class);
         wxPushTaskMapper.updateById(wxPushTask);
         return null;
+    }
+
+
+    @Override
+    public String downloadFile(Integer id) throws ApiException {
+        WxPushTask wxPushTask = wxPushTaskMapper.selectById(id);
+        Asserts.assertTrue(wxPushTask != null && wxPushTask.getFileUrl() != null, 500, "获取下载地址失败！");
+        return ossDownloader.privateDownloadUrl(wxPushTask.getFileUrl(), 60 * 5, null);
     }
 
     @Override
@@ -135,7 +145,7 @@ public class AdminWxPushTaskImplService implements WxPushTaskService {
     @Override
     public List<WxPushTemplateResult> pushTemplateList() throws ApiException {
 
-        return BeanUtil.convertList(wxPushTemplateMapper.selectList(Wrappers.emptyWrapper()),WxPushTemplateResult.class);
+        return BeanUtil.convertList(wxPushTemplateMapper.selectList(Wrappers.emptyWrapper()), WxPushTemplateResult.class);
     }
 
 }
