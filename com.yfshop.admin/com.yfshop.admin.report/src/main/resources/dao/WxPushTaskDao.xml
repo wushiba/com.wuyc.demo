@@ -41,7 +41,7 @@
             AND a.un_third_count&gt;= #{thirdCount}
         </if>
         <if test="otherCount!=null">
-            AND a.otherCount&gt;= 0
+            AND a.un_other_count&gt;= 0
         </if>
     </select>
 
@@ -82,7 +82,7 @@
             AND a.un_third_count&gt;= #{thirdCount}
         </if>
         <if test="otherCount!=null">
-            AND a.otherCount&gt;= 0
+            AND a.un_other_count&gt;= 0
         </if>
     </select>
 </mapper>
