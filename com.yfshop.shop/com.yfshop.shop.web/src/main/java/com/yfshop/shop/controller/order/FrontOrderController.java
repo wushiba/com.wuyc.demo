@@ -1,6 +1,7 @@
 package com.yfshop.shop.controller.order;
 
 import cn.dev33.satoken.annotation.SaCheckLogin;
+import cn.dev33.satoken.stp.StpUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.github.binarywang.wxpay.bean.order.WxPayMpOrderResult;
 import com.github.binarywang.wxpay.exception.WxPayException;
@@ -187,6 +188,7 @@ public class FrontOrderController implements BaseController {
     @ResponseBody
     @SaCheckLogin
     public CommonResult<UserCartSummary> calcUserCart(Integer skuId, Integer num, String cartIds, Long userCouponId) {
+        StpUtil.setLoginId(getCurrentAdminUserId());
         return CommonResult.success(userCartService.calcUserCart(skuId, num, cartIds, userCouponId));
     }
 
