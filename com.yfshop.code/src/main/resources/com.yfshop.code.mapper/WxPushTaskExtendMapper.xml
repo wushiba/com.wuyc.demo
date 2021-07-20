@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yfshop.code.mapper.WxPushTaskExtendMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.yfshop.code.model.WxPushTaskExtend">
+        <id column="id" property="id" />
+        <result column="push_id" property="pushId" />
+        <result column="subscribe_start_time" property="subscribeStartTime" />
+        <result column="subscribe_end_time" property="subscribeEndTime" />
+        <result column="first_count" property="firstCount" />
+        <result column="second_count" property="secondCount" />
+        <result column="other_count" property="otherCount" />
+        <result column="coupon_start_time" property="couponStartTime" />
+        <result column="coupon_end_time" property="couponEndTime" />
+        <result column="use_count" property="useCount" />
+        <result column="use_start_time" property="useStartTime" />
+        <result column="use_end_time" property="useEndTime" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, push_id, subscribe_start_time, subscribe_end_time, first_count, second_count, other_count, coupon_start_time, coupon_end_time, use_count, use_start_time, use_end_time
+    </sql>
+
+</mapper>

@@ -14,15 +14,17 @@ import com.yfshop.admin.dao.WxPushTaskDao;
 import com.yfshop.admin.tool.poster.kernal.oss.OssDownloader;
 import com.yfshop.code.manager.WxPushTaskDetailManager;
 import com.yfshop.code.mapper.WxPushTaskDetailMapper;
+import com.yfshop.code.mapper.WxPushTaskExtendMapper;
 import com.yfshop.code.mapper.WxPushTaskMapper;
 import com.yfshop.code.mapper.WxPushTemplateMapper;
-import com.yfshop.code.mapper.WxTemplateMessageMapper;
 import com.yfshop.code.model.WxPushTask;
 import com.yfshop.code.model.WxPushTaskDetail;
+import com.yfshop.code.model.WxPushTaskExtend;
 import com.yfshop.common.exception.ApiException;
 import com.yfshop.common.exception.Asserts;
 import com.yfshop.common.util.BeanUtil;
 import com.yfshop.common.util.ExcelUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -37,7 +39,8 @@ import java.util.List;
 public class AdminWxPushTaskImplService implements WxPushTaskService {
     @Resource
     private WxPushTaskMapper wxPushTaskMapper;
-
+    @Resource
+    private WxPushTaskExtendMapper wxPushTaskExtendMapper;
     @Resource
     private WxPushTemplateMapper wxPushTemplateMapper;
     @Resource
@@ -73,11 +76,14 @@ public class AdminWxPushTaskImplService implements WxPushTaskService {
                 wxPushTask.setPushTime(wxPushTask.getPushTime().plusHours(i));
                 List<WxPushTaskData> list = lists.get(i);
                 wxPushTask.setPushCount(list.size());
-                Integer pushId = wxPushTaskMapper.insert(wxPushTask);
+                wxPushTaskMapper.insert(wxPushTask);
+                WxPushTaskExtend wxPushTaskExtend = BeanUtil.convert(wxPushTaskReq, WxPushTaskExtend.class);
+                wxPushTaskExtend.setPushId(wxPushTask.getId());
+                wxPushTaskExtendMapper.insert(wxPushTaskExtend);
                 List<WxPushTaskDetail> pushTaskDetails = new ArrayList<>();
                 list.forEach(date -> {
                     WxPushTaskDetail wxPushTaskDetail = new WxPushTaskDetail();
-                    wxPushTaskDetail.setPushId(pushId);
+                    wxPushTaskDetail.setPushId(wxPushTask.getId());
                     wxPushTaskDetail.setUserId(date.getId());
                     wxPushTaskDetail.setOpenId(date.getOpenId());
                     pushTaskDetails.add(wxPushTaskDetail);
@@ -101,6 +107,12 @@ public class AdminWxPushTaskImplService implements WxPushTaskService {
     public Void editPushTask(WxPushTaskReq wxPushTaskReq) throws ApiException {
         WxPushTask wxPushTask = BeanUtil.convert(wxPushTaskReq, WxPushTask.class);
         wxPushTaskMapper.updateById(wxPushTask);
+        if (StringUtils.isNotBlank(wxPushTaskReq.getSource())) {
+            WxPushTaskExtend wxPushTaskExtend = BeanUtil.convert(wxPushTaskReq, WxPushTaskExtend.class);
+            wxPushTaskExtend.setPushId(wxPushTaskReq.getId());
+            wxPushTaskExtendMapper.delete(Wrappers.lambdaQuery(WxPushTaskExtend.class).eq(WxPushTaskExtend::getPushId, wxPushTaskReq.getId()));
+            wxPushTaskExtendMapper.insert(wxPushTaskExtend);
+        }
         return null;
     }
 
@@ -108,7 +120,7 @@ public class AdminWxPushTaskImplService implements WxPushTaskService {
     @Override
     public String downloadFile(Integer id) throws ApiException {
         WxPushTask wxPushTask = wxPushTaskMapper.selectById(id);
-        Asserts.assertTrue(wxPushTask != null && wxPushTask.getFileUrl() != null, 500, "获取下载地址失败！");
+        Asserts.assertTrue(wxPushTask != null && StringUtils.isNotBlank(wxPushTask.getFileUrl()), 500, "获取下载地址失败！");
         return ossDownloader.privateDownloadUrl(wxPushTask.getFileUrl(), 60 * 5, null);
     }
 
@@ -122,6 +134,20 @@ public class AdminWxPushTaskImplService implements WxPushTaskService {
     public IPage<WxPushTaskResult> pushTaskList(WxPushTaskReq wxPushTaskReq) {
         IPage<WxPushTask> iPage = wxPushTaskMapper.selectPage(new Page<>(wxPushTaskReq.getPageIndex(), wxPushTaskReq.getPageSize()), Wrappers.lambdaQuery(WxPushTask.class).orderByDesc(WxPushTask::getPushTime));
         return BeanUtil.iPageConvert(iPage, WxPushTaskResult.class);
+    }
+
+    @Override
+    public WxPushTaskResult pushTaskDetail(Integer id) {
+        WxPushTask wxPushTask = wxPushTaskMapper.selectById(id);
+        if (wxPushTask != null) {
+            WxPushTaskResult wxPushTaskResult = BeanUtil.convert(wxPushTask, WxPushTaskResult.class);
+            WxPushTaskExtend wxPushTaskExtend = wxPushTaskExtendMapper.selectOne(Wrappers.lambdaQuery(WxPushTaskExtend.class).eq(WxPushTaskExtend::getPushId, id));
+            if (wxPushTaskExtend != null) {
+                BeanUtil.copyProperties(wxPushTaskExtend, wxPushTaskResult);
+            }
+            return wxPushTaskResult;
+        }
+        return null;
     }
 
     @Override

@@ -145,6 +145,19 @@
             <groupId>com.sf</groupId>
             <artifactId>sf-express-sdk</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.jd</groupId>
+            <artifactId>jd-open-sdk</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.codehaus.jackson</groupId>
+            <artifactId>jackson-mapper-asl</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.codehaus.jackson</groupId>
+            <artifactId>jackson-core-asl</artifactId>
+        </dependency>
     </dependencies>
 
 

@@ -18,7 +18,6 @@ class RouteController {
     private FrontUserCouponService frontUserCouponService;
 
     @RequestMapping("/coupon")
-    @SaCheckLogin
     public void coupon(Long id, HttpServletResponse response) throws IOException {
         response.sendRedirect(frontUserCouponService.getCouponRouteUrl(id));
     }
