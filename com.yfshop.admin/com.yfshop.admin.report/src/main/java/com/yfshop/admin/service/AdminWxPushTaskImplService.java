@@ -21,6 +21,7 @@ import com.yfshop.code.model.WxPushTask;
 import com.yfshop.code.model.WxPushTaskDetail;
 import com.yfshop.code.model.WxPushTaskExtend;
 import com.yfshop.common.exception.ApiException;
+import com.yfshop.common.exception.Asserts;
 import com.yfshop.common.util.BeanUtil;
 import com.yfshop.common.util.ExcelUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -118,7 +119,9 @@ public class AdminWxPushTaskImplService implements WxPushTaskService {
 
     @Override
     public String downloadFile(Integer id) throws ApiException {
-        return null;
+        WxPushTask wxPushTask = wxPushTaskMapper.selectById(id);
+        Asserts.assertTrue(wxPushTask != null && StringUtils.isNotBlank(wxPushTask.getFileUrl()), 500, "获取下载地址失败！");
+        return ossDownloader.privateDownloadUrl(wxPushTask.getFileUrl(), 60 * 5, null);
     }
 
     @Override
