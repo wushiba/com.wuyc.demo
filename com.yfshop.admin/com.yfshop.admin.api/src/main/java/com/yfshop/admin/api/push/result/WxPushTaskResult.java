@@ -68,6 +68,8 @@ public class WxPushTaskResult implements Serializable {
      */
     private String templateData;
 
+    private String templateUrl;
+
     private String remark;
 
 
