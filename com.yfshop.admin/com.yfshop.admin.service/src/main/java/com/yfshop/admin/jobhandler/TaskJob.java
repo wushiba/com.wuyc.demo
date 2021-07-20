@@ -58,32 +58,5 @@ public class TaskJob {
     public void syncShopTimeOutOrder() throws Exception {
         orderTask.syncShopTimeOutOrder();
     }
-
-    @XxlJob("buyGoods")
-    public void buyGoods() {
-        List<Item> items = itemMapper.selectList(Wrappers.lambdaQuery(Item.class).eq(Item::getIsEnable, "Y").eq(Item::getIsDelete, "N"));
-        items.forEach(item -> {
-            redisService.incr("BuyGoods:" + item.getId(), RandomUtil.randomInt(1, 10));
-        });
-    }
-
-
-    @XxlJob("healthyRemainderGoods")
-    public void HealthyRemainderGoods() {
-        String dataStr = DateUtil.format(LocalDateTime.now(), "yyyyMMdd");
-        List<HealthyItem> items = healthyItemMapper.selectList(Wrappers.lambdaQuery(HealthyItem.class).eq(HealthyItem::getIsEnable, "Y").eq(HealthyItem::getIsDelete, "N"));
-        items.forEach(item -> {
-            String key = "HealthyRemainderGoods:" + dataStr + ":" + item.getId();
-            redisService.incr(key, 1, 1, TimeUnit.DAYS);
-        });
-    }
-
-    @XxlJob("healthyBugGoods")
-    public void healthyBugGoods() {
-        List<HealthyItem> items = healthyItemMapper.selectList(Wrappers.lambdaQuery(HealthyItem.class).eq(HealthyItem::getIsEnable, "Y").eq(HealthyItem::getIsDelete, "N"));
-        items.forEach(item -> {
-            String key = "HealthyBugGoods:" + item.getId();
-            redisService.incr(key, RandomUtil.randomInt(1, 10));
-        });
-    }
+    
 }
