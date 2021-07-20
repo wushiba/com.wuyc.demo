@@ -1,5 +1,6 @@
 package com.yfshop.shop.controller;
 
+import com.yfshop.common.log.IgnoreLog;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import springfox.documentation.annotations.ApiIgnore;
@@ -10,6 +11,7 @@ import springfox.documentation.annotations.ApiIgnore;
  * @author Xulg
  * Created in 2019-05-30 11:04
  */
+@IgnoreLog
 @Controller
 @ApiIgnore
 public class ErrorController {

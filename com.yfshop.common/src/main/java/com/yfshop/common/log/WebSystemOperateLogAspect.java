@@ -40,8 +40,13 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
@@ -163,6 +168,18 @@ public class WebSystemOperateLogAspect {
     }
 
     protected boolean shouldIgnore(Class<?> targetClass, Method targetMethod) {
+        if (targetMethod.isAnnotationPresent(ForceLog.class)) {
+            return false;
+        }
+        if (targetMethod.isAnnotationPresent(IgnoreLog.class)) {
+            return true;
+        }
+        if (targetClass.isAnnotationPresent(ForceLog.class)) {
+            return false;
+        }
+        if (targetClass.isAnnotationPresent(IgnoreLog.class)) {
+            return true;
+        }
         return false;
     }
 

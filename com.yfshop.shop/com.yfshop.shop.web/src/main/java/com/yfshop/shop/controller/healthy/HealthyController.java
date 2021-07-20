@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.github.binarywang.wxpay.bean.order.WxPayMpOrderResult;
 import com.yfshop.common.api.CommonResult;
 import com.yfshop.common.base.BaseController;
+import com.yfshop.common.log.IgnoreLog;
 import com.yfshop.shop.service.healthy.HealthyService;
 import com.yfshop.shop.service.healthy.req.PreviewShowShipPlansReq;
 import com.yfshop.shop.service.healthy.req.QueryHealthyOrdersReq;
@@ -47,18 +48,21 @@ public class HealthyController implements BaseController {
         return CommonResult.success(healthyService.submitOrder(getCurrentUserId(), req));
     }
 
+    @IgnoreLog
     @RequestMapping(value = "/queryHealthyItems", method = {RequestMethod.GET, RequestMethod.POST})
     @ResponseBody
     public CommonResult<List<HealthyItemResult>> queryHealthyItems() {
         return CommonResult.success(healthyService.queryHealthyItems());
     }
 
+    @IgnoreLog
     @RequestMapping(value = "/queryHealthyActivities", method = {RequestMethod.GET, RequestMethod.POST})
     @ResponseBody
     public CommonResult<List<HealthyActResult>> queryHealthyActivities() {
         return CommonResult.success(healthyService.queryHealthyActivities());
     }
 
+    @IgnoreLog
     @RequestMapping(value = "/queryHealthyActivityDetail", method = {RequestMethod.GET, RequestMethod.POST})
     @ResponseBody
     public CommonResult<HealthyActResult> queryHealthyActivityDetail(Integer id) {
@@ -80,6 +84,7 @@ public class HealthyController implements BaseController {
         return CommonResult.success(healthyService.pageQueryHealthyOrderDetail(getCurrentUserId(), orderId));
     }
 
+    @IgnoreLog
     @RequestMapping(value = "/findHealthyItemDetail", method = {RequestMethod.GET, RequestMethod.POST})
     @ResponseBody
     public CommonResult<HealthyItemResult> findHealthyItemDetail(@NotNull(message = "商品ID不能为空") Integer itemId) {

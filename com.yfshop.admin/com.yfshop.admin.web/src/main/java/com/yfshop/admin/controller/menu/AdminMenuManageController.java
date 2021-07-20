@@ -5,6 +5,7 @@ import com.yfshop.admin.api.menu.AdminMenuManageService;
 import com.yfshop.admin.api.menu.result.MenuResult;
 import com.yfshop.common.api.CommonResult;
 import com.yfshop.common.base.BaseController;
+import com.yfshop.common.log.IgnoreLog;
 import io.swagger.annotations.ApiOperation;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.stereotype.Controller;
@@ -27,6 +28,7 @@ public class AdminMenuManageController implements BaseController {
     @DubboReference(check = false)
     private AdminMenuManageService adminMenuManageService;
 
+    @IgnoreLog
     @ApiOperation(value = "查询商户的菜单", httpMethod = "GET")
     @RequestMapping(value = "/queryMerchantMenus", method = {RequestMethod.GET, RequestMethod.POST})
     @ResponseBody

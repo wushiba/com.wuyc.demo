@@ -4,6 +4,7 @@ import cn.dev33.satoken.annotation.SaCheckLogin;
 import cn.hutool.core.date.DateUtil;
 import com.yfshop.common.api.CommonResult;
 import com.yfshop.common.api.ResultCode;
+import com.yfshop.common.log.IgnoreLog;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -33,6 +34,7 @@ public class UploadController {
     @Value("${upload.server.imagePath}")
     private String imagePath;
 
+    @IgnoreLog
     @RequestMapping("/image")
     @ResponseBody
     @SaCheckLogin

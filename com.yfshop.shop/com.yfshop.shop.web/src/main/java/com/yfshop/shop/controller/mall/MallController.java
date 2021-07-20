@@ -4,6 +4,7 @@ import com.yfshop.common.api.CommonResult;
 import com.yfshop.common.base.BaseController;
 import com.yfshop.common.enums.BannerPositionsEnum;
 import com.yfshop.common.exception.ApiException;
+import com.yfshop.common.log.IgnoreLog;
 import com.yfshop.shop.service.mall.MallService;
 import com.yfshop.shop.service.mall.req.QueryItemDetailReq;
 import com.yfshop.shop.service.mall.req.QueryItemReq;
@@ -41,6 +42,7 @@ public class MallController implements BaseController {
     @DubboReference(check = false)
     private MallService mallService;
 
+    @IgnoreLog
     @ApiOperation(value = "查询商城商品分类", httpMethod = "GET")
     @RequestMapping(value = "/queryCategories", method = {RequestMethod.GET, RequestMethod.POST})
     @ResponseBody
@@ -48,6 +50,7 @@ public class MallController implements BaseController {
         return CommonResult.success(mallService.queryCategories());
     }
 
+    @IgnoreLog
     @ApiOperation(value = "根据分类ID查询商品列表", httpMethod = "GET")
     @ApiImplicitParams(value = {
             @ApiImplicitParam(paramType = "query", name = "categoryId", value = "分类ID")
@@ -58,6 +61,7 @@ public class MallController implements BaseController {
         return CommonResult.success(mallService.queryItems(req));
     }
 
+    @IgnoreLog
     @ApiOperation(value = "查询商品详情", httpMethod = "GET")
     @ApiImplicitParams(value = {
             @ApiImplicitParam(paramType = "query", name = "itemId", value = "商品ID")
@@ -68,6 +72,7 @@ public class MallController implements BaseController {
         return CommonResult.success(mallService.findItemDetail(req));
     }
 
+    @IgnoreLog
     @ApiOperation(value = "查询banner", httpMethod = "GET")
     @RequestMapping(value = "/queryBanners", method = {RequestMethod.GET, RequestMethod.POST})
     @ResponseBody
@@ -89,6 +94,7 @@ public class MallController implements BaseController {
         }
     }
 
+    @IgnoreLog
     @ApiOperation(value = "查询商品购买数量", httpMethod = "GET")
     @RequestMapping(value = "/getBuyGoodsCount", method = {RequestMethod.GET, RequestMethod.POST})
     @ResponseBody
@@ -96,7 +102,7 @@ public class MallController implements BaseController {
        return CommonResult.success(mallService.getBuyGoodsCount(itemId));
     }
 
-
+    @IgnoreLog
     @ApiOperation(value = "查询商品购买数量", httpMethod = "GET")
     @RequestMapping(value = "/getBuyGoodsUser", method = {RequestMethod.GET, RequestMethod.POST})
     @ResponseBody
@@ -105,7 +111,7 @@ public class MallController implements BaseController {
     }
 
 
-
+    @IgnoreLog
     @ApiOperation(value = "根据分类ID查询商品列表", httpMethod = "GET")
     @ApiImplicitParams(value = {
             @ApiImplicitParam(paramType = "query", name = "categoryId", value = "分类ID")
