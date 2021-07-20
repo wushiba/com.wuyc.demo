@@ -13,8 +13,10 @@ public class WxPushTaskResult implements Serializable {
 
     private Integer id;
 
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", locale = "zh", timezone = "GMT+8")
     private LocalDateTime createTime;
 
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", locale = "zh", timezone = "GMT+8")
     private LocalDateTime updateTime;
 
     /**
@@ -76,11 +78,13 @@ public class WxPushTaskResult implements Serializable {
     /**
      * 关注时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", locale = "zh", timezone = "GMT+8")
     private LocalDateTime subscribeStartTime;
 
     /**
      * 关注时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", locale = "zh", timezone = "GMT+8")
     private LocalDateTime subscribeEndTime;
     /**
      * 一等奖可用优惠券数量
@@ -101,11 +105,13 @@ public class WxPushTaskResult implements Serializable {
     /**
      * 获取优惠券时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", locale = "zh", timezone = "GMT+8")
     private LocalDateTime couponStartTime;
 
     /**
      * 获取优惠券时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", locale = "zh", timezone = "GMT+8")
     private LocalDateTime couponEndTime;
     /**
      * 使用数量
@@ -114,11 +120,13 @@ public class WxPushTaskResult implements Serializable {
     /**
      * 使用时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", locale = "zh", timezone = "GMT+8")
     private LocalDateTime useStartTime;
 
     /**
      * 使用时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", locale = "zh", timezone = "GMT+8")
     private LocalDateTime useEndTime;
 
 

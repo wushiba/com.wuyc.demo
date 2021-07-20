@@ -75,14 +75,14 @@ public class AdminWxPushTaskImplService implements WxPushTaskService {
                 wxPushTask.setPushTime(wxPushTask.getPushTime().plusHours(i));
                 List<WxPushTaskData> list = lists.get(i);
                 wxPushTask.setPushCount(list.size());
-                Integer pushId = wxPushTaskMapper.insert(wxPushTask);
+                wxPushTaskMapper.insert(wxPushTask);
                 WxPushTaskExtend wxPushTaskExtend = BeanUtil.convert(wxPushTaskReq, WxPushTaskExtend.class);
-                wxPushTaskExtend.setPushId(pushId);
+                wxPushTaskExtend.setPushId(wxPushTask.getId());
                 wxPushTaskExtendMapper.insert(wxPushTaskExtend);
                 List<WxPushTaskDetail> pushTaskDetails = new ArrayList<>();
                 list.forEach(date -> {
                     WxPushTaskDetail wxPushTaskDetail = new WxPushTaskDetail();
-                    wxPushTaskDetail.setPushId(pushId);
+                    wxPushTaskDetail.setPushId(wxPushTask.getId());
                     wxPushTaskDetail.setUserId(date.getId());
                     wxPushTaskDetail.setOpenId(date.getOpenId());
                     pushTaskDetails.add(wxPushTaskDetail);
