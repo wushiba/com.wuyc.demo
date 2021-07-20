@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.yfshop.admin.api.push.WxPushTaskService;
 import com.yfshop.admin.api.push.request.WxPushTaskReq;
 import com.yfshop.admin.api.push.result.WxPushFailExportResult;
+import com.yfshop.admin.api.push.result.WxPushTaskResult;
 import com.yfshop.admin.api.push.result.WxPushTaskStatsResult;
 import com.yfshop.admin.api.push.result.WxPushTemplateResult;
 import com.yfshop.common.api.CommonResult;
@@ -82,6 +83,14 @@ public class AdminWxPushTaskController implements BaseController {
         return CommonResult.success(wxPushTaskService.pushTaskList(req));
     }
 
+
+    @SaCheckLogin
+    @RequestMapping(value = "/pushTaskDetail", method = {RequestMethod.POST, RequestMethod.GET})
+    @SaCheckRole(value = "sys")
+    @ResponseBody
+    public CommonResult<WxPushTaskResult> pushTaskDetail(Integer id) {
+        return CommonResult.success(wxPushTaskService.pushTaskDetail(id));
+    }
 
     @SneakyThrows
     @RequestMapping(value = "/pushTaskStats", method = {RequestMethod.POST, RequestMethod.GET})

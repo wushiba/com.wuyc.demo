@@ -24,6 +24,8 @@ public interface WxPushTaskService {
 
     IPage<WxPushTaskResult> pushTaskList(WxPushTaskReq wxPushTaskReq);
 
+    WxPushTaskResult pushTaskDetail(Integer id);
+
     WxPushTaskStatsResult pushTaskStats();
 
     List<WxPushFailExportResult> pushFailExport(Integer id) throws ApiException;

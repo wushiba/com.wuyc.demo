@@ -14,13 +14,16 @@ import com.yfshop.admin.dao.WxPushTaskDao;
 import com.yfshop.admin.tool.poster.kernal.oss.OssDownloader;
 import com.yfshop.code.manager.WxPushTaskDetailManager;
 import com.yfshop.code.mapper.WxPushTaskDetailMapper;
+import com.yfshop.code.mapper.WxPushTaskExtendMapper;
 import com.yfshop.code.mapper.WxPushTaskMapper;
 import com.yfshop.code.mapper.WxPushTemplateMapper;
 import com.yfshop.code.model.WxPushTask;
 import com.yfshop.code.model.WxPushTaskDetail;
+import com.yfshop.code.model.WxPushTaskExtend;
 import com.yfshop.common.exception.ApiException;
 import com.yfshop.common.util.BeanUtil;
 import com.yfshop.common.util.ExcelUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -35,7 +38,8 @@ import java.util.List;
 public class AdminWxPushTaskImplService implements WxPushTaskService {
     @Resource
     private WxPushTaskMapper wxPushTaskMapper;
-
+    @Resource
+    private WxPushTaskExtendMapper wxPushTaskExtendMapper;
     @Resource
     private WxPushTemplateMapper wxPushTemplateMapper;
     @Resource
@@ -48,20 +52,21 @@ public class AdminWxPushTaskImplService implements WxPushTaskService {
     private String dirPath = "/home/www/web-deploy/yufan-admin-report/websiteCode/";
     @Autowired
     private OssDownloader ossDownloader;
+
     @Override
     public Void createPushTask(WxPushTaskReq wxPushTaskReq) throws ApiException {
-        List<WxPushTaskData> wxPushTaskDataList=new ArrayList<>();
-        if ("EXCEL".equals(wxPushTaskReq.getSource())&& HttpUtil.isHttp(wxPushTaskReq.getFileUrl())){
+        List<WxPushTaskData> wxPushTaskDataList = new ArrayList<>();
+        if ("EXCEL".equals(wxPushTaskReq.getSource()) && HttpUtil.isHttp(wxPushTaskReq.getFileUrl())) {
             File dir = new File(dirPath, "excel");
             if (!dir.isDirectory()) {
                 dir.mkdirs();
             }
-            File file = new File(dir, "push-"+DateUtil.format(new Date(), "yyMMddHHmmss") + ".xls");
+            File file = new File(dir, "push-" + DateUtil.format(new Date(), "yyMMddHHmmss") + ".xls");
             String fileUrl = ossDownloader.privateDownloadUrl(wxPushTaskReq.getFileUrl(), 60 * 5, null);
             HttpUtil.downloadFileFromUrl(fileUrl, file);
-            wxPushTaskDataList=ExcelUtils.importExcel(file.getPath(),1,1,WxPushTaskData.class);
-        }else{
-            wxPushTaskDataList=wxPushTaskDao.getWxPushTaskData(wxPushTaskReq);
+            wxPushTaskDataList = ExcelUtils.importExcel(file.getPath(), 1, 1, WxPushTaskData.class);
+        } else {
+            wxPushTaskDataList = wxPushTaskDao.getWxPushTaskData(wxPushTaskReq);
         }
         if (CollectionUtil.isNotEmpty(wxPushTaskDataList)) {
             List<List<WxPushTaskData>> lists = ListUtil.split(wxPushTaskDataList, 100000);
@@ -71,6 +76,9 @@ public class AdminWxPushTaskImplService implements WxPushTaskService {
                 List<WxPushTaskData> list = lists.get(i);
                 wxPushTask.setPushCount(list.size());
                 Integer pushId = wxPushTaskMapper.insert(wxPushTask);
+                WxPushTaskExtend wxPushTaskExtend = BeanUtil.convert(wxPushTaskReq, WxPushTaskExtend.class);
+                wxPushTaskExtend.setPushId(pushId);
+                wxPushTaskExtendMapper.insert(wxPushTaskExtend);
                 List<WxPushTaskDetail> pushTaskDetails = new ArrayList<>();
                 list.forEach(date -> {
                     WxPushTaskDetail wxPushTaskDetail = new WxPushTaskDetail();
@@ -96,8 +104,14 @@ public class AdminWxPushTaskImplService implements WxPushTaskService {
 
     @Override
     public Void editPushTask(WxPushTaskReq wxPushTaskReq) throws ApiException {
-        WxPushTask wxPushTask= BeanUtil.convert(wxPushTaskReq,WxPushTask.class);
+        WxPushTask wxPushTask = BeanUtil.convert(wxPushTaskReq, WxPushTask.class);
         wxPushTaskMapper.updateById(wxPushTask);
+        if (StringUtils.isNotBlank(wxPushTaskReq.getSource())) {
+            WxPushTaskExtend wxPushTaskExtend = BeanUtil.convert(wxPushTaskReq, WxPushTaskExtend.class);
+            wxPushTaskExtend.setPushId(wxPushTaskReq.getId());
+            wxPushTaskExtendMapper.delete(Wrappers.lambdaQuery(WxPushTaskExtend.class).eq(WxPushTaskExtend::getPushId, wxPushTaskReq.getId()));
+            wxPushTaskExtendMapper.insert(wxPushTaskExtend);
+        }
         return null;
     }
 
@@ -117,6 +131,20 @@ public class AdminWxPushTaskImplService implements WxPushTaskService {
     public IPage<WxPushTaskResult> pushTaskList(WxPushTaskReq wxPushTaskReq) {
         IPage<WxPushTask> iPage = wxPushTaskMapper.selectPage(new Page<>(wxPushTaskReq.getPageIndex(), wxPushTaskReq.getPageSize()), Wrappers.lambdaQuery(WxPushTask.class).orderByDesc(WxPushTask::getPushTime));
         return BeanUtil.iPageConvert(iPage, WxPushTaskResult.class);
+    }
+
+    @Override
+    public WxPushTaskResult pushTaskDetail(Integer id) {
+        WxPushTask wxPushTask = wxPushTaskMapper.selectById(id);
+        if (wxPushTask != null) {
+            WxPushTaskResult wxPushTaskResult = BeanUtil.convert(wxPushTask, WxPushTaskResult.class);
+            WxPushTaskExtend wxPushTaskExtend = wxPushTaskExtendMapper.selectOne(Wrappers.lambdaQuery(WxPushTaskExtend.class).eq(WxPushTaskExtend::getPushId, id));
+            if (wxPushTaskExtend != null) {
+                BeanUtil.copyProperties(wxPushTaskExtend, wxPushTaskResult);
+            }
+            return wxPushTaskResult;
+        }
+        return null;
     }
 
     @Override
@@ -140,7 +168,7 @@ public class AdminWxPushTaskImplService implements WxPushTaskService {
     @Override
     public List<WxPushTemplateResult> pushTemplateList() throws ApiException {
 
-        return BeanUtil.convertList(wxPushTemplateMapper.selectList(Wrappers.emptyWrapper()),WxPushTemplateResult.class);
+        return BeanUtil.convertList(wxPushTemplateMapper.selectList(Wrappers.emptyWrapper()), WxPushTemplateResult.class);
     }
 
 }
