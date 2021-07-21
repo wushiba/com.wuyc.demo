@@ -38,7 +38,7 @@ public class WxPushTaskExtend extends Model<WxPushTaskExtend> {
     private Integer secondCount;
 
     private Integer thirdCount;
-    
+
     private Integer otherCount;
 
     private LocalDateTime couponStartTime;

@@ -70,6 +70,7 @@ public class WxPushMsgTask {
                         .url(wxPushTask.getTemplateUrl())
                         .templateId(wxPushTask.getTemplateId())
                         .build();
+                data.setPushTime(LocalDateTime.now());
                 mpService.sendWxMsg(wxMpTemplateMessage);
                 data.setStatus("SUCCESS");
                 successCount++;

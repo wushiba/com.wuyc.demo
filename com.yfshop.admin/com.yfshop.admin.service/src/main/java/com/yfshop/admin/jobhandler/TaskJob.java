@@ -58,5 +58,5 @@ public class TaskJob {
     public void syncShopTimeOutOrder() throws Exception {
         orderTask.syncShopTimeOutOrder();
     }
-    
+
 }
