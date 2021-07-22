@@ -84,7 +84,7 @@ public class WxPushMsgTask {
         wxPushTask.setSuccessCount(successCount);
         wxPushTask.setStatus("SUCCESS");
         wxPushTaskMapper.updateById(wxPushTask);
-        wxPushTaskDetailManager.saveBatch(wxPushTaskDetails);
+        wxPushTaskDetailManager.saveOrUpdateBatch(wxPushTaskDetails);
 
     }
 
