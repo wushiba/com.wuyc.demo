@@ -1,16 +1,19 @@
 package com.yfshop.code.model;
 
 import java.math.BigDecimal;
+
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.activerecord.Model;
+
 import java.time.LocalDateTime;
 import java.io.Serializable;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 /**
  * <p>
- * 
+ *
  * </p>
  *
  * @author yoush
@@ -31,7 +34,11 @@ public class SpreadOrder extends Model<SpreadOrder> {
 
     private String orderNo;
 
+    private LocalDateTime orderTime;
+
     private String itemName;
+
+    private String itemUrl;
 
     private String merchantName;
 

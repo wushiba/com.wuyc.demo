@@ -32,7 +32,12 @@ public class SpreadOrderResult implements Serializable {
 
     private String orderNo;
 
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", locale = "zh", timezone = "GMT+8")
+    private LocalDateTime orderTime;
+
     private String itemName;
+
+    private String itemUrl;
 
     private String merchantName;
 
