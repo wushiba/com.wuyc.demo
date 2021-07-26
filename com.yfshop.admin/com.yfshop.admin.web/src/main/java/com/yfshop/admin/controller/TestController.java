@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -29,6 +30,7 @@ import java.util.TreeMap;
 public class TestController {
 
     @GetMapping("/acquireGift")
+    @ResponseBody
     public CommonResult<Object> acquireGift(boolean isProProfile, String userPhone, String orderNo) {
         QunarAcquireGiftHelper2 qunarAcquireGiftHelper2 = new QunarAcquireGiftHelper2(isProProfile);
         AcquireGiftResult acquireGiftResult = qunarAcquireGiftHelper2.acquireGift(userPhone, orderNo);
