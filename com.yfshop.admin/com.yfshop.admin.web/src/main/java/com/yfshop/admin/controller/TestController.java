@@ -66,10 +66,9 @@ public class TestController {
 
     @RequestMapping("/callbackHGDS")
     @ResponseBody
-    public CommonResult<Object> callbackHGDS(HttpServletRequest request) {
-        CallbackData callbackData = HaagenDazsHelper.handleCallback(request);
+    public CommonResult<Object> callbackHGDS(@RequestBody CallbackData callbackData) {
+        //CallbackData callbackData = HaagenDazsHelper.handleCallback(request);
         logger.info("哈根达斯回调啊啊啊啊啊啊啊啊啊啊啊啊啊======\r\n" + JSON.toJSONString(callbackData, true));
-        System.out.println("哈根达斯回调啊啊啊啊啊啊啊啊啊啊啊啊啊======\r\n" + JSON.toJSONString(callbackData, true));
         return CommonResult.success(callbackData);
     }
 
