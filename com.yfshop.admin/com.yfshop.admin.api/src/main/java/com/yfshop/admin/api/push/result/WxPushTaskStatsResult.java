@@ -12,17 +12,17 @@ public class WxPushTaskStatsResult implements Serializable {
     /**
      * 推送人数
      */
-    private Integer pushCount;
+    private Integer pushCount = 0;
 
     /**
      * 成功人数
      */
-    private Integer successCount;
+    private Integer successCount = 0;
 
     /**
      * 失败人数
      */
-    private Integer failCount;
+    private Integer failCount = 0;
 
 
 }

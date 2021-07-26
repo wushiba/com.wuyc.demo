@@ -17,7 +17,7 @@ public class WxPushFailExportResult implements Serializable {
 
 
     @Excel(name = "失败原因", width = 60)
-    private String failMsg;
+    private String errorMsg;
 
 
 }

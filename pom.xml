@@ -50,7 +50,7 @@
         <hutool.version>5.5.9</hutool.version>
         <!--httpcomponents依赖的版本-->
         <httpcomponents.version>4.5.5</httpcomponents.version>
-        <easypoi.version>3.2.0</easypoi.version>
+        <easypoi.version>4.4.0</easypoi.version>
         <logstash-logback.version>5.3</logstash-logback.version>
         <weixin-java-mp.version>4.0.0</weixin-java-mp.version>
         <weixin-java-pay.version>4.0.0</weixin-java-pay.version>

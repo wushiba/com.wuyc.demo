@@ -35,7 +35,6 @@ public class MpServiceImpl implements MpService {
     private WxPayService wxService;
 
 
-    @Async
     @Override
     public void sendWxMsg(WxMpTemplateMessage wxMpTemplateMessage) throws WxErrorException {
         wxMpService.getTemplateMsgService().sendTemplateMsg(wxMpTemplateMessage);

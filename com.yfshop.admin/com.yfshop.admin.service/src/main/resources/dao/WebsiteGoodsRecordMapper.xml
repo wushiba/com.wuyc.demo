@@ -18,7 +18,7 @@
     <select id="sumAllGoodsRecord" resultType="java.lang.Integer">
         select IFNULL(sum(r.quantity), 0)
         from yf_website_goods_record r
-        where r.pid_path like CONCAT('%.', #{merchantId}, '.%')
+        where r.pid_path like CONCAT(#{merchantPath}, '%')
         <if test="startTime!=null">
             and r.create_time &gt;= #{startTime}
         </if>

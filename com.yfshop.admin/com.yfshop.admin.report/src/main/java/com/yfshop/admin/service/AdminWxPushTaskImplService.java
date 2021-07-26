@@ -57,7 +57,7 @@ public class AdminWxPushTaskImplService implements WxPushTaskService {
     @Override
     public Void createPushTask(WxPushTaskReq wxPushTaskReq) throws ApiException {
         List<WxPushTaskData> wxPushTaskDataList = new ArrayList<>();
-        if ("EXCEL".equals(wxPushTaskReq.getSource()) && HttpUtil.isHttp(wxPushTaskReq.getFileUrl())) {
+        if ("EXCEL".equals(wxPushTaskReq.getSource()) && StringUtils.isNotBlank(wxPushTaskReq.getFileUrl()) && wxPushTaskReq.getFileUrl().startsWith("http")) {
             File dir = new File(dirPath, "excel");
             if (!dir.isDirectory()) {
                 dir.mkdirs();

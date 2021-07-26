@@ -15,41 +15,27 @@ import lombok.EqualsAndHashCode;
  * </p>
  *
  * @author yoush
- * @since 2021-07-20
+ * @since 2021-07-21
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
-@TableName("yf_wx_push_task_extend")
-public class WxPushTaskExtend extends Model<WxPushTaskExtend> {
+@TableName("yf_spread_url")
+public class SpreadUrl extends Model<SpreadUrl> {
 
     private static final long serialVersionUID = 1L;
 
     @TableId(value = "id", type = IdType.AUTO)
-    private Integer id;
+    private Long id;
 
-    private Integer pushId;
+    private LocalDateTime createTime;
 
-    private LocalDateTime subscribeStartTime;
+    private LocalDateTime updateTime;
 
-    private LocalDateTime subscribeEndTime;
+    private Integer merchantId;
 
-    private Integer firstCount;
+    private Integer itemId;
 
-    private Integer secondCount;
-
-    private Integer thirdCount;
-
-    private Integer otherCount;
-
-    private LocalDateTime couponStartTime;
-
-    private LocalDateTime couponEndTime;
-
-    private Integer useCount;
-
-    private LocalDateTime useStartTime;
-
-    private LocalDateTime useEndTime;
+    private String url;
 
 
     @Override

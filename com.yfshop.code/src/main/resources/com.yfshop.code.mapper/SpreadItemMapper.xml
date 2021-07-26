@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yfshop.code.mapper.SpreadItemMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.yfshop.code.model.SpreadItem">
+        <id column="id" property="id" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+        <result column="item_name" property="itemName" />
+        <result column="item_image_url" property="itemImageUrl" />
+        <result column="jump_url" property="jumpUrl" />
+        <result column="item_price" property="itemPrice" />
+        <result column="first_commission" property="firstCommission" />
+        <result column="second_commission" property="secondCommission" />
+        <result column="is_enable" property="isEnable" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, create_time, update_time, item_name, item_image_url, jump_url, item_price, first_commission, second_commission, is_enable
+    </sql>
+
+</mapper>

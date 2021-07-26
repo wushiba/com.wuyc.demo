@@ -1,55 +1,54 @@
 package com.yfshop.code.model;
 
+import java.math.BigDecimal;
+
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.extension.activerecord.Model;
 import com.baomidou.mybatisplus.annotation.TableId;
+
 import java.time.LocalDateTime;
 import java.io.Serializable;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 /**
  * <p>
- * 
+ *
  * </p>
  *
  * @author yoush
- * @since 2021-07-20
+ * @since 2021-07-19
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
-@TableName("yf_wx_push_task_extend")
-public class WxPushTaskExtend extends Model<WxPushTaskExtend> {
+@TableName("yf_spread_bill")
+public class SpreadBill extends Model<SpreadBill> {
 
     private static final long serialVersionUID = 1L;
 
     @TableId(value = "id", type = IdType.AUTO)
-    private Integer id;
+    private Long id;
 
-    private Integer pushId;
+    private LocalDateTime createTime;
 
-    private LocalDateTime subscribeStartTime;
+    private LocalDateTime updateTime;
 
-    private LocalDateTime subscribeEndTime;
+    private Integer merchantId;
 
-    private Integer firstCount;
+    private BigDecimal price;
 
-    private Integer secondCount;
+    /**
+     * WAIT 等待 SUCCESS 成功 FAIL 失败
+     */
+    private String status;
 
-    private Integer thirdCount;
+    private String remark;
 
-    private Integer otherCount;
+    private Long pid;
 
-    private LocalDateTime couponStartTime;
-
-    private LocalDateTime couponEndTime;
-
-    private Integer useCount;
-
-    private LocalDateTime useStartTime;
-
-    private LocalDateTime useEndTime;
+    private Integer type;
 
 
     @Override

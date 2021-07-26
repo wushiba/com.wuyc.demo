@@ -112,25 +112,6 @@ public class ExcelUtils {
         return list;
     }
 
-    /**
-     * 导出Excel大文件
-     */
-    public static void exportBigExcel(List<?> list, String title, String sheetName, Class<?> pojoClass,
-                                      String fileName, HttpServletResponse response) {
-        long start = System.currentTimeMillis();
-        ExportParams params = new ExportParams(title, sheetName);
-        List<? extends List<?>> partitions = Lists.partition(list, 10000);
-        Workbook workbook = null;
-        for (List<?> partition : partitions) {
-            workbook = ExcelExportUtil.exportBigExcel(params, pojoClass, partition);
-        }
-        ExcelExportUtil.closeExportBigExcel();
-        if (workbook == null) {
-            return;
-        }
-        System.out.println("EasyPOI导出" + list.size() + "条数据耗时：" + (System.currentTimeMillis() - start) + "ms");
-        downLoadExcel(fileName, response, workbook);
-    }
 
     /**
      * 分页导出大文件

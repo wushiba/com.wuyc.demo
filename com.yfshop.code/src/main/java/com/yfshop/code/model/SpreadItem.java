@@ -1,5 +1,6 @@
 package com.yfshop.code.model;
 
+import java.math.BigDecimal;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.extension.activerecord.Model;
@@ -15,41 +16,41 @@ import lombok.EqualsAndHashCode;
  * </p>
  *
  * @author yoush
- * @since 2021-07-20
+ * @since 2021-07-19
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
-@TableName("yf_wx_push_task_extend")
-public class WxPushTaskExtend extends Model<WxPushTaskExtend> {
+@TableName("yf_spread_item")
+public class SpreadItem extends Model<SpreadItem> {
 
     private static final long serialVersionUID = 1L;
 
     @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
 
-    private Integer pushId;
+    private LocalDateTime createTime;
 
-    private LocalDateTime subscribeStartTime;
+    private LocalDateTime updateTime;
 
-    private LocalDateTime subscribeEndTime;
+    private String itemName;
 
-    private Integer firstCount;
+    private String itemImageUrl;
 
-    private Integer secondCount;
+    private String jumpUrl;
 
-    private Integer thirdCount;
+    private BigDecimal itemPrice;
 
-    private Integer otherCount;
+    /**
+     * 一级分佣
+     */
+    private Integer firstCommission;
 
-    private LocalDateTime couponStartTime;
+    /**
+     * 二级分佣
+     */
+    private Integer secondCommission;
 
-    private LocalDateTime couponEndTime;
-
-    private Integer useCount;
-
-    private LocalDateTime useStartTime;
-
-    private LocalDateTime useEndTime;
+    private String isEnable;
 
 
     @Override

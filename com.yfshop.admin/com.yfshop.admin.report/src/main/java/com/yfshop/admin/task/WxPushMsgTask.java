@@ -58,7 +58,7 @@ public class WxPushMsgTask {
         Integer failCount=0;
         Integer successCount=0;
         List<WxPushTaskDetail> wxPushTaskDetails= wxPushTaskDetailMapper.selectList(Wrappers.lambdaQuery(WxPushTaskDetail.class)
-                .eq(WxPushTaskDetail::getPushId,wxPushTask)
+                .eq(WxPushTaskDetail::getPushId,wxPushTask.getId())
                 .eq(WxPushTaskDetail::getStatus,"WAIT"));
         List<WxMpTemplateData> templateData = WxMpGsonBuilder.create().fromJson(wxPushTask.getTemplateData(), new TypeToken<List<WxMpTemplateData>>() {
         }.getType());
@@ -70,6 +70,7 @@ public class WxPushMsgTask {
                         .url(wxPushTask.getTemplateUrl())
                         .templateId(wxPushTask.getTemplateId())
                         .build();
+                data.setPushTime(LocalDateTime.now());
                 mpService.sendWxMsg(wxMpTemplateMessage);
                 data.setStatus("SUCCESS");
                 successCount++;
@@ -83,7 +84,7 @@ public class WxPushMsgTask {
         wxPushTask.setSuccessCount(successCount);
         wxPushTask.setStatus("SUCCESS");
         wxPushTaskMapper.updateById(wxPushTask);
-        wxPushTaskDetailManager.saveBatch(wxPushTaskDetails);
+        wxPushTaskDetailManager.saveOrUpdateBatch(wxPushTaskDetails);
 
     }
 
