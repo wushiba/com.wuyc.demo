@@ -74,7 +74,7 @@ public class AdminSpreadServiceImpl implements AdminSpreadService {
 
     @Override
     public IPage<SpreadItemResult> getItemList(SpreadItemReq spreadItemReq) throws ApiException {
-        IPage<SpreadItem> iPage = spreadItemMapper.selectPage(new Page<>(spreadItemReq.getPageIndex(), spreadItemReq.getPageSize()), Wrappers.lambdaQuery(SpreadItem.class).eq(SpreadItem::getIsEnable, "Y"));
+        IPage<SpreadItem> iPage = spreadItemMapper.selectPage(new Page<>(spreadItemReq.getPageIndex(), spreadItemReq.getPageSize()), Wrappers.lambdaQuery(SpreadItem.class).orderByDesc());
         return BeanUtil.iPageConvert(iPage, SpreadItemResult.class);
     }
 
