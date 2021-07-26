@@ -74,7 +74,7 @@ public class AdminSpreadServiceImpl implements AdminSpreadService {
 
     @Override
     public IPage<SpreadItemResult> getItemList(SpreadItemReq spreadItemReq) throws ApiException {
-        IPage<SpreadItem> iPage = spreadItemMapper.selectPage(new Page<>(spreadItemReq.getPageIndex(), spreadItemReq.getPageSize()), Wrappers.lambdaQuery(SpreadItem.class).eq(SpreadItem::getIsEnable, "Y"));
+        IPage<SpreadItem> iPage = spreadItemMapper.selectPage(new Page<>(spreadItemReq.getPageIndex(), spreadItemReq.getPageSize()), Wrappers.lambdaQuery(SpreadItem.class).orderByDesc());
         return BeanUtil.iPageConvert(iPage, SpreadItemResult.class);
     }
 
@@ -82,6 +82,17 @@ public class AdminSpreadServiceImpl implements AdminSpreadService {
     public Void createItem(SpreadItemReq spreadItemReq) throws ApiException {
         spreadItemMapper.insert(BeanUtil.convert(spreadItemReq, SpreadItem.class));
         return null;
+    }
+
+    @Override
+    public Void updateItem(SpreadItemReq spreadItemReq) throws ApiException {
+        spreadItemMapper.updateById(BeanUtil.convert(spreadItemReq, SpreadItem.class));
+        return null;
+    }
+
+    @Override
+    public SpreadItemResult getItemDetail(Integer id) throws ApiException {
+        return BeanUtil.convert(spreadItemMapper.selectById(id), SpreadItemResult.class);
     }
 
     @Override
