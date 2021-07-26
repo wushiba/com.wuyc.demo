@@ -174,7 +174,10 @@ public class SpreadServiceImpl implements SpreadService {
         IPage<SpreadBill> iPage = spreadBillMapper.selectPage(new Page<>(spreadBillReq.getPageIndex(), spreadBillReq.getPageSize()), Wrappers.lambdaQuery(SpreadBill.class)
                 .eq(SpreadBill::getMerchantId, spreadBillReq.getMerchantId())
                 .eq(SpreadBill::getStatus, "SUCCESS")
-                .eq(spreadBillReq.getType() != null, SpreadBill::getType, spreadBillReq.getType()));
+                .eq(spreadBillReq.getType() != null, SpreadBill::getType, spreadBillReq.getType())
+                .ge(spreadBillReq.getStartTime() != null, SpreadBill::getUpdateTime, spreadBillReq.getStartTime())
+                .lt(spreadBillReq.getEndTime() != null, SpreadBill::getUpdateTime, spreadBillReq.getEndTime())
+        );
         return BeanUtil.iPageConvert(iPage, SpreadBillResult.class);
     }
 
