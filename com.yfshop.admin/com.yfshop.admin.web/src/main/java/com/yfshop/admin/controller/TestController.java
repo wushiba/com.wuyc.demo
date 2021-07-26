@@ -67,9 +67,12 @@ public class TestController {
     @ResponseBody
     public CommonResult<Object> callbackHGDS(HttpServletRequest request) {
         Map<String, String[]> params = ServletUtil.getParams(request);
-        logger.info("哈根达斯回调啊啊啊啊啊啊啊啊啊啊啊啊啊======\r\n" + JSON.toJSONString(params, true));
+        logger.info("哈根达斯回调啊啊啊啊啊啊啊啊啊啊啊啊啊======\r\n");
         Map<String, String> paramMap = ServletUtil.getParamMap(request);
-        logger.info("哈根达斯回调啊啊啊啊啊啊啊啊啊啊啊啊啊======\r\n" + JSON.toJSONString(paramMap, true));
+        for (Entry<String, String> entry : paramMap.entrySet()) {
+            logger.info(entry.getKey() + "=" + entry.getValue());
+        }
+        logger.info("哈根达斯回调啊啊啊啊啊啊啊啊啊啊啊啊啊======\r\n");
         return CommonResult.success(params);
     }
 
