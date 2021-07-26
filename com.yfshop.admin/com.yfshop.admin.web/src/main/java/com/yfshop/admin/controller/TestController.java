@@ -6,7 +6,6 @@ import cn.hutool.http.HttpRequest;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.yfshop.admin.controller.TestController.HaagenDazsHelper.CallbackData;
 import com.yfshop.admin.controller.TestController.HaagenDazsHelper.SendTicketReq;
 import com.yfshop.admin.controller.TestController.HaagenDazsHelper.SendTicketResult;
 import com.yfshop.admin.controller.TestController.QunarAcquireGiftHelper2.AcquireGiftResult;
@@ -66,10 +65,12 @@ public class TestController {
 
     @RequestMapping("/callbackHGDS")
     @ResponseBody
-    public CommonResult<Object> callbackHGDS(@RequestBody CallbackData callbackData) {
-        //CallbackData callbackData = HaagenDazsHelper.handleCallback(request);
-        logger.info("哈根达斯回调啊啊啊啊啊啊啊啊啊啊啊啊啊======\r\n" + JSON.toJSONString(callbackData, true));
-        return CommonResult.success(callbackData);
+    public CommonResult<Object> callbackHGDS(@RequestBody HttpServletRequest request) {
+        Map<String, String[]> params = ServletUtil.getParams(request);
+        logger.info("哈根达斯回调啊啊啊啊啊啊啊啊啊啊啊啊啊======\r\n" + JSON.toJSONString(params, true));
+        Map<String, String> paramMap = ServletUtil.getParamMap(request);
+        logger.info("哈根达斯回调啊啊啊啊啊啊啊啊啊啊啊啊啊======\r\n" + JSON.toJSONString(paramMap, true));
+        return CommonResult.success(params);
     }
 
     public static class QunarAcquireGiftHelper2 {
