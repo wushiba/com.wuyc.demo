@@ -85,6 +85,17 @@ public class AdminSpreadServiceImpl implements AdminSpreadService {
     }
 
     @Override
+    public Void updateItem(SpreadItemReq spreadItemReq) throws ApiException {
+        spreadItemMapper.updateById(BeanUtil.convert(spreadItemReq, SpreadItem.class));
+        return null;
+    }
+
+    @Override
+    public SpreadItemResult getItemDetail(Integer id) throws ApiException {
+        return BeanUtil.convert(spreadItemMapper.selectById(id), SpreadItemResult.class);
+    }
+
+    @Override
     public IPage<SpreadOrderResult> getOrderList(SpreadOrderReq spreadOrderReq) throws ApiException {
         IPage<SpreadOrder> iPage = spreadOrderMapper.selectPage(new Page<>(spreadOrderReq.getPageIndex(), spreadOrderReq.getPageSize()),
                 Wrappers.lambdaQuery(SpreadOrder.class)

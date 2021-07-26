@@ -9,6 +9,7 @@ import java.util.Date;
 
 @Data
 public class SpreadItemReq implements Serializable {
+    private Integer id;
     private String itemName;
     private String itemImageUrl;
     private String jumpUrl;

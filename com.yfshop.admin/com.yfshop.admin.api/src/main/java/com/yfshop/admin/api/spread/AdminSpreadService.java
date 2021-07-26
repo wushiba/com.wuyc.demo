@@ -15,6 +15,11 @@ public interface AdminSpreadService {
 
     Void createItem(SpreadItemReq spreadItemReq) throws ApiException;
 
+
+    Void updateItem(SpreadItemReq spreadItemReq) throws ApiException;
+
+    SpreadItemResult getItemDetail(Integer id) throws ApiException;
+
     IPage<SpreadOrderResult> getOrderList(SpreadOrderReq spreadOrderReq) throws ApiException;
 
     List<SpreadOrderExport> getOrderExport(SpreadOrderReq spreadOrderReq) throws ApiException;

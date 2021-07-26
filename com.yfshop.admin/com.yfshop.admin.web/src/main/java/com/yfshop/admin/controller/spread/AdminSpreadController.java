@@ -46,6 +46,24 @@ public class AdminSpreadController implements BaseController {
         return CommonResult.success(adminSpreadService.createItem(req));
     }
 
+
+    @RequestMapping(value = "/updateItem", method = {RequestMethod.POST, RequestMethod.GET})
+    @ResponseBody
+    @SaCheckLogin
+    @SaCheckRole(value = "sys")
+    public CommonResult<Void> updateItem(SpreadItemReq req) {
+        return CommonResult.success(adminSpreadService.updateItem(req));
+    }
+
+
+    @RequestMapping(value = "/getItemDetail", method = {RequestMethod.POST, RequestMethod.GET})
+    @ResponseBody
+    @SaCheckLogin
+    @SaCheckRole(value = "sys")
+    public CommonResult<SpreadItemResult> getItemDetail(Integer id) {
+        return CommonResult.success(adminSpreadService.getItemDetail(id));
+    }
+
     @RequestMapping(value = "/getItemList", method = {RequestMethod.POST, RequestMethod.GET})
     @ResponseBody
     @SaCheckLogin
