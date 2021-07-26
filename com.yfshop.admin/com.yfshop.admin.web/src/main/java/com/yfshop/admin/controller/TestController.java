@@ -65,7 +65,7 @@ public class TestController {
 
     @RequestMapping("/callbackHGDS")
     @ResponseBody
-    public CommonResult<Object> callbackHGDS(@RequestBody HttpServletRequest request) {
+    public CommonResult<Object> callbackHGDS(HttpServletRequest request) {
         Map<String, String[]> params = ServletUtil.getParams(request);
         logger.info("哈根达斯回调啊啊啊啊啊啊啊啊啊啊啊啊啊======\r\n" + JSON.toJSONString(params, true));
         Map<String, String> paramMap = ServletUtil.getParamMap(request);
