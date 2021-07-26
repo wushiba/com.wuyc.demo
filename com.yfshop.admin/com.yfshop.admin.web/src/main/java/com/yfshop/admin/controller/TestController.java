@@ -10,6 +10,7 @@ import com.yfshop.common.exception.Asserts;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -24,6 +25,7 @@ import java.util.TreeMap;
  * @since 2021-07-26 13:48
  * Description: 测试去哪儿领取会员接口
  */
+@Profile("uat")
 @Controller
 @RequestMapping("/test")
 public class TestController {
