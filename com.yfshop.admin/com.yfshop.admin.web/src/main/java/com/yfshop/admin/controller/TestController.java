@@ -384,6 +384,7 @@ public class TestController {
 
         public static CallbackData handleCallback(HttpServletRequest request) {
             String data = ServletUtil.getBody(request);
+            logger.info("哈根达斯的回调的数据啊啊啊啊啊" + data);
             CallbackData callbackData = JSON.parseObject(data, CallbackData.class);
             System.out.println(callbackData);
             return callbackData;
@@ -606,6 +607,7 @@ public class TestController {
             private String cardNo;
             // 描述
             private String msg;
+            private Boolean isSuccess;
 
             public String getPhone() {
                 return phone;
@@ -629,6 +631,14 @@ public class TestController {
 
             public void setMsg(String msg) {
                 this.msg = msg;
+            }
+
+            public Boolean getIsSuccess() {
+                return isSuccess;
+            }
+
+            public void setIsSuccess(Boolean success) {
+                isSuccess = success;
             }
         }
 
