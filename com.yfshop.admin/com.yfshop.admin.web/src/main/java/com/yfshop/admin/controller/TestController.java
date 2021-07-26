@@ -130,10 +130,10 @@ public class TestController {
                 if (value instanceof String && StringUtils.isEmpty((String) value)) {
                     continue;
                 }
-                sb.append(key).append("&").append(value);
+                sb.append(key).append("=").append(value).append("&");
             }
-            sb.append(pubKey);
-            return new MD5().digestHex(sb.toString());
+            String s = StringUtils.removeEnd(sb.toString(), "&") + pubKey;
+            return new MD5().digestHex(s);
         }
 
         /* ************************************************************************************************************** */
