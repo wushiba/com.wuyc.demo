@@ -44,5 +44,7 @@ public class SpreadBillResult implements Serializable {
 
     private String remark;
 
+    private Integer type;
+
 
 }
