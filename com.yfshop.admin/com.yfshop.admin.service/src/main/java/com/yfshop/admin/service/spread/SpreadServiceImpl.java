@@ -161,8 +161,7 @@ public class SpreadServiceImpl implements SpreadService {
                     }).or(w -> {
                         w.eq(SpreadBill::getType, 2).in(SpreadBill::getStatus, "SUCCESS", "WAIT");
                     });
-                })
-                .eq(SpreadBill::getStatus, "SUCCESS"))
+                }))
                 .stream()
                 .map(SpreadBill::getPrice)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
@@ -192,8 +191,7 @@ public class SpreadServiceImpl implements SpreadService {
                     }).or(w -> {
                         w.eq(SpreadBill::getType, 2).in(SpreadBill::getStatus, "SUCCESS", "WAIT");
                     });
-                })
-                .eq(SpreadBill::getStatus, "SUCCESS"))
+                }))
                 .stream()
                 .map(SpreadBill::getPrice)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
