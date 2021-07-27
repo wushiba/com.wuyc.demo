@@ -172,7 +172,11 @@ public class SpreadServiceImpl implements SpreadService {
     public IPage<SpreadBillResult> getBillList(SpreadBillReq spreadBillReq) throws ApiException {
         IPage<SpreadBill> iPage = spreadBillMapper.selectPage(new Page<>(spreadBillReq.getPageIndex(), spreadBillReq.getPageSize()), Wrappers.lambdaQuery(SpreadBill.class)
                 .eq(SpreadBill::getMerchantId, spreadBillReq.getMerchantId())
-                .eq(SpreadBill::getStatus, "SUCCESS")
+                .and(wrapper -> {
+                    wrapper.and(w -> {
+                        w.eq(SpreadBill::getType, 1).eq(SpreadBill::getStatus, "SUCCESS");
+                    });
+                })
                 .eq(spreadBillReq.getType() != null, SpreadBill::getType, spreadBillReq.getType())
                 .ge(spreadBillReq.getStartTime() != null, SpreadBill::getUpdateTime, spreadBillReq.getStartTime())
                 .lt(spreadBillReq.getEndTime() != null, SpreadBill::getUpdateTime, spreadBillReq.getEndTime())
