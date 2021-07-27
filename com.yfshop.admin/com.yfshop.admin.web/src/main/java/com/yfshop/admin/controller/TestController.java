@@ -1,13 +1,10 @@
 package com.yfshop.admin.controller;
 
 import cn.hutool.crypto.digest.MD5;
-import cn.hutool.extra.servlet.ServletUtil;
 import cn.hutool.http.HttpRequest;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.yfshop.admin.controller.TestController.HaagenDazsHelper.CallbackData;
-import com.yfshop.admin.controller.TestController.HaagenDazsHelper.MyFunction;
 import com.yfshop.admin.controller.TestController.HaagenDazsHelper.SendTicketReq;
 import com.yfshop.admin.controller.TestController.HaagenDazsHelper.SendTicketResult;
 import com.yfshop.admin.controller.TestController.QunarAcquireGiftHelper2.AcquireGiftResult;
@@ -68,20 +65,10 @@ public class TestController {
     @RequestMapping("/callbackHGDS")
     @ResponseBody
     public CommonResult<Object> callbackHGDS(HttpServletRequest request) {
-        Map<String, String[]> params = ServletUtil.getParams(request);
-        logger.info("哈根达斯回调啊啊啊啊啊啊啊啊啊啊啊啊啊======\r\n");
-        Map<String, String> paramMap = ServletUtil.getParamMap(request);
-        for (Entry<String, String> entry : paramMap.entrySet()) {
-            logger.info(entry.getKey() + "=" + entry.getValue());
-        }
-        logger.info("哈根达斯回调啊啊啊啊啊啊啊啊啊啊啊啊啊======\r\n");
-        Object handleCallback = HaagenDazsHelper.handleCallback(request, new MyFunction<CallbackData, Object>() {
-            @Override
-            public Object apply(CallbackData callbackData) {
-                return callbackData;
-            }
+        Object handleCallback = HaagenDazsHelper.handleCallback(request, callbackData -> {
+            logger.info("哈根达斯回调啊啊啊啊啊啊啊啊啊啊啊啊啊======\r\n" + JSON.toJSONString(callbackData, true));
+            return callbackData;
         });
-        logger.info("*************handleCallback*************\r\n" + JSON.toJSONString(handleCallback, true));
         return CommonResult.success(handleCallback);
     }
 
@@ -325,7 +312,7 @@ public class TestController {
     }
 
     public static class HaagenDazsHelper {
-        private static final Logger logger = LoggerFactory.getLogger(HaagenDazsHelper.class);
+        private static final Logger LOGGER = LoggerFactory.getLogger(HaagenDazsHelper.class);
 
         private static final Pattern MOBILE_PATTERN = Pattern.compile("(?:0|86|\\+86)?1[3456789]\\d{9}");
         private static final List<String> IGNORE_KEYS = Collections.unmodifiableList(Arrays.asList("sign", "data"));
@@ -382,7 +369,7 @@ public class TestController {
             data.put("list", list);
             TreeMap<String, Object> formMap = buildRequestParameters("card.send", data);
             String body = HttpRequest.post(url).form(formMap).execute().body();
-            logger.info("哈根达斯发券接口：地址{}参数{}响应结果{}", url, JSON.toJSONString(formMap), body);
+            LOGGER.info("哈根达斯发券接口：地址{}参数{}响应结果{}", url, JSON.toJSONString(formMap), body);
             //{"code":200,"data":"success","msg":"调用成功","sessionId":"","stack":""}
             JSONObject jsonObject = JSON.parseObject(body);
             SendTicketResult sendTicketResult = new SendTicketResult();
@@ -396,7 +383,7 @@ public class TestController {
 
         public static Object handleCallback(HttpServletRequest request, MyFunction<CallbackData, Object> callback) {
             String data = request.getParameterMap().keySet().iterator().next();
-            logger.info("哈根达斯的回调的数据啊啊啊啊啊" + data);
+            LOGGER.info("哈根达斯的回调的数据啊啊啊啊啊" + data);
             CallbackData callbackData = JSON.parseObject(data, CallbackData.class);
             return callback.apply(callbackData);
         }
@@ -410,7 +397,7 @@ public class TestController {
             data.put("orderSn", orderSn);
             TreeMap<String, Object> formMap = buildRequestParameters("card.total", data);
             String body = HttpRequest.post(url).form(formMap).execute().body();
-            logger.info("哈根达斯查询订单卡券总数与剩余数量接口：地址{}参数{}响应结果{}", url, JSON.toJSONString(formMap), body);
+            LOGGER.info("哈根达斯查询订单卡券总数与剩余数量接口：地址{}参数{}响应结果{}", url, JSON.toJSONString(formMap), body);
             JSONObject jsonObject = JSON.parseObject(body);
 
             FindOrderResult findOrderResult = new FindOrderResult();
