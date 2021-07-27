@@ -175,6 +175,8 @@ public class SpreadServiceImpl implements SpreadService {
                 .and(wrapper -> {
                     wrapper.and(w -> {
                         w.eq(SpreadBill::getType, 1).eq(SpreadBill::getStatus, "SUCCESS");
+                    }).or(w -> {
+                        w.eq(SpreadBill::getType, 2);
                     });
                 })
                 .eq(spreadBillReq.getType() != null, SpreadBill::getType, spreadBillReq.getType())
