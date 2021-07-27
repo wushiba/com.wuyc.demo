@@ -188,6 +188,7 @@ public class SpreadServiceImpl implements SpreadService {
 
     @Override
     public Void withDraw(SpreadWithdrawReq spreadWithdrawReq) throws ApiException {
+        Asserts.assertTrue(spreadWithdrawReq.getWithdraw().compareTo(BigDecimal.ZERO) >= 5, 500, "提现金额不得小于5元！");
         Merchant merchant = merchantMapper.selectById(spreadWithdrawReq.getMerchantId());
         BigDecimal total = spreadBillMapper.selectList(Wrappers.lambdaQuery(SpreadBill.class)
                 .eq(SpreadBill::getMerchantId, spreadWithdrawReq.getMerchantId())
