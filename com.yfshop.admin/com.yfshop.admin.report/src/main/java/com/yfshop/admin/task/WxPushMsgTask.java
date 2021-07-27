@@ -45,7 +45,7 @@ public class WxPushMsgTask {
 
     @Async
     public void doTask(){
-        WxPushTask wxPushTask= wxPushTaskMapper.selectOne(Wrappers.lambdaQuery(WxPushTask.class).ge(WxPushTask::getPushTime,LocalDateTime.now()).eq(WxPushTask::getStatus,"WAIT"));
+        WxPushTask wxPushTask= wxPushTaskMapper.selectOne(Wrappers.lambdaQuery(WxPushTask.class).le(WxPushTask::getPushTime,LocalDateTime.now()).eq(WxPushTask::getStatus,"WAIT").orderByDesc(WxPushTask::getPushTime));
         if (wxPushTask!=null){
             wxPushTask.setStatus("DOING");
             wxPushTaskMapper.updateById(wxPushTask);
