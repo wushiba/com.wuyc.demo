@@ -159,7 +159,7 @@ public class SpreadServiceImpl implements SpreadService {
                     wrapper.and(w -> {
                         w.eq(SpreadBill::getType, 1).eq(SpreadBill::getStatus, "SUCCESS");
                     }).or(w -> {
-                        w.eq(SpreadBill::getType, 2).in(SpreadBill::getStatus, "SUCCESS", "WAIT");
+                        w.eq(SpreadBill::getType, 2);
                     });
                 }))
                 .stream()
@@ -196,7 +196,7 @@ public class SpreadServiceImpl implements SpreadService {
                     wrapper.and(w -> {
                         w.eq(SpreadBill::getType, 1).eq(SpreadBill::getStatus, "SUCCESS");
                     }).or(w -> {
-                        w.eq(SpreadBill::getType, 2).in(SpreadBill::getStatus, "SUCCESS", "WAIT");
+                        w.eq(SpreadBill::getType, 2)
                     });
                 }))
                 .stream()
