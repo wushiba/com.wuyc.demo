@@ -6,6 +6,8 @@ import cn.hutool.http.HttpRequest;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.yfshop.admin.controller.TestController.HaagenDazsHelper.CallbackData;
+import com.yfshop.admin.controller.TestController.HaagenDazsHelper.MyFunction;
 import com.yfshop.admin.controller.TestController.HaagenDazsHelper.SendTicketReq;
 import com.yfshop.admin.controller.TestController.HaagenDazsHelper.SendTicketResult;
 import com.yfshop.admin.controller.TestController.QunarAcquireGiftHelper2.AcquireGiftResult;
@@ -73,7 +75,13 @@ public class TestController {
             logger.info(entry.getKey() + "=" + entry.getValue());
         }
         logger.info("哈根达斯回调啊啊啊啊啊啊啊啊啊啊啊啊啊======\r\n");
-        return CommonResult.success(params);
+        Object handleCallback = HaagenDazsHelper.handleCallback(request, new MyFunction<CallbackData, Object>() {
+            @Override
+            public Object apply(CallbackData callbackData) {
+                return callbackData;
+            }
+        });
+        return CommonResult.success(handleCallback);
     }
 
     public static class QunarAcquireGiftHelper2 {
@@ -385,12 +393,11 @@ public class TestController {
             return sendTicketResult;
         }
 
-        public static CallbackData handleCallback(HttpServletRequest request) {
-            String data = ServletUtil.getBody(request);
+        public static Object handleCallback(HttpServletRequest request, MyFunction<CallbackData, Object> callback) {
+            String data = request.getParameterMap().keySet().iterator().next();
             logger.info("哈根达斯的回调的数据啊啊啊啊啊" + data);
             CallbackData callbackData = JSON.parseObject(data, CallbackData.class);
-            System.out.println(callbackData);
-            return callbackData;
+            return callback.apply(callbackData);
         }
 
         public FindOrderResult findOrder(String orderSn) {
@@ -728,6 +735,10 @@ public class TestController {
             public void setFaild(List<CardDetail> faild) {
                 this.faild = faild;
             }
+        }
+
+        public interface MyFunction<T, R> {
+            R apply(T t);
         }
 
         public static void main(String[] args) {
