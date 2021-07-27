@@ -104,7 +104,7 @@ public class AdminSpreadServiceImpl implements AdminSpreadService {
                         .like(StringUtils.isNotBlank(spreadOrderReq.getMerchantName()), SpreadOrder::getMerchantName, spreadOrderReq.getMerchantName())
                         .like(StringUtils.isNotBlank(spreadOrderReq.getPidName()), SpreadOrder::getPid, spreadOrderReq.getPidName())
                         .like(StringUtils.isNotBlank(spreadOrderReq.getMerchantMobile()), SpreadOrder::getMerchantMobile, spreadOrderReq.getMerchantMobile())
-                        .eq(SpreadOrder::getMerchantRole, spreadOrderReq.getMerchantRole())
+                        .eq(StringUtils.isNotBlank(spreadOrderReq.getMerchantRole()),SpreadOrder::getMerchantRole, spreadOrderReq.getMerchantRole())
                         .eq(StringUtils.isNotBlank(spreadOrderReq.getOrderStatus()), SpreadOrder::getOrderStatus, spreadOrderReq.getOrderStatus())
                         .gt(spreadOrderReq.getStartTime() != null, SpreadOrder::getCreateTime, spreadOrderReq.getStartTime())
                         .lt(spreadOrderReq.getEndTime() != null, SpreadOrder::getCreateTime, spreadOrderReq.getEndTime())
