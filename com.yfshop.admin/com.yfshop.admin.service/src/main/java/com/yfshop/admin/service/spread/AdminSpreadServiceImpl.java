@@ -28,6 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @DubboService
@@ -184,6 +185,7 @@ public class AdminSpreadServiceImpl implements AdminSpreadService {
     @Transactional(rollbackFor = Exception.class)
     public Void tryWithdraw(Long id) throws ApiException {
         SpreadWithdraw spreadWithdraw = new SpreadWithdraw();
+        spreadWithdraw.setSettlementTime(LocalDateTime.now());
         spreadWithdraw.setStatus("SUCCESS");
         int count = spreadWithdrawMapper.update(spreadWithdraw, Wrappers.lambdaQuery(SpreadWithdraw.class).eq(SpreadWithdraw::getId, id).eq(SpreadWithdraw::getStatus, "FAIL"));
         SpreadBill spreadBill = new SpreadBill();
