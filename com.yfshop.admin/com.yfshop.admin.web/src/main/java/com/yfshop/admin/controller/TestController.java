@@ -81,6 +81,7 @@ public class TestController {
                 return callbackData;
             }
         });
+        logger.info("*************handleCallback*************\r\n" + JSON.toJSONString(handleCallback, true));
         return CommonResult.success(handleCallback);
     }
 
