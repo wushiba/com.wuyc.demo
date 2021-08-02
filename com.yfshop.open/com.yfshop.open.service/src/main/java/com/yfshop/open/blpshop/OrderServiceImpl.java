@@ -74,7 +74,7 @@ public class OrderServiceImpl implements OrderService {
                     List<OrderAddress> orderAddresses = orderAddressMapper.selectList(Wrappers.<OrderAddress>lambdaQuery().in(OrderAddress::getOrderId, orderIds));
                     Map<Long, List<OrderDetail>> orderDetailMap = orderDetailLists.stream().collect(Collectors.groupingBy(OrderDetail::getOrderId));
                     Map<Long, OrderAddress> orderAddressMap = orderAddresses.stream().collect(Collectors.toMap(OrderAddress::getOrderId, Function.identity()));
-                    orderIPage.getRecords().forEach(o->{
+                    orderIPage.getRecords().forEach(o -> {
                         List<OrderResult.GoodInfo> goodInfos = new ArrayList<>();
                         OrderAddress orderAddress = orderAddressMap.get(o.getId());
                         OrderResult.Order order = new OrderResult.Order();
@@ -131,6 +131,11 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public SendResult send(SendReq sendReq) throws ApiException {
+        List<RlItemHotpot> list = rlItemHotpotMapper.selectList(Wrappers.emptyWrapper());
+        List<Integer> skuIds = new ArrayList<>();
+        list.stream().forEach(item -> {
+            skuIds.add(item.getSkuId());
+        });
         List<Long> subPlatOrderNo = new ArrayList<>();
         if (StringUtils.isNotBlank(sendReq.getSubPlatOrderNo())) {
             subPlatOrderNo = Arrays.stream(sendReq.getSubPlatOrderNo().split("|")).map(a -> Long.parseLong(a)).collect(Collectors.toList());
@@ -144,7 +149,8 @@ public class OrderServiceImpl implements OrderService {
         orderDetail.setExpressStatus("SUCCESS");
         orderDetailMapper.update(orderDetail, Wrappers.<OrderDetail>lambdaQuery()
                 .eq(OrderDetail::getOrderId, Long.parseLong(sendReq.getPlatOrderNo()))
-                .in(!CollectionUtils.isEmpty(subPlatOrderNo), OrderDetail::getId, subPlatOrderNo));
+                .in(!CollectionUtils.isEmpty(subPlatOrderNo), OrderDetail::getId, subPlatOrderNo)
+                .in(OrderDetail::getSkuId, skuIds));
         SendResult sendResult = new SendResult();
         sendResult.setCode("10000");
         sendResult.setMessage("Success");
