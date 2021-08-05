@@ -52,12 +52,12 @@ public class SpreadServiceImpl implements SpreadService {
     private MerchantMapper merchantMapper;
 
 
-    static String SERVER_URL = "";
-    static String accessToken = "";
-    static String appKey = "";
-    static String appSecret = "";
-    static String siteId = "";
-    static String key;
+    static String SERVER_URL = "https://router.jd.com/api";
+    static String accessToken = null;
+    static String appKey = "e4ad74fd3a422b9d63f625336056516d";
+    static String appSecret = "b4f7144429c34ac98276a03309a78be9";
+    static String siteId = "4100490551";
+    static String key="6ca822d2fda5ca49dadd82d0c6efccf3873d88f7f5474995f466c4dd91408a2de50f139fdacbb1e0";
 
     @Override
     public String createPromotion(Integer merchantId, Integer itemId) throws Exception {
