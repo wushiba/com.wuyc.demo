@@ -1,5 +1,7 @@
 package com.yfshop.admin.service.spread;
 
+import cn.hutool.json.JSON;
+import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -9,7 +11,6 @@ import com.jd.open.api.sdk.domain.kplunion.OrderService.request.query.OrderReq;
 import com.jd.open.api.sdk.domain.kplunion.OrderService.request.query.OrderRowReq;
 import com.jd.open.api.sdk.domain.kplunion.OrderService.response.query.OrderRowResp;
 import com.jd.open.api.sdk.domain.kplunion.OrderService.response.query.QueryResult;
-import com.jd.open.api.sdk.internal.JSON.JSON;
 import com.jd.open.api.sdk.request.kplunion.UnionOpenOrderQueryRequest;
 import com.jd.open.api.sdk.request.kplunion.UnionOpenOrderRowQueryRequest;
 import com.jd.open.api.sdk.response.kplunion.UnionOpenOrderQueryResponse;
@@ -19,7 +20,6 @@ import com.yfshop.admin.api.spread.request.SpreadItemReq;
 import com.yfshop.admin.api.spread.request.SpreadOrderReq;
 import com.yfshop.admin.api.spread.request.SpreadWithdrawReq;
 import com.yfshop.admin.api.spread.result.*;
-import com.yfshop.admin.jobhandler.TaskJob;
 import com.yfshop.code.mapper.*;
 import com.yfshop.code.model.*;
 import com.yfshop.common.exception.ApiException;
@@ -48,7 +48,7 @@ public class AdminSpreadServiceImpl implements AdminSpreadService {
     static String appKey = "e4ad74fd3a422b9d63f625336056516d";
     static String appSecret = "b4f7144429c34ac98276a03309a78be9";
     static String siteId = "4100490551";
-    static String key = "6ca822d2fda5ca49dadd82d0c6efccf3873d88f7f5474995f466c4dd91408a2de50f139fdacbb1e0";
+    static String key = null;
     @Resource
     private SpreadItemMapper spreadItemMapper;
     @Resource
@@ -63,28 +63,7 @@ public class AdminSpreadServiceImpl implements AdminSpreadService {
     private MerchantMapper merchantMapper;
 
 
-    /**
-     * @param type      订单时间查询类型(1：下单时间，2：完成时间（购买用户确认收货时间），3：更新时间
-     * @param time      查询时间，建议使用分钟级查询，格式：yyyyMMddHH、yyyyMMddHHmm或yyyyMMddHHmmss，如201811031212 的查询范围从12:12:00--12:12:59
-     * @param pageIndex
-     * @param pageSize
-     * @throws Exception
-     */
-    public QueryResult orderQuery(Integer type, String time, Integer pageIndex, Integer pageSize) throws Exception {
-        JdClient client = new DefaultJdClient(SERVER_URL, accessToken, appKey, appSecret);
-        UnionOpenOrderQueryRequest request = new UnionOpenOrderQueryRequest();
-        OrderReq orderReq = new OrderReq();
-        orderReq.setTime(time);
-        orderReq.setType(type);
-        orderReq.setKey(key);
-        orderReq.setPageNo(pageIndex);
-        orderReq.setPageSize(pageSize);
-        request.setOrderReq(orderReq);
-        request.setVersion("1.0");
-        UnionOpenOrderQueryResponse response = client.execute(request);
-        Asserts.assertEquals("200", response.getCode(), 500, "查询订单接口失败");
-        return response.getQueryResult();
-    }
+
 
     @Override
     public IPage<SpreadItemResult> getItemList(SpreadItemReq spreadItemReq) throws ApiException {
@@ -210,21 +189,26 @@ public class AdminSpreadServiceImpl implements AdminSpreadService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Void doOrderTask() throws Exception {
+    public Void doOrderTask(){
         Map<String, SpreadItem> spreadItemMap = new HashMap<>();
         JdClient client = new DefaultJdClient(SERVER_URL, accessToken, appKey, appSecret);
         UnionOpenOrderRowQueryRequest request = new UnionOpenOrderRowQueryRequest();
         OrderRowReq orderReq = new OrderRowReq();
-        orderReq.setStartTime(LocalDateTime.now().plusMinutes(-60).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:00")));
+        orderReq.setStartTime(LocalDateTime.now().plusMinutes(-10).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:00")));
         orderReq.setEndTime(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:00")));
         orderReq.setPageIndex(1);
         orderReq.setPageSize(500);
         orderReq.setType(3);
-        orderReq.setKey(key);
         request.setOrderReq(orderReq);
         request.setVersion("1.0");
-        UnionOpenOrderRowQueryResponse response = client.execute(request);
-        logger.info(JSON.toString(response.toString()));
+        UnionOpenOrderRowQueryResponse response = null;
+        try {
+            response = client.execute(request);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+        logger.info(JSONUtil.toJsonPrettyStr(response));
         if (response.getQueryResult().getCode() == 200) {
             for (OrderRowResp rowResp : response.getQueryResult().getData()) {
                 String jdUrl = String.format("https://item.m.jd.com/product/%d.html", rowResp.getSkuId());
@@ -329,5 +313,4 @@ public class AdminSpreadServiceImpl implements AdminSpreadService {
 
         return null;
     }
-
 }
