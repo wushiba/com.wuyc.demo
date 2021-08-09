@@ -239,7 +239,7 @@ public class AdminSpreadServiceImpl implements AdminSpreadService {
                 spreadOrder.setOrderNo(String.valueOf(rowResp.getOrderId()));
                 spreadOrder.setOrderTime(LocalDateTime.parse(rowResp.getOrderTime(), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
                 spreadOrder.setValidCode(rowResp.getValidCode());
-                spreadOrder.setOrderPrice(new BigDecimal(rowResp.getEstimateFee()));
+                spreadOrder.setOrderPrice(new BigDecimal(rowResp.getEstimateCosPrice()));
                 spreadOrder.setMerchantId(merchant.getId());
                 spreadOrder.setMerchantRole(merchant.getRoleAlias());
                 spreadOrder.setMerchantMobile(merchant.getMobile());
