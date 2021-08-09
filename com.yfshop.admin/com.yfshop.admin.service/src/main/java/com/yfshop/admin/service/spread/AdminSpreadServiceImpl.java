@@ -258,7 +258,7 @@ public class AdminSpreadServiceImpl implements AdminSpreadService {
                             if (spreadWhite != null) {
                                 Merchant jxsMerchant = merchantMapper.selectById(jxsId);
                                 if (jxsMerchant != null) {
-                                    spreadOrder.setPid(jxsMerchant.getPid());
+                                    spreadOrder.setPid(jxsMerchant.getId());
                                     spreadOrder.setPidName(jxsMerchant.getMerchantName());
                                     spreadOrder.setFirstCommission(spreadOrder.getOrderPrice().multiply(new BigDecimal(spreadItem.getFirstCommission())).divide(new BigDecimal(10000), 2, RoundingMode.HALF_UP));
                                 }
