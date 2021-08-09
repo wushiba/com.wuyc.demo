@@ -49,6 +49,7 @@ public class AdminSpreadServiceImpl implements AdminSpreadService {
     static String appSecret = "b4f7144429c34ac98276a03309a78be9";
     static String siteId = "4100490551";
     static String key = null;
+
     @Resource
     private SpreadItemMapper spreadItemMapper;
     @Resource

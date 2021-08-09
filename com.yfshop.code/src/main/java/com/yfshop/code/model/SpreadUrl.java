@@ -37,6 +37,8 @@ public class SpreadUrl extends Model<SpreadUrl> {
 
     private String url;
 
+    private String shortCode;
+
 
     @Override
     protected Serializable pkVal() {

@@ -31,4 +31,5 @@ public interface SpreadService {
 
     Void withDraw(SpreadWithdrawReq spreadWithdrawReq) throws ApiException;
 
+    String getLongUrlByShortCode(String shortCode) throws ApiException;
 }

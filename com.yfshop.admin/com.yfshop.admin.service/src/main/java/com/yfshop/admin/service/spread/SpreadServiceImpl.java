@@ -17,6 +17,7 @@ import com.yfshop.admin.api.spread.result.SpreadBillResult;
 import com.yfshop.admin.api.spread.result.SpreadItemResult;
 import com.yfshop.admin.api.spread.result.SpreadOrderResult;
 import com.yfshop.admin.api.spread.result.SpreadStatsResult;
+import com.yfshop.admin.utils.ShortUrlUtil;
 import com.yfshop.code.mapper.*;
 import com.yfshop.code.model.*;
 import com.yfshop.common.exception.ApiException;
@@ -24,6 +25,7 @@ import com.yfshop.common.exception.Asserts;
 import com.yfshop.common.util.BeanUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboService;
+import org.springframework.beans.factory.annotation.Value;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
@@ -44,29 +46,16 @@ public class SpreadServiceImpl implements SpreadService {
     private SpreadUrlMapper spreadUrlMapper;
     @Resource
     private MerchantMapper merchantMapper;
-
+    @Value("${merchant.url}")
+    private String merchantUrl;
 
     static String SERVER_URL = "https://api.jd.com/routerjson";
     static String accessToken = "";
     static String appKey = "e4ad74fd3a422b9d63f625336056516d";
     static String appSecret = "b4f7144429c34ac98276a03309a78be9";
     static String siteId = "4100490551";
-    static String key="6ca822d2fda5ca49dadd82d0c6efccf3873d88f7f5474995f466c4dd91408a2de50f139fdacbb1e0";
-    static String unionId="2016815343";
-
-    public static void main(String[] args) throws Exception {
-        JdClient client = new DefaultJdClient(SERVER_URL, accessToken, appKey, appSecret);
-        UnionOpenPromotionCommonGetRequest request = new UnionOpenPromotionCommonGetRequest();
-        PromotionCodeReq promotionCodeReq = new PromotionCodeReq();
-        promotionCodeReq.setPositionId(1);
-        promotionCodeReq.setMaterialId("https://item.m.jd.com/product/10031954570798.html");
-        promotionCodeReq.setSiteId(siteId);
-        request.setPromotionCodeReq(promotionCodeReq);
-        request.setVersion("1.0");
-        UnionOpenPromotionCommonGetResponse response = client.execute(request);
-
-        System.out.println(response.getGetResult().getData().getClickURL());
-    }
+    static String key = "6ca822d2fda5ca49dadd82d0c6efccf3873d88f7f5474995f466c4dd91408a2de50f139fdacbb1e0";
+    static String unionId = "2016815343";
 
     @Override
     public String createPromotion(Integer merchantId, Integer itemId) throws Exception {
@@ -87,11 +76,12 @@ public class SpreadServiceImpl implements SpreadService {
             String shortUrl = response.getGetResult().getData().getClickURL();
             spreadUrl = new SpreadUrl();
             spreadUrl.setUrl(shortUrl);
+            spreadUrl.setShortCode(ShortUrlUtil.shorten(shortUrl, 6));
             spreadUrl.setMerchantId(merchantId);
             spreadUrl.setItemId(itemId);
             spreadUrlMapper.insert(spreadUrl);
         }
-        return spreadUrl.getUrl();
+        return String.format("%s/jd/%s", merchantUrl, spreadUrl.getShortCode());
     }
 
     @Override
@@ -231,4 +221,12 @@ public class SpreadServiceImpl implements SpreadService {
         spreadBillMapper.insert(spreadBill);
         return null;
     }
+
+    @Override
+    public String getLongUrlByShortCode(String shortCode) throws ApiException {
+        SpreadUrl spreadUrl = spreadUrlMapper.selectOne(Wrappers.lambdaQuery(SpreadUrl.class).eq(SpreadUrl::getShortCode, shortCode));
+        Asserts.assertNonNull(spreadUrl, 500, "链接不存在！");
+        return spreadUrl.getUrl();
+    }
+
 }
