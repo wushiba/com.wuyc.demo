@@ -253,7 +253,7 @@ public class AdminSpreadServiceImpl implements AdminSpreadService {
                     case 16:
                         spreadOrder.setOrderStatus("WAIT");
                         spreadOrder.setSecondCommission(spreadOrder.getOrderPrice().multiply(new BigDecimal(spreadItem.getSecondCommission())).divide(new BigDecimal(10000), 2, RoundingMode.HALF_UP));
-                        if (jxsId != null && jxsId.equals(merchant.getId())) {
+                        if (jxsId != null && !jxsId.equals(merchant.getId())) {
                             SpreadWhite spreadWhite = spreadWhiteMapper.selectOne(Wrappers.lambdaQuery(SpreadWhite.class).eq(SpreadWhite::getMerchantId, jxsId));
                             if (spreadWhite != null) {
                                 Merchant jxsMerchant = merchantMapper.selectById(jxsId);
@@ -311,7 +311,17 @@ public class AdminSpreadServiceImpl implements AdminSpreadService {
                 }
             }
         }
-
         return null;
+    }
+
+    public static void main(String[] args) {
+        String[] ids = "10388.10487.10488.10507.".split("\\.");
+        try {
+            if (ids.length > 2) {
+                System.out.println(Integer.valueOf(ids[2]));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
