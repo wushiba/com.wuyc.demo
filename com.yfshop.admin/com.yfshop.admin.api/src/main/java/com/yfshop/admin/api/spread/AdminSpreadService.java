@@ -15,7 +15,6 @@ public interface AdminSpreadService {
 
     Void createItem(SpreadItemReq spreadItemReq) throws ApiException;
 
-
     Void updateItem(SpreadItemReq spreadItemReq) throws ApiException;
 
     SpreadItemResult getItemDetail(Integer id) throws ApiException;
@@ -31,4 +30,8 @@ public interface AdminSpreadService {
     List<SpreadWithdrawExport> getWithdrawExport(SpreadWithdrawReq spreadWithdrawReq);
 
     SpreadStatsResult getSpreadStats() throws ApiException;
+
+    Void doOrderTask() throws Exception;
+
+
 }

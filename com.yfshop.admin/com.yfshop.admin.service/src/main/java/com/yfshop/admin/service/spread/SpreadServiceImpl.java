@@ -6,17 +6,11 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.jd.open.api.sdk.DefaultJdClient;
 import com.jd.open.api.sdk.JdClient;
-import com.jd.open.api.sdk.domain.kplunion.OrderService.request.query.OrderReq;
-import com.jd.open.api.sdk.domain.kplunion.OrderService.response.query.QueryResult;
 import com.jd.open.api.sdk.domain.kplunion.promotioncommon.PromotionService.request.get.PromotionCodeReq;
-import com.jd.open.api.sdk.request.kplunion.UnionOpenOrderQueryRequest;
 import com.jd.open.api.sdk.request.kplunion.UnionOpenPromotionCommonGetRequest;
-import com.jd.open.api.sdk.response.kplunion.UnionOpenOrderQueryResponse;
 import com.jd.open.api.sdk.response.kplunion.UnionOpenPromotionCommonGetResponse;
-import com.yfshop.admin.api.spread.AdminSpreadService;
 import com.yfshop.admin.api.spread.SpreadService;
 import com.yfshop.admin.api.spread.request.SpreadBillReq;
-import com.yfshop.admin.api.spread.request.SpreadItemReq;
 import com.yfshop.admin.api.spread.request.SpreadOrderReq;
 import com.yfshop.admin.api.spread.request.SpreadWithdrawReq;
 import com.yfshop.admin.api.spread.result.SpreadBillResult;
@@ -52,12 +46,27 @@ public class SpreadServiceImpl implements SpreadService {
     private MerchantMapper merchantMapper;
 
 
-    static String SERVER_URL = "https://router.jd.com/api";
-    static String accessToken = null;
+    static String SERVER_URL = "https://api.jd.com/routerjson";
+    static String accessToken = "";
     static String appKey = "e4ad74fd3a422b9d63f625336056516d";
     static String appSecret = "b4f7144429c34ac98276a03309a78be9";
     static String siteId = "4100490551";
     static String key="6ca822d2fda5ca49dadd82d0c6efccf3873d88f7f5474995f466c4dd91408a2de50f139fdacbb1e0";
+    static String unionId="2016815343";
+
+    public static void main(String[] args) throws Exception {
+        JdClient client = new DefaultJdClient(SERVER_URL, accessToken, appKey, appSecret);
+        UnionOpenPromotionCommonGetRequest request = new UnionOpenPromotionCommonGetRequest();
+        PromotionCodeReq promotionCodeReq = new PromotionCodeReq();
+        promotionCodeReq.setPositionId(1);
+        promotionCodeReq.setMaterialId("https://item.m.jd.com/product/10031954570798.html");
+        promotionCodeReq.setSiteId(siteId);
+        request.setPromotionCodeReq(promotionCodeReq);
+        request.setVersion("1.0");
+        UnionOpenPromotionCommonGetResponse response = client.execute(request);
+
+        System.out.println(response.getGetResult().getData().getClickURL());
+    }
 
     @Override
     public String createPromotion(Integer merchantId, Integer itemId) throws Exception {

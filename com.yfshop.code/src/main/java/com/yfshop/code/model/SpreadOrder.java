@@ -72,6 +72,10 @@ public class SpreadOrder extends Model<SpreadOrder> {
      */
     private String orderStatus;
 
+    private Integer validCode;
+
+    private LocalDateTime finishTime;
+
 
     @Override
     protected Serializable pkVal() {

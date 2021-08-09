@@ -5,6 +5,7 @@ import cn.hutool.core.util.RandomUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.xxl.job.core.handler.annotation.XxlJob;
 import com.xxl.job.core.log.XxlJobFileAppender;
+import com.yfshop.admin.api.spread.AdminSpreadService;
 import com.yfshop.admin.task.OrderTask;
 import com.yfshop.code.mapper.HealthyItemMapper;
 import com.yfshop.code.mapper.ItemMapper;
@@ -37,6 +38,8 @@ public class TaskJob {
     private ItemMapper itemMapper;
     @Resource
     private HealthyItemMapper healthyItemMapper;
+    @Resource
+    private AdminSpreadService adminSpreadService;
 
     @PostConstruct
     public void init() {
@@ -57,6 +60,12 @@ public class TaskJob {
     @XxlJob("syncShopTimeOutOrder")
     public void syncShopTimeOutOrder() throws Exception {
         orderTask.syncShopTimeOutOrder();
+    }
+
+
+    @XxlJob("syncJdOrder")
+    public void syncJdOrder() throws Exception {
+        adminSpreadService.doOrderTask();
     }
 
 }
