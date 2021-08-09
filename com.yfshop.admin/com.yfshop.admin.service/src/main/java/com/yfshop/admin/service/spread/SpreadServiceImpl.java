@@ -128,7 +128,9 @@ public class SpreadServiceImpl implements SpreadService {
     public IPage<SpreadOrderResult> getOrderList(SpreadOrderReq spreadOrderReq) throws ApiException {
         IPage<SpreadOrder> iPage = spreadOrderMapper.selectPage(new Page<>(spreadOrderReq.getPageIndex(), spreadOrderReq.getPageSize()),
                 Wrappers.lambdaQuery(SpreadOrder.class)
-                        .eq(SpreadOrder::getMerchantId, spreadOrderReq.getMerchantId())
+                        .and(wrapper -> {
+                            wrapper.eq(SpreadOrder::getMerchantId, spreadOrderReq.getMerchantId()).or().eq(SpreadOrder::getPid, spreadOrderReq.getMerchantId());
+                        })
                         .eq(StringUtils.isNotBlank(spreadOrderReq.getOrderStatus()), SpreadOrder::getOrderStatus, spreadOrderReq.getOrderStatus())
                         .and(StringUtils.isNotBlank(spreadOrderReq.getKey()),
                                 wrapper -> {
