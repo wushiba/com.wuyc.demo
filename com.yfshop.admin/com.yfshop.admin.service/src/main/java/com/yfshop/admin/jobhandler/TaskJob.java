@@ -65,7 +65,11 @@ public class TaskJob {
 
     @XxlJob("syncJdOrder")
     public void syncJdOrder() throws Exception {
-        adminSpreadService.doOrderTask();
+        try {
+            adminSpreadService.doOrderTask();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 }
