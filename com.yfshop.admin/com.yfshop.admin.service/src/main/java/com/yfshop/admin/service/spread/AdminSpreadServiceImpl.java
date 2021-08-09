@@ -9,6 +9,7 @@ import com.jd.open.api.sdk.domain.kplunion.OrderService.request.query.OrderReq;
 import com.jd.open.api.sdk.domain.kplunion.OrderService.request.query.OrderRowReq;
 import com.jd.open.api.sdk.domain.kplunion.OrderService.response.query.OrderRowResp;
 import com.jd.open.api.sdk.domain.kplunion.OrderService.response.query.QueryResult;
+import com.jd.open.api.sdk.internal.JSON.JSON;
 import com.jd.open.api.sdk.request.kplunion.UnionOpenOrderQueryRequest;
 import com.jd.open.api.sdk.request.kplunion.UnionOpenOrderRowQueryRequest;
 import com.jd.open.api.sdk.response.kplunion.UnionOpenOrderQueryResponse;
@@ -18,6 +19,7 @@ import com.yfshop.admin.api.spread.request.SpreadItemReq;
 import com.yfshop.admin.api.spread.request.SpreadOrderReq;
 import com.yfshop.admin.api.spread.request.SpreadWithdrawReq;
 import com.yfshop.admin.api.spread.result.*;
+import com.yfshop.admin.jobhandler.TaskJob;
 import com.yfshop.code.mapper.*;
 import com.yfshop.code.model.*;
 import com.yfshop.common.exception.ApiException;
@@ -25,6 +27,8 @@ import com.yfshop.common.exception.Asserts;
 import com.yfshop.common.util.BeanUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
@@ -38,6 +42,7 @@ import java.util.Map;
 
 @DubboService
 public class AdminSpreadServiceImpl implements AdminSpreadService {
+    private static Logger logger = LoggerFactory.getLogger(AdminSpreadServiceImpl.class);
     static String SERVER_URL = "https://api.jd.com/routerjson";
     static String accessToken = null;
     static String appKey = "e4ad74fd3a422b9d63f625336056516d";
@@ -210,7 +215,7 @@ public class AdminSpreadServiceImpl implements AdminSpreadService {
         JdClient client = new DefaultJdClient(SERVER_URL, accessToken, appKey, appSecret);
         UnionOpenOrderRowQueryRequest request = new UnionOpenOrderRowQueryRequest();
         OrderRowReq orderReq = new OrderRowReq();
-        orderReq.setStartTime(LocalDateTime.now().plusMinutes(-10).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:00")));
+        orderReq.setStartTime(LocalDateTime.now().plusMinutes(-60).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:00")));
         orderReq.setEndTime(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:00")));
         orderReq.setPageIndex(1);
         orderReq.setPageSize(500);
@@ -219,6 +224,7 @@ public class AdminSpreadServiceImpl implements AdminSpreadService {
         request.setOrderReq(orderReq);
         request.setVersion("1.0");
         UnionOpenOrderRowQueryResponse response = client.execute(request);
+        logger.info(JSON.toString(response.toString()));
         if (response.getQueryResult().getCode() == 200) {
             for (OrderRowResp rowResp : response.getQueryResult().getData()) {
                 String jdUrl = String.format("https://item.m.jd.com/product/%d.html", rowResp.getSkuId());
