@@ -83,7 +83,7 @@ public class SpreadServiceImpl implements SpreadService {
             request.setPromotionCodeReq(promotionCodeReq);
             request.setVersion("1.0");
             UnionOpenPromotionCommonGetResponse response = client.execute(request);
-            Asserts.assertEquals("200", response.getCode(), 500, "获取推广链接失败");
+            Asserts.assertEquals(200, response.getGetResult().getCode(), 500, "获取推广链接失败");
             String shortUrl = response.getGetResult().getData().getClickURL();
             spreadUrl = new SpreadUrl();
             spreadUrl.setUrl(shortUrl);
