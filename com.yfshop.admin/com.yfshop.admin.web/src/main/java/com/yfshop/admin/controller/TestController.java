@@ -39,9 +39,9 @@ import java.util.regex.Pattern;
  * @since 2021-07-26 13:48
  * Description: 测试去哪儿领取会员接口
  */
-@Profile("uat")
-@Controller
-@RequestMapping("/test")
+// @Profile("uat")
+// @Controller
+// @RequestMapping("/test")
 public class TestController {
     private static final Logger logger = LoggerFactory.getLogger(TestController.class);
 
