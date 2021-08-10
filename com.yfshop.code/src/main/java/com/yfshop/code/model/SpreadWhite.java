@@ -4,7 +4,6 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.extension.activerecord.Model;
 import com.baomidou.mybatisplus.annotation.TableId;
-import java.time.LocalDateTime;
 import java.io.Serializable;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -15,29 +14,22 @@ import lombok.EqualsAndHashCode;
  * </p>
  *
  * @author yoush
- * @since 2021-07-21
+ * @since 2021-08-06
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
-@TableName("yf_spread_url")
-public class SpreadUrl extends Model<SpreadUrl> {
+@TableName("yf_spread_white")
+public class SpreadWhite extends Model<SpreadWhite> {
 
     private static final long serialVersionUID = 1L;
 
     @TableId(value = "id", type = IdType.AUTO)
-    private Long id;
+    private Integer id;
 
-    private LocalDateTime createTime;
-
-    private LocalDateTime updateTime;
-
+    /**
+     * 经销商
+     */
     private Integer merchantId;
-
-    private Integer itemId;
-
-    private String url;
-
-    private String shortCode;
 
 
     @Override

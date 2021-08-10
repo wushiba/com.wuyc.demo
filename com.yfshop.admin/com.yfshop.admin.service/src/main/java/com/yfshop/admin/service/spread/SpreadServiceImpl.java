@@ -6,23 +6,18 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.jd.open.api.sdk.DefaultJdClient;
 import com.jd.open.api.sdk.JdClient;
-import com.jd.open.api.sdk.domain.kplunion.OrderService.request.query.OrderReq;
-import com.jd.open.api.sdk.domain.kplunion.OrderService.response.query.QueryResult;
 import com.jd.open.api.sdk.domain.kplunion.promotioncommon.PromotionService.request.get.PromotionCodeReq;
-import com.jd.open.api.sdk.request.kplunion.UnionOpenOrderQueryRequest;
 import com.jd.open.api.sdk.request.kplunion.UnionOpenPromotionCommonGetRequest;
-import com.jd.open.api.sdk.response.kplunion.UnionOpenOrderQueryResponse;
 import com.jd.open.api.sdk.response.kplunion.UnionOpenPromotionCommonGetResponse;
-import com.yfshop.admin.api.spread.AdminSpreadService;
 import com.yfshop.admin.api.spread.SpreadService;
 import com.yfshop.admin.api.spread.request.SpreadBillReq;
-import com.yfshop.admin.api.spread.request.SpreadItemReq;
 import com.yfshop.admin.api.spread.request.SpreadOrderReq;
 import com.yfshop.admin.api.spread.request.SpreadWithdrawReq;
 import com.yfshop.admin.api.spread.result.SpreadBillResult;
 import com.yfshop.admin.api.spread.result.SpreadItemResult;
 import com.yfshop.admin.api.spread.result.SpreadOrderResult;
 import com.yfshop.admin.api.spread.result.SpreadStatsResult;
+import com.yfshop.admin.utils.ShortUrlUtil;
 import com.yfshop.code.mapper.*;
 import com.yfshop.code.model.*;
 import com.yfshop.common.exception.ApiException;
@@ -30,6 +25,7 @@ import com.yfshop.common.exception.Asserts;
 import com.yfshop.common.util.BeanUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboService;
+import org.springframework.beans.factory.annotation.Value;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
@@ -50,14 +46,16 @@ public class SpreadServiceImpl implements SpreadService {
     private SpreadUrlMapper spreadUrlMapper;
     @Resource
     private MerchantMapper merchantMapper;
+    @Value("${merchant.url}")
+    private String merchantUrl;
 
-
-    static String SERVER_URL = "";
+    static String SERVER_URL = "https://api.jd.com/routerjson";
     static String accessToken = "";
-    static String appKey = "";
-    static String appSecret = "";
-    static String siteId = "";
-    static String key;
+    static String appKey = "e4ad74fd3a422b9d63f625336056516d";
+    static String appSecret = "b4f7144429c34ac98276a03309a78be9";
+    static String siteId = "4100490551";
+    static String key = "6ca822d2fda5ca49dadd82d0c6efccf3873d88f7f5474995f466c4dd91408a2de50f139fdacbb1e0";
+    static String unionId = "2016815343";
 
     @Override
     public String createPromotion(Integer merchantId, Integer itemId) throws Exception {
@@ -74,15 +72,16 @@ public class SpreadServiceImpl implements SpreadService {
             request.setPromotionCodeReq(promotionCodeReq);
             request.setVersion("1.0");
             UnionOpenPromotionCommonGetResponse response = client.execute(request);
-            Asserts.assertEquals("200", response.getCode(), 500, "获取推广链接失败");
+            Asserts.assertEquals(200, response.getGetResult().getCode(), 500, "获取推广链接失败");
             String shortUrl = response.getGetResult().getData().getClickURL();
             spreadUrl = new SpreadUrl();
             spreadUrl.setUrl(shortUrl);
+            spreadUrl.setShortCode(ShortUrlUtil.shorten(shortUrl, 6));
             spreadUrl.setMerchantId(merchantId);
             spreadUrl.setItemId(itemId);
             spreadUrlMapper.insert(spreadUrl);
         }
-        return spreadUrl.getUrl();
+        return String.format("%s/jd/%s", merchantUrl, spreadUrl.getShortCode());
     }
 
     @Override
@@ -129,7 +128,9 @@ public class SpreadServiceImpl implements SpreadService {
     public IPage<SpreadOrderResult> getOrderList(SpreadOrderReq spreadOrderReq) throws ApiException {
         IPage<SpreadOrder> iPage = spreadOrderMapper.selectPage(new Page<>(spreadOrderReq.getPageIndex(), spreadOrderReq.getPageSize()),
                 Wrappers.lambdaQuery(SpreadOrder.class)
-                        .eq(SpreadOrder::getMerchantId, spreadOrderReq.getMerchantId())
+                        .and(wrapper -> {
+                            wrapper.eq(SpreadOrder::getMerchantId, spreadOrderReq.getMerchantId()).or().eq(SpreadOrder::getPid, spreadOrderReq.getMerchantId());
+                        })
                         .eq(StringUtils.isNotBlank(spreadOrderReq.getOrderStatus()), SpreadOrder::getOrderStatus, spreadOrderReq.getOrderStatus())
                         .and(StringUtils.isNotBlank(spreadOrderReq.getKey()),
                                 wrapper -> {
@@ -222,4 +223,12 @@ public class SpreadServiceImpl implements SpreadService {
         spreadBillMapper.insert(spreadBill);
         return null;
     }
+
+    @Override
+    public String getLongUrlByShortCode(String shortCode) throws ApiException {
+        SpreadUrl spreadUrl = spreadUrlMapper.selectOne(Wrappers.lambdaQuery(SpreadUrl.class).eq(SpreadUrl::getShortCode, shortCode));
+        Asserts.assertNonNull(spreadUrl, 500, "链接不存在！");
+        return spreadUrl.getUrl();
+    }
+
 }
