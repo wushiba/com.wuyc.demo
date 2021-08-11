@@ -213,9 +213,12 @@ public class SpreadServiceImpl implements SpreadService {
         withdraw.setMerchantId(spreadWithdrawReq.getMerchantId());
         withdraw.setMerchantMobile(merchant.getMobile());
         withdraw.setMerchantName(merchant.getContacts());
+        withdraw.setOpenId(spreadWithdrawReq.getOpenId());
+        withdraw.setIpStr(spreadWithdrawReq.getIpStr());
+        withdraw.setReUserName(spreadWithdrawReq.getReUserName());
         withdraw.setStatus("WAIT");
         withdraw.setMerchantRole(merchant.getRoleAlias());
-        withdraw.setBillNo(String.format("%06d", spreadWithdrawReq.getMerchantId()) + DateUtil.format(new Date(), "yyMMddHHmmSS"));
+        withdraw.setBillNo(String.format("%06d", spreadWithdrawReq.getMerchantId()) + DateUtil.format(new Date(), "yyMMddHHmmss"));
         spreadWithdrawMapper.insert(withdraw);
         SpreadBill spreadBill = new SpreadBill();
         spreadBill.setMerchantId(spreadWithdrawReq.getMerchantId());
