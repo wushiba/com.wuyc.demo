@@ -2,6 +2,7 @@ package com.yfshop.admin.controller;
 
 import cn.dev33.satoken.annotation.SaCheckLogin;
 import cn.dev33.satoken.annotation.SaCheckRole;
+import cn.hutool.extra.servlet.ServletUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.yfshop.admin.api.push.result.WxPushFailExportResult;
 import com.yfshop.admin.api.spread.AdminSpreadService;
@@ -30,7 +31,7 @@ import java.util.List;
 @Validated
 @Controller
 @RequestMapping("merchant/spread")
-public class MerchantSpreadController implements BaseController {
+public class MerchantSpreadController extends AbstractBaseController {
     private static final Logger logger = LoggerFactory.getLogger(MerchantSpreadController.class);
 
     @DubboReference(check = false)
@@ -102,6 +103,8 @@ public class MerchantSpreadController implements BaseController {
     @SaCheckLogin
     public CommonResult<Void> withDraw(SpreadWithdrawReq spreadWithdrawReq) {
         spreadWithdrawReq.setMerchantId(getCurrentAdminUserId());
+        spreadWithdrawReq.setIpStr(ServletUtil.getClientIP(getCurrentRequest()));
+        spreadWithdrawReq.setOpenId(getCurrentOpenId());
         return CommonResult.success(spreadService.withDraw(spreadWithdrawReq));
     }
 }

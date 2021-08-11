@@ -1,19 +1,16 @@
 package com.yfshop.admin.service.spread;
 
-import cn.hutool.json.JSON;
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.github.binarywang.wxpay.bean.entpay.EntPayRequest;
+import com.github.binarywang.wxpay.bean.entpay.EntPayResult;
 import com.jd.open.api.sdk.DefaultJdClient;
 import com.jd.open.api.sdk.JdClient;
-import com.jd.open.api.sdk.domain.kplunion.OrderService.request.query.OrderReq;
 import com.jd.open.api.sdk.domain.kplunion.OrderService.request.query.OrderRowReq;
 import com.jd.open.api.sdk.domain.kplunion.OrderService.response.query.OrderRowResp;
-import com.jd.open.api.sdk.domain.kplunion.OrderService.response.query.QueryResult;
-import com.jd.open.api.sdk.request.kplunion.UnionOpenOrderQueryRequest;
 import com.jd.open.api.sdk.request.kplunion.UnionOpenOrderRowQueryRequest;
-import com.jd.open.api.sdk.response.kplunion.UnionOpenOrderQueryResponse;
 import com.jd.open.api.sdk.response.kplunion.UnionOpenOrderRowQueryResponse;
 import com.yfshop.admin.api.spread.AdminSpreadService;
 import com.yfshop.admin.api.spread.request.SpreadItemReq;
@@ -23,9 +20,11 @@ import com.yfshop.admin.api.spread.result.*;
 import com.yfshop.code.mapper.*;
 import com.yfshop.code.model.*;
 import com.yfshop.common.exception.ApiException;
-import com.yfshop.common.exception.Asserts;
 import com.yfshop.common.util.BeanUtil;
+import com.yfshop.wx.api.service.MpPayService;
+import com.yfshop.wx.api.service.MpService;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,8 +61,8 @@ public class AdminSpreadServiceImpl implements AdminSpreadService {
     private SpreadWhiteMapper spreadWhiteMapper;
     @Resource
     private MerchantMapper merchantMapper;
-
-
+    @DubboReference
+    private MpPayService mpPayService;
 
 
     @Override
@@ -178,19 +177,41 @@ public class AdminSpreadServiceImpl implements AdminSpreadService {
     @Transactional(rollbackFor = Exception.class)
     public Void tryWithdraw(Long id) throws ApiException {
         SpreadWithdraw spreadWithdraw = new SpreadWithdraw();
-        spreadWithdraw.setSettlementTime(LocalDateTime.now());
         spreadWithdraw.setStatus("SUCCESS");
         int count = spreadWithdrawMapper.update(spreadWithdraw, Wrappers.lambdaQuery(SpreadWithdraw.class).eq(SpreadWithdraw::getId, id).eq(SpreadWithdraw::getStatus, "FAIL"));
         SpreadBill spreadBill = new SpreadBill();
         spreadBill.setStatus("SUCCESS");
         spreadBillMapper.update(spreadBill, Wrappers.lambdaQuery(SpreadBill.class).eq(SpreadBill::getPid, id).eq(SpreadBill::getType, 2));
+        if (count > 0) {
+            spreadWithdraw = spreadWithdrawMapper.selectById(id);
+            EntPayRequest entPayRequest = new EntPayRequest();
+            entPayRequest.setCheckName("OPTION_CHECK");
+            entPayRequest.setReUserName(spreadWithdraw.getReUserName());
+            entPayRequest.setAmount(spreadWithdraw.getWithdraw().multiply(new BigDecimal(100)).intValue());
+            entPayRequest.setDescription("分销佣金提现");
+            entPayRequest.setOpenid(spreadWithdraw.getOpenId());
+            entPayRequest.setSpbillCreateIp(spreadWithdraw.getIpStr());
+            entPayRequest.setPartnerTradeNo(spreadWithdraw.getBillNo());
+            try {
+                EntPayResult entPayResult = mpPayService.entPay(entPayRequest);
+                spreadWithdraw.setTransactionId(entPayResult.getPaymentNo());
+                spreadWithdraw.setSettlementTime(LocalDateTime.now());
+                spreadWithdrawMapper.updateById(spreadWithdraw);
+                logger.info(entPayResult.toString());
+            } catch (Exception e) {
+                e.printStackTrace();
+                spreadWithdraw.setStatus("FAIL");
+                spreadWithdraw.setRemark(e.getMessage());
+                spreadWithdrawMapper.updateById(spreadWithdraw);
+            }
+        }
         return null;
     }
 
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Void doOrderTask(){
+    public Void doOrderTask() {
         Map<String, SpreadItem> spreadItemMap = new HashMap<>();
         JdClient client = new DefaultJdClient(SERVER_URL, accessToken, appKey, appSecret);
         UnionOpenOrderRowQueryRequest request = new UnionOpenOrderRowQueryRequest();
@@ -314,14 +335,42 @@ public class AdminSpreadServiceImpl implements AdminSpreadService {
         return null;
     }
 
-    public static void main(String[] args) {
-        String[] ids = "10388.10487.10488.10507.".split("\\.");
-        try {
-            if (ids.length > 2) {
-                System.out.println(Integer.valueOf(ids[2]));
+
+    @Override
+    public Void doWithdrawTask() throws Exception {
+        List<SpreadWithdraw> list = spreadWithdrawMapper.selectList(Wrappers.lambdaQuery(SpreadWithdraw.class)
+                .ge(SpreadWithdraw::getCreateTime, LocalDateTime.now().withSecond(0).plusHours(-24))
+                .lt(SpreadWithdraw::getCreateTime, LocalDateTime.now().withSecond(0).plusHours(-24).plusMinutes(1))
+                .eq(SpreadWithdraw::getStatus, "WAIT"));
+        list.forEach(item -> {
+            try {
+                SpreadBill spreadBill = new SpreadBill();
+                spreadBill.setStatus("SUCCESS");
+                int count = spreadBillMapper.update(spreadBill, Wrappers.lambdaQuery(SpreadBill.class).eq(SpreadBill::getPid, item.getId()).eq(SpreadBill::getType, 2).eq(SpreadBill::getStatus, "WAIT"));
+                item.setStatus("SUCCESS");
+                item.setSettlementTime(LocalDateTime.now());
+                count = spreadWithdrawMapper.updateById(item) + count;
+                if (count > 1) {
+                    EntPayRequest entPayRequest = new EntPayRequest();
+                    entPayRequest.setCheckName("OPTION_CHECK");
+                    entPayRequest.setReUserName(item.getReUserName());
+                    entPayRequest.setAmount(item.getWithdraw().multiply(new BigDecimal(100)).intValue());
+                    entPayRequest.setDescription("分销佣金提现");
+                    entPayRequest.setOpenid(item.getOpenId());
+                    entPayRequest.setSpbillCreateIp(item.getIpStr());
+                    entPayRequest.setPartnerTradeNo(item.getBillNo());
+                    EntPayResult entPayResult = mpPayService.entPay(entPayRequest);
+                    logger.info(entPayResult.toString());
+                    item.setTransactionId(entPayResult.getPaymentNo());
+                    item.setSettlementTime(LocalDateTime.now());
+                    spreadWithdrawMapper.updateById(item);
+                }
+            } catch (Exception e) {
+                item.setStatus("FAIL");
+                item.setRemark(e.getMessage());
+                spreadWithdrawMapper.updateById(item);
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        });
+        return null;
     }
 }

@@ -39,6 +39,12 @@ public class SpreadWithdrawReq implements Serializable {
 
     private String transactionId;
 
+    private String openId;
+
+    private String reUserName;
+
+    private String ipStr;
+
     /**
      * WAIT 等待 SUCCESS 成功 FAIL 失败
      */

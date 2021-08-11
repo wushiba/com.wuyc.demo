@@ -189,7 +189,11 @@ public class SpreadServiceImpl implements SpreadService {
 
     @Override
     public Void withDraw(SpreadWithdrawReq spreadWithdrawReq) throws ApiException {
+        Asserts.assertStringNotBlank(spreadWithdrawReq.getOpenId(), 500, "微信未授权，不能提现！");
+        Asserts.assertStringNotBlank(spreadWithdrawReq.getReUserName(), 500, "提现需要填写真实姓名！");
         Asserts.assertTrue(spreadWithdrawReq.getWithdraw().compareTo(new BigDecimal("5")) >= 0, 500, "提现金额不得小于5元！");
+        int count = spreadWithdrawMapper.selectCount(Wrappers.lambdaQuery(SpreadWithdraw.class).gt(SpreadWithdraw::getCreateTime, DateUtil.date().toSqlDate()));
+        Asserts.assertTrue(count > 3, 500, "当日提现已经超出3次限制！");
         Merchant merchant = merchantMapper.selectById(spreadWithdrawReq.getMerchantId());
         BigDecimal total = spreadBillMapper.selectList(Wrappers.lambdaQuery(SpreadBill.class)
                 .eq(SpreadBill::getMerchantId, spreadWithdrawReq.getMerchantId())

@@ -58,6 +58,12 @@ public class SpreadWithdraw extends Model<SpreadWithdraw> {
 
     private String openId;
 
+    private String reUserName;
+
+    private String ipStr;
+
+    private String remark;
+
     @Override
     protected Serializable pkVal() {
         return this.id;

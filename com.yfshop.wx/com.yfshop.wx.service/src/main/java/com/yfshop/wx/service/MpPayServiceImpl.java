@@ -1,5 +1,7 @@
 package com.yfshop.wx.service;
 
+import com.github.binarywang.wxpay.bean.entpay.EntPayRequest;
+import com.github.binarywang.wxpay.bean.entpay.EntPayResult;
 import com.github.binarywang.wxpay.bean.order.WxPayMpOrderResult;
 import com.github.binarywang.wxpay.bean.request.WxPayOrderQueryRequest;
 import com.github.binarywang.wxpay.bean.request.WxPayUnifiedOrderRequest;
@@ -34,8 +36,12 @@ public class MpPayServiceImpl implements MpPayService {
     @SneakyThrows
     @Async
     @Override
-    public void closeOrder(String outTradeNo){
+    public void closeOrder(String outTradeNo) {
         wxPayService.closeOrder(outTradeNo);
     }
 
+    @Override
+    public EntPayResult entPay(EntPayRequest entPayRequest) throws WxPayException {
+       return wxPayService.getEntPayService().entPay(entPayRequest);
+    }
 }

@@ -33,5 +33,7 @@ public interface AdminSpreadService {
 
     Void doOrderTask() throws Exception;
 
+    Void doWithdrawTask() throws Exception;
+
 
 }
