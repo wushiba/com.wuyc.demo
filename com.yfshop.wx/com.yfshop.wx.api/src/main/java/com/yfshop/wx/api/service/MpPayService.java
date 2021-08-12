@@ -6,6 +6,7 @@ import com.github.binarywang.wxpay.bean.order.WxPayMpOrderResult;
 import com.github.binarywang.wxpay.bean.request.WxPayUnifiedOrderRequest;
 import com.github.binarywang.wxpay.bean.result.WxPayOrderQueryResult;
 import com.github.binarywang.wxpay.exception.WxPayException;
+import com.yfshop.wx.api.request.WxEntPayResult;
 
 public interface MpPayService {
 
@@ -16,6 +17,6 @@ public interface MpPayService {
 
     void closeOrder(String outTradeNo);
 
-    EntPayResult entPay(EntPayRequest entPayRequest) throws WxPayException;
+    WxEntPayResult entPay(EntPayRequest entPayRequest) throws WxPayException;
 
 }

@@ -21,9 +21,8 @@ import com.yfshop.code.mapper.*;
 import com.yfshop.code.model.*;
 import com.yfshop.common.exception.ApiException;
 import com.yfshop.common.util.BeanUtil;
+import com.yfshop.wx.api.request.WxEntPayResult;
 import com.yfshop.wx.api.service.MpPayService;
-import com.yfshop.wx.api.service.MpService;
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
@@ -194,7 +193,7 @@ public class AdminSpreadServiceImpl implements AdminSpreadService {
             entPayRequest.setSpbillCreateIp(spreadWithdraw.getIpStr());
             entPayRequest.setPartnerTradeNo(spreadWithdraw.getBillNo());
             try {
-                EntPayResult entPayResult = mpPayService.entPay(entPayRequest);
+                WxEntPayResult entPayResult = mpPayService.entPay(entPayRequest);
                 spreadWithdraw.setTransactionId(entPayResult.getPaymentNo());
                 spreadWithdraw.setSettlementTime(LocalDateTime.now());
                 spreadWithdrawMapper.updateById(spreadWithdraw);
@@ -359,7 +358,7 @@ public class AdminSpreadServiceImpl implements AdminSpreadService {
                     entPayRequest.setOpenid(item.getOpenId());
                     entPayRequest.setSpbillCreateIp(item.getIpStr());
                     entPayRequest.setPartnerTradeNo(item.getBillNo());
-                    EntPayResult entPayResult = mpPayService.entPay(entPayRequest);
+                    WxEntPayResult entPayResult = mpPayService.entPay(entPayRequest);
                     logger.info(entPayResult.toString());
                     item.setTransactionId(entPayResult.getPaymentNo());
                     item.setSettlementTime(LocalDateTime.now());

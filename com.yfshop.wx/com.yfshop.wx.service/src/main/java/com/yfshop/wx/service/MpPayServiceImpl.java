@@ -9,6 +9,7 @@ import com.github.binarywang.wxpay.bean.result.WxPayOrderQueryResult;
 import com.github.binarywang.wxpay.exception.WxPayException;
 import com.github.binarywang.wxpay.service.WxPayService;
 import com.yfshop.common.util.BeanUtil;
+import com.yfshop.wx.api.request.WxEntPayResult;
 import com.yfshop.wx.api.service.MpPayService;
 import lombok.SneakyThrows;
 import org.apache.dubbo.config.annotation.DubboService;
@@ -41,7 +42,11 @@ public class MpPayServiceImpl implements MpPayService {
     }
 
     @Override
-    public EntPayResult entPay(EntPayRequest entPayRequest) throws WxPayException {
-       return wxPayService.getEntPayService().entPay(entPayRequest);
+    public WxEntPayResult entPay(EntPayRequest entPayRequest) throws WxPayException {
+        WxEntPayResult wxEntPayResult = new WxEntPayResult();
+        EntPayResult entPayResult = wxPayService.getEntPayService().entPay(entPayRequest);
+        wxEntPayResult.setPaymentNo(entPayResult.getPaymentNo());
+        wxEntPayResult.setPartnerTradeNo(entPayRequest.getPartnerTradeNo());
+        return wxEntPayResult;
     }
 }
