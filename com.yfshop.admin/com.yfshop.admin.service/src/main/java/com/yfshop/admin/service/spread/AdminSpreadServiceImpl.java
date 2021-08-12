@@ -23,6 +23,7 @@ import com.yfshop.common.exception.ApiException;
 import com.yfshop.common.util.BeanUtil;
 import com.yfshop.wx.api.service.MpPayService;
 import com.yfshop.wx.api.service.MpService;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
@@ -231,7 +232,7 @@ public class AdminSpreadServiceImpl implements AdminSpreadService {
             return;
         }
         logger.info(JSONUtil.toJsonPrettyStr(response));
-        if (response.getQueryResult().getCode() == 200) {
+        if (response.getQueryResult().getCode() == 200 && response.getQueryResult().getData() != null) {
             for (OrderRowResp rowResp : response.getQueryResult().getData()) {
                 String jdUrl = String.format("https://item.m.jd.com/product/%d.html", rowResp.getSkuId());
                 SpreadItem spreadItem = spreadItemMap.get(jdUrl);
