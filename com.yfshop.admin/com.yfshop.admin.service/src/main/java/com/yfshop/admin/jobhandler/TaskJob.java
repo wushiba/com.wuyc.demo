@@ -72,4 +72,13 @@ public class TaskJob {
         }
     }
 
+
+    @XxlJob("syncJdWithdraw")
+    public void syncJdWithdraw() throws Exception {
+        try {
+            adminSpreadService.doWithdrawTask();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }
