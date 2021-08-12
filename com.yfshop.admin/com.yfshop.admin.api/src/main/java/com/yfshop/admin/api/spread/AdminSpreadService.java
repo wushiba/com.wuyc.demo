@@ -31,9 +31,9 @@ public interface AdminSpreadService {
 
     SpreadStatsResult getSpreadStats() throws ApiException;
 
-    Void doOrderTask() throws Exception;
+    void doOrderTask() throws Exception;
 
-    Void doWithdrawTask() throws Exception;
+    void doWithdrawTask() throws Exception;
 
 
 }

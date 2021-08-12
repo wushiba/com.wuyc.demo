@@ -211,7 +211,7 @@ public class AdminSpreadServiceImpl implements AdminSpreadService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Void doOrderTask() {
+    public void doOrderTask() {
         Map<String, SpreadItem> spreadItemMap = new HashMap<>();
         JdClient client = new DefaultJdClient(SERVER_URL, accessToken, appKey, appSecret);
         UnionOpenOrderRowQueryRequest request = new UnionOpenOrderRowQueryRequest();
@@ -228,7 +228,7 @@ public class AdminSpreadServiceImpl implements AdminSpreadService {
             response = client.execute(request);
         } catch (Exception e) {
             e.printStackTrace();
-            return null;
+            return;
         }
         logger.info(JSONUtil.toJsonPrettyStr(response));
         if (response.getQueryResult().getCode() == 200) {
@@ -332,12 +332,11 @@ public class AdminSpreadServiceImpl implements AdminSpreadService {
                 }
             }
         }
-        return null;
     }
 
 
     @Override
-    public Void doWithdrawTask() throws Exception {
+    public void doWithdrawTask() throws Exception {
         List<SpreadWithdraw> list = spreadWithdrawMapper.selectList(Wrappers.lambdaQuery(SpreadWithdraw.class)
                 .ge(SpreadWithdraw::getCreateTime, LocalDateTime.now().withSecond(0).plusHours(-24))
                 .lt(SpreadWithdraw::getCreateTime, LocalDateTime.now().withSecond(0).plusHours(-24).plusMinutes(1))
@@ -371,6 +370,5 @@ public class AdminSpreadServiceImpl implements AdminSpreadService {
                 spreadWithdrawMapper.updateById(item);
             }
         });
-        return null;
     }
 }
