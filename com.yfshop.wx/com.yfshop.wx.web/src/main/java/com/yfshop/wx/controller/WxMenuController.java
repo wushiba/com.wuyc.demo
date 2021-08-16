@@ -148,6 +148,11 @@ public class WxMenuController {
         kfThree.setUrl("https://merchant.yufanlook.com/#/MerchantLogin");
         kf.getSubButtons().add(kfThree);
 
+        WxMenuButton kfFour = new WxMenuButton();
+        kfFour.setType(MenuButtonType.VIEW);
+        kfFour.setName("积分兑换");
+        kfFour.setUrl("https://m.jf.10086.cn/?keyword=%E5%99%9C%E6%B8%B4&WT.ac_id=210730_LK_prom_h5_code1#/pages/goodslist/index?keyWord=%E5%99%9C%E6%B8%B4");
+        kf.getSubButtons().add(kfFour);
 
         menu.getButtons().add(healthy);
         menu.getButtons().add(action);

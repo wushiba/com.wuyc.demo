@@ -66,7 +66,7 @@ public class AdminWxPushTaskImplService implements WxPushTaskService {
             String fileUrl = ossDownloader.privateDownloadUrl(wxPushTaskReq.getFileUrl(), 60 * 5, null);
             HttpUtil.downloadFileFromUrl(fileUrl, file);
             wxPushTaskDataList = ExcelUtils.importExcel(file.getPath(), 1, 1, WxPushTaskData.class);
-        } else {
+        } else if ("CREATE".equals(wxPushTaskReq.getSource())) {
             wxPushTaskDataList = wxPushTaskDao.getWxPushTaskData(wxPushTaskReq);
         }
         if (CollectionUtil.isNotEmpty(wxPushTaskDataList)) {
