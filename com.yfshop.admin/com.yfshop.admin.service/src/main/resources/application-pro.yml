@@ -103,7 +103,7 @@ shop:
   url: https://m.yufanlook.com/
 
 merchant:
-  url: https://merchant.yufanlook.com/
+  url: https://b.yufanlook.com/
 
 websiteCode:
   dir: /home/www/web-deploy/yufan-admin-report/websiteCode/
