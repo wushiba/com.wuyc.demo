@@ -145,7 +145,7 @@ public class WxMenuController {
         WxMenuButton kfThree = new WxMenuButton();
         kfThree.setType(MenuButtonType.VIEW);
         kfThree.setName("商户登录");
-        kfThree.setUrl("https://merchant.yufanlook.com/#/MerchantLogin");
+        kfThree.setUrl("https://b.yufanlook.com/#/MerchantLogin");
         kf.getSubButtons().add(kfThree);
 
         WxMenuButton kfFour = new WxMenuButton();
