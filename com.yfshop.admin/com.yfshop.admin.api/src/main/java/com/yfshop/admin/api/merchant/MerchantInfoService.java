@@ -208,4 +208,6 @@ public interface MerchantInfoService {
     Integer getWebsiteCodeBindCount(Integer merchantId);
 
     void updateOpenId(Integer merchantId,String openId);
+
+    Void modifyPwd(Integer currentAdminUserId, String oldPwd, String newPwd);
 }

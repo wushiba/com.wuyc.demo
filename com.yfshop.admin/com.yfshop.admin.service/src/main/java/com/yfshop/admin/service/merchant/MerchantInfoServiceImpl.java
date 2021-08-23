@@ -1143,6 +1143,19 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
     }
 
 
+    @Override
+    public Void modifyPwd(Integer currentAdminUserId, String oldPwd, String newPwd) {
+        Asserts.assertStringNotBlank(oldPwd, 500, "请输入旧密码！");
+        Asserts.assertStringNotBlank(oldPwd, 500, "请输入新密码！");
+        Merchant merchant = merchantMapper.selectById(currentAdminUserId);
+        oldPwd = SecureUtil.md5(oldPwd);
+        newPwd = SecureUtil.md5(newPwd);
+        Asserts.assertEquals(oldPwd, merchant.getPassword(), 500, "旧密码验证错误！");
+        merchant.setPassword(newPwd);
+        merchantMapper.updateById(merchant);
+        return null;
+    }
+
     public MerchantMyselfResult getMyselfWebsite(Integer merchantId, Date stareTime, Date endTime) {
         MerchantMyselfResult myselfResult = new MerchantMyselfResult();
         AtomicReference<Integer> count = new AtomicReference<>(0);
@@ -1187,7 +1200,7 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
     private Integer getCurrentWebsiteCodeCount(Integer merchantId, Integer currentMerchantId) {
         LambdaQueryWrapper lambdaQueryWrapper = Wrappers.<WebsiteCodeDetail>lambdaQuery()
                 .eq(WebsiteCodeDetail::getMerchantId, merchantId)
-                .like( WebsiteCodeDetail::getMerchantPidPath, "." + currentMerchantId + ".")
+                .like(WebsiteCodeDetail::getMerchantPidPath, "." + currentMerchantId + ".")
                 .eq(WebsiteCodeDetail::getIsActivate, "Y");
         return websiteCodeDetailMapper.selectCount(lambdaQueryWrapper);
     }

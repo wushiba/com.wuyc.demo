@@ -102,8 +102,11 @@ class MerchantInfoController extends AbstractBaseController {
     @SaCheckLogin
     @RequestMapping(value = "/websiteInfo", method = {RequestMethod.POST})
     public CommonResult<MerchantResult> getWebsiteInfo() {
-        merchantInfoService.updateOpenId(getCurrentAdminUserId(), getCurrentOpenId());
+        if (StringUtils.isNotBlank(getCurrentOpenId())) {
+            merchantInfoService.updateOpenId(getCurrentAdminUserId(), getCurrentOpenId());
+        }
         MerchantResult merchantResult = merchantInfoService.getWebsiteInfo(getCurrentAdminUserId());
+
         if (!merchantResult.getRoleAlias().equals(GroupRoleEnum.WD.getCode())) {
             Integer count = merchantInfoService.getWebsiteCodeBindCount(getCurrentAdminUserId());
             merchantResult.setIsMerchantCode(count > 0 ? "Y" : "N");
@@ -237,8 +240,8 @@ class MerchantInfoController extends AbstractBaseController {
      */
     @RequestMapping(value = "/websiteCodeBind", method = {RequestMethod.POST})
     public CommonResult<Void> websiteCodeBind(WebsiteCodeBindReq websiteReq) {
-        Asserts.assertStringNotBlank(websiteReq.getWebsiteTypeName(),500,"请选择网点类型！");
-        Asserts.assertStringNotBlank(websiteReq.getIsRefrigerator(),500,"请选择是否有冰箱！");
+        Asserts.assertStringNotBlank(websiteReq.getWebsiteTypeName(), 500, "请选择网点类型！");
+        Asserts.assertStringNotBlank(websiteReq.getIsRefrigerator(), 500, "请选择是否有冰箱！");
         if (StpUtil.isLogin()) {
             websiteReq.setId(StpUtil.getLoginIdAsInt());
         }
@@ -407,8 +410,8 @@ class MerchantInfoController extends AbstractBaseController {
     @RequestMapping(value = "/findNearMerchantList", method = {RequestMethod.GET, RequestMethod.POST})
     @ResponseBody
     @SaCheckLogin
-    public CommonResult<List<MerchantResult>> findNearMerchantList(String key,Integer districtId, Double longitude, Double latitude) {
-        return CommonResult.success(merchantInfoService.findNearMerchantList(key,getCurrentAdminUserId(), districtId, longitude, latitude));
+    public CommonResult<List<MerchantResult>> findNearMerchantList(String key, Integer districtId, Double longitude, Double latitude) {
+        return CommonResult.success(merchantInfoService.findNearMerchantList(key, getCurrentAdminUserId(), districtId, longitude, latitude));
     }
 
 
@@ -446,6 +449,20 @@ class MerchantInfoController extends AbstractBaseController {
     @SaCheckLogin
     public CommonResult<MerchantResult> getWebsiteByMobile(@Mobile(message = "手机号不正确") String mobile) {
         return CommonResult.success(merchantInfoService.getWebsiteByMobile(mobile));
+    }
+
+
+    /**
+     * 修改密码
+     * @param oldPwd
+     * @param newPwd
+     * @return
+     */
+    @RequestMapping(value = "/modifyPwd", method = {RequestMethod.GET, RequestMethod.POST})
+    @ResponseBody
+    @SaCheckLogin
+    public CommonResult<Void> modifyPwd(String oldPwd, String newPwd) {
+        return CommonResult.success(merchantInfoService.modifyPwd(getCurrentAdminUserId(), oldPwd, newPwd));
     }
 
 
