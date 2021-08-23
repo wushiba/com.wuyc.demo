@@ -173,9 +173,8 @@ public interface MerchantInfoService {
 
     /**
      * 网点码支付回调
-     *
      */
-    void websitePayOrderNotify(String transactionId,String outTradeNo) throws ApiException;
+    void websitePayOrderNotify(String transactionId, String outTradeNo) throws ApiException;
 
     /**
      * 获取商户层级数据
@@ -193,11 +192,11 @@ public interface MerchantInfoService {
 
     void cancelWebsiteCodePay(WebsiteCodePayReq websiteCodePayReq);
 
-    MerchantGroupResult getWebsiteList(Integer merchantId,MerchantGroupReq merchantGroupReq);
+    MerchantGroupResult getWebsiteList(Integer merchantId, MerchantGroupReq merchantGroupReq);
 
-    WebsiteCodeGroupResult getWebsiteCodeData(Integer merchantId,WebsiteCodeDataReq websiteCodeDataReq);
+    WebsiteCodeGroupResult getWebsiteCodeData(Integer merchantId, WebsiteCodeDataReq websiteCodeDataReq);
 
-    List<MerchantResult> findNearMerchantList(String key,Integer merchantId,Integer districtId, Double longitude, Double latitude);
+    List<MerchantResult> findNearMerchantList(String key, Integer merchantId, Integer districtId, Double longitude, Double latitude);
 
     Void websiteAddGoods(Integer merchantId, String mobile, Integer count) throws ApiException;
 
@@ -207,7 +206,7 @@ public interface MerchantInfoService {
 
     Integer getWebsiteCodeBindCount(Integer merchantId);
 
-    void updateOpenId(Integer merchantId,String openId);
+    void updateOpenId(Integer merchantId, String openId);
 
-    Void modifyPwd(Integer currentAdminUserId, String oldPwd, String newPwd);
+    Void modifyPwd(Integer currentAdminUserId, String oldPwd, String newPwd) throws ApiException;
 }

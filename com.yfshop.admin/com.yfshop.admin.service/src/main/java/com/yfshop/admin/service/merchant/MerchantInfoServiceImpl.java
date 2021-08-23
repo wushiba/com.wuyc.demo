@@ -1144,7 +1144,7 @@ public class MerchantInfoServiceImpl implements MerchantInfoService {
 
 
     @Override
-    public Void modifyPwd(Integer currentAdminUserId, String oldPwd, String newPwd) {
+    public Void modifyPwd(Integer currentAdminUserId, String oldPwd, String newPwd) throws ApiException {
         Asserts.assertStringNotBlank(oldPwd, 500, "请输入旧密码！");
         Asserts.assertStringNotBlank(oldPwd, 500, "请输入新密码！");
         Merchant merchant = merchantMapper.selectById(currentAdminUserId);
