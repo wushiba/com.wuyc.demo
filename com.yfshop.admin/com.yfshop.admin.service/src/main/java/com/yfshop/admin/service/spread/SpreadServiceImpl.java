@@ -46,8 +46,10 @@ public class SpreadServiceImpl implements SpreadService {
     private SpreadUrlMapper spreadUrlMapper;
     @Resource
     private MerchantMapper merchantMapper;
-    @Value("${merchant.url}")
-    private String merchantUrl;
+    @Value("${work.url}")
+    private String workUrl;
+
+
 
     static String SERVER_URL = "https://api.jd.com/routerjson";
     static String accessToken = "";
@@ -81,7 +83,7 @@ public class SpreadServiceImpl implements SpreadService {
             spreadUrl.setItemId(itemId);
             spreadUrlMapper.insert(spreadUrl);
         }
-        return String.format("%s/jd/%s", merchantUrl, spreadUrl.getShortCode());
+        return String.format("%s/jd/%s", workUrl, spreadUrl.getShortCode());
     }
 
     @Override

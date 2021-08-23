@@ -105,6 +105,9 @@ shop:
 merchant:
   url: https://b.yufanlook.com/
 
+work:
+  url: https://work.yufanlook.com/
+
 websiteCode:
   dir: /home/www/web-deploy/yufan-admin-report/websiteCode/
   url: https://merchant.yufanlook.com/#/MerchantRegisterPrep?websiteCode=
