@@ -195,7 +195,7 @@ public class SpreadServiceImpl implements SpreadService {
         Asserts.assertStringNotBlank(spreadWithdrawReq.getReUserName(), 500, "提现需要填写真实姓名！");
         Asserts.assertTrue(spreadWithdrawReq.getWithdraw().compareTo(new BigDecimal("5")) >= 0, 500, "提现金额不得小于5元！");
         int count = spreadWithdrawMapper.selectCount(Wrappers.lambdaQuery(SpreadWithdraw.class).eq(SpreadWithdraw::getMerchantId,spreadWithdrawReq.getMerchantId()).gt(SpreadWithdraw::getCreateTime, DateUtil.date().toSqlDate()));
-        Asserts.assertTrue(count < 4, 500, "当日提现已经超出3次限制！");
+        Asserts.assertTrue(count < 3, 500, "当日提现已经超出3次限制！");
         Merchant merchant = merchantMapper.selectById(spreadWithdrawReq.getMerchantId());
         BigDecimal total = spreadBillMapper.selectList(Wrappers.lambdaQuery(SpreadBill.class)
                 .eq(SpreadBill::getMerchantId, spreadWithdrawReq.getMerchantId())
