@@ -10,6 +10,7 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.xxl.job.core.handler.annotation.XxlJob;
 import com.xxl.job.core.log.XxlJobFileAppender;
+import com.yfshop.admin.dao.DrawRecordDao;
 import com.yfshop.admin.dao.UserCouponDao;
 import com.yfshop.admin.task.ActCodeTask;
 import com.yfshop.admin.task.WxPushMsgTask;
@@ -32,6 +33,7 @@ import org.springframework.util.CollectionUtils;
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
@@ -71,6 +73,8 @@ public class TaskJob {
     @Resource
     private DrawRecordMapper drawRecordMapper;
 
+    @Resource
+    private DrawRecordDao drawRecordDao;
 
     @Value("${xxl.job.executor.logpath}")
     String logPath;
@@ -141,6 +145,7 @@ public class TaskJob {
 
     @XxlJob("syncTraceData")
     public void syncTraceData() {
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         String value = stringRedisTemplate.opsForValue().get("TraceDataIndex");
         Integer id = 0;
         if (value != null) {
@@ -167,7 +172,7 @@ public class TaskJob {
                         item.setDealerAddress(dealerAddress);
                         item.setUpdateTime(item.getUpdateTime().plusSeconds(1));
                         item.setDealerName(dealerName);
-                        drawRecordMapper.updateById(item);
+                        drawRecordDao.updateTrace(item.getId(), item.getUpdateTime().format(dateTimeFormatter), dealerAddress, dealerName);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();

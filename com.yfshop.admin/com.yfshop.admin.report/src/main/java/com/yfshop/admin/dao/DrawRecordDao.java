@@ -18,4 +18,6 @@ public interface DrawRecordDao {
     List<DrawRecordSatsByProvinceResult> satsByProvince(@Param("req") QueryDrawRecordSatsReq req);
 
     List<DrawRecordSatsByJxsResult> satsByJxs(@Param("req") QueryDrawRecordSatsReq recordReq);
+
+    void updateTrace(@Param("id") Integer id,@Param("updateTime")String updateTime,@Param("dealerAddress")String dealerAddress,@Param("dealerName")String dealerName);
 }
