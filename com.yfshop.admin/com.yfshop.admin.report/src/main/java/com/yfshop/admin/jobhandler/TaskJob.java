@@ -23,6 +23,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
@@ -53,7 +54,7 @@ public class TaskJob {
     private WxPushMsgTask wxPushMsgTask;
 
     @Autowired
-    private RedisService redisService;
+    StringRedisTemplate stringRedisTemplate;
 
 
     @DubboReference
@@ -138,15 +139,15 @@ public class TaskJob {
 
     @XxlJob("syncTraceData")
     public void syncTraceData() {
-        Object value = redisService.get("TraceDataIndex");
+        String value = stringRedisTemplate.opsForValue().get("TraceDataIndex");
         Integer id = 0;
         if (value != null) {
-            id = (Integer) value;
+            id = Integer.valueOf(value);
         }
         List<DrawRecord> list = drawRecordMapper.selectList(Wrappers.lambdaQuery(DrawRecord.class).select(DrawRecord::getId, DrawRecord::getUpdateTime, DrawRecord::getTraceNo).gt(DrawRecord::getId, id).eq(DrawRecord::getUseStatus, "HAS_USE").isNull(DrawRecord::getDealerName).apply("limit 1000"));
         if (CollectionUtils.isEmpty(list)) return;
         id = list.get(list.size() - 1).getId();
-        redisService.set("TraceDataIndex", id);
+        stringRedisTemplate.opsForValue().set("TraceDataIndex", id+"");
         list.forEach(item -> {
             Map<String, Object> paramMap = new HashMap<>();
             paramMap.put("traceNo", item.getTraceNo());
