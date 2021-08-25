@@ -165,6 +165,7 @@ public class TaskJob {
                         String dealerAddress = jsonObject.getStr("dealer_address");
                         item.setTraceNo(null);
                         item.setDealerAddress(dealerAddress);
+                        item.setUpdateTime(item.getUpdateTime().plusSeconds(1));
                         item.setDealerName(dealerName);
                         drawRecordMapper.updateById(item);
                     }
