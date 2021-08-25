@@ -5,7 +5,9 @@ import cn.hutool.http.HttpUtil;
 import cn.hutool.json.JSON;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.xxl.job.core.handler.annotation.XxlJob;
 import com.xxl.job.core.log.XxlJobFileAppender;
 import com.yfshop.admin.dao.UserCouponDao;
@@ -144,28 +146,31 @@ public class TaskJob {
         if (value != null) {
             id = Integer.valueOf(value);
         }
-        List<DrawRecord> list = drawRecordMapper.selectList(Wrappers.lambdaQuery(DrawRecord.class).select(DrawRecord::getId, DrawRecord::getUpdateTime, DrawRecord::getTraceNo).gt(DrawRecord::getId, id).eq(DrawRecord::getUseStatus, "HAS_USE").isNull(DrawRecord::getDealerName).apply("limit 1000"));
-        if (CollectionUtils.isEmpty(list)) return;
+        IPage<DrawRecord> iPage = drawRecordMapper.selectPage(new Page<>(1, 1000), Wrappers.lambdaQuery(DrawRecord.class).select(DrawRecord::getId, DrawRecord::getUpdateTime, DrawRecord::getTraceNo).gt(DrawRecord::getId, id).eq(DrawRecord::getUseStatus, "HAS_USE").isNull(DrawRecord::getDealerName));
+        List<DrawRecord> list = iPage.getRecords();
+        if (CollectionUtils.isEmpty(iPage.getRecords())) return;
         id = list.get(list.size() - 1).getId();
-        stringRedisTemplate.opsForValue().set("TraceDataIndex", id+"");
+        stringRedisTemplate.opsForValue().set("TraceDataIndex", id + "");
         list.forEach(item -> {
-            Map<String, Object> paramMap = new HashMap<>();
-            paramMap.put("traceNo", item.getTraceNo());
-            String result = HttpUtil.post("http://yf.sma12315.com/ajax/search", paramMap);
-            logger.info("traceNo={},result={}", item.getTraceNo(), result);
-            try {
-                JSONObject jsonObject = JSONUtil.parseObj(result);
-                Boolean flag = jsonObject.getBool("flag");
-                if (flag != null && true == flag) {
-                    String dealerName = jsonObject.getStr("dealer_name");
-                    String dealerAddress = jsonObject.getStr("dealer_address");
-                    item.setTraceNo(null);
-                    item.setDealerAddress(dealerAddress);
-                    item.setDealerName(dealerName);
-                    drawRecordMapper.updateById(item);
+            if (!item.getTraceNo().startsWith("yf")) {
+                Map<String, Object> paramMap = new HashMap<>();
+                paramMap.put("traceNo", item.getTraceNo());
+                String result = HttpUtil.post("http://yf.sma12315.com/ajax/search", paramMap);
+                logger.info("traceNo={},result={}", item.getTraceNo(), result);
+                try {
+                    JSONObject jsonObject = JSONUtil.parseObj(result);
+                    Boolean flag = jsonObject.getBool("flag");
+                    if (flag != null && true == flag) {
+                        String dealerName = jsonObject.getStr("dealer_name");
+                        String dealerAddress = jsonObject.getStr("dealer_address");
+                        item.setTraceNo(null);
+                        item.setDealerAddress(dealerAddress);
+                        item.setDealerName(dealerName);
+                        drawRecordMapper.updateById(item);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
-            } catch (Exception e) {
-                e.printStackTrace();
             }
         });
 
