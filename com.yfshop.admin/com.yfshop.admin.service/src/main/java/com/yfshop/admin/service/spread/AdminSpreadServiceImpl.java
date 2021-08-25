@@ -353,7 +353,7 @@ public class AdminSpreadServiceImpl implements AdminSpreadService {
                     entPayRequest.setCheckName("OPTION_CHECK");
                     entPayRequest.setReUserName(item.getReUserName());
                     entPayRequest.setAmount(item.getWithdraw().multiply(new BigDecimal(100)).intValue());
-                    entPayRequest.setDescription("分销佣金提现");
+                    entPayRequest.setDescription("商品提现");
                     entPayRequest.setOpenid(item.getOpenId());
                     entPayRequest.setSpbillCreateIp(item.getIpStr());
                     entPayRequest.setPartnerTradeNo(item.getBillNo());
