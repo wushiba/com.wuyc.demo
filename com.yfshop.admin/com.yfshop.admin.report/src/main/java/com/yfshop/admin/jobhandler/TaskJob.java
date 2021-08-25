@@ -1,6 +1,10 @@
 package com.yfshop.admin.jobhandler;
 
 import cn.hutool.core.util.RandomUtil;
+import cn.hutool.http.HttpUtil;
+import cn.hutool.json.JSON;
+import cn.hutool.json.JSONObject;
+import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.xxl.job.core.handler.annotation.XxlJob;
 import com.xxl.job.core.log.XxlJobFileAppender;
@@ -9,6 +13,7 @@ import com.yfshop.admin.task.ActCodeTask;
 import com.yfshop.admin.task.WxPushMsgTask;
 import com.yfshop.code.mapper.*;
 import com.yfshop.code.model.*;
+import com.yfshop.common.service.RedisService;
 import com.yfshop.wx.api.service.MpService;
 import me.chanjar.weixin.mp.bean.template.WxMpTemplateData;
 import me.chanjar.weixin.mp.bean.template.WxMpTemplateMessage;
@@ -24,9 +29,7 @@ import org.springframework.util.CollectionUtils;
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 
@@ -50,7 +53,8 @@ public class TaskJob {
     private WxPushMsgTask wxPushMsgTask;
 
     @Autowired
-    private RedisTemplate redisTemplate;
+    private RedisService redisService;
+
 
     @DubboReference
     private MpService mpService;
@@ -60,6 +64,9 @@ public class TaskJob {
 
     @Resource
     private VisitLogMapper visitLogMapper;
+
+    @Resource
+    private DrawRecordMapper drawRecordMapper;
 
 
     @Value("${xxl.job.executor.logpath}")
@@ -91,55 +98,6 @@ public class TaskJob {
         } else {
             logger.debug("当前有溯源码任务正则执行");
         }
-    }
-
-    /**
-     * 每隔1小时查询快过期的消息
-     *
-     * @throws Exception
-     */
-    @XxlJob("expiredCoupon")
-    public void expiredCoupon() throws Exception {
-        LocalDateTime localDateTime = LocalDateTime.now();
-        //消息发送时间未8-22点如果这个时间之外进入待发送消息队列
-        boolean flag = localDateTime.getHour() >= 8 && localDateTime.getHour() < 22;
-        List<CouponExpiredConfig> couponExpiredConfigList = couponExpiredConfigMapper.selectList(Wrappers.emptyWrapper());
-        couponExpiredConfigList.forEach(couponExpiredConfig -> {
-            List<UserCoupon> userCoupons = userCouponDao.getUserCouponExpired(couponExpiredConfig.getDay());
-            if (!CollectionUtils.isEmpty(userCoupons)) {
-                if (flag) {
-                    userCoupons.forEach(userCoupon -> {
-                        sendExpiredCouponMsg(userCoupon);
-                    });
-                } else {
-                    String key = "ExpiredCoupon:" + couponExpiredConfig.getDay();
-                    redisTemplate.opsForList().leftPushAll(key, userCoupons);
-                    redisTemplate.expire(key, 1, TimeUnit.DAYS);
-                }
-            }
-        });
-    }
-
-    /**
-     * 每天12点查询未发送的消息
-     *
-     * @throws Exception
-     */
-    @XxlJob("expiredCouponOther")
-    public void expiredCouponOther() throws Exception {
-        List<CouponExpiredConfig> couponExpiredConfigList = couponExpiredConfigMapper.selectList(Wrappers.emptyWrapper());
-        couponExpiredConfigList.forEach(couponExpiredConfig -> {
-            String key = "ExpiredCoupon:" + couponExpiredConfig.getDay();
-            while (true) {
-                UserCoupon userCoupon = (UserCoupon) redisTemplate.opsForList().rightPop(key);
-                if (userCoupon != null) {
-                    sendExpiredCouponMsg(userCoupon);
-                } else {
-                    break;
-                }
-            }
-
-        });
     }
 
 
@@ -175,6 +133,42 @@ public class TaskJob {
     public void wxPushTask() {
 
         wxPushMsgTask.doTask();
+    }
+
+
+    @XxlJob("syncTraceData")
+    public void syncTraceData() {
+        Object value = redisService.get("TraceDataIndex");
+        Integer id = 0;
+        if (value != null) {
+            id = (Integer) value;
+        }
+        List<DrawRecord> list = drawRecordMapper.selectList(Wrappers.lambdaQuery(DrawRecord.class).select(DrawRecord::getId, DrawRecord::getUpdateTime, DrawRecord::getTraceNo).gt(DrawRecord::getId, id).eq(DrawRecord::getUseStatus, "HAS_USE").isNull(DrawRecord::getDealerName).apply("limit 1000"));
+        if (CollectionUtils.isEmpty(list)) return;
+        id = list.get(list.size() - 1).getId();
+        redisService.set("TraceDataIndex", id);
+        list.forEach(item -> {
+            Map<String, Object> paramMap = new HashMap<>();
+            paramMap.put("traceNo", item.getTraceNo());
+            String result = HttpUtil.post("http://yf.sma12315.com/ajax/search", paramMap);
+            logger.info("traceNo={},result={}", item.getTraceNo(), result);
+            try {
+                JSONObject jsonObject = JSONUtil.parseObj(result);
+                Boolean flag = jsonObject.getBool("flag");
+                if (flag != null && true == flag) {
+                    String dealerName = jsonObject.getStr("dealer_name");
+                    String dealerAddress = jsonObject.getStr("dealer_address");
+                    item.setTraceNo(null);
+                    item.setDealerAddress(dealerAddress);
+                    item.setDealerName(dealerName);
+                    drawRecordMapper.updateById(item);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+
+
     }
 
 }
