@@ -8,6 +8,7 @@ import com.yfshop.admin.api.draw.result.DrawRecordSatsByProvinceResult;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Map;
 
 public interface DrawRecordDao {
 
@@ -20,4 +21,6 @@ public interface DrawRecordDao {
     List<DrawRecordSatsByJxsResult> satsByJxs(@Param("req") QueryDrawRecordSatsReq recordReq);
 
     void updateTrace(@Param("id") Integer id,@Param("updateTime")String updateTime,@Param("dealerAddress")String dealerAddress,@Param("dealerName")String dealerName);
+
+    List<Map<String,String>> getTractNo(Long id);
 }

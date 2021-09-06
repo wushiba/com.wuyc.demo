@@ -6,6 +6,7 @@ import cn.hutool.json.JSON;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.xxl.job.core.handler.annotation.XxlJob;
@@ -75,6 +76,9 @@ public class TaskJob {
 
     @Resource
     private DrawRecordDao drawRecordDao;
+
+    @Resource
+    private TraceDrawMapper traceDrawMapper;
 
     @Value("${xxl.job.executor.logpath}")
     String logPath;
@@ -180,7 +184,49 @@ public class TaskJob {
             }
         });
 
+    }
+
+    @XxlJob("syncTraceData")
+    public void syncTraceNewData() {
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        String value = stringRedisTemplate.opsForValue().get("syncTraceNewData");
+        Long id = 0L;
+        if (value != null) {
+            id = Long.valueOf(value);
+        }
+        List<Map<String, String>> list = drawRecordDao.getTractNo(id);
+        if (CollectionUtils.isEmpty(list)) return;
+        id = Long.valueOf(list.get(list.size() - 1).get("id"));
+        stringRedisTemplate.opsForValue().set("syncTraceNewData", id + "");
+        list.forEach(item -> {
+            String traceNo = item.get("traceNo");
+            if (StringUtils.isNotBlank(traceNo) && !traceNo.startsWith("yf")) {
+                Map<String, Object> paramMap = new HashMap<>();
+                paramMap.put("traceNo", traceNo);
+                String result = HttpUtil.post("http://yf.sma12315.com/ajax/search", paramMap);
+                logger.info("traceNo={},result={}", traceNo, result);
+                try {
+                    JSONObject jsonObject = JSONUtil.parseObj(result);
+                    Boolean flag = jsonObject.getBool("flag");
+                    if (flag != null && true == flag) {
+                        String dealerNo = jsonObject.getStr("dealer_no");
+                        TraceDraw traceDraw = new TraceDraw();
+                        traceDraw.setTraceNo(traceNo);
+                        traceDraw.setNo(dealerNo);
+                        try {
+                            traceDrawMapper.insert(traceDraw);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
 
     }
+
 
 }

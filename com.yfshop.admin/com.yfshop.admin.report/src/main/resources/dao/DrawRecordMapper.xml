@@ -73,4 +73,14 @@
             dealer_address=#{dealerAddress}
         WHERE id = #{id}
     </update>
+
+    <select id="getTractNo" resultType="java.util.Map">
+        SELECT d.id, r.`trace_no` as traceNo
+        FROM `yf_order_detail` d
+                 LEFT JOIN `yf_draw_record` r on r.`user_coupon_id` = d.`user_coupon_id`
+        where d.id &lt; #{id}
+          and d.`receive_way` = 'PS'
+          and d.`is_pay` = 'Y'
+          and `trace_no` IS NOT NULL limit 1000;
+    </select>
 </mapper>
