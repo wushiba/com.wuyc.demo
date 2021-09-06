@@ -75,12 +75,15 @@
     </update>
 
     <select id="getTractNo" resultType="com.yfshop.admin.api.draw.result.TraceDrawResult">
-        SELECT d.id, r.`trace_no`
+        SELECT d.id,
+               r.`trace_no`
         FROM `yf_order_detail` d
                  LEFT JOIN `yf_draw_record` r on r.`user_coupon_id` = d.`user_coupon_id`
+                 LEFT JOIN `yf_trace_draw` td on td.trace_no = r.`trace_no`
         where d.id > #{id}
           and d.`receive_way` = 'PS'
           and d.`is_pay` = 'Y'
-          and `trace_no` IS NOT NULL limit 1000;
+          and r.`trace_no` IS NOT NULL
+          and td.trace_no IS NULL limit 1000
     </select>
 </mapper>
