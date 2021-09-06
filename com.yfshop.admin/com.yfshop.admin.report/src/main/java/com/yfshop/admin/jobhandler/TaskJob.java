@@ -11,6 +11,7 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.xxl.job.core.handler.annotation.XxlJob;
 import com.xxl.job.core.log.XxlJobFileAppender;
+import com.yfshop.admin.api.draw.result.TraceDrawResult;
 import com.yfshop.admin.dao.DrawRecordDao;
 import com.yfshop.admin.dao.UserCouponDao;
 import com.yfshop.admin.task.ActCodeTask;
@@ -194,12 +195,12 @@ public class TaskJob {
         if (value != null) {
             id = Long.valueOf(value);
         }
-        List<Map<String, String>> list = drawRecordDao.getTractNo(id);
+        List<TraceDrawResult> list = drawRecordDao.getTractNo(id);
         if (CollectionUtils.isEmpty(list)) return;
-        id = Long.valueOf(list.get(list.size() - 1).get("id"));
+        id = list.get(list.size() - 1).getId();
         stringRedisTemplate.opsForValue().set("syncTraceNewData", id + "");
         list.forEach(item -> {
-            String traceNo = item.get("traceNo");
+            String traceNo = item.getTraceNo();
             if (StringUtils.isNotBlank(traceNo) && !traceNo.startsWith("yf")) {
                 Map<String, Object> paramMap = new HashMap<>();
                 paramMap.put("traceNo", traceNo);

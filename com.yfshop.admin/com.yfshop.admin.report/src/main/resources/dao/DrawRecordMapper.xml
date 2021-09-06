@@ -74,8 +74,8 @@
         WHERE id = #{id}
     </update>
 
-    <select id="getTractNo" resultType="java.util.Map">
-        SELECT d.id, r.`trace_no` as traceNo
+    <select id="getTractNo" resultType="com.yfshop.admin.api.draw.result.TraceDrawResult">
+        SELECT d.id, r.`trace_no`
         FROM `yf_order_detail` d
                  LEFT JOIN `yf_draw_record` r on r.`user_coupon_id` = d.`user_coupon_id`
         where d.id > #{id}

@@ -1,10 +1,8 @@
 package com.yfshop.admin.dao;
 
 import com.yfshop.admin.api.draw.request.QueryDrawRecordSatsReq;
-import com.yfshop.admin.api.draw.result.DrawRecordSatsByDayResult;
-import com.yfshop.admin.api.draw.result.DrawRecordSatsByJxsResult;
-import com.yfshop.admin.api.draw.result.DrawRecordSatsByLevelResult;
-import com.yfshop.admin.api.draw.result.DrawRecordSatsByProvinceResult;
+import com.yfshop.admin.api.draw.result.*;
+import com.yfshop.code.model.TraceDraw;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -22,5 +20,5 @@ public interface DrawRecordDao {
 
     void updateTrace(@Param("id") Integer id,@Param("updateTime")String updateTime,@Param("dealerAddress")String dealerAddress,@Param("dealerName")String dealerName);
 
-    List<Map<String,String>> getTractNo(Long id);
+    List<TraceDrawResult> getTractNo(Long id);
 }
