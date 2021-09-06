@@ -186,7 +186,7 @@ public class TaskJob {
 
     }
 
-    @XxlJob("syncTraceData")
+    @XxlJob("syncTraceNewData")
     public void syncTraceNewData() {
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         String value = stringRedisTemplate.opsForValue().get("syncTraceNewData");
