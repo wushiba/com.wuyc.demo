@@ -374,9 +374,8 @@ public class FrontDrawServiceImpl implements FrontDrawService {
                 prizeLevel = 2;
             }
         }
-        logger.info("抽中了" + prizeLevel + "等奖");
+        logger.info("抽中了" + prizeLevel + "等奖"+",随机数="+random+","+"一等奖中奖率="+firstRate+",二等奖中奖率="+secondRate);
         return prizeLevel;
     }
-
 }
 
