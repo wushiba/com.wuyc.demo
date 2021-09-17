@@ -11,12 +11,11 @@ import com.jd.open.api.sdk.request.kplunion.UnionOpenPromotionCommonGetRequest;
 import com.jd.open.api.sdk.response.kplunion.UnionOpenPromotionCommonGetResponse;
 import com.yfshop.admin.api.spread.SpreadService;
 import com.yfshop.admin.api.spread.request.SpreadBillReq;
+import com.yfshop.admin.api.spread.request.SpreadGroupOrderReq;
 import com.yfshop.admin.api.spread.request.SpreadOrderReq;
 import com.yfshop.admin.api.spread.request.SpreadWithdrawReq;
-import com.yfshop.admin.api.spread.result.SpreadBillResult;
-import com.yfshop.admin.api.spread.result.SpreadItemResult;
-import com.yfshop.admin.api.spread.result.SpreadOrderResult;
-import com.yfshop.admin.api.spread.result.SpreadStatsResult;
+import com.yfshop.admin.api.spread.result.*;
+import com.yfshop.admin.dao.SpreadGroupOrderDao;
 import com.yfshop.admin.utils.ShortUrlUtil;
 import com.yfshop.code.mapper.*;
 import com.yfshop.code.model.*;
@@ -46,9 +45,12 @@ public class SpreadServiceImpl implements SpreadService {
     private SpreadUrlMapper spreadUrlMapper;
     @Resource
     private MerchantMapper merchantMapper;
+    @Resource
+    private SpreadGroupOrderDao spreadGroupOrderDao;
+    @Resource
+    private SpreadWhiteMapper spreadWhiteMapper;
     @Value("${work.url}")
     private String workUrl;
-
 
 
     static String SERVER_URL = "https://api.jd.com/routerjson";
@@ -194,7 +196,7 @@ public class SpreadServiceImpl implements SpreadService {
         Asserts.assertStringNotBlank(spreadWithdrawReq.getOpenId(), 500, "微信未授权，不能提现！");
         Asserts.assertStringNotBlank(spreadWithdrawReq.getReUserName(), 500, "提现需要填写真实姓名！");
         Asserts.assertTrue(spreadWithdrawReq.getWithdraw().compareTo(new BigDecimal("5")) >= 0, 500, "提现金额不得小于5元！");
-        int count = spreadWithdrawMapper.selectCount(Wrappers.lambdaQuery(SpreadWithdraw.class).eq(SpreadWithdraw::getMerchantId,spreadWithdrawReq.getMerchantId()).gt(SpreadWithdraw::getCreateTime, DateUtil.date().toSqlDate()));
+        int count = spreadWithdrawMapper.selectCount(Wrappers.lambdaQuery(SpreadWithdraw.class).eq(SpreadWithdraw::getMerchantId, spreadWithdrawReq.getMerchantId()).gt(SpreadWithdraw::getCreateTime, DateUtil.date().toSqlDate()));
         Asserts.assertTrue(count < 3, 500, "当日提现已经超出3次限制！");
         Merchant merchant = merchantMapper.selectById(spreadWithdrawReq.getMerchantId());
         BigDecimal total = spreadBillMapper.selectList(Wrappers.lambdaQuery(SpreadBill.class)
@@ -240,4 +242,33 @@ public class SpreadServiceImpl implements SpreadService {
         return spreadUrl.getUrl();
     }
 
+    @Override
+    public IPage<SpreadGroupOrderResult> getGroupOrderList(SpreadGroupOrderReq groupOrderReq) throws ApiException {
+        Page<SpreadGroupOrderResult> iPage = new Page(groupOrderReq.getPageIndex(), groupOrderReq.getPageSize());
+        SpreadWhite spreadWhite = spreadWhiteMapper.selectOne(Wrappers.lambdaQuery(SpreadWhite.class)
+                .eq(SpreadWhite::getMerchantId, groupOrderReq.getMerchantId()));
+        if (spreadWhite == null) {
+            return iPage;
+        }
+        return spreadGroupOrderDao.getGroupOrderList(iPage, groupOrderReq);
+    }
+
+    @Override
+    public SpreadGroupOrderStatsResult getSpreadGroupOrderStats(SpreadGroupOrderReq groupOrderReq) throws ApiException {
+        SpreadWhite spreadWhite = spreadWhiteMapper.selectOne(Wrappers.lambdaQuery(SpreadWhite.class)
+                .eq(SpreadWhite::getMerchantId, groupOrderReq.getMerchantId()));
+        if (spreadWhite == null) {
+            SpreadGroupOrderStatsResult spreadGroupOrderStatsResult = new SpreadGroupOrderStatsResult();
+            spreadGroupOrderStatsResult.setOrderCount(0);
+            spreadGroupOrderStatsResult.setOrderPrice(BigDecimal.ZERO);
+            return spreadGroupOrderStatsResult;
+        }
+        return spreadGroupOrderDao.getGroupOrderStats(groupOrderReq);
+    }
+
+    @Override
+    public SpreadGroupOrderStatsResult getSpreadOrderStats(SpreadGroupOrderReq groupOrderReq) throws ApiException {
+
+        return spreadGroupOrderDao.getOrderStats(groupOrderReq);
+    }
 }

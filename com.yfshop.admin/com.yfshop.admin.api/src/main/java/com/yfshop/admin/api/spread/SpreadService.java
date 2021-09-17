@@ -1,10 +1,7 @@
 package com.yfshop.admin.api.spread;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.yfshop.admin.api.spread.request.SpreadBillReq;
-import com.yfshop.admin.api.spread.request.SpreadItemReq;
-import com.yfshop.admin.api.spread.request.SpreadOrderReq;
-import com.yfshop.admin.api.spread.request.SpreadWithdrawReq;
+import com.yfshop.admin.api.spread.request.*;
 import com.yfshop.admin.api.spread.result.*;
 import com.yfshop.common.exception.ApiException;
 
@@ -32,4 +29,10 @@ public interface SpreadService {
     Void withDraw(SpreadWithdrawReq spreadWithdrawReq) throws ApiException;
 
     String getLongUrlByShortCode(String shortCode) throws ApiException;
+
+    IPage<SpreadGroupOrderResult> getGroupOrderList(SpreadGroupOrderReq groupOrderReq) throws ApiException;
+
+    SpreadGroupOrderStatsResult getSpreadGroupOrderStats(SpreadGroupOrderReq groupOrderReq) throws ApiException;
+
+    SpreadGroupOrderStatsResult getSpreadOrderStats(SpreadGroupOrderReq groupOrderReq) throws ApiException;
 }

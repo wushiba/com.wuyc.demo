@@ -1,12 +1,10 @@
 package com.yfshop.admin.api.spread.result;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 
 /**
  * <p>
@@ -18,17 +16,10 @@ import java.time.LocalDateTime;
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class SpreadStatsResult implements Serializable {
+public class SpreadGroupOrderStatsResult implements Serializable {
 
     private static final long serialVersionUID = 1L;
-
-    private BigDecimal total;
-
-    private BigDecimal settlement;
-
-    private BigDecimal withdraw;
-
-    private BigDecimal approveWithdraw;
-
+    private Integer orderCount;
+    private BigDecimal orderPrice;
 
 }

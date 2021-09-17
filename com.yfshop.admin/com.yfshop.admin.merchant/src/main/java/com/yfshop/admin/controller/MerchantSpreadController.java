@@ -7,10 +7,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.yfshop.admin.api.push.result.WxPushFailExportResult;
 import com.yfshop.admin.api.spread.AdminSpreadService;
 import com.yfshop.admin.api.spread.SpreadService;
-import com.yfshop.admin.api.spread.request.SpreadBillReq;
-import com.yfshop.admin.api.spread.request.SpreadItemReq;
-import com.yfshop.admin.api.spread.request.SpreadOrderReq;
-import com.yfshop.admin.api.spread.request.SpreadWithdrawReq;
+import com.yfshop.admin.api.spread.request.*;
 import com.yfshop.admin.api.spread.result.*;
 import com.yfshop.common.api.CommonResult;
 import com.yfshop.common.base.BaseController;
@@ -106,5 +103,30 @@ public class MerchantSpreadController extends AbstractBaseController {
         spreadWithdrawReq.setIpStr(ServletUtil.getClientIP(getCurrentRequest()));
         spreadWithdrawReq.setOpenId(getCurrentOpenId());
         return CommonResult.success(spreadService.withDraw(spreadWithdrawReq));
+    }
+
+    @RequestMapping(value = "/getGroupOrderList", method = {RequestMethod.POST, RequestMethod.GET})
+    @ResponseBody
+    @SaCheckLogin
+    public CommonResult<IPage<SpreadGroupOrderResult>> getGroupOrderList(SpreadGroupOrderReq spreadOrderReq) {
+        spreadOrderReq.setMerchantId(getCurrentAdminUserId());
+        return CommonResult.success(spreadService.getGroupOrderList(spreadOrderReq));
+    }
+
+
+    @RequestMapping(value = "/getGroupOrderStats", method = {RequestMethod.POST, RequestMethod.GET})
+    @ResponseBody
+    @SaCheckLogin
+    public CommonResult<SpreadGroupOrderStatsResult> getSpreadGroupOrderStats(SpreadGroupOrderReq spreadOrderReq) {
+        spreadOrderReq.setMerchantId(getCurrentAdminUserId());
+        return CommonResult.success(spreadService.getSpreadGroupOrderStats(spreadOrderReq));
+    }
+
+    @RequestMapping(value = "/getOrderStats", method = {RequestMethod.POST, RequestMethod.GET})
+    @ResponseBody
+    @SaCheckLogin
+    public CommonResult<SpreadGroupOrderStatsResult> getOrderStats(SpreadGroupOrderReq spreadOrderReq) {
+        spreadOrderReq.setMerchantId(getCurrentAdminUserId());
+        return CommonResult.success(spreadService.getSpreadOrderStats(spreadOrderReq));
     }
 }

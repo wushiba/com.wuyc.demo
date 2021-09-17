@@ -18,17 +18,13 @@ import java.time.LocalDateTime;
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class SpreadStatsResult implements Serializable {
+public class SpreadGroupOrderResult implements Serializable {
 
     private static final long serialVersionUID = 1L;
-
-    private BigDecimal total;
-
-    private BigDecimal settlement;
-
-    private BigDecimal withdraw;
-
-    private BigDecimal approveWithdraw;
-
+    private String merchantId;
+    private String merchantName;
+    private Integer orderCount;
+    private BigDecimal orderPrice;
+    private BigDecimal commission;
 
 }

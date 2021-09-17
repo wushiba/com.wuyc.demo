@@ -169,6 +169,11 @@ public class AdminSpreadServiceImpl implements AdminSpreadService {
                 .map(SpreadWithdraw::getWithdraw)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
         spreadStatsResult.setWithdraw(withdraw);
+
+        BigDecimal approveWithdraw = spreadWithdrawMapper.selectList(Wrappers.lambdaQuery(SpreadWithdraw.class).in(SpreadWithdraw::getStatus, "WAIT", "FAIL")).stream()
+                .map(SpreadWithdraw::getWithdraw)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        spreadStatsResult.setApproveWithdraw(approveWithdraw);
         return spreadStatsResult;
     }
 
