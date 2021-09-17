@@ -61,7 +61,9 @@ public class MerchantSpreadController extends AbstractBaseController {
     @ResponseBody
     @SaCheckLogin
     public CommonResult<IPage<SpreadOrderResult>> getOrderList(SpreadOrderReq spreadOrderReq) {
-        spreadOrderReq.setMerchantId(getCurrentAdminUserId());
+        if (spreadOrderReq.getMerchantId() == null) {
+            spreadOrderReq.setMerchantId(getCurrentAdminUserId());
+        }
         return CommonResult.success(spreadService.getOrderList(spreadOrderReq));
     }
 
@@ -126,7 +128,9 @@ public class MerchantSpreadController extends AbstractBaseController {
     @ResponseBody
     @SaCheckLogin
     public CommonResult<SpreadGroupOrderStatsResult> getOrderStats(SpreadGroupOrderReq spreadOrderReq) {
-        spreadOrderReq.setMerchantId(getCurrentAdminUserId());
+        if (spreadOrderReq.getMerchantId() == null) {
+            spreadOrderReq.setMerchantId(getCurrentAdminUserId());
+        }
         return CommonResult.success(spreadService.getSpreadOrderStats(spreadOrderReq));
     }
 }
