@@ -127,7 +127,7 @@ public class AdminSpreadServiceImpl implements AdminSpreadService {
                 .like(StringUtils.isNotBlank(spreadWithdrawReq.getMerchantName()), SpreadWithdraw::getMerchantName, spreadWithdrawReq.getMerchantName())
                 .like(StringUtils.isNotBlank(spreadWithdrawReq.getMerchantMobile()), SpreadWithdraw::getMerchantMobile, spreadWithdrawReq.getMerchantMobile())
                 .eq(StringUtils.isNotBlank(spreadWithdrawReq.getMerchantRole()), SpreadWithdraw::getMerchantRole, spreadWithdrawReq.getMerchantRole())
-                .eq(StringUtils.isNotBlank(spreadWithdrawReq.getStatus()), SpreadWithdraw::getStatus, spreadWithdrawReq.getWithdraw())
+                .eq(StringUtils.isNotBlank(spreadWithdrawReq.getStatus()), SpreadWithdraw::getStatus, spreadWithdrawReq.getStatus())
                 .gt(spreadWithdrawReq.getStartTime() != null, SpreadWithdraw::getCreateTime, spreadWithdrawReq.getStartTime())
                 .lt(spreadWithdrawReq.getEndTime() != null, SpreadWithdraw::getCreateTime, spreadWithdrawReq.getEndTime()));
         return BeanUtil.iPageConvert(iPage, SpreadWithdrawResult.class);
@@ -140,7 +140,7 @@ public class AdminSpreadServiceImpl implements AdminSpreadService {
                 .like(StringUtils.isNotBlank(spreadWithdrawReq.getMerchantName()), SpreadWithdraw::getMerchantName, spreadWithdrawReq.getMerchantName())
                 .like(StringUtils.isNotBlank(spreadWithdrawReq.getMerchantMobile()), SpreadWithdraw::getMerchantMobile, spreadWithdrawReq.getMerchantMobile())
                 .eq(StringUtils.isNotBlank(spreadWithdrawReq.getMerchantRole()), SpreadWithdraw::getMerchantRole, spreadWithdrawReq.getMerchantRole())
-                .eq(StringUtils.isNotBlank(spreadWithdrawReq.getStatus()), SpreadWithdraw::getStatus, spreadWithdrawReq.getWithdraw())
+                .eq(StringUtils.isNotBlank(spreadWithdrawReq.getStatus()), SpreadWithdraw::getStatus, spreadWithdrawReq.getStatus())
                 .gt(spreadWithdrawReq.getStartTime() != null, SpreadWithdraw::getCreateTime, spreadWithdrawReq.getStartTime())
                 .lt(spreadWithdrawReq.getEndTime() != null, SpreadWithdraw::getCreateTime, spreadWithdrawReq.getEndTime()));
         return BeanUtil.convertList(list, SpreadWithdrawExport.class);
