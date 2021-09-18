@@ -144,6 +144,7 @@ public class SpreadServiceImpl implements SpreadService {
                                 })
                         .gt(spreadOrderReq.getStartTime() != null, SpreadOrder::getCreateTime, spreadOrderReq.getStartTime())
                         .lt(spreadOrderReq.getEndTime() != null, SpreadOrder::getCreateTime, spreadOrderReq.getEndTime())
+                        .orderByDesc(SpreadOrder::getId)
         );
         return BeanUtil.iPageConvert(iPage, SpreadOrderResult.class);
     }
@@ -185,6 +186,7 @@ public class SpreadServiceImpl implements SpreadService {
                 .eq(spreadBillReq.getType() != null, SpreadBill::getType, spreadBillReq.getType())
                 .ge(spreadBillReq.getStartTime() != null, SpreadBill::getUpdateTime, spreadBillReq.getStartTime())
                 .lt(spreadBillReq.getEndTime() != null, SpreadBill::getUpdateTime, spreadBillReq.getEndTime())
+                .orderByDesc(SpreadBill::getId)
         );
         return BeanUtil.iPageConvert(iPage, SpreadBillResult.class);
     }
