@@ -144,7 +144,7 @@ public class SpreadServiceImpl implements SpreadService {
                                 })
                         .gt(spreadOrderReq.getStartTime() != null, SpreadOrder::getCreateTime, spreadOrderReq.getStartTime())
                         .lt(spreadOrderReq.getEndTime() != null, SpreadOrder::getCreateTime, spreadOrderReq.getEndTime())
-                        .orderByDesc(SpreadOrder::getId)
+                        .orderByDesc(SpreadOrder::getOrderTime)
         );
         return BeanUtil.iPageConvert(iPage, SpreadOrderResult.class);
     }
