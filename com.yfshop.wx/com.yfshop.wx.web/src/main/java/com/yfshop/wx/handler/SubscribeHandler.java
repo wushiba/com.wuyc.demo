@@ -74,7 +74,7 @@ public class SubscribeHandler extends AbstractHandler {
                     "雨帆健康家--给家人以温暖，给生活以健康\n" +
                     "\n" +
                     "▒▒▒中奖后哪里领奖？\n" +
-                    "点击链接：https://m.yufanlook.com/#/couponList";
+                    "点击链接：https://shop.yufanlook.com/#/couponList";
             if (StringUtils.isNotBlank(msg)) {
                 return new TextBuilder().build(msg, wxMessage, weixinService);
             }

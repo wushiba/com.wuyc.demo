@@ -58,12 +58,12 @@ public class WxMenuController {
 //        WxMenuButton introduce = new WxMenuButton();//跳转
 //        introduce.setType(MenuButtonType.VIEW);
 //        introduce.setName("进入商城");
-//        introduce.setUrl("https://m.yufanlook.com/#/ActPage");
+//        introduce.setUrl("https://shop.yufanlook.com/#/ActPage");
 //
 //        WxMenuButton bindPhone = new WxMenuButton();
 //        bindPhone.setType(MenuButtonType.VIEW);
 //        bindPhone.setName("个人中心");
-//        bindPhone.setUrl("https://m.yufanlook.com/#/MyPage");
+//        bindPhone.setUrl("https://shop.yufanlook.com/#/MyPage");
 //
 //        shop.getSubButtons().add(introduce);
 //        shop.getSubButtons().add(bindPhone);
@@ -76,7 +76,7 @@ public class WxMenuController {
 //        WxMenuButton order = new WxMenuButton();
 //        order.setType(MenuButtonType.VIEW);
 //        order.setName("噜鹿相遇");
-//        order.setUrl("https://m.yufanlook.com/#/LuckDrawPageForWx");
+//        order.setUrl("https://shop.yufanlook.com/#/LuckDrawPageForWx");
 //
 //        button3.getSubButtons().add(order);
 //        menu.getButtons().add(button3);
@@ -104,7 +104,7 @@ public class WxMenuController {
         WxMenuButton healthy = new WxMenuButton();
         healthy.setType(MenuButtonType.VIEW);
         healthy.setName("我的奖券");
-        healthy.setUrl("https://m.yufanlook.com/#/MyPage");
+        healthy.setUrl("https://shop.yufanlook.com/#/MyPage");
 
         WxMenuButton action = new WxMenuButton();
         action.setName("进入商城");
@@ -112,19 +112,19 @@ public class WxMenuController {
         WxMenuButton actionOne = new WxMenuButton();
         actionOne.setType(MenuButtonType.VIEW);
         actionOne.setName("健康商城");
-        actionOne.setUrl("https://m.yufanlook.com/#/allPage");
+        actionOne.setUrl("https://shop.yufanlook.com/#/allPage");
         action.getSubButtons().add(actionOne);
 
         WxMenuButton actionTwo = new WxMenuButton();
         actionTwo.setType(MenuButtonType.VIEW);
         actionTwo.setName("到家火锅");
-        actionTwo.setUrl("https://m.yufanlook.com/#/allPage?id=3");
+        actionTwo.setUrl("https://shop.yufanlook.com/#/allPage?id=3");
         action.getSubButtons().add(actionTwo);
 
         WxMenuButton actionThree = new WxMenuButton();
         actionThree.setType(MenuButtonType.VIEW);
         actionThree.setName("5折好货");
-        actionThree.setUrl("https://m.yufanlook.com/#/ActPage");
+        actionThree.setUrl("https://shop.yufanlook.com/#/ActPage");
         action.getSubButtons().add(actionThree);
 
         WxMenuButton kf = new WxMenuButton();

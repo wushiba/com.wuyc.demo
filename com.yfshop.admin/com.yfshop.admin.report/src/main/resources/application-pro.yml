@@ -103,7 +103,7 @@ websiteCode:
 actCode:
   srcDir: /home/www/web-deploy/yufan-admin-report/actCode/src/
   targetDir: /home/www/web-deploy/yufan-admin-report/actCode/target/
-  url: https://m.yufanlook.com/#/LuckDrawPage?actCode=
+  url: https://shop.yufanlook.com/#/LuckDrawPage?actCode=
 
 shop:
-  url: https://m.yufanlook.com/
+  url: https://shop.yufanlook.com/

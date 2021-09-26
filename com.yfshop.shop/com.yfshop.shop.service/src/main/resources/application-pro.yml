@@ -56,4 +56,4 @@ wxPay:
   notifyUrl: http://wx.yufanlook.com/wx/pay/notify/order/
 
 shop:
-  url: https://m.yufanlook.com/
+  url: https://shop.yufanlook.com/
