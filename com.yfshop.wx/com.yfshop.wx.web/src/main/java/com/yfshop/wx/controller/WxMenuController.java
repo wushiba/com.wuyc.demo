@@ -107,6 +107,7 @@ public class WxMenuController {
         healthy.setUrl("https://shop.yufanlook.com/#/MyPage");
 
         WxMenuButton action = new WxMenuButton();
+        action.setType(MenuButtonType.VIEW);
         action.setName("进入商城");
         action.setUrl("https://shop.yufanlook.com/#/allPage?id=3");
 
