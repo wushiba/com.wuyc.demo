@@ -108,24 +108,25 @@ public class WxMenuController {
 
         WxMenuButton action = new WxMenuButton();
         action.setName("进入商城");
+        action.setUrl("https://shop.yufanlook.com/#/allPage?id=3");
 
-        WxMenuButton actionOne = new WxMenuButton();
-        actionOne.setType(MenuButtonType.VIEW);
-        actionOne.setName("健康商城");
-        actionOne.setUrl("https://shop.yufanlook.com/#/allPage");
-        action.getSubButtons().add(actionOne);
-
-        WxMenuButton actionTwo = new WxMenuButton();
-        actionTwo.setType(MenuButtonType.VIEW);
-        actionTwo.setName("到家火锅");
-        actionTwo.setUrl("https://shop.yufanlook.com/#/allPage?id=3");
-        action.getSubButtons().add(actionTwo);
-
-        WxMenuButton actionThree = new WxMenuButton();
-        actionThree.setType(MenuButtonType.VIEW);
-        actionThree.setName("5折好货");
-        actionThree.setUrl("https://shop.yufanlook.com/#/ActPage");
-        action.getSubButtons().add(actionThree);
+//        WxMenuButton actionOne = new WxMenuButton();
+//        actionOne.setType(MenuButtonType.VIEW);
+//        actionOne.setName("健康商城");
+//        actionOne.setUrl("https://shop.yufanlook.com/#/allPage");
+//        action.getSubButtons().add(actionOne);
+//
+//        WxMenuButton actionTwo = new WxMenuButton();
+//        actionTwo.setType(MenuButtonType.VIEW);
+//        actionTwo.setName("到家火锅");
+//        actionTwo.setUrl("https://shop.yufanlook.com/#/allPage?id=3");
+//        action.getSubButtons().add(actionTwo);
+//
+//        WxMenuButton actionThree = new WxMenuButton();
+//        actionThree.setType(MenuButtonType.VIEW);
+//        actionThree.setName("5折好货");
+//        actionThree.setUrl("https://shop.yufanlook.com/#/ActPage");
+//        action.getSubButtons().add(actionThree);
 
         WxMenuButton kf = new WxMenuButton();
         kf.setName("客服中心");
@@ -154,7 +155,7 @@ public class WxMenuController {
         kfFour.setUrl("https://m.jf.10086.cn/?keyword=%E5%99%9C%E6%B8%B4&WT.ac_id=210730_LK_prom_h5_code1#/pages/goodslist/index?keyWord=%E5%99%9C%E6%B8%B4");
         kf.getSubButtons().add(kfFour);
 
-        menu.getButtons().add(healthy);
+//        menu.getButtons().add(healthy);
         menu.getButtons().add(action);
         menu.getButtons().add(kf);
 
