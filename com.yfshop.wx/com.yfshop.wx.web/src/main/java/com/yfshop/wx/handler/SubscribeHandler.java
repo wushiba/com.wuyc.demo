@@ -71,10 +71,10 @@ public class SubscribeHandler extends AbstractHandler {
            // String msg = userService.getSubscribeMsg();
             String msg ="hi，我们是光明乳业、椰岛集团官方合作商\n" +
                     "\n" +
-                    "雨帆健康家--给家人以温暖，给生活以健康\n" +
-                    "\n" +
-                    "▒▒▒中奖后哪里领奖？\n" +
-                    "点击链接：https://shop.yufanlook.com/#/couponList";
+                    "雨帆健康家--给家人以温暖，给生活以健康\n";
+                    // "\n" +
+                    // "▒▒▒中奖后哪里领奖？\n" +
+                    // "点击链接：https://shop.yufanlook.com/#/couponList";
             if (StringUtils.isNotBlank(msg)) {
                 return new TextBuilder().build(msg, wxMessage, weixinService);
             }
