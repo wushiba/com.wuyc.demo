@@ -130,7 +130,7 @@ public class WxMenuController {
 //        action.getSubButtons().add(actionThree);
 
         WxMenuButton kf = new WxMenuButton();
-        kf.setName("客服中心");
+        kf.setName("其他服务");
 
         WxMenuButton kfOne = new WxMenuButton();
         kfOne.setType(MenuButtonType.VIEW);
@@ -157,15 +157,16 @@ public class WxMenuController {
         kf.getSubButtons().add(kfFour);
 
 
-        WxMenuButton vip = new WxMenuButton();
-        vip.setType(MenuButtonType.VIEW);
-        vip.setName("雨帆噜渴会员");
-        vip.setUrl("https://v.urpass.cn/f/q/100209.html/member");
+        WxMenuButton kfFive = new WxMenuButton();
+        kfFive.setType(MenuButtonType.VIEW);
+        kfFive.setName("雨帆会员");
+        kfFive.setUrl("https://v.urpass.cn/f/q/100209.html/member");
+        kf.getSubButtons().add(kfFive);
 
         //        menu.getButtons().add(healthy);
         menu.getButtons().add(action);
         menu.getButtons().add(kf);
-        menu.getButtons().add(vip);
+        // menu.getButtons().add(vip);
 
         this.wxService.switchover(appid);
         return this.wxService.getMenuService().menuCreate(menu);
