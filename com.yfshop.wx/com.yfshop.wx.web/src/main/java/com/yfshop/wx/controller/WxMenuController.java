@@ -156,9 +156,16 @@ public class WxMenuController {
         kfFour.setUrl("https://m.jf.10086.cn/?keyword=%E5%99%9C%E6%B8%B4&WT.ac_id=210730_LK_prom_h5_code1#/pages/goodslist/index?keyWord=%E5%99%9C%E6%B8%B4");
         kf.getSubButtons().add(kfFour);
 
-//        menu.getButtons().add(healthy);
+
+        WxMenuButton vip = new WxMenuButton();
+        vip.setType(MenuButtonType.VIEW);
+        vip.setName("雨帆噜渴会员");
+        vip.setUrl("https://v.urpass.cn/f/q/100209.html/member");
+
+        //        menu.getButtons().add(healthy);
         menu.getButtons().add(action);
         menu.getButtons().add(kf);
+        menu.getButtons().add(vip);
 
         this.wxService.switchover(appid);
         return this.wxService.getMenuService().menuCreate(menu);
