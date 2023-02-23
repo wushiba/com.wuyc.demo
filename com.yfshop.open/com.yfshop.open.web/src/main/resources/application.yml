@@ -1,6 +1,0 @@
----
-spring:
-  application:
-    name: yfshop-open-web
-  profiles:
-    active: @profiles.active@
