@@ -7,7 +7,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * @author sp0313
  * @date 2022年11月28日 09:41:00
  */
-
 @SpringBootApplication
 public class ApplicationStart {
 
