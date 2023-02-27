@@ -23,7 +23,7 @@ public class ListUtilsTest {
 //        System.out.println(dataList.toString());
 
 
-        listMap();
+//        listMap();
 
 //        mapToInt();
 
@@ -36,7 +36,7 @@ public class ListUtilsTest {
 //        listFilterList();
 
         // 获取list的某列集合
-//        listColumnList();
+        listColumnList();
 
         // 获取list去重后的某列集合
 //        listColumnDistinctList();

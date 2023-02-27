@@ -34,7 +34,6 @@ public class ListUtils {
                 .collect(Collectors.toList());
     }
 
-
     /**
      * 根据条件获取集合里符合条件第一条数据
      *
@@ -63,13 +62,7 @@ public class ListUtils {
      */
     public static <T> List<T> filterToList(List<T> dataList,
                                            Predicate<T> predicate) {
-        if (CollectionUtils.isEmpty(dataList)) {
-            return null;
-        }
-
-        return dataList.stream()
-                .filter(predicate)
-                .collect(Collectors.toList());
+       return filterColumnToList(dataList, Function.identity(), predicate);
     }
 
     /**
@@ -81,13 +74,7 @@ public class ListUtils {
      */
     public static <T, R> List<R> columnToList(List<T> dataList,
                                               Function<T, R> function) {
-        if (CollectionUtils.isEmpty(dataList)) {
-            return null;
-        }
-
-        return dataList.stream()
-                .map(function)
-                .collect(Collectors.toList());
+        return filterColumnToList(dataList, function, data -> true);
     }
 
     /**
@@ -102,7 +89,7 @@ public class ListUtils {
                                                     Function<T, R> function,
                                                     Predicate<T> condition) {
         if (CollectionUtils.isEmpty(dataList)) {
-            return null;
+            return Lists.newArrayList();
         }
 
         return dataList.stream()
