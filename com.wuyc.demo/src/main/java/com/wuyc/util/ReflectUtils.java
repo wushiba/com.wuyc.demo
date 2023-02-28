@@ -1,16 +1,14 @@
 package com.wuyc.util;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.wuyc.vo.StudentVO;
 import org.apache.commons.collections4.MapUtils;
-import org.springframework.util.CollectionUtils;
 
 import java.lang.reflect.Field;
 import java.util.*;
 
 /**
- * @author sp0313
+ * @author wuycl
  * @date 2023年02月22日 17:46:00
  */
 public class ReflectUtils {

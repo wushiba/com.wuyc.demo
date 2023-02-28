@@ -18,7 +18,7 @@ import static java.lang.annotation.ElementType.*;
  * 检查值是否在枚举中
  * 要求枚举有getCode()方法来获取枚举值
  *
- * @author sp0313
+ * @author wuyc
  */
 @Documented
 @Target({FIELD, PARAMETER, ANNOTATION_TYPE})

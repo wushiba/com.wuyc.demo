@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
- * @author sp0313
+ * @author wuyc
  * @date 2022年11月25日 13:22:00
  */
 public class ListUtilsTest {

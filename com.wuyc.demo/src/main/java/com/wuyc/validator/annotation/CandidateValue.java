@@ -17,7 +17,7 @@ import static java.lang.annotation.ElementType.*;
  * 自定义校验Validation中的校验注解
  * 检查值是否在给定的候选值中
  *
- * @author sp0313
+ * @author wuyc
  */
 @Documented
 @Target({FIELD, PARAMETER, ANNOTATION_TYPE})
