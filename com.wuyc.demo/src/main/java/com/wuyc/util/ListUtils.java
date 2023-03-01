@@ -21,20 +21,6 @@ public class ListUtils {
     private static final int ZERO = 0;
 
     /**
-     * 将集合转换为map, key为对象指定列 value为当前对象
-     *
-     * @param dataList 入参集合
-     * @param function 转为map - key属性的function函数
-     * @return Map<R, T></R>
-     */
-    public static <T, R> List<R> map(List<T> dataList,
-                                     Function<T, R> function) {
-
-        return dataList.stream().map(function)
-                .collect(Collectors.toList());
-    }
-
-    /**
      * 根据条件获取集合里符合条件第一条数据
      *
      * @param dataList  入参集合
@@ -60,21 +46,21 @@ public class ListUtils {
      * @param predicate 条件
      * @return List<T></>
      */
-    public static <T> List<T> filterToList(List<T> dataList,
-                                           Predicate<T> predicate) {
-       return filterColumnToList(dataList, Function.identity(), predicate);
+    public static <T> List<T> filterList(List<T> dataList,
+                                         Predicate<T> predicate) {
+        return filterMapToList(dataList, Function.identity(), predicate);
     }
 
     /**
-     * 获取集合里某一列的值
+     * 将集合转换为map, key为对象指定列 value为当前对象
      *
      * @param dataList 入参集合
-     * @param function 获取的某一列
-     * @return List<R></R>
+     * @param function 转为map - key属性的function函数
+     * @return Map<R, T></R>
      */
-    public static <T, R> List<R> columnToList(List<T> dataList,
-                                              Function<T, R> function) {
-        return filterColumnToList(dataList, function, data -> true);
+    public static <T, R> List<R> mapToList(List<T> dataList,
+                                           Function<T, R> function) {
+        return filterMapToList(dataList, function, data -> true);
     }
 
     /**
@@ -85,9 +71,9 @@ public class ListUtils {
      * @param condition 条件
      * @return List<R></R>
      */
-    public static <T, R> List<R> filterColumnToList(List<T> dataList,
-                                                    Function<T, R> function,
-                                                    Predicate<T> condition) {
+    public static <T, R> List<R> filterMapToList(List<T> dataList,
+                                                 Function<T, R> function,
+                                                 Predicate<T> condition) {
         if (CollectionUtils.isEmpty(dataList)) {
             return Lists.newArrayList();
         }
@@ -105,8 +91,8 @@ public class ListUtils {
      * @param function 获取的某一列
      * @return List<R></R>
      */
-    public static <T, R> List<R> distinctColumnToList(List<T> dataList,
-                                                      Function<T, R> function) {
+    public static <T, R> List<R> distinctMapToList(List<T> dataList,
+                                                   Function<T, R> function) {
         if (CollectionUtils.isEmpty(dataList)) {
             return null;
         }

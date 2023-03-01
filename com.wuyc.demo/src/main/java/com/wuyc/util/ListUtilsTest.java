@@ -2,9 +2,7 @@ package com.wuyc.util;
 
 import com.alibaba.fastjson.JSON;
 import com.google.common.collect.Lists;
-import com.wuyc.vo.StudentDTO;
 import com.wuyc.vo.StudentVO;
-import org.springframework.beans.BeanUtils;
 
 import java.util.Collection;
 import java.util.List;
@@ -23,23 +21,24 @@ public class ListUtilsTest {
 //        System.out.println(dataList.toString());
 
 
-//        listMap();
-
 //        mapToInt();
 
 //        filterMapToInt();
 
         // 过滤list中数据，返回第一条数据
-//        listFilterFirst();
+//        filterFirst();
 
         // 过滤list中数据，返回list
-//        listFilterList();
+//        filterList();
 
         // 获取list的某列集合
-        listColumnList();
+//        mapToList();
+
+        // 获取集合过滤后新的集合
+        filterMapToList();
 
         // 获取list去重后的某列集合
-//        listColumnDistinctList();
+//        distinctMapToList();
 
         // 将list转换为V是本身map
 //        listToMap();
@@ -80,41 +79,37 @@ public class ListUtilsTest {
 //        System.out.println(JSON.toJSONString(dataList));
     }
 
-    public static void listFilterFirst() {
+    public static void filterFirst() {
         List<StudentVO> dataList = initSmallStudentList();
         StudentVO studentVO = ListUtils.filterFirst(dataList,
                 (data) -> data.getHeight() > 1000 && data.getSex() == 1);
         System.out.println(JSON.toJSONString(studentVO));
     }
 
-    public static void listFilterList() {
+    public static void filterList() {
         List<StudentVO> dataList = initSmallStudentList();
-        List<StudentVO> resultList = ListUtils.filterToList(dataList,
+        List<StudentVO> resultList = ListUtils.filterList(dataList,
                 (data) -> data.getHeight() > 100 && data.getSex() == 1);
         System.out.println(JSON.toJSONString(resultList, true));
     }
 
-    public static void listColumnList() {
+    public static void mapToList() {
         List<StudentVO> dataList = initSmallStudentList();
-        List<String> nameList = ListUtils.columnToList(dataList, StudentVO::getName);
+        List<String> nameList = ListUtils.mapToList(dataList, StudentVO::getName);
         System.out.println(JSON.toJSONString(nameList, true));
     }
 
-    public static void listColumnDistinctList() {
+    public static void filterMapToList() {
         List<StudentVO> dataList = initSmallStudentList();
-        Function<StudentVO, String> function = StudentVO::getName;
-        List<String> nameList = ListUtils.distinctColumnToList(dataList, StudentVO::getName);
+        List<StudentVO> nameList = ListUtils.filterMapToList(dataList, Function.identity(),
+                (data) -> data.getHeight() > 100 && data.getSex() == 1);
         System.out.println(JSON.toJSONString(nameList, true));
     }
 
-    public static void listMap() {
+    public static void distinctMapToList() {
         List<StudentVO> dataList = initSmallStudentList();
-        List<StudentDTO> resultList = ListUtils.map(dataList, data -> {
-            StudentDTO studentDTO = new StudentDTO();
-            BeanUtils.copyProperties(data, studentDTO);
-            return studentDTO;
-        });
-        System.out.println(JSON.toJSONString(resultList, true));
+        List<String> nameList = ListUtils.distinctMapToList(dataList, StudentVO::getName);
+        System.out.println(JSON.toJSONString(nameList, true));
     }
 
     public static void listToMap() {
