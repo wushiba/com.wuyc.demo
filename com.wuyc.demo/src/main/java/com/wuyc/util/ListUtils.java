@@ -437,11 +437,6 @@ public class ListUtils {
         if (CollectionUtils.isEmpty(dataList)) {
             return null;
         }
-
-//        return String.join(regex,
-//                dataList.stream().map(String::valueOf)
-//                        .collect(Collectors.toList())
-//        );
         return dataList.stream().map(String::valueOf)
                 .collect(Collectors.joining(regex));
     }

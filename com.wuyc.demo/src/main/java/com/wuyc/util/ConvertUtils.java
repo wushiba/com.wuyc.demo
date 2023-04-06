@@ -38,7 +38,7 @@ public class ConvertUtils {
         if (source == null) {
             return null;
         }
-        T instantiate = org.springframework.beans.BeanUtils.instantiateClass(clazz);
+        T instantiate = BeanUtils.instantiateClass(clazz);
         copyProperties(source, instantiate);
         return instantiate;
     }
