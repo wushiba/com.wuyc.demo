@@ -35,7 +35,7 @@ public class ListUtilsTest {
 //        mapToList();
 
         // 获取集合过滤后新的集合
-        filterMapToList();
+//        filterMapToList();
 
         // 获取list去重后的某列集合
 //        distinctMapToList();
@@ -51,7 +51,7 @@ public class ListUtilsTest {
 //        flatMapList();
 
         // 获取将Collection下集合合并成一个list集合，并且取某个字段的数据
-//        flatMapColumnList();
+        flatMapColumnList();
 
         // 获取Collection下集合合并成一个map
 //        flatMapToMap();
@@ -143,6 +143,11 @@ public class ListUtilsTest {
         List<List<StudentVO>> dataList = initCollectionList();
         List<String> nameList = ListUtils.flatMapColumnToList(dataList, StudentVO::getName, Collection::stream);
         System.out.println(JSON.toJSONString(nameList, true));
+
+        List<StudentVO> middleStudentList = initMiddleStudentList();
+        List<List<String>> aliasNameCollection = ListUtils.distinctMapToList(middleStudentList, StudentVO::getAliasNameList);
+        List<String> aliasNameList = ListUtils.flatMapColumnToList(aliasNameCollection, String::valueOf, Collection::stream);
+        System.out.println(JSON.toJSONString(aliasNameList, true));
     }
 
     public static void flatMapToMap() {
@@ -216,19 +221,19 @@ public class ListUtilsTest {
 
     public static List<StudentVO> initSmallStudentList() {
         return Stream.of(
-                new StudentVO(20, 60, "张三", 1),
-                new StudentVO(60, 170, "李四", 1),
-                new StudentVO(45, 140, "王五", 1),
-                new StudentVO(40, 130, "杨迪", 2),
-                new StudentVO(55, 120, "杨迪", 2))
+                new StudentVO(20, 60, "张三", 1, Lists.newArrayList("张三01", "张三01", "张三02")),
+                new StudentVO(60, 170, "李四", 1, Lists.newArrayList("李四01", "李四01", "李四02")),
+                new StudentVO(45, 140, "王五", 1, Lists.newArrayList("王五01", "王五01", "王五2")),
+                new StudentVO(40, 130, "杨迪", 2, Lists.newArrayList("杨迪01", "杨迪01", "杨迪02")),
+                new StudentVO(55, 120, "杨迪", 2, Lists.newArrayList("杨迪03", "杨迪04", "杨迪05")))
                 .collect(Collectors.toList());
     }
 
     public static List<StudentVO> initMiddleStudentList() {
         return Stream.of(
-                new StudentVO(55, 165, "梦莹", 2),
-                new StudentVO(55, 165, "梦莹", 2),
-                new StudentVO(60, 170, "梦莹", 2))
+                new StudentVO(55, 165, "梦莹", 2, Lists.newArrayList("梦莹09", "梦莹08", "梦莹08")),
+                new StudentVO(55, 165, "梦莹", 2, Lists.newArrayList("梦莹01", "梦莹02", "梦莹03")),
+                new StudentVO(60, 170, "梦莹", 2, Lists.newArrayList("梦莹04", "梦莹05", "梦莹06")))
                 .collect(Collectors.toList());
     }
 

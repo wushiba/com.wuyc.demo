@@ -5,6 +5,7 @@ import com.wuyc.validator.annotation.CheckEnum;
 import lombok.Data;
 
 import javax.validation.constraints.NotNull;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -26,6 +27,8 @@ public class StudentVO {
     @CheckEnum(getter = "getDescription", value = SexEnum.class, message = "错误的性别")
     private Integer sex;
 
+    private List<String> aliasNameList;
+
     public StudentVO() {
     }
 
@@ -34,5 +37,13 @@ public class StudentVO {
         this.name = name;
         this.weight = weight;
         this.height = height;
+    }
+
+    public StudentVO(Integer weight, Integer height, String name, Integer sex, List<String> aliasNameList) {
+        this.sex = sex;
+        this.name = name;
+        this.weight = weight;
+        this.height = height;
+        this.aliasNameList = aliasNameList;
     }
 }
