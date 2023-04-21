@@ -29,6 +29,11 @@ public class StudentVO {
 
     private List<String> aliasNameList;
 
+
+    private Integer pageNo;
+
+    private Integer pageSize;
+
     public StudentVO() {
     }
 

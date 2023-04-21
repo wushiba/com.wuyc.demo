@@ -26,6 +26,12 @@ public class StudentDTO {
 
     private String hobby;
 
+    private Integer pageNo;
+
+    private Integer pageSize;
+
+    private Integer total;
+
     public StudentDTO() {
     }
 
@@ -35,4 +41,18 @@ public class StudentDTO {
         this.weight = weight;
         this.height = height;
     }
+
+    public void setTotal() {
+        if (this.pageSize != null && this.pageNo != null) {
+            this.total = this.pageSize * this.pageSize;
+        }
+    }
+
+    public Integer getTotal() {
+        if (this.pageSize != null && this.pageNo != null) {
+            this.total = this.pageSize * this.pageNo;
+        }
+        return this.total;
+    }
+
 }
