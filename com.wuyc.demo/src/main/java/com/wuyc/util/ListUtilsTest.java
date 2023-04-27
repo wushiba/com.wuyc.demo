@@ -5,6 +5,7 @@ import com.google.common.collect.Lists;
 import com.wuyc.vo.StudentVO;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -19,7 +20,6 @@ public class ListUtilsTest {
     public static void main(String[] args) {
 //        List<StudentVO> dataList = initSmallStudentList();
 //        System.out.println(dataList.toString());
-
 
 //        mapToInt();
 

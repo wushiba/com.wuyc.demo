@@ -1,5 +1,6 @@
 package com.wuyc.util;
 
+import java.util.Calendar;
 import java.util.Date;
 
 /**
@@ -19,22 +20,27 @@ public class DateUtilsTest {
 //        System.out.println(DateUtils.getLocalDateTime());
 //        System.out.println(DateUtils.localDateTimeFormat(DateUtils.YYYY_MM_DD));
 
-        Date nowDate = new Date();
-        Date beforeNowDate = new Date();
-        Date afterNowDate = new Date();
-        nowDate.setTime(1765303650000L);
+//        Date nowDate = new Date();
+//        Date beforeNowDate = new Date();
+//        Date afterNowDate = new Date();
+//        nowDate.setTime(1765303650000L);
 //        beforeNowDate.setTime(1665303650000L);
 //        afterNowDate.setTime(1893477900000L);
-        beforeNowDate.setTime(1765303650000L);
-        afterNowDate.setTime(1765303650000L);
-        System.out.println(nowDate.getTime());
-        System.out.println(nowDate.after(beforeNowDate));
-        System.out.println(nowDate.before(afterNowDate));
+//        beforeNowDate.setTime(1765303650000L);
+//        afterNowDate.setTime(1765303650000L);
+//        System.out.println(nowDate.getTime());
+//        System.out.println(nowDate.after(beforeNowDate));
+//        System.out.println(nowDate.before(afterNowDate));
 
-        System.out.println(String.format("%s_%s", "REDIS:KEY:ACCESS:TOKEN", "aaaa"));
-
-
-
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(new Date());
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        Date date = calendar.getTime();
+        System.out.println(date);
+        System.out.println(date.getTime());
     }
+
 
 }

@@ -2,6 +2,8 @@ package com.wuyc.util;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Calendar;
+import java.util.Date;
 
 /**
  * 日期工具类
@@ -87,5 +89,14 @@ public class DateUtils {
         return LocalDateTime.now().format(DateTimeFormatter.ofPattern(pattern));
     }
 
+
+    public static Date getDate(Date date) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        return calendar.getTime();
+    }
 
 }
