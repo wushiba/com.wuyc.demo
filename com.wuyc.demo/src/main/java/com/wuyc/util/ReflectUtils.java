@@ -14,14 +14,12 @@ import java.util.*;
 public class ReflectUtils {
 
     public static void main(String[] args) {
-
         StudentVO studentVO = new StudentVO();
         studentVO.setWeight(20);
         studentVO.setHeight(30);
         studentVO.setName("老吴");
         studentVO.setProperties(Maps.newHashMap());
         studentVO.setSex(18);
-
 
         Set<String> setList = new HashSet<>();
         setList.add("name");

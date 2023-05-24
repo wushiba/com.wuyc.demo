@@ -26,17 +26,16 @@ import java.util.ResourceBundle;
 @RestController
 public class ValidController {
 
-    @Autowired
-    public TestConfig testConfig;
-
     @Value("${config.url}")
     public String url;
 
     @RequestMapping("/test")
     public String test() throws IOException {
-        System.out.println(JSON.toJSONString(7));
+        System.out.println(JSON.toJSONString("66666666666666666666"));
+        System.out.println(JSON.toJSONString("666666666666666666667777"));
+        System.out.println(JSON.toJSONString("aaaaaaaaaaaaa"));
+        System.out.println(JSON.toJSONString("aaaaaaaaaaaaa22222222222222222222222"));
         System.out.println(JSON.toJSONString(url));
-
 //        Resource resource = new ClassPathResource("test.yml");
 //        File file = resource.getFile();
 //        byte[] buffer =new byte[(int) file.length()];

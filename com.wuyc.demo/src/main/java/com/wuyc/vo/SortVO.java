@@ -26,11 +26,14 @@ public class SortVO {
     public static List<SortVO> initSortList() {
         return Stream.of(
                 new SortVO(1111111L, 1),
-                new SortVO(2222222L, 2),
+//                new SortVO(2222222L, 2),
                 new SortVO(3333333L, 3),
                 new SortVO(4444444L, 4),
                 new SortVO(5555555L, 5)
         ).collect(Collectors.toList());
+//        return Stream.of(
+//                new SortVO(33333336666L, 2)
+//        ).collect(Collectors.toList());
     }
 
 }

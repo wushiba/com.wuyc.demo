@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -21,7 +22,7 @@ public class ListSort {
     private static final Integer GROUP_DETAIL_TOP_MAX_SIZE = 5;
 
     public static void main(String[] args) throws Exception {
-        List<SortVO> sortList = sortList(33333336666L, 4, SortVO.initSortList());
+        List<SortVO> sortList = sortList(5555555L, 4, SortVO.initSortList());
         System.out.println(JSON.toJSONString(sortList, true));
     }
 
@@ -46,13 +47,17 @@ public class ListSort {
     }
 
     private static List<SortVO> fillDataSortList(Long valueId, Integer sortNum, List<SortVO> sortList) {
-        // 如果当前下标不存在，直接顶替
+
         Map<Integer, Long> sortMap = ListUtils.toMap(sortList, SortVO::getSortNum, SortVO::getValueId);
         List<SortVO> initList = new ArrayList<>();
         for (int i = 1; i <= GROUP_DETAIL_TOP_MAX_SIZE; i++) {
             initList.add(new SortVO(sortMap.getOrDefault(i, null), i));
         }
         if (!sortMap.containsKey(sortNum)) {
+            // 如果当前下标不存在直接顶替，且valueId存在存在的话就删掉原来的数据
+            if (sortMap.containsValue(valueId)) {
+                removeExistMapData(valueId, initList);
+            }
             initList.set(sortNum - 1, new SortVO(valueId, sortNum));
             return ListUtils.filterList(initList, data -> Objects.nonNull(data.getValueId()));
         }
@@ -62,18 +67,35 @@ public class ListSort {
             return sortList;
         }
 
-        // 当前下标存在且valueId存在其它下标中,删除旧数据、将下标的值换成新值
+        // 当前下标存在且valueId存在其它下标中,将两个排序号对应的值颠倒
         if (sortMap.containsKey(sortNum) && sortMap.containsValue(valueId)) {
-            sortList.forEach(data -> {
+            int oldSortNum = 1;
+            long oldValue = sortMap.get(sortNum);
+            for (Integer key : sortMap.keySet()) {
+                if (valueId.equals(sortMap.get(key))) {
+                    oldSortNum = key;
+                }
+            }
+            for (SortVO data : sortList) {
                 if (data.getSortNum().intValue() == sortNum) {
                     data.setValueId(valueId);
+                } else if (data.getSortNum() == oldSortNum) {
+                    data.setValueId(oldValue);
                 }
-            });
+            }
             return sortList;
         }
 
         // 当前下标存在value不存在其它下标中
         return sortExistNodeDataList(valueId, sortNum, initList);
+    }
+
+    private static void removeExistMapData(Long valueId, List<SortVO> initList) {
+        for (SortVO sortVO : initList) {
+            if (valueId.equals(sortVO.getValueId())) {
+                sortVO.setValueId(null);
+            }
+        }
     }
 
     /**

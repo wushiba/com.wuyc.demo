@@ -6,3 +6,7 @@ spring:
         active: dev
     config:
         location: classpath:/test.yml
+
+config:
+    url: www.baidu.com
+    param: json
