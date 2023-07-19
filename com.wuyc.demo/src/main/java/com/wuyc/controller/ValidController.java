@@ -16,7 +16,6 @@ import java.io.IOException;
 @RestController
 public class ValidController {
 
-
     @RequestMapping("/test")
     public String test() throws IOException {
         System.out.println(JSON.toJSONString("66666666666666666666"));
