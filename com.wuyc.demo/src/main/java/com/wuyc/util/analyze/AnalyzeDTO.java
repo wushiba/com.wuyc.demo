@@ -18,7 +18,6 @@ public class AnalyzeDTO {
     private Boolean if_flag;
 
     public AnalyzeDTO() {
-
     }
 
     public AnalyzeDTO(String user_name, String real_name, Integer user_type, Boolean if_flag) {
