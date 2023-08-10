@@ -406,6 +406,20 @@ public class ListUtils {
     }
 
     /**
+     * 对集合排序
+     *
+     * @param dataList   入参集合
+     * @param comparator 排序参数
+     * @return 排序好的集合
+     */
+    public static <T> List<T> sortedList(List<T> dataList, Comparator<? super T> comparator) {
+        if (org.springframework.util.CollectionUtils.isEmpty(dataList)) {
+            return Lists.newArrayList();
+        }
+        return dataList.stream().sorted(comparator).collect(Collectors.toList());
+    }
+
+    /**
      * 将字符串根据特定字符分割后，转换成特定类型集合
      *
      * @param dataStr     字符串入参
