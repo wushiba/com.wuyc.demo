@@ -5,6 +5,7 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.wuyc.vo.StudentVO;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.*;
 import java.util.stream.Collectors;
@@ -19,6 +20,7 @@ public class CompletableFutureTest {
 
     private final static Integer PAGE_SIZE = 3;
     private static volatile ExecutorService EXECUTOR = null;
+    public static Integer COUNT = 0;
 
     private CompletableFutureTest() {
     }
@@ -46,18 +48,27 @@ public class CompletableFutureTest {
         List<StudentVO> studentList = initSmallStudentList();
         int total = studentList.size();
         int totalPage = total % PAGE_SIZE == 0 ? total / PAGE_SIZE : total / PAGE_SIZE + 1;
+        List<CompletableFuture<Void>> futureList = new ArrayList<>();
         for (int i = 0; i < totalPage; i++) {
             final int startIndex = i * PAGE_SIZE;
             final int endIndex = Math.min(startIndex + PAGE_SIZE, total);
-            CompletableFuture.runAsync(() -> handleInfo(startIndex, endIndex, studentList)).get();
 
-            CompletableFuture.supplyAsync(CompletableFutureTest::initSmallStudentList);
+//            CompletableFuture.runAsync(() -> handleInfo(startIndex, endIndex, studentList)).get();
+//            CompletableFuture<List<StudentVO>> completableFuture = CompletableFuture.supplyAsync(CompletableFutureTest::initSmallStudentList);
+            CompletableFuture<Void> completableFuture = CompletableFuture.runAsync(() -> handleInfo(startIndex, endIndex, studentList));
+            futureList.add(completableFuture);
         }
+
+        for (CompletableFuture<Void> feature : futureList) {
+            feature.get();
+        }
+        System.out.println(COUNT);
     }
 
     private static void handleInfo(int startIndex, int endIndex, List<StudentVO> studentList) {
         studentList.subList(startIndex, endIndex).forEach(data -> {
             System.out.println(data.getName());
+            COUNT++;
         });
     }
 
