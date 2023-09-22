@@ -18,7 +18,6 @@ public class TransController {
     @RequestMapping("/trans")
     public String test(@RequestBody TestDriveReq testDriveReq) throws IOException {
         System.out.println(JSON.toJSONString("66666666666666666666"));
-        System.out.println(JSON.toJSONString("66666666666666666666"));
         return "SUCCESS";
     }
 
